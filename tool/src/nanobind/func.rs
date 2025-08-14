@@ -35,6 +35,8 @@ pub(super) struct MethodInfo<'a> {
     pub(super) overloads: Vec<ParamInfo<'a>>,
 }
 
+/// Helper for rendering function block information.
+/// Used either for creating blocks of functions that belong to structs, or for free functions that belong to no structs.
 pub(super) struct FuncGenContext {
     pub(super) namespace: Option<String>,
     namespaces: Vec<String>,
