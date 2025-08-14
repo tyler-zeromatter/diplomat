@@ -97,7 +97,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
             .entry(vec.join("::"))
             .or_default()
             .push(format!(
-                "void {}(nb::handle);",
+                "void {}(nb::module_);",
                 binding_fn_name_unnamespaced
             ));
 
