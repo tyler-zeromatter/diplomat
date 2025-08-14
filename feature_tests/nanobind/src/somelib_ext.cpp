@@ -54,8 +54,10 @@ void add_ErrorEnum_binding(nb::handle);
 void add_ContiguousEnum_binding(nb::handle);
 void add_DefaultEnum_binding(nb::handle);
 void add_MyEnum_binding(nb::handle);
+void add_diplomat_func_bindings(nb::handle);
 namespace nested::ns {
 void add_Nested_binding(nb::handle);
+void add_nested_ns_func_bindings(nb::handle);
 }
 
 namespace nested::ns2 {
@@ -77,6 +79,7 @@ void add_RenamedOpaqueIterator_binding(nb::handle);
 void add_RenamedTestOpaque_binding(nb::handle);
 void add_RenamedVectorTest_binding(nb::handle);
 void add_RenamedAttrEnum_binding(nb::handle);
+void add_ns_func_bindings(nb::handle);
 }
 
 
@@ -189,8 +192,10 @@ NB_MODULE(somelib, somelib_mod)
     add_ContiguousEnum_binding(somelib_mod);
     add_DefaultEnum_binding(somelib_mod);
     add_MyEnum_binding(somelib_mod);
+    add_diplomat_func_bindings(somelib_mod);
     
     nested::ns::add_Nested_binding(somelib_nested_ns_mod);
+    nested::ns::add_nested_ns_func_bindings(somelib_nested_ns_mod);
     
     nested::ns2::add_Nested_binding(somelib_nested_ns2_mod);
     
@@ -208,6 +213,7 @@ NB_MODULE(somelib, somelib_mod)
     ns::add_RenamedTestOpaque_binding(somelib_ns_mod);
     ns::add_RenamedVectorTest_binding(somelib_ns_mod);
     ns::add_RenamedAttrEnum_binding(somelib_ns_mod);
+    ns::add_ns_func_bindings(somelib_ns_mod);
     
 	
 }

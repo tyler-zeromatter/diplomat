@@ -183,7 +183,7 @@ pub(crate) fn run<'cx>(
             let context = if let Some(v) = func_map.get_mut(&key) {
                 v
             } else {
-                func_map.insert(key.clone(), FuncGenContext::new());
+                func_map.insert(key.clone(), FuncGenContext::new(func.attrs.namespace.clone(), formatter.fmt_namespaces(id.into()).map(|n| n.to_string()).collect()));
                 func_map.get_mut(&key).unwrap()
             };
 
@@ -208,12 +208,11 @@ pub(crate) fn run<'cx>(
             };
 
             context.generate_function(id, func, &mut ty_context);
-            ty_context.gen_modules(id.into(), None);
         }
     }
         
     for (_, ctx) in func_map.iter_mut() {
-        
+        ctx.render(&mut root_module).unwrap();
     }
 
     // Traverse the module_fns keys list and expand into the list of submodules needing generation.

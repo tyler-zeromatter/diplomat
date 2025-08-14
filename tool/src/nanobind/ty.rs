@@ -4,7 +4,6 @@ use crate::nanobind::func::{FuncGenContext, MethodInfo};
 use crate::{c::TyGenContext as C2TyGenContext, hir, ErrorStore};
 use askama::Template;
 use diplomat_core::hir::{OpaqueOwner, StructPathLike, SymbolId, TyPosition, Type, TypeId};
-use itertools::Itertools;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -86,29 +85,33 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
         self.add_to_root_module(id);
     }
 
-    pub fn add_to_root_module(&mut self, id: TypeId) {
+    pub fn add_to_root_module(&mut self, id : TypeId) {
         self.gen_modules(id.into(), None);
-        self.root_module
+        Self::gen_binding_fn(self.root_module, self.formatter.fmt_namespaces(id.into()), self.formatter.fmt_binding_fn(id, true), self.formatter.fmt_binding_fn(id, false));
+    }
+
+    pub fn gen_binding_fn(root_module : &mut RootModule, namespaces : impl Iterator<Item = &'tcx str>, binding_fn_name : String, binding_fn_name_unnamespaced : String) {
+        let vec = namespaces.collect::<Vec<_>>();
+        root_module
             .fwd_decls
-            .entry(self.formatter.fmt_namespaces(id.into()).join("::"))
+            .entry(vec.join("::"))
             .or_default()
             .push(format!(
                 "void {}(nb::handle);",
-                self.formatter.fmt_binding_fn(id, false)
+                binding_fn_name_unnamespaced
             ));
 
-        let module_namespaces = [self.root_module.module_name.to_string()]
+        let module_namespaces = [root_module.module_name.to_string()]
             .into_iter()
-            .chain(self.formatter.fmt_namespaces(id.into()).map(|s| s.to_owned()))
+            .chain(vec.iter().map(|s| s.to_string()))
             .collect();
 
-        let entry = self
-            .root_module
+        let entry = root_module
             .module_fns
             .entry(module_namespaces)
             .or_default();
 
-        entry.push(self.formatter.fmt_binding_fn(id, true));
+        entry.push(binding_fn_name);
     }
 
     pub fn gen_opaque_def<W: std::fmt::Write + ?Sized>(

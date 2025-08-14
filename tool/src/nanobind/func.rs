@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{self, FunctionId, SymbolId};
 
-use crate::nanobind::{ty::NamedType, TyGenContext};
+use crate::nanobind::{ty::NamedType, RootModule, TyGenContext};
 
 use diplomat_core::hir::Type;
 
@@ -36,17 +36,22 @@ pub(super) struct MethodInfo<'a> {
 }
 
 pub(super) struct FuncGenContext {
+    namespace : Option<String>,
+    namespaces : Vec<String>,
     functions : Vec<String>
 }
 
 impl<'tcx> FuncGenContext {
-    pub(super) fn new() -> Self {
+    pub(super) fn new(namespace : Option<String>, namespaces : Vec<String>) -> Self {
         Self {
+            namespace,
+            namespaces,
             functions: Vec::new()
         }
     }
 
     pub fn generate_function<'b>(&mut self, id : FunctionId, func : &'tcx hir::Method, context : &mut TyGenContext<'b, 'tcx>) {
+        context.gen_modules(id.into(), None);
         let info = Self::gen_method_info(id.into(), func, context);
 
         #[derive(Template)]
@@ -61,6 +66,23 @@ impl<'tcx> FuncGenContext {
             };
             self.functions.push(def.to_string());
         }
+    }
+
+    pub fn render(&mut self, root_module : &mut RootModule) -> Result<(), askama::Error> {
+        let binding_fn_name_unnamespaced = if self.namespace.is_some() {
+            format!("add_{}_func_bindings", self.namespaces.join("_"))
+        } else {
+            "add_diplomat_func_bindings".into()
+        };
+
+        let binding_fn_name = if let Some(ns) = &self.namespace {
+            format!("{ns}::{binding_fn_name_unnamespaced}")
+        } else {
+            binding_fn_name_unnamespaced.clone()
+        };
+
+        TyGenContext::gen_binding_fn(root_module, self.namespaces.iter().map(|s| s.as_str()), binding_fn_name, binding_fn_name_unnamespaced);
+        Ok(())
     }
 
     pub(super) fn gen_method_info<'a, 'b>(
