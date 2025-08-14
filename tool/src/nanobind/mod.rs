@@ -1,7 +1,7 @@
 mod formatter;
+mod func;
 mod root_module;
 mod ty;
-mod func;
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -183,7 +183,16 @@ pub(crate) fn run<'cx>(
             let context = if let Some(v) = func_map.get_mut(&key) {
                 v
             } else {
-                func_map.insert(key.clone(), FuncGenContext::new(func.attrs.namespace.clone(), formatter.fmt_namespaces(id.into()).map(|n| n.to_string()).collect()));
+                func_map.insert(
+                    key.clone(),
+                    FuncGenContext::new(
+                        func.attrs.namespace.clone(),
+                        formatter
+                            .fmt_namespaces(id.into())
+                            .map(|n| n.to_string())
+                            .collect(),
+                    ),
+                );
                 func_map.get_mut(&key).unwrap()
             };
 
@@ -199,12 +208,12 @@ pub(crate) fn run<'cx>(
                     errors: &errors,
                     id: id.into(),
                     decl_header_path: "".into(),
-                    impl_header_path: "".into()
+                    impl_header_path: "".into(),
                 },
                 root_module: &mut root_module,
                 submodules: &mut submodules,
                 includes: &mut includes,
-                generating_struct_fields: false
+                generating_struct_fields: false,
             };
 
             context.generate_function(id, func, &mut ty_context);
@@ -212,10 +221,14 @@ pub(crate) fn run<'cx>(
             drop(_guard);
         }
     }
-        
+
     for (_, ctx) in func_map.iter_mut() {
         let binding_impl_path = if let Some(ns) = &ctx.namespace {
-            format!("sub_modules/{}/{}_func_bindings.cpp", ns.replace("::", "/"), ns.replace("::", "_"))
+            format!(
+                "sub_modules/{}/{}_func_bindings.cpp",
+                ns.replace("::", "/"),
+                ns.replace("::", "_")
+            )
         } else {
             "sub_modules/diplomat_func_bindings.cpp".into()
         };

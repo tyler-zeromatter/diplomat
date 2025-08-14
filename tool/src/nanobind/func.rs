@@ -36,44 +36,48 @@ pub(super) struct MethodInfo<'a> {
 }
 
 pub(super) struct FuncGenContext {
-    pub(super) namespace : Option<String>,
-    namespaces : Vec<String>,
-    pub(super) functions : Vec<String>,
-    pub(super) includes : BTreeSet<String>,
+    pub(super) namespace: Option<String>,
+    namespaces: Vec<String>,
+    pub(super) functions: Vec<String>,
+    pub(super) includes: BTreeSet<String>,
 }
 
 impl<'tcx> FuncGenContext {
-    pub(super) fn new(namespace : Option<String>, namespaces : Vec<String>) -> Self {
+    pub(super) fn new(namespace: Option<String>, namespaces: Vec<String>) -> Self {
         Self {
             namespace,
             namespaces,
             functions: Vec::new(),
-            includes: BTreeSet::new()
+            includes: BTreeSet::new(),
         }
     }
 
-    pub fn generate_function<'b>(&mut self, id : FunctionId, func : &'tcx hir::Method, context : &mut TyGenContext<'b, 'tcx>) {
+    pub fn generate_function<'b>(
+        &mut self,
+        id: FunctionId,
+        func: &'tcx hir::Method,
+        context: &mut TyGenContext<'b, 'tcx>,
+    ) {
         context.gen_modules(id.into(), None);
         let info = Self::gen_method_info(id.into(), func, context);
 
         #[derive(Template)]
         #[template(path = "nanobind/function_impl.cpp.jinja", escape = "none")]
         struct FunctionDef<'a> {
-            m : MethodInfo<'a>
+            m: MethodInfo<'a>,
         }
-        
-        self.includes.insert(context.formatter.cxx.fmt_impl_header_path(id.into()));
+
+        self.includes
+            .insert(context.formatter.cxx.fmt_impl_header_path(id.into()));
 
         if let Some(m) = info {
-            let def = FunctionDef {
-                m
-            };
+            let def = FunctionDef { m };
             self.functions.push(def.to_string());
             self.includes.append(&mut context.includes);
         }
     }
 
-    pub fn render(&mut self, root_module : &mut RootModule) -> Result<String, askama::Error> {
+    pub fn render(&mut self, root_module: &mut RootModule) -> Result<String, askama::Error> {
         #[derive(Template)]
         #[template(path = "nanobind/binding.cpp.jinja", escape = "none")]
         struct Binding {
@@ -90,7 +94,8 @@ impl<'tcx> FuncGenContext {
             "diplomat_func".into()
         };
 
-        let binding_fn_name_unnamespaced = format!("add_{}_binding", no_add_binding_fn_name_unnamespaced);
+        let binding_fn_name_unnamespaced =
+            format!("add_{}_binding", no_add_binding_fn_name_unnamespaced);
 
         let binding_fn_name = if let Some(ns) = &self.namespace {
             format!("{ns}::{binding_fn_name_unnamespaced}")
@@ -98,7 +103,12 @@ impl<'tcx> FuncGenContext {
             binding_fn_name_unnamespaced.clone()
         };
 
-        TyGenContext::gen_binding_fn(root_module, self.namespaces.iter().map(|s| s.as_str()), binding_fn_name, binding_fn_name_unnamespaced);
+        TyGenContext::gen_binding_fn(
+            root_module,
+            self.namespaces.iter().map(|s| s.as_str()),
+            binding_fn_name,
+            binding_fn_name_unnamespaced,
+        );
         let b = Binding {
             includes: self.includes.clone(),
             namespace: self.namespace.clone().unwrap_or_default(),
@@ -112,7 +122,7 @@ impl<'tcx> FuncGenContext {
     pub(super) fn gen_method_info<'a, 'b>(
         id: SymbolId,
         method: &'a hir::Method,
-        context : &mut TyGenContext<'b, 'a>
+        context: &mut TyGenContext<'b, 'a>,
     ) -> Option<MethodInfo<'b>> {
         if method.attrs.disable {
             return None;
@@ -149,7 +159,8 @@ impl<'tcx> FuncGenContext {
             && !matches!(
                 method.attrs.special_method,
                 Some(hir::SpecialMethod::Constructor) // Constructors weirdly don't use def_static
-            ) && !matches!(id, hir::SymbolId::FunctionId(..))
+            )
+            && !matches!(id, hir::SymbolId::FunctionId(..))
         {
             def_qualifiers.extend(["static"]);
         }

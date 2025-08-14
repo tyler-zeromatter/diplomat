@@ -48,9 +48,16 @@ impl<'tcx> PyFormatter<'tcx> {
     /// Returns an iterator to the namespaces. Will always have at least one entry
     pub fn fmt_namespaces(&self, id: SymbolId) -> impl Iterator<Item = &'tcx str> {
         let namespace = match id {
-            SymbolId::FunctionId(f) => self.cxx.c.tcx().resolve_function(f).attrs.namespace.as_ref(),
+            SymbolId::FunctionId(f) => self
+                .cxx
+                .c
+                .tcx()
+                .resolve_function(f)
+                .attrs
+                .namespace
+                .as_ref(),
             SymbolId::TypeId(ty) => self.cxx.c.tcx().resolve_type(ty).attrs().namespace.as_ref(),
-            _ => panic!("Unsupported SymbolId {id:?}")
+            _ => panic!("Unsupported SymbolId {id:?}"),
         };
         namespace
             .as_ref()
