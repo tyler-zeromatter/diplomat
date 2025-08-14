@@ -1,10 +1,11 @@
 mod formatter;
 mod root_module;
 mod ty;
+mod func;
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::{Config, ErrorStore, FileMap};
+use crate::{nanobind::func::FuncGenContext, Config, ErrorStore, FileMap};
 use askama::Template;
 use diplomat_core::hir::{self, BackendAttrSupport, DocsUrlGenerator};
 use formatter::PyFormatter;
@@ -51,6 +52,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     a.generate_mocking_interface = false;
     a.abi_compatibles = true;
     a.struct_refs = true;
+    a.free_functions = true;
 
     a
 }
@@ -160,12 +162,58 @@ pub(crate) fn run<'cx>(
 
         let binding_impl = Binding {
             includes,
-            namespace: formatter.fmt_namespaces(id).join("::"),
+            namespace: formatter.fmt_namespaces(id.into()).join("::"),
             unqualified_type: formatter.cxx.fmt_type_name_unnamespaced(id).to_string(),
             body,
             binding_prefix,
         };
         files.add_file(binding_impl_path, binding_impl.to_string());
+    }
+
+    let mut func_map = BTreeMap::new();
+    {
+
+        for (id, func) in tcx.all_free_functions() {
+            let key = if let Some(ns) = &func.attrs.namespace {
+                ns.clone()
+            } else {
+                "".into()
+            };
+
+            let context = if let Some(v) = func_map.get_mut(&key) {
+                v
+            } else {
+                func_map.insert(key.clone(), FuncGenContext::new());
+                func_map.get_mut(&key).unwrap()
+            };
+
+            let mut includes = BTreeSet::default();
+
+            let mut ty_context = TyGenContext {
+                formatter: &formatter,
+                errors: &errors,
+                c2: crate::c::TyGenContext {
+                    tcx: &tcx,
+                    formatter: &formatter.cxx.c,
+                    is_for_cpp: false,
+                    errors: &errors,
+                    id: id.into(),
+                    decl_header_path: "".into(),
+                    impl_header_path: "".into()
+                },
+                root_module: &mut root_module,
+                submodules: &mut submodules,
+                includes: &mut includes,
+                generating_struct_fields: false
+            };
+
+            context.generate_function(id, func, &mut ty_context);
+            ty_context.gen_modules(id.into(), None);
+        }
+    }
+        
+    for (_, ctx) in func_map.iter_mut() {
+        
     }
 
     // Traverse the module_fns keys list and expand into the list of submodules needing generation.

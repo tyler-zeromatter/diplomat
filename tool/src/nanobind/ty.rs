@@ -1,8 +1,9 @@
 use super::root_module::RootModule;
 use super::PyFormatter;
+use crate::nanobind::func::{FuncGenContext, MethodInfo};
 use crate::{c::TyGenContext as C2TyGenContext, hir, ErrorStore};
 use askama::Template;
-use diplomat_core::hir::{OpaqueOwner, StructPathLike, TyPosition, Type, TypeId};
+use diplomat_core::hir::{OpaqueOwner, StructPathLike, SymbolId, TyPosition, Type, TypeId};
 use itertools::Itertools;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
@@ -10,37 +11,9 @@ use std::collections::BTreeSet;
 
 /// A type name with a corresponding variable name, such as a struct field or a function parameter.
 #[derive(Clone)]
-struct NamedType<'a> {
-    var_name: Cow<'a, str>,
-    type_name: Cow<'a, str>,
-}
-
-#[derive(Clone)]
-struct ParamInfo<'a> {
-    params: Vec<NamedType<'a>>,
-}
-
-/// Everything needed for rendering a method.
-struct MethodInfo<'a> {
-    /// HIR of the method being rendered
-    method: &'a hir::Method,
-    /// The python method name
-    method_name: Cow<'a, str>,
-    /// The C++ method name. May differ due to keyword renaming or other constraints.
-    cpp_method_name: Cow<'a, str>,
-    // def statement to use - def, def_static, def_prop_ro, etc
-    def: String,
-    /// The property name, if any
-    prop_name: Option<Cow<'a, str>>,
-    // If this is a property, this is the associated setter's c++ method name
-    setter_name: Option<Cow<'a, str>>,
-    /// The C++ names & types of the function params.
-    /// Always required in case of overloading, and a few special methods.
-    param_decls: ParamInfo<'a>,
-    // The lifetime annotation required for the method, if any. May be keep_alive<...> or reference_internal
-    // Everything else is handled by the automatic behavior depending on return type.
-    lifetime_args: Option<Cow<'a, str>>,
-    overloads: Vec<ParamInfo<'a>>,
+pub(super) struct NamedType<'a> {
+    pub(super) var_name: Cow<'a, str>,
+    pub(super) type_name: Cow<'a, str>,
 }
 
 /// Context for generating a particular type's impl
@@ -59,7 +32,7 @@ pub(super) struct TyGenContext<'cx, 'tcx> {
 
 impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
     /// Checks for & adds modules with their parents to the root module definition.
-    pub fn gen_modules(&mut self, id: TypeId, _docstring: Option<&str>) {
+    pub fn gen_modules(&mut self, id: SymbolId, _docstring: Option<&str>) {
         let namespaces = self.formatter.fmt_namespaces(id);
 
         let mut parent = self.root_module.module_name.clone();
@@ -114,10 +87,10 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
     }
 
     pub fn add_to_root_module(&mut self, id: TypeId) {
-        self.gen_modules(id, None);
+        self.gen_modules(id.into(), None);
         self.root_module
             .fwd_decls
-            .entry(self.formatter.fmt_namespaces(id).join("::"))
+            .entry(self.formatter.fmt_namespaces(id.into()).join("::"))
             .or_default()
             .push(format!(
                 "void {}(nb::handle);",
@@ -126,7 +99,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
 
         let module_namespaces = [self.root_module.module_name.to_string()]
             .into_iter()
-            .chain(self.formatter.fmt_namespaces(id).map(|s| s.to_owned()))
+            .chain(self.formatter.fmt_namespaces(id.into()).map(|s| s.to_owned()))
             .collect();
 
         let entry = self
@@ -187,7 +160,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
 
         let methods = self.gen_all_method_infos(id, def.methods.iter());
 
-        self.gen_modules(id, None);
+        self.gen_modules(id.into(), None);
         #[derive(Template)]
         #[template(path = "nanobind/struct_impl.cpp.jinja", escape = "none")]
         struct ImplTemplate<'a> {
@@ -231,7 +204,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
         let mut method_infos = BTreeMap::<String, MethodInfo>::new();
 
         for method in methods {
-            if let Some(info) = self.gen_method_info(id, method) {
+            if let Some(info) = FuncGenContext::gen_method_info(id.into(), method, self) {
                 method_infos
                     // Use the property name as the key if present so we can collapse getters & setters
                     .entry(info.prop_name.clone().unwrap_or(info.method_name.clone()).to_string())
@@ -288,159 +261,6 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
         method_infos.into_values().collect()
     }
 
-    fn gen_method_info(
-        &mut self,
-        id: TypeId,
-        method: &'tcx hir::Method,
-    ) -> Option<MethodInfo<'ccx>> {
-        if method.attrs.disable {
-            return None;
-        }
-        let _guard = self.errors.set_context_method(
-            self.c2.tcx.fmt_type_name_diagnostics(id),
-            method.name.as_str().into(),
-        );
-        let cpp_method_name = self.formatter.cxx.fmt_method_name(method);
-        let method_name = self.formatter.fmt_method_name(method);
-        let mut setter_name = None;
-
-        let mut def_qualifiers = vec!["def"];
-
-        let mut prop_name = None;
-        if let Some(hir::SpecialMethod::Getter(name)) = &method.attrs.special_method {
-            def_qualifiers.extend(["prop_ro"]);
-            prop_name = Some(
-                name.as_ref()
-                    .map(|v| v.into())
-                    .unwrap_or(method_name.clone()),
-            );
-        } else if let Some(hir::SpecialMethod::Setter(name)) = &method.attrs.special_method {
-            def_qualifiers.extend(["prop_rw"]);
-            setter_name = Some(method_name.clone());
-            prop_name = Some(
-                name.as_ref()
-                    .map(|v| v.into())
-                    .unwrap_or(method_name.clone()),
-            );
-        }
-
-        if method.param_self.is_none()
-            && !matches!(
-                method.attrs.special_method,
-                Some(hir::SpecialMethod::Constructor) // Constructors weirdly don't use def_static
-            )
-        {
-            def_qualifiers.extend(["static"]);
-        }
-
-        let param_decls = ParamInfo {
-            params: method
-                .params
-                .iter()
-                .map(|p| NamedType {
-                    var_name: self.formatter.cxx.fmt_param_name(p.name.as_str()),
-                    type_name: self.gen_type_name(&p.ty),
-                })
-                .collect(),
-        };
-
-        let mut visitor = method.borrowing_param_visitor(self.c2.tcx, false);
-
-        // Collect all the relevant borrowed params, with self in position 1 if present
-        let mut param_borrows = Vec::new();
-
-        let self_borrow = method
-            .param_self
-            .as_ref()
-            .map(|s| visitor.visit_param(&s.ty.clone().into(), "self"));
-
-        if let Some(b) = self_borrow.as_ref() {
-            param_borrows.push(b.clone());
-        };
-
-        // Must be a separate call *after* collect to avoid double-borrowing visitor
-        param_borrows.extend(
-            method
-                .params
-                .iter()
-                .map(|p| visitor.visit_param(&p.ty, p.name.as_str())),
-        );
-
-        let self_number = if matches!(
-            method.attrs.special_method,
-            Some(hir::SpecialMethod::Constructor)
-        ) {
-            1 // per the docs, constructors don't have "returns", they act on "self"
-        } else {
-            0
-        };
-
-        let mut lifetime_args = vec![];
-
-        // Only returned values that are either created on return or return addresses previously unknown
-        // to nanobind require additional annotation with keep_alive per: https://nanobind.readthedocs.io/en/latest/api_core.html#_CPPv4N8nanobind9rv_policyE
-        // For any return of a reference to an existing object, nanobind is smart enough to locate its python wrapper object & correctly increment its refcount
-        // No keep_alive for even borrowed string outputs, the type conversion always involves a copy
-        if matches!(
-            method.attrs.special_method,
-            Some(hir::SpecialMethod::Iterator)
-        ) || matches!(
-            method.output.success_type(),
-            hir::SuccessType::OutType(hir::OutType::Struct(..))
-        ) || matches!(method.output.success_type(), hir::SuccessType::OutType(hir::OutType::Opaque(pth)) if pth.is_owned())
-        {
-            lifetime_args.extend(
-                param_borrows
-                    .into_iter()
-                    .enumerate()
-                    .filter_map(|(i, p)| match p {
-                        hir::borrowing_param::ParamBorrowInfo::BorrowedSlice
-                        | hir::borrowing_param::ParamBorrowInfo::Struct(_)
-                        | hir::borrowing_param::ParamBorrowInfo::BorrowedOpaque => {
-                            Some(format!(
-                                "nb::keep_alive<{self_number}, {}>()",
-                                i + 1 + self_number
-                            )) // Keep 0 (the return) alive until the element at P is returned
-                        }
-                        _ => None,
-                    })
-                    .collect::<Vec<_>>(),
-            );
-        }
-
-        // Keep this just in case our method is returning some initially unknown value to an Opaque.
-        // This won't make a difference for methods that return a reference to an already created value.
-        if matches!(method.output.success_type(), hir::SuccessType::OutType(hir::Type::Opaque(path)) if !path.is_owned())
-        {
-            // For any type -> `Type<'a>`, as long as our self reference `&'a self` has the same lifetime (`'a`), we can assume that `&'a`` self has some kind of ownership of the returned type.
-            //  Because `rv_policy` is only applied to unknown types (i.e., newly created references), then we can apply `reference_internal` to any of the cases above, without worrying about unnecessarily increasing the reference count for when we return `self` (since `self` is an already known type to Nanobind).
-            let str = match self_borrow.as_ref() {
-                // For non-borrowed &self however, we can just return a standard reference that has no attachment to &self:
-                Some(hir::borrowing_param::ParamBorrowInfo::NotBorrowed) | None => {
-                    "nb::rv_policy::reference"
-                }
-                _ => "nb::rv_policy::reference_internal",
-            };
-            lifetime_args.push(str.to_owned());
-        }
-
-        Some(MethodInfo {
-            method,
-            method_name,
-            cpp_method_name,
-            def: def_qualifiers.join("_"),
-            setter_name,
-            prop_name,
-            param_decls,
-            lifetime_args: if lifetime_args.is_empty() {
-                None
-            } else {
-                Some(lifetime_args.join(", ").into())
-            },
-            overloads: vec![],
-        })
-    }
-
     /// Generates C++ code for referencing a particular type with a given name.
     fn gen_ty_decl<'a, P: TyPosition>(&mut self, ty: &Type<P>, var_name: &'a str) -> NamedType<'a>
     where
@@ -482,7 +302,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
     /// Generates Python code for referencing a particular type.
     ///
     /// This function adds the necessary type imports to the decl and impl files.
-    fn gen_type_name<P: TyPosition>(&mut self, ty: &Type<P>) -> Cow<'ccx, str> {
+    pub(super) fn gen_type_name<P: TyPosition>(&mut self, ty: &Type<P>) -> Cow<'ccx, str> {
         match *ty {
             Type::Primitive(prim) => self.formatter.cxx.fmt_primitive_as_c(prim),
             Type::Opaque(ref op) => {

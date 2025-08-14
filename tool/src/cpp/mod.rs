@@ -5,9 +5,11 @@ mod ty;
 
 use std::collections::BTreeMap;
 
-use crate::{cpp::func::FuncGenContext, ErrorStore, FileMap};
+use crate::{ErrorStore, FileMap};
 use diplomat_core::hir::{self, BackendAttrSupport, DocsUrlGenerator};
 use ty::TyGenContext;
+
+pub(crate) use func::FuncGenContext;
 
 pub(crate) use formatter::Cpp2Formatter;
 
