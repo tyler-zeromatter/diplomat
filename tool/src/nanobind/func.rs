@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
 use diplomat_core::hir::{self, FunctionId, SymbolId};
@@ -36,9 +36,10 @@ pub(super) struct MethodInfo<'a> {
 }
 
 pub(super) struct FuncGenContext {
-    namespace : Option<String>,
+    pub(super) namespace : Option<String>,
     namespaces : Vec<String>,
-    functions : Vec<String>
+    pub(super) functions : Vec<String>,
+    pub(super) includes : BTreeSet<String>,
 }
 
 impl<'tcx> FuncGenContext {
@@ -46,7 +47,8 @@ impl<'tcx> FuncGenContext {
         Self {
             namespace,
             namespaces,
-            functions: Vec::new()
+            functions: Vec::new(),
+            includes: BTreeSet::new()
         }
     }
 
@@ -59,21 +61,36 @@ impl<'tcx> FuncGenContext {
         struct FunctionDef<'a> {
             m : MethodInfo<'a>
         }
+        
+        self.includes.insert(context.formatter.cxx.fmt_impl_header_path(id.into()));
 
         if let Some(m) = info {
             let def = FunctionDef {
                 m
             };
             self.functions.push(def.to_string());
+            self.includes.append(&mut context.includes);
         }
     }
 
-    pub fn render(&mut self, root_module : &mut RootModule) -> Result<(), askama::Error> {
-        let binding_fn_name_unnamespaced = if self.namespace.is_some() {
-            format!("add_{}_func_bindings", self.namespaces.join("_"))
+    pub fn render(&mut self, root_module : &mut RootModule) -> Result<String, askama::Error> {
+        #[derive(Template)]
+        #[template(path = "nanobind/binding.cpp.jinja", escape = "none")]
+        struct Binding {
+            includes: BTreeSet<String>,
+            namespace: String,
+            unqualified_type: String,
+            body: String,
+            binding_prefix: String,
+        }
+
+        let no_add_binding_fn_name_unnamespaced = if self.namespace.is_some() {
+            format!("{}_func", self.namespaces.join("_"))
         } else {
-            "add_diplomat_func_bindings".into()
+            "diplomat_func".into()
         };
+
+        let binding_fn_name_unnamespaced = format!("add_{}_binding", no_add_binding_fn_name_unnamespaced);
 
         let binding_fn_name = if let Some(ns) = &self.namespace {
             format!("{ns}::{binding_fn_name_unnamespaced}")
@@ -82,7 +99,14 @@ impl<'tcx> FuncGenContext {
         };
 
         TyGenContext::gen_binding_fn(root_module, self.namespaces.iter().map(|s| s.as_str()), binding_fn_name, binding_fn_name_unnamespaced);
-        Ok(())
+        let b = Binding {
+            includes: self.includes.clone(),
+            namespace: self.namespace.clone().unwrap_or_default(),
+            unqualified_type: no_add_binding_fn_name_unnamespaced,
+            body: format!("mod\n{};", self.functions.join("\n")),
+            binding_prefix: String::new(),
+        };
+        b.render()
     }
 
     pub(super) fn gen_method_info<'a, 'b>(

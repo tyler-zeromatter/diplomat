@@ -172,8 +172,8 @@ pub(crate) fn run<'cx>(
 
     let mut func_map = BTreeMap::new();
     {
-
         for (id, func) in tcx.all_free_functions() {
+            let _guard = errors.set_context_ty(func.name.as_str().into());
             let key = if let Some(ns) = &func.attrs.namespace {
                 ns.clone()
             } else {
@@ -208,11 +208,18 @@ pub(crate) fn run<'cx>(
             };
 
             context.generate_function(id, func, &mut ty_context);
+
+            drop(_guard);
         }
     }
         
     for (_, ctx) in func_map.iter_mut() {
-        ctx.render(&mut root_module).unwrap();
+        let binding_impl_path = if let Some(ns) = &ctx.namespace {
+            format!("sub_modules/{}/{}_func_bindings.cpp", ns.replace("::", "/"), ns.replace("::", "_"))
+        } else {
+            "sub_modules/diplomat_func_bindings.cpp".into()
+        };
+        files.add_file(binding_impl_path, ctx.render(&mut root_module).unwrap());
     }
 
     // Traverse the module_fns keys list and expand into the list of submodules needing generation.
