@@ -74,8 +74,8 @@ struct DeclTemplate {
 /// Helper for rendering function block information to [`Header`]s
 /// Used either for creating blocks of functions that belong to structs, or for free functions that belong to no structs.
 pub struct FuncGenContext<'tcx> {
-    pub impl_header: Header,
-    pub decl_header: Header,
+    pub(super) impl_header: Header,
+    pub(super) decl_header: Header,
     c: crate::c::FuncGenContext<'tcx>,
     impl_template: ImplTemplate,
     decl_template: DeclTemplate,
@@ -106,7 +106,7 @@ impl<'tcx> FuncGenContext<'tcx> {
     }
 
     /// Generate a free function and prepare it for rendering to [`DeclTemplate`] and [`ImplTemplate`].
-    pub fn generate_function<'b>(
+    pub(super) fn generate_function<'b>(
         &mut self,
         func_id: FunctionId,
         func: &'tcx hir::Method,

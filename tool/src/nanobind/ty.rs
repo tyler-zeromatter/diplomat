@@ -107,8 +107,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
             .entry(vec.join("::"))
             .or_default()
             .push(format!(
-                "void {}(nb::module_);",
-                binding_fn_name_unnamespaced
+                "void {binding_fn_name_unnamespaced}(nb::module_);"
             ));
 
         let module_namespaces = [root_module.module_name.to_string()]

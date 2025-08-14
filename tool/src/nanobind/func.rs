@@ -73,7 +73,7 @@ impl<'tcx> FuncGenContext {
         if let Some(m) = info {
             let def = FunctionDef { m };
             self.functions.push(def.to_string());
-            self.includes.append(&mut context.includes);
+            self.includes.append(context.includes);
         }
     }
 
@@ -95,7 +95,7 @@ impl<'tcx> FuncGenContext {
         };
 
         let binding_fn_name_unnamespaced =
-            format!("add_{}_binding", no_add_binding_fn_name_unnamespaced);
+            format!("add_{no_add_binding_fn_name_unnamespaced}_binding");
 
         let binding_fn_name = if let Some(ns) = &self.namespace {
             format!("{ns}::{binding_fn_name_unnamespaced}")
