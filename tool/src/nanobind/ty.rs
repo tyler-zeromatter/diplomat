@@ -4,7 +4,6 @@ use crate::nanobind::func::{FuncGenContext, MethodInfo};
 use crate::{cpp::TyGenContext as Cpp2TyGenContext, hir, ErrorStore};
 use askama::Template;
 use diplomat_core::hir::{OpaqueOwner, StructPathLike, SymbolId, TyPosition, Type, TypeId};
-use itertools::Itertools;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
