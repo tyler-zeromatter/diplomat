@@ -24,8 +24,14 @@ struct DiplomatBridgeFiles<'tcx, 'ccx> {
 impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     fn visit_item_mod_mut(&mut self, i: &mut syn::ItemMod) {
         if let Some((_, items)) = &mut i.content {
-            for item in items {
-                self.visit_item_mut(item);
+            if i.attrs.contains(&syn::parse_quote!(#[diplomat::bridge])) {
+                for item in items {
+                    self.visit_item_mut(item);
+                }
+            } else {
+                // TODO: Get parent and remove the content.
+                // Or maybe just have a more robust system for only adding #[diplomat::bridge].
+                i.content = None;
             }
         } else {
             let try_mod_path = self.entry.join(format!("{}.rs", i.ident.to_string()));
