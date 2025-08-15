@@ -5,42 +5,24 @@
 pub mod ffi {
     #[test]
     macro_rules! impl_mac {
-        ($ arg1 : ident , $ arg2 : ident , $ arg3 : block) => {
-            pub fn $arg1() -> i32 {
-                $arg3
-            }
-            pub fn $arg2() -> i32 {
-                println!("Test");
-                0
+        ($arg1:ident, $arg2:ident, $arg3:block) => {
+            pub fn $arg1 () -> i32 { $arg3 } pub fn $arg2 () -> i32 { println!("Test"); 0
             }
         };
     }
     #[test]
     macro_rules! create_vec {
-        ($ vec_name : ident contains "hello" ; [$ ty : ident]) => {
-            #[diplomat::opaque]
-            pub struct $vec_name(Vec<$ty>);
-            impl $vec_name {
-                #[diplomat::attr(auto, constructor)]
-                pub fn new() -> Box<$vec_name> {
-                    println!("{}", stringify!($vec_name));
-                    Box::new(Self(Vec::new()))
-                }
-                #[diplomat::attr(auto, getter)]
-                pub fn len(&self) -> usize {
-                    self.0.len()
-                }
-                #[diplomat::attr(auto, indexer)]
-                pub fn get(&self, idx: usize) -> Option<$ty> {
-                    self.0.get(idx).cloned()
-                }
-                pub fn push(&mut self, value: $ty) {
-                    self.0.push(value)
-                }
-            }
+        ($vec_name:ident contains "hello"; [$ty:ident]) => {
+            #[diplomat::opaque] pub struct $vec_name (Vec <$ty >); impl $vec_name {
+            #[diplomat::attr(auto, constructor)] pub fn new() -> Box <$vec_name > {
+            println!("{}", stringify!($vec_name)); Box::new(Self(Vec::new())) }
+            #[diplomat::attr(auto, getter)] pub fn len(& self) -> usize { self.0.len() }
+            #[diplomat::attr(auto, indexer)] pub fn get(& self, idx : usize) -> Option
+            <$ty > { self.0.get(idx).cloned() } pub fn push(& mut self, value : $ty) {
+            self.0.push(value) } }
         };
     }
-    create_vec ! (VectorTest contains "hello" ; [f64]);
+    create_vec!(VectorTest contains "hello"; [f64]);
     #[test]
     #[test]
     #[test]
@@ -56,10 +38,7 @@ pub mod ffi {
         pub fn test_namespaced_callback(_t: impl Fn() -> Result<(), ()>) {
             todo!()
         }
-        impl_mac!(mac_test, hello, {
-            println!("Hello world!");
-            10
-        });
+        impl_mac!(mac_test, hello, { println!("Hello world!"); 10 });
         #[test]
         #[test]
         pub fn method(&self) -> u8 {
@@ -251,11 +230,7 @@ pub mod ffi {
         #[test]
         #[test]
         pub fn new_fallible(a: bool, b: u32) -> Result<StructWithAttrs, ()> {
-            if a {
-                Ok(Self { a, b })
-            } else {
-                Err(())
-            }
+            if a { Ok(Self { a, b }) } else { Err(()) }
         }
         #[test]
         pub fn c(self) -> u32 {
@@ -263,6 +238,21 @@ pub mod ffi {
         }
     }
     #[test]
-    macro_rules ! macro_frag_spec_test { (BLOCK $ b : block [EXPR $ e : expr , IDENT $ i : ident] LT $ lt : lifetime literal $ l : literal <=> $ m : meta $ p : path ; $ t : tt $ ty : ty , $ vis : vis , $ it : item) => { struct $ i { a : usize , } $ it use $ p ; impl $ i { # [allow (clippy :: extra_unused_lifetimes)] $ vis fn test_func <$ lt > (w : & mut DiplomatWrite) -> usize { let a = $ e ; write ! (w , $ l) . unwrap () ; a } # [$ m] $ vis fn test_meta () -> $ i { $ b $ i { a : 0 } } } # [diplomat :: opaque] struct TestOpaque ($ ty) ; impl TestOpaque $ t } ; }
-    macro_frag_spec_test! { BLOCK { println ! ("Hello world") ; } [EXPR 0 , IDENT TestMacroStruct] LT 'a literal "Testing" <=> diplomat :: attr (auto , constructor) std :: fmt :: Write ; { fn hello () { } } f64 , pub , const IT : usize = 0 ; }
+    macro_rules! macro_frag_spec_test {
+        (
+            BLOCK $b:block [EXPR $e:expr, IDENT $i:ident] LT $lt:lifetime literal
+            $l:literal <=> $m:meta $p:path; $t:tt $ty:ty, $vis:vis, $it:item
+        ) => {
+            struct $i { a : usize, } $it use $p; impl $i {
+            #[allow(clippy::extra_unused_lifetimes)] $vis fn test_func <$lt > (w : & mut
+            DiplomatWrite) -> usize { let a = $e; write!(w, $l) .unwrap(); a } #[$m] $vis
+            fn test_meta() -> $i { $b $i { a : 0 } } } #[diplomat::opaque] struct
+            TestOpaque($ty); impl TestOpaque $t
+        };
+    }
+    macro_frag_spec_test! {
+        BLOCK { println!("Hello world"); } [EXPR 0, IDENT TestMacroStruct] LT 'a literal
+        "Testing" <=> diplomat::attr(auto, constructor) std::fmt::Write; { fn hello() {}
+        } f64, pub, const IT : usize = 0;
+    }
 }

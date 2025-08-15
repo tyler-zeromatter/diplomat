@@ -67,11 +67,23 @@ pub mod ffi {
         }
         #[test]
         pub fn new_f64_be_bytes(v: &[DiplomatByte]) -> Box<Float64Vec> {
-            Box::new(Self(
-                v.chunks_exact(8)
-                    .map(|b| f64::from_be_bytes([b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7]]))
-                    .collect(),
-            ))
+            Box::new(
+                Self(
+                    v
+                        .chunks_exact(8)
+                        .map(|b| f64::from_be_bytes([
+                            b[0],
+                            b[1],
+                            b[2],
+                            b[3],
+                            b[4],
+                            b[5],
+                            b[6],
+                            b[7],
+                        ]))
+                        .collect(),
+                ),
+            )
         }
         #[test]
         #[test]
@@ -111,11 +123,7 @@ pub mod ffi {
         }
         #[test]
         pub fn get(&self, i: usize) -> Result<f64, ()> {
-            if let Some(i) = self.0.get(i) {
-                Ok(*i)
-            } else {
-                Err(())
-            }
+            if let Some(i) = self.0.get(i) { Ok(*i) } else { Err(()) }
         }
     }
 }

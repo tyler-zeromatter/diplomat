@@ -111,7 +111,10 @@ pub mod ffi {
             arg
         }
         #[test]
-        pub fn accepts_option_enum(arg: Option<OptionEnum>, sentinel: u8) -> Option<OptionEnum> {
+        pub fn accepts_option_enum(
+            arg: Option<OptionEnum>,
+            sentinel: u8,
+        ) -> Option<OptionEnum> {
             assert_eq!(sentinel, 123, "{arg:?}");
             arg
         }
@@ -137,7 +140,10 @@ pub mod ffi {
             arg.unwrap_or_default().len()
         }
         #[test]
-        pub fn accepts_option_str_slice(arg: Option<&[DiplomatStrSlice]>, sentinel: u8) -> bool {
+        pub fn accepts_option_str_slice(
+            arg: Option<&[DiplomatStrSlice]>,
+            sentinel: u8,
+        ) -> bool {
             assert_eq!(sentinel, 123);
             arg.is_some()
         }

@@ -19,10 +19,16 @@ mod ffi {
             -5
         }
         pub fn test_cb_with_struct(f: impl Fn(CallbackTestingStruct) -> i32) -> i32 {
-            let arg = CallbackTestingStruct { x: 1, y: 5 };
+            let arg = CallbackTestingStruct {
+                x: 1,
+                y: 5,
+            };
             f(arg)
         }
-        pub fn test_multiple_cb_args(f: impl Fn() -> i32, g: impl Fn(i32) -> i32) -> i32 {
+        pub fn test_multiple_cb_args(
+            f: impl Fn() -> i32,
+            g: impl Fn(i32) -> i32,
+        ) -> i32 {
             f() + g(5)
         }
         #[test]
@@ -80,7 +86,8 @@ mod ffi {
         }
         #[test]
         pub fn test_inner_conversion(
-            t: impl Fn() -> Result<crate::structs::ffi::MyStructContainingAnOption, usize>,
+            t: impl Fn(
+            ) -> Result<crate::structs::ffi::MyStructContainingAnOption, usize>,
         ) {
             let out = t();
             let out = out.expect("Could not get struct out.");
@@ -88,7 +95,9 @@ mod ffi {
             assert_eq!(out.a.into_option().unwrap().into_a(), 42);
         }
         #[test]
-        pub fn test_str_conversion<'a>(t: impl Fn() -> Result<DiplomatStrSlice<'a>, ()>) {
+        pub fn test_str_conversion<'a>(
+            t: impl Fn() -> Result<DiplomatStrSlice<'a>, ()>,
+        ) {
             let str = t().expect("Could not get string.");
             let str = String::from_utf8(str.to_vec()).unwrap();
             assert_eq!(str, "Slice conversion test string");
@@ -124,9 +133,7 @@ mod ffi {
     impl CallbackHolder {
         #[test]
         pub fn new(func: impl Fn(i32) -> i32 + 'static) -> Box<Self> {
-            Box::new(Self {
-                held: Box::new(func),
-            })
+            Box::new(Self { held: Box::new(func) })
         }
         pub fn call(&self, a: i32) -> i32 {
             (self.held)(a)
@@ -140,9 +147,7 @@ mod ffi {
     impl MutableCallbackHolder {
         #[test]
         pub fn new(func: impl FnMut(i32) -> i32 + 'static) -> Box<Self> {
-            Box::new(Self {
-                held: Box::new(func),
-            })
+            Box::new(Self { held: Box::new(func) })
         }
         pub fn call(&mut self, a: i32) -> i32 {
             (self.held)(a)

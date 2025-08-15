@@ -1,7 +1,7 @@
 #[diplomat::bridge]
 pub mod ffi {
-    use diplomat_runtime::DiplomatStr16;
     use std::fmt::Write;
+    use diplomat_runtime::DiplomatStr16;
     #[test]
     pub struct Foo<'a>(&'a DiplomatStr);
     #[test]
@@ -64,7 +64,7 @@ pub mod ffi {
         ) -> Self {
             BorrowedFields {
                 a: dstr16.into(),
-                b: bar.0 .0.into(),
+                b: bar.0.0.into(),
                 c: utf8_str.into(),
             }
         }
@@ -97,14 +97,17 @@ pub mod ffi {
             utf8_str_z: &'z str,
         ) -> Self {
             let fields = BorrowedFields::from_bar_and_strings(bar, dstr16_x, utf8_str_y);
-            let bounds =
-                BorrowedFieldsWithBounds::from_foo_and_strings(bar.0, dstr16_x, utf8_str_y);
-            let bounds2 = BorrowedFieldsWithBounds::from_foo_and_strings(foo, dstr16_z, utf8_str_z);
-            Self {
-                fields,
-                bounds,
-                bounds2,
-            }
+            let bounds = BorrowedFieldsWithBounds::from_foo_and_strings(
+                bar.0,
+                dstr16_x,
+                utf8_str_y,
+            );
+            let bounds2 = BorrowedFieldsWithBounds::from_foo_and_strings(
+                foo,
+                dstr16_z,
+                utf8_str_z,
+            );
+            Self { fields, bounds, bounds2 }
         }
     }
     impl<'b, 'a: 'b> Bar<'b, 'a> {
@@ -164,12 +167,14 @@ pub mod ffi {
             right: &One<'right>,
             bottom: &One<'bottom>,
         ) -> Box<One<'top>> {
-            Box::new(match 0 {
-                0 => *bottom,
-                1 => *left,
-                2 => *right,
-                _ => *top,
-            })
+            Box::new(
+                match 0 {
+                    0 => *bottom,
+                    1 => *left,
+                    2 => *right,
+                    _ => *top,
+                },
+            )
         }
         #[test]
         pub fn diamond_left<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
@@ -179,10 +184,12 @@ pub mod ffi {
             bottom: &One<'bottom>,
         ) -> Box<One<'left>> {
             let _ = (top, right);
-            Box::new(match 0 {
-                0 => *bottom,
-                _ => *left,
-            })
+            Box::new(
+                match 0 {
+                    0 => *bottom,
+                    _ => *left,
+                },
+            )
         }
         #[test]
         pub fn diamond_right<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
@@ -192,10 +199,12 @@ pub mod ffi {
             bottom: &One<'bottom>,
         ) -> Box<One<'right>> {
             let _ = (top, left);
-            Box::new(match 0 {
-                0 => *bottom,
-                _ => *right,
-            })
+            Box::new(
+                match 0 {
+                    0 => *bottom,
+                    _ => *right,
+                },
+            )
         }
         #[test]
         pub fn diamond_bottom<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
@@ -216,12 +225,14 @@ pub mod ffi {
             nohold: &One<'x>,
         ) -> Box<One<'a>> {
             let _ = nohold;
-            Box::new(match 0 {
-                0 => *a,
-                1 => *b,
-                2 => *c,
-                _ => *d,
-            })
+            Box::new(
+                match 0 {
+                    0 => *a,
+                    1 => *b,
+                    2 => *c,
+                    _ => *d,
+                },
+            )
         }
         #[test]
         #[test]
@@ -231,10 +242,12 @@ pub mod ffi {
             nohold: &One<'y>,
         ) -> Box<One<'a>> {
             let _ = nohold;
-            Box::new(match 0 {
-                0 => *explicit_hold,
-                _ => *implicit_hold,
-            })
+            Box::new(
+                match 0 {
+                    0 => *explicit_hold,
+                    _ => *implicit_hold,
+                },
+            )
         }
         #[test]
         #[test]
@@ -245,11 +258,13 @@ pub mod ffi {
             nohold: &'x One<'x>,
         ) -> Box<One<'a>> {
             let _ = nohold;
-            Box::new(match 0 {
-                0 => *explicit_,
-                1 => *implicit_1,
-                _ => *implicit_2,
-            })
+            Box::new(
+                match 0 {
+                    0 => *explicit_,
+                    1 => *implicit_1,
+                    _ => *implicit_2,
+                },
+            )
         }
     }
     #[test]
@@ -284,16 +299,19 @@ pub mod ffi {
         #[test]
         pub fn create(a: &[i32], b: &[f32], c: &DiplomatStr) -> Box<Self> {
             assert!(a.len() == b.len(), "arrays must be of equal size");
-            Box::new(Self(
-                a.iter()
-                    .zip(b.iter())
-                    .map(|(a, b)| crate::lifetimes::Internal {
-                        a: *a,
-                        b: *b,
-                        c: String::from_utf8(c.to_vec()).unwrap(),
-                    })
-                    .collect(),
-            ))
+            Box::new(
+                Self(
+                    a
+                        .iter()
+                        .zip(b.iter())
+                        .map(|(a, b)| crate::lifetimes::Internal {
+                            a: *a,
+                            b: *b,
+                            c: String::from_utf8(c.to_vec()).unwrap(),
+                        })
+                        .collect(),
+                ),
+            )
         }
         #[test]
         #[test]

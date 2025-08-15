@@ -1,8 +1,8 @@
 #[allow(clippy::needless_lifetimes)]
 #[diplomat::bridge]
 pub mod ffi {
-    use crate::imports::ffi::ImportedStruct;
     use diplomat_runtime::DiplomatStr16;
+    use crate::imports::ffi::ImportedStruct;
     use std::fmt::Write;
     use std::sync::Mutex;
     #[test]
@@ -70,7 +70,7 @@ pub mod ffi {
             Box::new(Self(input.into()))
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            let _infallible = write!(write, "{:?}", &self.0);
+            let _infallible = write!(write, "{:?}", & self.0);
         }
         #[test]
         #[test]
@@ -102,7 +102,9 @@ pub mod ffi {
         pub fn borrow<'a>(&'a self) -> &'a OpaqueMutexedString {
             self
         }
-        pub fn borrow_other<'a>(other: &'a OpaqueMutexedString) -> &'a OpaqueMutexedString {
+        pub fn borrow_other<'a>(
+            other: &'a OpaqueMutexedString,
+        ) -> &'a OpaqueMutexedString {
             other
         }
         pub fn borrow_self_or_other<'a>(
@@ -110,11 +112,7 @@ pub mod ffi {
             other: &'a OpaqueMutexedString,
         ) -> &'a OpaqueMutexedString {
             let guard = self.0.lock().expect("Failed to lock mutex");
-            if guard.len() % 2 == 0 {
-                self
-            } else {
-                other
-            }
+            if guard.len() % 2 == 0 { self } else { other }
         }
         pub fn get_len_and_add(&self, other: usize) -> usize {
             let guard = self.0.lock().expect("Failed to lock mutex");
@@ -139,7 +137,7 @@ pub mod ffi {
             Box::new(Self(input.into()))
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            let _infallible = write!(write, "{:?}", &self.0);
+            let _infallible = write!(write, "{:?}", & self.0);
         }
         pub fn borrow_cont<'a>(&'a self) -> &'a DiplomatStr16 {
             &self.0
@@ -160,14 +158,9 @@ pub mod ffi {
         }
         pub fn to_string(&self, write: &mut DiplomatWrite) {
             let _infallible = write!(
-                write,
-                "MyOpaqueEnum::{}",
-                match self {
-                    MyOpaqueEnum::A(..) => "A",
-                    MyOpaqueEnum::B(..) => "B",
-                    MyOpaqueEnum::C => "C",
-                    MyOpaqueEnum::D(..) => "D",
-                }
+                write, "MyOpaqueEnum::{}", match self { MyOpaqueEnum::A(..) => "A",
+                MyOpaqueEnum::B(..) => "B", MyOpaqueEnum::C => "C", MyOpaqueEnum::D(..)
+                => "D", }
             );
         }
     }
@@ -263,11 +256,8 @@ pub mod ffi {
             sum
         }
         pub fn double_cyclic_out(self, cyclic_struct_a: Self, out: &mut DiplomatWrite) {
-            out.write_fmt(format_args!(
-                "{} {}",
-                &self.a.field, cyclic_struct_a.a.field
-            ))
-            .unwrap();
+            out.write_fmt(format_args!("{} {}", & self.a.field, cyclic_struct_a.a.field))
+                .unwrap();
         }
         #[test]
         pub fn getter_out(self, out: &mut DiplomatWrite) {
@@ -447,7 +437,9 @@ pub mod ffi {
             self.0[idx].clone()
         }
         #[test]
-        pub fn take_slice_from_other_namespace(_sl: &[crate::attrs::ffi::StructWithAttrs]) {
+        pub fn take_slice_from_other_namespace(
+            _sl: &[crate::attrs::ffi::StructWithAttrs],
+        ) {
             assert!(true)
         }
     }
