@@ -1,0 +1,11 @@
+[package]
+name = "feature_tests_static_rust"
+publish = false
+
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+diplomat_static_rust = { path = "../../../static_rust_macro" }
