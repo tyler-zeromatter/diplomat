@@ -1,9 +1,10 @@
 use super::root_module::RootModule;
 use super::PyFormatter;
 use crate::nanobind::func::{FuncGenContext, MethodInfo};
-use crate::{c::TyGenContext as C2TyGenContext, hir, ErrorStore};
+use crate::{cpp::TyGenContext as Cpp2TyGenContext, hir, ErrorStore};
 use askama::Template;
 use diplomat_core::hir::{OpaqueOwner, StructPathLike, SymbolId, TyPosition, Type, TypeId};
+use itertools::Itertools;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -21,10 +22,9 @@ pub(super) struct NamedType<'a> {
 pub(super) struct TyGenContext<'cx, 'tcx> {
     pub formatter: &'cx PyFormatter<'tcx>,
     pub errors: &'cx ErrorStore<'tcx, String>,
-    pub c2: C2TyGenContext<'cx, 'tcx>,
+    pub cpp2: Cpp2TyGenContext<'cx, 'tcx, 'cx>,
     pub root_module: &'cx mut RootModule<'tcx>,
     pub submodules: &'cx mut BTreeMap<Cow<'tcx, str>, BTreeSet<Cow<'tcx, str>>>,
-    pub includes: &'cx mut BTreeSet<String>,
     /// Are we currently generating struct fields?
     pub generating_struct_fields: bool,
 }
@@ -274,7 +274,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
         'ccx: 'a,
     {
         let var_name = self.formatter.cxx.fmt_param_name(var_name);
-        let type_name = self.gen_type_name(ty);
+        let type_name = self.cpp2.gen_type_name(ty);
 
         NamedType {
             var_name,
@@ -286,13 +286,13 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
         let id = st.id();
         let type_name = self.formatter.cxx.fmt_type_name(id);
 
-        let def = self.c2.tcx.resolve_type(id);
+        let def = self.cpp2.c.tcx.resolve_type(id);
         if def.attrs().disable {
             self.errors
                 .push_error(format!("Found usage of disabled type {type_name}"))
         }
 
-        self.includes
+        self.cpp2.impl_header.includes
             .insert(self.formatter.cxx.fmt_impl_header_path(id.into()));
         if let hir::MaybeOwn::Borrow(borrow) = st.owner() {
             let mutability = borrow.mutability;
@@ -315,7 +315,7 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
             Type::Opaque(ref op) => {
                 let op_id = op.tcx_id.into();
                 let type_name = self.formatter.cxx.fmt_type_name(op_id);
-                let def = self.c2.tcx.resolve_type(op_id);
+                let def = self.cpp2.c.tcx.resolve_type(op_id);
 
                 if def.attrs().disable {
                     self.errors
@@ -333,33 +333,33 @@ impl<'ccx, 'tcx: 'ccx> TyGenContext<'ccx, 'tcx> {
                 };
                 let ret = ret.into_owned().into();
 
-                self.includes
+                self.cpp2.impl_header.includes
                     .insert(self.formatter.cxx.fmt_impl_header_path(op_id.into()));
                 ret
             }
             Type::Struct(ref st) => {
                 let id = st.id();
                 let type_name = self.formatter.cxx.fmt_type_name(id);
-                let def = self.c2.tcx.resolve_type(id);
+                let def = self.cpp2.c.tcx.resolve_type(id);
                 if def.attrs().disable {
                     self.errors
                         .push_error(format!("Found usage of disabled type {type_name}"))
                 }
 
-                self.includes
+                self.cpp2.impl_header.includes
                     .insert(self.formatter.cxx.fmt_impl_header_path(id.into()));
                 type_name
             }
             Type::Enum(ref e) => {
                 let id = e.tcx_id.into();
                 let type_name = self.formatter.cxx.fmt_type_name(id);
-                let def = self.c2.tcx.resolve_type(id);
+                let def = self.cpp2.c.tcx.resolve_type(id);
                 if def.attrs().disable {
                     self.errors
                         .push_error(format!("Found usage of disabled type {type_name}"))
                 }
 
-                self.includes
+                self.cpp2.impl_header.includes
                     .insert(self.formatter.cxx.fmt_impl_header_path(id.into()));
                 type_name
             }

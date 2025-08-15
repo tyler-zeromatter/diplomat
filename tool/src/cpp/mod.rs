@@ -4,10 +4,11 @@ mod header;
 mod ty;
 
 use std::collections::BTreeMap;
+pub(crate) use header::Header;
 
 use crate::{ErrorStore, FileMap};
 use diplomat_core::hir::{self, BackendAttrSupport, DocsUrlGenerator};
-use ty::TyGenContext;
+pub(crate) use ty::TyGenContext;
 
 pub(crate) use func::FuncGenContext;
 
