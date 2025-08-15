@@ -1,4 +1,4 @@
-#[diplomat::bridge]
+#[diplomat_static_rust::bridge]
 pub mod ffi {
     use diplomat_runtime::{DiplomatChar, DiplomatOption, DiplomatWrite};
     #[test]

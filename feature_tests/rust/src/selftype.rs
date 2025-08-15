@@ -1,4 +1,4 @@
-#[diplomat::bridge]
+#[diplomat_static_rust::bridge]
 mod ffi {
     #[test]
     struct RefListParameter;

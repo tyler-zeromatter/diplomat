@@ -1,4 +1,4 @@
-#[diplomat::bridge]
+#[diplomat_static_rust::bridge]
 #[diplomat::abi_rename = "namespace_{0}"]
 #[diplomat::attr(not(any(c, kotlin)), rename = "Renamed{0}")]
 #[diplomat::attr(auto, namespace = "ns")]

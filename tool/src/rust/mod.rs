@@ -24,7 +24,9 @@ struct DiplomatBridgeFiles<'tcx, 'ccx> {
 impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     fn visit_item_mod_mut(&mut self, i: &mut syn::ItemMod) {
         if let Some((_, items)) = &mut i.content {
-            if i.attrs.contains(&syn::parse_quote!(#[diplomat::bridge])) {
+            let bridge = i.attrs.iter_mut().find(|a| { a.meta == syn::parse_quote!(diplomat::bridge) });
+            if let Some(b) = bridge {
+                b.meta = syn::parse_quote!(diplomat_static_rust::bridge);
                 for item in items {
                     self.visit_item_mut(item);
                 }

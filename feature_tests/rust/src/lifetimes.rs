@@ -1,4 +1,4 @@
-#[diplomat::bridge]
+#[diplomat_static_rust::bridge]
 pub mod ffi {
     use std::fmt::Write;
     use diplomat_runtime::DiplomatStr16;
