@@ -70,7 +70,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
 // Macros. Should use Diplomat's built-in macro parser (since that's what it's built for)
 // Opaque conversions.
 // Stripping out #[diplomat] attributes.
-// Ignoring anything outside of #[diplomat::bridge]
+// Ignoring anything outside of #[diplomat::bridge] (and renaming #[diplomat::bridge] to #[diplomat::rust] or something like that)
 pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
     let files = FileMap::default();
     let errors = ErrorStore::default();
