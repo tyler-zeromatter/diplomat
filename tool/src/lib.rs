@@ -13,6 +13,7 @@ mod demo_gen;
 mod js;
 mod kotlin;
 mod nanobind;
+mod rust;
 
 use colored::*;
 use config::toml_value_from_str;
@@ -65,6 +66,7 @@ pub fn gen(
         }
         "kotlin" => kotlin::attr_support(),
         "py-nanobind" | "nanobind" => nanobind::attr_support(),
+        "rust" => rust::attr_support(),
         o => panic!("Unknown target: {}", o),
     };
 
@@ -114,6 +116,7 @@ pub fn gen(
             demo_gen::run(entry, &tcx, docs_url_gen, config.clone())
         }
         "kotlin" => kotlin::run(&tcx, config.clone(), docs_url_gen),
+        "rust" => rust::run(entry),
         o => panic!("Unknown target: {}", o),
     };
 

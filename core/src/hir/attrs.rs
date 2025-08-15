@@ -1003,8 +1003,7 @@ pub struct BackendAttrSupport {
 }
 
 impl BackendAttrSupport {
-    #[cfg(test)]
-    fn all_true() -> Self {
+    pub fn all_true() -> Self {
         Self {
             namespacing: true,
             memory_sharing: true,
