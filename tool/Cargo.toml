@@ -26,7 +26,7 @@ heck = "0.5" # conversion between naming convention
 displaydoc = "0.2"
 askama = "0.13.0"
 itertools = "0.14.0"
-toolchain_find = "0.4.0"
+prettyplease = "0.2.36"
 
 [dev-dependencies]
 insta = { version = "1.7.1", features = ["yaml"] }
