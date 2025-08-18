@@ -16,8 +16,13 @@ fn gen_bridge(mut input : ItemMod) -> ItemMod {
             let abi_name = &m.abi_name;
             let mut extern_fn : syn::ForeignItemFn = syn::parse_quote! { fn #abi_name(); };
             if let Some(s) = &m.self_param {
-                // TODO: Borrowing, references.
-                // extern_fn.sig.inputs.push(syn::parse_quote!(self));
+                let type_ident = custom_type.name().to_syn();
+                let is_borrowed = match &s.reference {
+                    Some((_, mt)) if mt.is_mutable() => quote!(&mut),
+                    Some(..) => quote!(&),
+                    None => quote!()
+                };
+                extern_fn.sig.inputs.push(syn::parse_quote!(this : #is_borrowed #type_ident));
             }
 
             m.params.iter().enumerate().for_each(|(i, p)| { 
@@ -31,7 +36,6 @@ fn gen_bridge(mut input : ItemMod) -> ItemMod {
                 extern_fn.sig.output = syn::parse_quote!(-> #out);
              }
             extern_block.items.push(extern_fn.into());
-            // new_contents.push(gen_m);
         });
     }
 
