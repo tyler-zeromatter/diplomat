@@ -8,4 +8,5 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
+diplomat-runtime = "0.12.0"
 diplomat_static_rust = { path = "../../../static_rust_macro" }
