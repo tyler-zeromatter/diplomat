@@ -1,4 +1,4 @@
-use diplomat_core::hir::BackendAttrSupport;
+use diplomat_core::{ast, hir::BackendAttrSupport};
 use quote::ToTokens;
 use std::{
     env, fmt,
@@ -12,6 +12,10 @@ use crate::{ErrorStore, FileMap};
 
 pub(crate) fn attr_support() -> BackendAttrSupport {
     BackendAttrSupport::all_true()
+}
+
+struct DiplomatBridgeMod {
+    
 }
 
 struct DiplomatBridgeFiles<'tcx, 'ccx> {
@@ -61,6 +65,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
                 }
 
                 // TODO: Remove MacroRules and MacroUse here, parse macro expressions here.
+                // TODO: Remove `use::` expressions. We'll add those back in for any function definitions.
                 let mut file = file.unwrap();
                 self.visit_file_mut(&mut file);
 
@@ -82,7 +87,9 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
 
     fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         Self::clear_attributes(&mut i.attrs);
-        i.block = syn::parse_quote!({ unsafe {  } });
+        // TODO: Use AST to get ABI name.
+        let name = i.sig.ident.to_string();
+        i.block = syn::parse_quote!({ unsafe { #name() } });
     }
 
     fn visit_item_enum_mut(&mut self, i: &mut syn::ItemEnum) {
@@ -90,6 +97,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     }
 
     fn visit_item_struct_mut(&mut self, i: &mut syn::ItemStruct) {
+        // TODO: Do we have an Opaque? If so, we need to hide the type.
         Self::clear_attributes(&mut i.attrs);
     }
 
