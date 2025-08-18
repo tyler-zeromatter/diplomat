@@ -20,17 +20,27 @@ struct DiplomatBridgeFiles<'tcx, 'ccx> {
     errors: &'tcx ErrorStore<'ccx, String>,
 }
 
+impl<'tcx, 'ccx> DiplomatBridgeFiles<'tcx, 'ccx> {
+    fn clear_attributes(attributes : &mut Vec<syn::Attribute>) {
+        attributes.retain(|a| {
+            a.meta.path().segments.first().unwrap().ident.to_string() != String::from("diplomat")
+        });
+    }
+}
+
 // VisitMut to strip out unwanted files when ultimately outputting to our binding directory.
 impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     fn visit_item_mod_mut(&mut self, i: &mut syn::ItemMod) {
         if let Some((_, items)) = &mut i.content {
-            let bridge = i.attrs.iter_mut().find(|a| { a.meta == syn::parse_quote!(diplomat::bridge) });
-            if let Some(b) = bridge {
-                b.meta = syn::parse_quote!(diplomat_static_rust::bridge);
+            let bridge = i.attrs.iter().find(|a| { a.meta == syn::parse_quote!(diplomat::bridge) });
+            if bridge.is_some() {
+                Self::clear_attributes(&mut i.attrs);
+                i.attrs.push(syn::parse_quote!(#[diplomat_static_rust::bridge]));
                 for item in items {
                     self.visit_item_mut(item);
                 }
             } else {
+                i.attrs.clear();
                 // TODO: Get parent and remove the content.
                 // Or maybe just have a more robust system for only adding #[diplomat::bridge].
                 i.content = None;
@@ -50,6 +60,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
                         .push_error(format!("Could not parse file: {}", e.to_string()));
                 }
 
+                // TODO: Remove MacroRules and MacroUse here, parse macro expressions here.
                 let mut file = file.unwrap();
                 self.visit_file_mut(&mut file);
 
@@ -69,8 +80,21 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
         }
     }
 
+    fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
+        Self::clear_attributes(&mut i.attrs);
+        i.block = syn::parse_quote!({ unsafe {  } });
+    }
+
+    fn visit_item_enum_mut(&mut self, i: &mut syn::ItemEnum) {
+        Self::clear_attributes(&mut i.attrs);
+    }
+
+    fn visit_item_struct_mut(&mut self, i: &mut syn::ItemStruct) {
+        Self::clear_attributes(&mut i.attrs);
+    }
+
     fn visit_attribute_mut(&mut self, i: &mut syn::Attribute) {
-        i.meta = syn::Meta::Path(syn::parse_quote!(test))
+        // i.meta = syn::Meta::Path(syn::parse_quote!(test))
     }
 }
 
