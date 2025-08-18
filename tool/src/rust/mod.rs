@@ -118,7 +118,6 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
 
     fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         Self::clear_attributes(&mut i.attrs);
-        // TODO: Use AST to get ABI name.
         let name = self.function_abis.get(&i.sig.ident).unwrap();
         let mut call : syn::ExprCall = syn::parse_quote!(#name());
         i.sig.inputs.iter().for_each(|p| {
