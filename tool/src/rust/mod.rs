@@ -1,12 +1,9 @@
 use diplomat_core::{ast, hir::BackendAttrSupport};
 use quote::ToTokens;
 use std::{
-    env, fmt,
-    io::Write,
-    path::{Path, PathBuf},
-    process::{Command, Stdio},
+    collections::BTreeMap, env, fmt, io::Write, path::{Path, PathBuf}, process::{Command, Stdio}
 };
-use syn::visit_mut::VisitMut;
+use syn::{visit_mut::VisitMut, Ident};
 
 use crate::{ErrorStore, FileMap};
 
@@ -14,33 +11,43 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     BackendAttrSupport::all_true()
 }
 
-struct DiplomatBridgeMod {
-    
-}
-
-struct DiplomatBridgeFiles<'tcx, 'ccx> {
+struct DiplomatBridgeMod<'tcx, 'ccx> {
     entry: &'tcx Path,
     files: &'tcx FileMap,
     errors: &'tcx ErrorStore<'ccx, String>,
+    module : Option<ast::Module>,
+    function_abis : BTreeMap<Ident, Ident>,
 }
 
-impl<'tcx, 'ccx> DiplomatBridgeFiles<'tcx, 'ccx> {
-    fn clear_attributes(attributes : &mut Vec<syn::Attribute>) {
-        attributes.retain(|a| {
-            a.meta.path().segments.first().unwrap().ident.to_string() != String::from("diplomat")
-        });
+impl<'tcx, 'ccx> DiplomatBridgeMod<'tcx, 'ccx> {
+    fn get_module(&mut self, i : &syn::ItemMod) {
+        self.module = Some(ast::Module::from_syn(i, true));
+
+        for (_, ty) in &self.module.as_ref().unwrap().declared_types {
+            for m in ty.methods() {
+                self.function_abis.insert(m.name.to_syn(), m.abi_name.to_syn());
+            }
+        }
+    }
+
+    fn parse_file(file : syn::File) {
+
     }
 }
 
 // VisitMut to strip out unwanted files when ultimately outputting to our binding directory.
-impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
+impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
     fn visit_item_mod_mut(&mut self, i: &mut syn::ItemMod) {
-        if let Some((_, items)) = &mut i.content {
+        if i.content.is_some() {
+            // TODO: Remove MacroRules and MacroUse here, parse macro expressions here.
+            // TODO: Remove `use::` expressions. We'll add those back in for any function definitions.
             let bridge = i.attrs.iter().find(|a| { a.meta == syn::parse_quote!(diplomat::bridge) });
             if bridge.is_some() {
+                self.get_module(i);
+
                 Self::clear_attributes(&mut i.attrs);
                 i.attrs.push(syn::parse_quote!(#[diplomat_static_rust::bridge]));
-                for item in items {
+                for item in &mut i.content.as_mut().unwrap().1 {
                     self.visit_item_mut(item);
                 }
             } else {
@@ -64,10 +71,15 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
                         .push_error(format!("Could not parse file: {}", e.to_string()));
                 }
 
-                // TODO: Remove MacroRules and MacroUse here, parse macro expressions here.
-                // TODO: Remove `use::` expressions. We'll add those back in for any function definitions.
+                let mut module = DiplomatBridgeMod {
+                    entry: self.entry,
+                    files: self.files,
+                    errors: self.errors,
+                    module: None,
+                    function_abis: BTreeMap::new(),
+                };
                 let mut file = file.unwrap();
-                self.visit_file_mut(&mut file);
+                module.visit_file_mut(&mut file);
 
                 self.files.add_file(
                     try_mod_path
@@ -88,7 +100,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         Self::clear_attributes(&mut i.attrs);
         // TODO: Use AST to get ABI name.
-        let name = i.sig.ident.to_string();
+        let name = self.function_abis.get(&i.sig.ident).unwrap();
         i.block = syn::parse_quote!({ unsafe { #name() } });
     }
 
@@ -106,6 +118,15 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeFiles<'tcx, 'ccx> {
     }
 }
 
+impl<'tcx, 'ccx> DiplomatBridgeMod<'tcx, 'ccx> {
+    // TODO: Support renames.
+    fn clear_attributes(attributes : &mut Vec<syn::Attribute>) {
+        attributes.retain(|a| {
+            a.meta.path().segments.first().unwrap().ident.to_string() != String::from("diplomat")
+        });
+    }
+}
+
 // Important TODOs:
 // Macros. Should use Diplomat's built-in macro parser (since that's what it's built for)
 // Opaque conversions.
@@ -119,11 +140,13 @@ pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
     let src = std::fs::read_to_string(entry).unwrap();
     let mut res = syn::parse_file(&src).unwrap();
 
-    let mut main = DiplomatBridgeFiles {
+    let mut main = DiplomatBridgeMod {
         // TODO: Better entry parsing.
         entry: entry.parent().unwrap_or(Path::new("./")),
         files: &files,
         errors: &errors,
+        module: None,
+        function_abis: BTreeMap::new(),
     };
     // TODO: Lib.rs generation.
     main.visit_file_mut(&mut res);
