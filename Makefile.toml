@@ -59,6 +59,10 @@ dependencies = ["test-kotlin-example", "test-kotlin-feature"]
 category = "Tests"
 dependencies = ["test-nanobind-feature"]
 
+[tasks.test-static-rust]
+category = "Tests"
+dependencies = ["test-rust-feature"]
+
 [tasks.test-example]
 category = "Tests"
 dependencies = [
@@ -212,6 +216,16 @@ script_runner = "@duckscript"
 script = '''
 exit_on_error true
 exec --fail-on-error uvx --with feature_tests/nanobind --refresh-package somelib pytest feature_tests/nanobind/test/
+'''
+
+[tasks.test-rust-feature]
+category = "Tests"
+dependencies = ["build-feature"]
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+cd feature_tests/rust/test
+exec --fail-on-error cargo test
 '''
 
 [tasks.check-c-example]

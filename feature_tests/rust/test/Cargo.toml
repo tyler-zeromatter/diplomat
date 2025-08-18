@@ -1,0 +1,11 @@
+[package]
+name = "feature_tests_static_rust_test"
+publish = false
+
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+feature_tests_static_rust = { path = "../bindings/" }
