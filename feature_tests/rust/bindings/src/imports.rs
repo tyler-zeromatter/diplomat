@@ -9,4 +9,9 @@ pub mod ffi {
         foo: UnimportedEnum,
         count: u8,
     }
+    impl ImportedStruct {
+        pub fn small_test() -> Self {
+            unsafe { ImportedStruct_small_test() }
+        }
+    }
 }

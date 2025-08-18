@@ -10,4 +10,13 @@ pub mod ffi {
         foo: UnimportedEnum,
         count: u8,
     }
+
+    impl ImportedStruct {
+        pub fn small_test() -> Self {
+            Self {
+                foo: UnimportedEnum::A,
+                count : 5
+            }
+        }
+    }
 }
