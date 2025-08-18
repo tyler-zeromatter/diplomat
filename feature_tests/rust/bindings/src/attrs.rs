@@ -1,16 +1,13 @@
 #[diplomat_static_rust::bridge]
-#[diplomat::abi_rename = "namespace_{0}"]
-#[diplomat::attr(not(any(c, kotlin)), rename = "Renamed{0}")]
-#[diplomat::attr(auto, namespace = "ns")]
 pub mod ffi {
-    #[test]
+    #[diplomat::macro_rules]
     macro_rules! impl_mac {
         ($arg1:ident, $arg2:ident, $arg3:block) => {
             pub fn $arg1 () -> i32 { $arg3 } pub fn $arg2 () -> i32 { println!("Test"); 0
             }
         };
     }
-    #[test]
+    #[diplomat::macro_rules]
     macro_rules! create_vec {
         ($vec_name:ident contains "hello"; [$ty:ident]) => {
             #[diplomat::opaque] pub struct $vec_name (Vec <$ty >); impl $vec_name {
@@ -23,221 +20,150 @@ pub mod ffi {
         };
     }
     create_vec!(VectorTest contains "hello"; [f64]);
-    #[test]
-    #[test]
-    #[test]
-    #[test]
+    #[derive(Clone)]
     pub struct AttrOpaque1;
     impl AttrOpaque1 {
-        #[test]
-        #[test]
         pub fn new() -> Box<AttrOpaque1> {
-            Box::new(AttrOpaque1)
+            unsafe {}
         }
-        #[test]
         pub fn test_namespaced_callback(_t: impl Fn() -> Result<(), ()>) {
-            todo!()
+            unsafe {}
         }
         impl_mac!(mac_test, hello, { println!("Hello world!"); 10 });
-        #[test]
-        #[test]
         pub fn method(&self) -> u8 {
-            77
+            unsafe {}
         }
-        #[test]
-        #[test]
         pub fn abirenamed(&self) -> u8 {
-            123
+            unsafe {}
         }
-        #[test]
         pub fn method_disabled(&self) {
-            println!("disabled in hir");
+            unsafe {}
         }
-        pub fn use_unnamespaced(&self, _un: &Unnamespaced) {}
-        pub fn use_namespaced(&self, _n: AttrEnum) {}
+        pub fn use_unnamespaced(&self, _un: &Unnamespaced) {
+            unsafe {}
+        }
+        pub fn use_namespaced(&self, _n: AttrEnum) {
+            unsafe {}
+        }
     }
-    #[test]
     pub struct AttrOpaque2;
     pub enum AttrEnum {
         A,
         B,
-        #[test]
+        #[diplomat::attr(*, rename = "Renamed")]
         C,
     }
-    #[test]
-    #[test]
-    #[test]
     pub struct Unnamespaced;
     impl Unnamespaced {
-        #[test]
         pub fn make(_e: AttrEnum) -> Box<Self> {
-            Box::new(Self)
+            unsafe {}
         }
-        pub fn use_namespaced(&self, _n: &AttrOpaque1) {}
+        pub fn use_namespaced(&self, _n: &AttrOpaque1) {
+            unsafe {}
+        }
     }
-    #[test]
-    #[test]
-    #[test]
     pub struct Nested;
-    #[test]
-    #[test]
-    #[test]
     pub struct Nested2;
-    #[test]
-    #[test]
     pub struct Comparable(u8);
     impl Comparable {
         pub fn new(int: u8) -> Box<Self> {
-            Box::new(Self(int))
+            unsafe {}
         }
-        #[test]
         pub fn cmp(&self, other: &Comparable) -> core::cmp::Ordering {
-            self.0.cmp(&other.0)
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     pub struct MyIndexer(Vec<String>);
-    #[test]
-    #[test]
     pub struct MyIterable(Vec<u8>);
     impl MyIterable {
-        #[test]
         pub fn new(x: &[u8]) -> Box<Self> {
-            Box::new(Self(x.into()))
+            unsafe {}
         }
-        #[test]
         pub fn iter<'a>(&'a self) -> Box<MyIterator<'a>> {
-            Box::new(MyIterator(self.0.iter()))
+            unsafe {}
         }
-        #[test]
-        #[test]
         pub fn len(&self) -> usize {
-            self.0.len()
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     pub struct MyIterator<'a>(std::slice::Iter<'a, u8>);
     impl<'a> MyIterator<'a> {
-        #[test]
         pub fn next(&mut self) -> Option<u8> {
-            self.0.next().copied()
+            unsafe {}
         }
     }
     impl MyIndexer {
-        #[test]
         pub fn get<'a>(&'a self, i: usize) -> Option<&'a DiplomatStr> {
-            self.0.get(i).as_ref().map(|string| string.as_bytes())
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     struct OpaqueIterable(Vec<AttrOpaque1>);
     impl OpaqueIterable {
-        #[test]
         pub fn iter<'a>(&'a self) -> Box<OpaqueIterator<'a>> {
-            Box::new(OpaqueIterator(Box::new(self.0.iter().cloned())))
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     struct OpaqueIterator<'a>(Box<dyn Iterator<Item = AttrOpaque1> + 'a>);
     impl<'a> OpaqueIterator<'a> {
-        #[test]
         pub fn next(&'a mut self) -> Option<Box<AttrOpaque1>> {
-            self.0.next().map(Box::new)
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     pub(crate) struct OpaqueArithmetic {
         x: i32,
         y: i32,
     }
     impl OpaqueArithmetic {
         pub fn make(x: i32, y: i32) -> Box<Self> {
-            Box::new(Self { x, y })
+            unsafe {}
         }
-        #[test]
         pub fn make_overload(x: f32, y: f32) -> Box<Self> {
-            Box::new(Self {
-                x: (x as i32) + 2,
-                y: y as i32,
-            })
+            unsafe {}
         }
         pub fn x(&self) -> i32 {
-            self.x
+            unsafe {}
         }
         pub fn y(&self) -> i32 {
-            self.y
+            unsafe {}
         }
-        #[test]
         pub fn add(&self, o: &Self) -> Box<Self> {
-            Box::new(Self {
-                x: self.x + o.x,
-                y: self.y + o.y,
-            })
+            unsafe {}
         }
-        #[test]
         pub fn sub(&self, o: &Self) -> Box<Self> {
-            Box::new(Self {
-                x: self.x - o.x,
-                y: self.y - o.y,
-            })
+            unsafe {}
         }
-        #[test]
         pub fn mul(&self, o: &Self) -> Box<Self> {
-            Box::new(Self {
-                x: self.x * o.x,
-                y: self.y * o.y,
-            })
+            unsafe {}
         }
-        #[test]
         pub fn div(&self, o: &Self) -> Box<Self> {
-            Box::new(Self {
-                x: self.x / o.x,
-                y: self.y / o.y,
-            })
+            unsafe {}
         }
-        #[test]
         pub fn addassign(&mut self, o: &Self) {
-            self.x += o.x;
-            self.y += o.y;
+            unsafe {}
         }
-        #[test]
         pub fn subassign(&mut self, o: &Self) {
-            self.x -= o.x;
-            self.y -= o.y;
+            unsafe {}
         }
-        #[test]
         pub fn mulassign(&mut self, o: &Self) {
-            self.x *= o.x;
-            self.y *= o.y;
+            unsafe {}
         }
-        #[test]
         pub fn divassign(&mut self, o: &Self) {
-            self.x /= o.x;
-            self.y /= o.y;
+            unsafe {}
         }
     }
-    #[test]
     pub struct StructWithAttrs {
         a: bool,
         b: u32,
     }
     impl StructWithAttrs {
-        #[test]
-        #[test]
         pub fn new_fallible(a: bool, b: u32) -> Result<StructWithAttrs, ()> {
-            if a { Ok(Self { a, b }) } else { Err(()) }
+            unsafe {}
         }
-        #[test]
         pub fn c(self) -> u32 {
-            5
+            unsafe {}
         }
     }
-    #[test]
+    #[diplomat::macro_rules]
     macro_rules! macro_frag_spec_test {
         (
             BLOCK $b:block [EXPR $e:expr, IDENT $i:ident] LT $lt:lifetime literal

@@ -2,10 +2,7 @@
 pub mod ffi {
     use std::fmt::Write;
     use diplomat_runtime::DiplomatStr16;
-    #[test]
     pub struct Foo<'a>(&'a DiplomatStr);
-    #[test]
-    #[test]
     pub struct Bar<'b, 'a: 'b>(&'b Foo<'a>);
     pub struct BorrowedFields<'a> {
         a: DiplomatStr16Slice<'a>,
@@ -21,39 +18,27 @@ pub mod ffi {
         bytes: DiplomatStrSlice<'a>,
     }
     impl<'a> Foo<'a> {
-        #[test]
         pub fn new(x: &'a DiplomatStr) -> Box<Self> {
-            Box::new(Foo(x))
+            unsafe {}
         }
-        #[test]
         pub fn get_bar<'b>(&'b self) -> Box<Bar<'b, 'a>> {
-            Box::new(Bar(self))
+            unsafe {}
         }
-        #[test]
-        #[test]
         pub fn new_static(x: &'static DiplomatStr) -> Box<Self> {
-            Box::new(Foo(x))
+            unsafe {}
         }
         pub fn as_returning(&self) -> BorrowedFieldsReturning<'a> {
-            BorrowedFieldsReturning {
-                bytes: self.0.into(),
-            }
+            unsafe {}
         }
-        #[test]
         pub fn extract_from_fields(fields: BorrowedFields<'a>) -> Box<Self> {
-            Box::new(Foo(fields.b.into()))
+            unsafe {}
         }
-        #[test]
-        #[test]
+        /// Test that the extraction logic correctly pins the right fields
         pub fn extract_from_bounds<'x, 'y: 'x + 'a, 'z: 'x + 'y>(
             bounds: BorrowedFieldsWithBounds<'x, 'y, 'z>,
             another_string: &'a DiplomatStr,
         ) -> Box<Self> {
-            if bounds.field_b.is_empty() {
-                Box::new(Self(another_string))
-            } else {
-                Box::new(Self(bounds.field_b.into()))
-            }
+            unsafe {}
         }
     }
     impl<'x> BorrowedFields<'x> {
@@ -62,11 +47,7 @@ pub mod ffi {
             dstr16: &'x DiplomatStr16,
             utf8_str: &'x str,
         ) -> Self {
-            BorrowedFields {
-                a: dstr16.into(),
-                b: bar.0.0.into(),
-                c: utf8_str.into(),
-            }
+            unsafe {}
         }
     }
     impl<'x, 'y: 'x, 'z: 'y> BorrowedFieldsWithBounds<'x, 'y, 'z> {
@@ -75,11 +56,7 @@ pub mod ffi {
             dstr16_x: &'x DiplomatStr16,
             utf8_str_z: &'z str,
         ) -> Self {
-            BorrowedFieldsWithBounds {
-                field_a: dstr16_x.into(),
-                field_b: foo.0.into(),
-                field_c: utf8_str_z.into(),
-            }
+            unsafe {}
         }
     }
     pub struct NestedBorrowedFields<'x, 'y: 'x, 'z> {
@@ -96,52 +73,33 @@ pub mod ffi {
             utf8_str_y: &'y str,
             utf8_str_z: &'z str,
         ) -> Self {
-            let fields = BorrowedFields::from_bar_and_strings(bar, dstr16_x, utf8_str_y);
-            let bounds = BorrowedFieldsWithBounds::from_foo_and_strings(
-                bar.0,
-                dstr16_x,
-                utf8_str_y,
-            );
-            let bounds2 = BorrowedFieldsWithBounds::from_foo_and_strings(
-                foo,
-                dstr16_z,
-                utf8_str_z,
-            );
-            Self { fields, bounds, bounds2 }
+            unsafe {}
         }
     }
     impl<'b, 'a: 'b> Bar<'b, 'a> {
-        #[test]
         pub fn foo(&'b self) -> &'b Foo<'a> {
-            self.0
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
+    #[derive(Copy, Clone)]
     pub struct One<'a>(super::One<'a>);
-    #[test]
-    #[test]
+    #[derive(Copy, Clone)]
     pub struct Two<'a, 'b>(super::Two<'a, 'b>);
     impl<'o> One<'o> {
-        #[test]
-        #[test]
+        #[allow(clippy::extra_unused_lifetimes)]
         pub fn transitivity<'a, 'b: 'a, 'c: 'b, 'd: 'c, 'e: 'd, 'x>(
             hold: &'x One<'e>,
             nohold: &One<'x>,
         ) -> Box<One<'a>> {
-            let _ = (hold, nohold);
-            unimplemented!()
+            unsafe {}
         }
-        #[test]
-        #[test]
+        #[allow(clippy::extra_unused_lifetimes)]
         pub fn cycle<'a: 'b, 'b: 'c, 'c: 'a, 'x>(
             hold: &Two<'x, 'b>,
             nohold: &'x One<'x>,
         ) -> Box<One<'a>> {
-            let _ = (hold, nohold);
-            unimplemented!()
+            unsafe {}
         }
-        #[test]
         pub fn many_dependents<'a, 'b: 'a, 'c: 'a, 'd: 'b + 'x, 'x, 'y>(
             a: &'x One<'a>,
             b: &'b One<'a>,
@@ -149,74 +107,46 @@ pub mod ffi {
             d: &'x Two<'d, 'y>,
             nohold: &'x Two<'x, 'y>,
         ) -> Box<One<'a>> {
-            let _ = (a, b, c, d, nohold);
-            unimplemented!()
+            unsafe {}
         }
-        #[test]
         pub fn return_outlives_param<'short, 'long: 'short>(
             hold: &Two<'long, 'short>,
             nohold: &'short One<'short>,
         ) -> Box<One<'long>> {
-            let _ = (hold, nohold);
-            unimplemented!()
+            unsafe {}
         }
-        #[test]
         pub fn diamond_top<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
             top: &One<'top>,
             left: &One<'left>,
             right: &One<'right>,
             bottom: &One<'bottom>,
         ) -> Box<One<'top>> {
-            Box::new(
-                match 0 {
-                    0 => *bottom,
-                    1 => *left,
-                    2 => *right,
-                    _ => *top,
-                },
-            )
+            unsafe {}
         }
-        #[test]
         pub fn diamond_left<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
             top: &One<'top>,
             left: &One<'left>,
             right: &One<'right>,
             bottom: &One<'bottom>,
         ) -> Box<One<'left>> {
-            let _ = (top, right);
-            Box::new(
-                match 0 {
-                    0 => *bottom,
-                    _ => *left,
-                },
-            )
+            unsafe {}
         }
-        #[test]
         pub fn diamond_right<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
             top: &One<'top>,
             left: &One<'left>,
             right: &One<'right>,
             bottom: &One<'bottom>,
         ) -> Box<One<'right>> {
-            let _ = (top, left);
-            Box::new(
-                match 0 {
-                    0 => *bottom,
-                    _ => *right,
-                },
-            )
+            unsafe {}
         }
-        #[test]
         pub fn diamond_bottom<'top, 'left: 'top, 'right: 'top, 'bottom: 'left + 'right>(
             top: &One<'top>,
             left: &One<'left>,
             right: &One<'right>,
             bottom: &One<'bottom>,
         ) -> Box<One<'bottom>> {
-            let _ = (top, left, right);
-            Box::new(*bottom)
+            unsafe {}
         }
-        #[test]
         pub fn diamond_and_nested_types<'a, 'b: 'a, 'c: 'b, 'd: 'b + 'c, 'x, 'y>(
             a: &One<'a>,
             b: &'y One<'b>,
@@ -224,119 +154,68 @@ pub mod ffi {
             d: &One<'d>,
             nohold: &One<'x>,
         ) -> Box<One<'a>> {
-            let _ = nohold;
-            Box::new(
-                match 0 {
-                    0 => *a,
-                    1 => *b,
-                    2 => *c,
-                    _ => *d,
-                },
-            )
+            unsafe {}
         }
-        #[test]
-        #[test]
+        #[allow(clippy::extra_unused_lifetimes)]
         pub fn implicit_bounds<'a, 'b: 'a, 'c: 'b, 'd: 'c, 'x, 'y>(
             explicit_hold: &'d One<'x>,
             implicit_hold: &One<'x>,
             nohold: &One<'y>,
         ) -> Box<One<'a>> {
-            let _ = nohold;
-            Box::new(
-                match 0 {
-                    0 => *explicit_hold,
-                    _ => *implicit_hold,
-                },
-            )
+            unsafe {}
         }
-        #[test]
-        #[test]
+        #[allow(clippy::needless_lifetimes)]
         pub fn implicit_bounds_deep<'a, 'b, 'c, 'd, 'x>(
             explicit_: &'a One<'b>,
             implicit_1: &'b One<'c>,
             implicit_2: &'c One<'d>,
             nohold: &'x One<'x>,
         ) -> Box<One<'a>> {
-            let _ = nohold;
-            Box::new(
-                match 0 {
-                    0 => *explicit_,
-                    1 => *implicit_1,
-                    _ => *implicit_2,
-                },
-            )
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
-    #[test]
     pub struct OpaqueThin(pub crate::lifetimes::Internal);
     impl OpaqueThin {
-        #[test]
         pub fn a(&self) -> i32 {
-            self.0.a
+            unsafe {}
         }
-        #[test]
         pub fn b(&self) -> f32 {
-            self.0.b
+            unsafe {}
         }
-        #[test]
         pub fn c(&self, w: &mut DiplomatWrite) {
-            w.write_str(&self.0.c).unwrap();
+            unsafe {}
         }
     }
-    #[test]
     pub struct OpaqueThinIter<'a>(pub std::slice::Iter<'a, crate::lifetimes::Internal>);
     impl<'a> OpaqueThinIter<'a> {
-        #[test]
         pub fn next(&'a mut self) -> Option<&'a OpaqueThin> {
-            self.0.next().map(OpaqueThin::transparent_convert)
+            unsafe {}
         }
     }
-    #[test]
     pub struct OpaqueThinVec(std::vec::Vec<crate::lifetimes::Internal>);
     impl OpaqueThinVec {
-        #[test]
         pub fn create(a: &[i32], b: &[f32], c: &DiplomatStr) -> Box<Self> {
-            assert!(a.len() == b.len(), "arrays must be of equal size");
-            Box::new(
-                Self(
-                    a
-                        .iter()
-                        .zip(b.iter())
-                        .map(|(a, b)| crate::lifetimes::Internal {
-                            a: *a,
-                            b: *b,
-                            c: String::from_utf8(c.to_vec()).unwrap(),
-                        })
-                        .collect(),
-                ),
-            )
+            unsafe {}
         }
-        #[test]
-        #[test]
+        #[allow(clippy::should_implement_trait)]
         pub fn iter<'a>(&'a self) -> Box<OpaqueThinIter<'a>> {
-            Box::new(OpaqueThinIter(self.0.iter()))
+            unsafe {}
         }
-        #[test]
-        #[test]
+        #[allow(clippy::len_without_is_empty)]
         pub fn len(&self) -> usize {
-            self.0.len()
+            unsafe {}
         }
-        #[test]
         pub fn get<'a>(&'a self, idx: usize) -> Option<&'a OpaqueThin> {
-            self.0.get(idx).map(OpaqueThin::transparent_convert)
+            unsafe {}
         }
-        #[test]
-        #[test]
         pub fn first<'a>(&'a self) -> Option<&'a OpaqueThin> {
-            self.0.get(0).map(OpaqueThin::transparent_convert)
+            unsafe {}
         }
     }
 }
-#[test]
+#[derive(Copy, Clone)]
 pub struct One<'a>(&'a ());
-#[test]
+#[derive(Copy, Clone)]
 pub struct Two<'a, 'b>(&'a (), &'b ());
 pub struct Internal {
     a: i32,

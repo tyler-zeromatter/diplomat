@@ -1,161 +1,116 @@
 #[diplomat_static_rust::bridge]
 pub mod ffi {
     use diplomat_runtime::{DiplomatChar, DiplomatOption, DiplomatWrite};
-    #[test]
     pub struct OptionOpaque(i32);
-    #[test]
     pub struct OptionOpaqueChar(char);
-    #[test]
-    #[test]
     pub struct OptionString(String);
     impl OptionString {
-        #[test]
         pub fn new<'a>(diplomat_str: &'a DiplomatStr) -> Option<Box<Self>> {
-            let string = std::str::from_utf8(diplomat_str).ok()?.into();
-            Some(Box::new(OptionString(string)))
+            unsafe {}
         }
         pub fn write<'a>(&'a self, write: &'a mut DiplomatWrite) -> Result<(), ()> {
-            use std::fmt::Write;
-            write!(write, "{}", self.0).map_err(|_| ())?;
-            Ok(())
+            unsafe {}
         }
         pub fn borrow<'a>(&'a self) -> Option<&'a DiplomatStr> {
-            Some(self.0.as_bytes())
+            unsafe {}
         }
     }
-    #[test]
     pub struct OptionStruct {
         a: Option<Box<OptionOpaque>>,
         b: Option<Box<OptionOpaqueChar>>,
         c: u32,
         d: Box<OptionOpaque>,
     }
-    #[test]
-    #[test]
+    #[derive(Debug)]
     pub struct OptionInputStruct {
         a: DiplomatOption<u8>,
         b: DiplomatOption<DiplomatChar>,
         c: DiplomatOption<OptionEnum>,
     }
     impl OptionInputStruct {
-        #[test]
-        #[test]
         pub fn default_ctor() -> Self {
-            Self {
-                a: None.into(),
-                b: None.into(),
-                c: None.into(),
-            }
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
+    #[derive(Debug)]
     pub enum OptionEnum {
         Foo,
         Bar,
     }
     impl OptionOpaque {
-        #[test]
         pub fn new(i: i32) -> Option<Box<OptionOpaque>> {
-            Some(Box::new(OptionOpaque(i)))
+            unsafe {}
         }
         pub fn new_none() -> Option<Box<OptionOpaque>> {
-            None
+            unsafe {}
         }
         pub fn returns() -> Option<OptionStruct> {
-            None
+            unsafe {}
         }
         pub fn option_isize(&self) -> Option<isize> {
-            Some(10)
+            unsafe {}
         }
         pub fn option_usize(&self) -> Option<usize> {
-            Some(10)
+            unsafe {}
         }
         pub fn option_i32(&self) -> Option<i32> {
-            Some(10)
+            unsafe {}
         }
         pub fn option_u32(&self) -> Option<u32> {
-            Some(10)
+            unsafe {}
         }
         pub fn new_struct() -> OptionStruct {
-            OptionStruct {
-                a: Some(Box::new(OptionOpaque(101))),
-                b: Some(Box::new(OptionOpaqueChar('餐'))),
-                c: 904,
-                d: Box::new(OptionOpaque(926535)),
-            }
+            unsafe {}
         }
         pub fn new_struct_nones() -> OptionStruct {
-            OptionStruct {
-                a: None,
-                b: None,
-                c: 908,
-                d: Box::new(OptionOpaque(926535)),
-            }
+            unsafe {}
         }
         pub fn returns_none_self<'a>(&'a self) -> Option<&'a OptionOpaque> {
-            None
+            unsafe {}
         }
         pub fn returns_some_self<'a>(&'a self) -> Option<&'a OptionOpaque> {
-            Some(self)
+            unsafe {}
         }
         pub fn assert_integer(&self, i: i32) {
-            assert_eq!(i, self.0);
+            unsafe {}
         }
         pub fn option_opaque_argument(arg: Option<&OptionOpaque>) -> bool {
-            arg.is_some()
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_u8(arg: Option<u8>, sentinel: u8) -> Option<u8> {
-            assert_eq!(sentinel, 123, "{arg:?}");
-            arg
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_enum(
             arg: Option<OptionEnum>,
             sentinel: u8,
         ) -> Option<OptionEnum> {
-            assert_eq!(sentinel, 123, "{arg:?}");
-            arg
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_input_struct(
             arg: Option<OptionInputStruct>,
             sentinel: u8,
         ) -> Option<OptionInputStruct> {
-            assert_eq!(sentinel, 123, "{arg:?}");
-            arg
+            unsafe {}
         }
-        #[test]
         pub fn returns_option_input_struct() -> OptionInputStruct {
-            OptionInputStruct {
-                a: Some(6).into(),
-                b: None.into(),
-                c: Some(OptionEnum::Bar).into(),
-            }
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_str(arg: Option<&str>, sentinel: u8) -> usize {
-            assert_eq!(sentinel, 123, "{arg:?}");
-            arg.unwrap_or_default().len()
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_str_slice(
             arg: Option<&[DiplomatStrSlice]>,
             sentinel: u8,
         ) -> bool {
-            assert_eq!(sentinel, 123);
-            arg.is_some()
+            unsafe {}
         }
-        #[test]
         pub fn accepts_option_primitive(arg: Option<&[u32]>, sentinel: u8) -> i64 {
-            assert_eq!(sentinel, 123);
-            arg.map(|v| v.iter().sum::<u32>().into()).unwrap_or(-1)
+            unsafe {}
         }
     }
     impl OptionOpaqueChar {
         pub fn assert_char(&self, ch: DiplomatChar) {
-            assert_eq!(ch, self.0 as u32)
+            unsafe {}
         }
     }
 }

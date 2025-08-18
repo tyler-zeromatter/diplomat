@@ -5,32 +5,27 @@ pub mod ffi {
     use crate::imports::ffi::ImportedStruct;
     use std::fmt::Write;
     use std::sync::Mutex;
-    #[test]
-    #[test]
     pub struct Opaque(String);
-    #[test]
     pub struct OpaqueMutexedString(Mutex<String>);
-    #[test]
     pub struct Utf16Wrap(Vec<u16>);
-    #[test]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum MyEnum {
         A = -2,
         B = -1,
         C = 0,
-        #[test]
+        #[diplomat::attr(auto, default)]
         D = 1,
         E = 2,
         F = 3,
     }
-    #[test]
+    #[derive(Debug, PartialEq, Eq)]
     pub enum ContiguousEnum {
         C = 0,
         D = 1,
-        #[test]
+        #[diplomat::attr(auto, default)]
         E = 2,
         F = 3,
     }
-    #[test]
     pub enum MyOpaqueEnum {
         A(String),
         B(Utf16Wrap),
@@ -50,253 +45,191 @@ pub mod ffi {
         f: DiplomatChar,
         g: MyEnum,
     }
-    #[test]
     pub struct MyStructContainingAnOption {
         pub(crate) a: DiplomatOption<MyStruct>,
         pub(crate) b: DiplomatOption<DefaultEnum>,
     }
-    #[test]
     pub struct MyZst;
     impl Opaque {
-        #[test]
         pub fn new() -> Box<Opaque> {
-            Box::new(Opaque("".into()))
+            unsafe {}
         }
         pub fn try_from_utf8(input: &DiplomatStr) -> Option<Box<Self>> {
-            let s = std::str::from_utf8(input).ok()?;
-            Some(Box::new(Self(s.into())))
+            unsafe {}
         }
         pub fn from_str(input: &str) -> Box<Self> {
-            Box::new(Self(input.into()))
+            unsafe {}
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            let _infallible = write!(write, "{:?}", & self.0);
+            unsafe {}
         }
-        #[test]
-        #[test]
-        #[test]
-        #[test]
-        #[test]
         pub fn assert_struct(&self, s: MyStruct) {
-            s.assert_value();
+            unsafe {}
         }
         pub fn returns_usize() -> usize {
-            412
+            unsafe {}
         }
         pub fn returns_imported() -> ImportedStruct {
-            unimplemented!()
+            unsafe {}
         }
         pub fn cmp() -> core::cmp::Ordering {
-            unimplemented!()
+            unsafe {}
         }
     }
     impl OpaqueMutexedString {
-        #[test]
         pub fn from_usize(number: usize) -> Box<OpaqueMutexedString> {
-            Box::new(OpaqueMutexedString(Mutex::new(format!("{number}"))))
+            unsafe {}
         }
         pub fn change(&self, number: usize) {
-            let mut guard = self.0.lock().expect("Failed to lock mutex");
-            *guard = format!("{number}");
+            unsafe {}
         }
         pub fn borrow<'a>(&'a self) -> &'a OpaqueMutexedString {
-            self
+            unsafe {}
         }
         pub fn borrow_other<'a>(
             other: &'a OpaqueMutexedString,
         ) -> &'a OpaqueMutexedString {
-            other
+            unsafe {}
         }
         pub fn borrow_self_or_other<'a>(
             &'a self,
             other: &'a OpaqueMutexedString,
         ) -> &'a OpaqueMutexedString {
-            let guard = self.0.lock().expect("Failed to lock mutex");
-            if guard.len() % 2 == 0 { self } else { other }
+            unsafe {}
         }
         pub fn get_len_and_add(&self, other: usize) -> usize {
-            let guard = self.0.lock().expect("Failed to lock mutex");
-            guard.len() + other
+            unsafe {}
         }
         pub fn dummy_str<'a>(&'a self) -> &'a DiplomatStr {
-            "A const str with non byte char: 餐 which is a DiplomatChar,".as_bytes()
+            unsafe {}
         }
         pub fn wrapper<'a>(&'a self) -> Box<Utf16Wrap> {
-            let chars = "A const str with non byte char: 𐐷 which is a DiplomatChar,"
-                .encode_utf16()
-                .collect();
-            Box::new(Utf16Wrap(chars))
+            unsafe {}
         }
         pub fn to_unsigned_from_unsigned(&self, input: u16) -> u16 {
-            input
+            unsafe {}
         }
     }
     impl Utf16Wrap {
-        #[test]
         pub fn from_utf16(input: &DiplomatStr16) -> Box<Self> {
-            Box::new(Self(input.into()))
+            unsafe {}
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            let _infallible = write!(write, "{:?}", & self.0);
+            unsafe {}
         }
         pub fn borrow_cont<'a>(&'a self) -> &'a DiplomatStr16 {
-            &self.0
+            unsafe {}
         }
     }
     impl MyEnum {
         pub fn into_value(self) -> i8 {
-            self as i8
+            unsafe {}
         }
         pub fn get_a() -> MyEnum {
-            MyEnum::A
+            unsafe {}
         }
     }
     impl MyOpaqueEnum {
-        #[test]
         pub fn new() -> Box<MyOpaqueEnum> {
-            Box::new(MyOpaqueEnum::A("a".into()))
+            unsafe {}
         }
         pub fn to_string(&self, write: &mut DiplomatWrite) {
-            let _infallible = write!(
-                write, "MyOpaqueEnum::{}", match self { MyOpaqueEnum::A(..) => "A",
-                MyOpaqueEnum::B(..) => "B", MyOpaqueEnum::C => "C", MyOpaqueEnum::D(..)
-                => "D", }
-            );
+            unsafe {}
         }
     }
     impl DefaultEnum {
-        #[test]
         pub fn new() -> DefaultEnum {
-            DefaultEnum::A
+            unsafe {}
         }
     }
     impl MyStruct {
-        #[test]
         pub fn new() -> MyStruct {
-            MyStruct {
-                a: 17,
-                b: true,
-                c: 209,
-                d: 1234,
-                e: 5991,
-                f: '餐' as DiplomatChar,
-                g: MyEnum::B,
-            }
+            unsafe {}
         }
-        #[test]
         pub fn takes_mut(&mut self, o: &mut Self) {
-            self.a = 0;
-            o.c = 100;
+            unsafe {}
         }
-        #[test]
         pub fn takes_const(&self, o: &mut Self) {
-            o.c = self.a;
+            unsafe {}
         }
         pub fn into_a(self) -> u8 {
-            self.a
+            unsafe {}
         }
         fn assert_value(&self) {
-            assert_eq!(self.a, 17);
-            assert!(self.b);
-            assert_eq!(self.c, 209);
-            assert_eq!(self.d, 1234);
-            assert_eq!(self.e, 5991);
-            assert_eq!(self.f, '餐' as DiplomatChar);
-            assert_eq!(self.g, MyEnum::B);
+            unsafe {}
         }
         pub fn returns_zst_result() -> Result<(), MyZst> {
-            Ok(())
+            unsafe {}
         }
         pub fn fails_zst_result() -> Result<(), MyZst> {
-            Err(MyZst {})
+            unsafe {}
         }
     }
     impl MyStructContainingAnOption {
-        #[test]
         pub fn new() -> Self {
-            MyStructContainingAnOption {
-                a: None.into(),
-                b: None.into(),
-            }
+            unsafe {}
         }
         pub fn filled() -> Self {
-            MyStructContainingAnOption {
-                a: Some(MyStruct::new()).into(),
-                b: Some(DefaultEnum::new()).into(),
-            }
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
+    #[derive(Default)]
     pub struct CyclicStructA {
         pub a: CyclicStructB,
     }
-    #[test]
-    #[test]
+    #[derive(Default)]
     pub struct CyclicStructB {
         pub field: u8,
     }
-    #[test]
+    #[derive(Default)]
     pub struct CyclicStructC {
         pub a: CyclicStructA,
     }
     impl CyclicStructA {
         pub fn get_b() -> CyclicStructB {
-            Default::default()
+            unsafe {}
         }
         pub fn cyclic_out(self, out: &mut DiplomatWrite) {
-            out.write_str(&self.a.field.to_string()).unwrap();
+            unsafe {}
         }
-        #[test]
         pub fn nested_slice(sl: &[CyclicStructA]) -> u8 {
-            let mut sum = 0;
-            for a in sl.iter() {
-                sum += a.a.field;
-            }
-            sum
+            unsafe {}
         }
         pub fn double_cyclic_out(self, cyclic_struct_a: Self, out: &mut DiplomatWrite) {
-            out.write_fmt(format_args!("{} {}", & self.a.field, cyclic_struct_a.a.field))
-                .unwrap();
+            unsafe {}
         }
-        #[test]
         pub fn getter_out(self, out: &mut DiplomatWrite) {
-            out.write_str(&self.a.field.to_string()).unwrap();
+            unsafe {}
         }
     }
     impl CyclicStructB {
         pub fn get_a() -> CyclicStructA {
-            Default::default()
+            unsafe {}
         }
         pub fn get_a_option() -> Option<CyclicStructA> {
-            Some(Default::default())
+            unsafe {}
         }
     }
     impl CyclicStructC {
         pub fn takes_nested_parameters(c: CyclicStructC) -> CyclicStructC {
-            c
+            unsafe {}
         }
         pub fn cyclic_out(self, out: &mut DiplomatWrite) {
-            out.write_str(&self.a.a.field.to_string()).unwrap();
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
-    #[test]
+    /// Testing JS-specific layout/padding behavior
     pub struct ScalarPairWithPadding {
         pub first: u8,
         pub second: u32,
     }
     impl ScalarPairWithPadding {
         pub fn assert_value(self) {
-            assert_eq!(self.first, 122);
-            assert_eq!(self.second, 414);
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
-    #[test]
-    #[test]
+    /// Testing JS-specific layout/padding behavior
+    /// Also being used to test CPP backends taking structs with primitive values.
     pub struct BigStructWithStuff {
         pub first: u8,
         pub second: u16,
@@ -306,65 +239,38 @@ pub mod ffi {
     }
     impl BigStructWithStuff {
         pub fn assert_value(self, extra_val: u16) {
-            assert_eq!(self.first, 101);
-            assert_eq!(self.second, 505);
-            assert_eq!(self.third, 9345);
-            self.fourth.assert_value();
-            assert_eq!(self.fifth, 99);
-            assert_eq!(extra_val, 853);
+            unsafe {}
         }
-        #[test]
         pub fn assert_slice(slice: &[BigStructWithStuff], second_value: u16) {
-            assert!(slice.len() > 1);
-            let mut i = slice.iter();
-            i.next();
-            assert_eq!(i.next().unwrap().second, second_value)
+            unsafe {}
         }
     }
-    #[test]
     struct StructArithmetic {
         x: i32,
         y: i32,
     }
     impl StructArithmetic {
-        #[test]
-        #[test]
+        #[allow(non_snake_case)]
         pub fn ORIGIN() -> Self {
-            Self { x: 0, y: 0 }
+            unsafe {}
         }
-        #[test]
-        pub fn set_origin(_new_origin: StructArithmetic) {}
-        #[test]
+        pub fn set_origin(_new_origin: StructArithmetic) {
+            unsafe {}
+        }
         pub fn new(x: i32, y: i32) -> Self {
-            Self { x, y }
+            unsafe {}
         }
-        #[test]
         pub fn add(self, o: Self) -> Self {
-            Self {
-                x: self.x + o.x,
-                y: self.y + o.y,
-            }
+            unsafe {}
         }
-        #[test]
         pub fn sub(self, o: Self) -> Self {
-            Self {
-                x: self.x - o.x,
-                y: self.y - o.y,
-            }
+            unsafe {}
         }
-        #[test]
         pub fn mul(self, o: Self) -> Self {
-            Self {
-                x: self.x * o.x,
-                y: self.y * o.y,
-            }
+            unsafe {}
         }
-        #[test]
         pub fn div(self, o: Self) -> Self {
-            Self {
-                x: self.x / o.x,
-                y: self.y / o.y,
-            }
+            unsafe {}
         }
     }
     pub struct StructWithSlices<'a> {
@@ -373,11 +279,10 @@ pub mod ffi {
     }
     impl<'a> StructWithSlices<'a> {
         pub fn return_last(self, w: &mut DiplomatWrite) {
-            w.write_char(*self.first.last().unwrap() as char).unwrap();
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
+    #[derive(Clone)]
     pub struct PrimitiveStruct {
         x: f32,
         a: bool,
@@ -387,64 +292,41 @@ pub mod ffi {
         e: DiplomatByte,
     }
     impl PrimitiveStruct {
-        #[test]
         pub fn mutable_slice(a: &mut [PrimitiveStruct]) {
-            let mut running_sum = 0.0;
-            let mut alternate = false;
-            for p in a.iter_mut() {
-                running_sum += p.x;
-                p.x = running_sum;
-                p.a = alternate;
-                alternate = !alternate;
-                p.b = running_sum as u32;
-                p.c = running_sum as i64;
-                p.d = (running_sum + 100.0) as isize;
-                p.e = running_sum as u8;
-            }
+            unsafe {}
         }
-        #[test]
         pub fn mutable_ref(&mut self, a: &mut Self) {
-            self.a = false;
-            a.d = 1;
+            unsafe {}
         }
     }
-    #[test]
-    #[test]
     pub struct PrimitiveStructVec(Vec<PrimitiveStruct>);
     impl PrimitiveStructVec {
-        #[test]
         pub fn new() -> Box<Self> {
-            Box::new(Self(Vec::new()))
+            unsafe {}
         }
-        #[test]
         pub fn push(&mut self, value: PrimitiveStruct) {
-            self.0.push(value);
+            unsafe {}
         }
-        #[test]
         pub fn len(&self) -> usize {
-            self.0.len()
+            unsafe {}
         }
-        #[test]
         pub fn as_slice<'a>(&'a self) -> &'a [PrimitiveStruct] {
-            &self.0
+            unsafe {}
         }
-        #[test]
         pub fn as_slice_mut<'a>(&'a mut self) -> &'a mut [PrimitiveStruct] {
-            &mut self.0
+            unsafe {}
         }
-        #[test]
         pub fn get(&self, idx: usize) -> PrimitiveStruct {
-            self.0[idx].clone()
+            unsafe {}
         }
-        #[test]
         pub fn take_slice_from_other_namespace(
             _sl: &[crate::attrs::ffi::StructWithAttrs],
         ) {
-            assert!(true)
+            unsafe {}
         }
     }
 }
-#[test]
+#[allow(unused)]
 fn test_transparent_convert_exists(s: &String) -> &ffi::Opaque {
     ffi::Opaque::transparent_convert(s)
 }
