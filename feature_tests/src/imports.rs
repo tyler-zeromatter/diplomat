@@ -18,5 +18,9 @@ pub mod ffi {
                 count : 5
             }
         }
+
+        pub fn assert_eq(&self, c : u8) {
+            assert_eq!(self.count, c);
+        }
     }
 }
