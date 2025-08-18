@@ -125,9 +125,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
             let out = match p {
                 syn::FnArg::Receiver(r) => {
                     let self_token = r.self_token;
-                    let mutable = r.mutability;
-                    let refs = r.reference.as_ref().map(|r| { r.0 });
-                    quote!(#refs #mutable #self_token)
+                    quote!(#self_token)
                 }
                 syn::FnArg::Typed(ty) => {
                     ty.pat.to_token_stream()
