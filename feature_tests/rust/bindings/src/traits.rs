@@ -16,13 +16,13 @@ mod ffi {
     }
     impl TraitWrapper {
         pub fn test_with_trait(t: impl TesterTrait, x: i32) -> i32 {
-            unsafe {}
+            unsafe { TraitWrapper_test_with_trait(t, x) }
         }
         pub fn test_trait_with_struct(t: impl TesterTrait) -> i32 {
-            unsafe {}
+            unsafe { TraitWrapper_test_trait_with_struct(t) }
         }
         pub fn test_result_output(t: impl TesterTrait) {
-            unsafe {}
+            unsafe { TraitWrapper_test_result_output(t) }
         }
     }
 }

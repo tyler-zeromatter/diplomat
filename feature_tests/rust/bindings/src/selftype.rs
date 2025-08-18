@@ -4,7 +4,7 @@ mod ffi {
     struct RefList<'a>((&'a RefListParameter, Option<Box<Self>>));
     impl<'b> RefList<'b> {
         pub fn node(data: &'b RefListParameter) -> Box<Self> {
-            unsafe {}
+            unsafe { RefList_node(data) }
         }
     }
 }

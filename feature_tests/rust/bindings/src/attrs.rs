@@ -24,26 +24,26 @@ pub mod ffi {
     pub struct AttrOpaque1;
     impl AttrOpaque1 {
         pub fn new() -> Box<AttrOpaque1> {
-            unsafe {}
+            unsafe { namespace_VectorTest_new() }
         }
         pub fn test_namespaced_callback(_t: impl Fn() -> Result<(), ()>) {
-            unsafe {}
+            unsafe { namespace_AttrOpaque1_test_namespaced_callback(_t) }
         }
         impl_mac!(mac_test, hello, { println!("Hello world!"); 10 });
         pub fn method(&self) -> u8 {
-            unsafe {}
+            unsafe { namespace_AttrOpaque1_method(self) }
         }
         pub fn abirenamed(&self) -> u8 {
-            unsafe {}
+            unsafe { renamed_on_abi_only(self) }
         }
         pub fn method_disabled(&self) {
-            unsafe {}
+            unsafe { namespace_AttrOpaque1_method_disabled(self) }
         }
         pub fn use_unnamespaced(&self, _un: &Unnamespaced) {
-            unsafe {}
+            unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) }
         }
         pub fn use_namespaced(&self, _n: AttrEnum) {
-            unsafe {}
+            unsafe { namespace_Unnamespaced_use_namespaced(self, _n) }
         }
     }
     pub struct AttrOpaque2;
@@ -56,10 +56,10 @@ pub mod ffi {
     pub struct Unnamespaced;
     impl Unnamespaced {
         pub fn make(_e: AttrEnum) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_Unnamespaced_make(_e) }
         }
         pub fn use_namespaced(&self, _n: &AttrOpaque1) {
-            unsafe {}
+            unsafe { namespace_Unnamespaced_use_namespaced(self, _n) }
         }
     }
     pub struct Nested;
@@ -67,46 +67,46 @@ pub mod ffi {
     pub struct Comparable(u8);
     impl Comparable {
         pub fn new(int: u8) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_VectorTest_new(int) }
         }
         pub fn cmp(&self, other: &Comparable) -> core::cmp::Ordering {
-            unsafe {}
+            unsafe { namespace_Comparable_cmp(self, other) }
         }
     }
     pub struct MyIndexer(Vec<String>);
     pub struct MyIterable(Vec<u8>);
     impl MyIterable {
         pub fn new(x: &[u8]) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_VectorTest_new(x) }
         }
         pub fn iter<'a>(&'a self) -> Box<MyIterator<'a>> {
-            unsafe {}
+            unsafe { namespace_OpaqueIterable_iter(self) }
         }
         pub fn len(&self) -> usize {
-            unsafe {}
+            unsafe { namespace_VectorTest_len(self) }
         }
     }
     pub struct MyIterator<'a>(std::slice::Iter<'a, u8>);
     impl<'a> MyIterator<'a> {
         pub fn next(&mut self) -> Option<u8> {
-            unsafe {}
+            unsafe { namespace_OpaqueIterator_next(self) }
         }
     }
     impl MyIndexer {
         pub fn get<'a>(&'a self, i: usize) -> Option<&'a DiplomatStr> {
-            unsafe {}
+            unsafe { namespace_VectorTest_get(self, i) }
         }
     }
     struct OpaqueIterable(Vec<AttrOpaque1>);
     impl OpaqueIterable {
         pub fn iter<'a>(&'a self) -> Box<OpaqueIterator<'a>> {
-            unsafe {}
+            unsafe { namespace_OpaqueIterable_iter(self) }
         }
     }
     struct OpaqueIterator<'a>(Box<dyn Iterator<Item = AttrOpaque1> + 'a>);
     impl<'a> OpaqueIterator<'a> {
         pub fn next(&'a mut self) -> Option<Box<AttrOpaque1>> {
-            unsafe {}
+            unsafe { namespace_OpaqueIterator_next(self) }
         }
     }
     pub(crate) struct OpaqueArithmetic {
@@ -115,40 +115,40 @@ pub mod ffi {
     }
     impl OpaqueArithmetic {
         pub fn make(x: i32, y: i32) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_Unnamespaced_make(x, y) }
         }
         pub fn make_overload(x: f32, y: f32) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_make_overload(x, y) }
         }
         pub fn x(&self) -> i32 {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_x(self) }
         }
         pub fn y(&self) -> i32 {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_y(self) }
         }
         pub fn add(&self, o: &Self) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_add(self, o) }
         }
         pub fn sub(&self, o: &Self) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_sub(self, o) }
         }
         pub fn mul(&self, o: &Self) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_mul(self, o) }
         }
         pub fn div(&self, o: &Self) -> Box<Self> {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_div(self, o) }
         }
         pub fn addassign(&mut self, o: &Self) {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_addassign(self, o) }
         }
         pub fn subassign(&mut self, o: &Self) {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_subassign(self, o) }
         }
         pub fn mulassign(&mut self, o: &Self) {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_mulassign(self, o) }
         }
         pub fn divassign(&mut self, o: &Self) {
-            unsafe {}
+            unsafe { namespace_OpaqueArithmetic_divassign(self, o) }
         }
     }
     pub struct StructWithAttrs {
@@ -157,10 +157,10 @@ pub mod ffi {
     }
     impl StructWithAttrs {
         pub fn new_fallible(a: bool, b: u32) -> Result<StructWithAttrs, ()> {
-            unsafe {}
+            unsafe { namespace_StructWithAttrs_new_fallible(a, b) }
         }
         pub fn c(self) -> u32 {
-            unsafe {}
+            unsafe { namespace_StructWithAttrs_c(self) }
         }
     }
     #[diplomat::macro_rules]

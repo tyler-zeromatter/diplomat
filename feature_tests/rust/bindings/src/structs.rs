@@ -52,125 +52,125 @@ pub mod ffi {
     pub struct MyZst;
     impl Opaque {
         pub fn new() -> Box<Opaque> {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
         pub fn try_from_utf8(input: &DiplomatStr) -> Option<Box<Self>> {
-            unsafe {}
+            unsafe { Opaque_try_from_utf8(input) }
         }
         pub fn from_str(input: &str) -> Box<Self> {
-            unsafe {}
+            unsafe { Opaque_from_str(input) }
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { Utf16Wrap_get_debug_str(self, write) }
         }
         pub fn assert_struct(&self, s: MyStruct) {
-            unsafe {}
+            unsafe { Opaque_assert_struct(self, s) }
         }
         pub fn returns_usize() -> usize {
-            unsafe {}
+            unsafe { Opaque_returns_usize() }
         }
         pub fn returns_imported() -> ImportedStruct {
-            unsafe {}
+            unsafe { Opaque_returns_imported() }
         }
         pub fn cmp() -> core::cmp::Ordering {
-            unsafe {}
+            unsafe { Opaque_cmp() }
         }
     }
     impl OpaqueMutexedString {
         pub fn from_usize(number: usize) -> Box<OpaqueMutexedString> {
-            unsafe {}
+            unsafe { OpaqueMutexedString_from_usize(number) }
         }
         pub fn change(&self, number: usize) {
-            unsafe {}
+            unsafe { OpaqueMutexedString_change(self, number) }
         }
         pub fn borrow<'a>(&'a self) -> &'a OpaqueMutexedString {
-            unsafe {}
+            unsafe { OpaqueMutexedString_borrow(self) }
         }
         pub fn borrow_other<'a>(
             other: &'a OpaqueMutexedString,
         ) -> &'a OpaqueMutexedString {
-            unsafe {}
+            unsafe { OpaqueMutexedString_borrow_other(other) }
         }
         pub fn borrow_self_or_other<'a>(
             &'a self,
             other: &'a OpaqueMutexedString,
         ) -> &'a OpaqueMutexedString {
-            unsafe {}
+            unsafe { OpaqueMutexedString_borrow_self_or_other(self, other) }
         }
         pub fn get_len_and_add(&self, other: usize) -> usize {
-            unsafe {}
+            unsafe { OpaqueMutexedString_get_len_and_add(self, other) }
         }
         pub fn dummy_str<'a>(&'a self) -> &'a DiplomatStr {
-            unsafe {}
+            unsafe { OpaqueMutexedString_dummy_str(self) }
         }
         pub fn wrapper<'a>(&'a self) -> Box<Utf16Wrap> {
-            unsafe {}
+            unsafe { OpaqueMutexedString_wrapper(self) }
         }
         pub fn to_unsigned_from_unsigned(&self, input: u16) -> u16 {
-            unsafe {}
+            unsafe { OpaqueMutexedString_to_unsigned_from_unsigned(self, input) }
         }
     }
     impl Utf16Wrap {
         pub fn from_utf16(input: &DiplomatStr16) -> Box<Self> {
-            unsafe {}
+            unsafe { Utf16Wrap_from_utf16(input) }
         }
         pub fn get_debug_str(&self, write: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { Utf16Wrap_get_debug_str(self, write) }
         }
         pub fn borrow_cont<'a>(&'a self) -> &'a DiplomatStr16 {
-            unsafe {}
+            unsafe { Utf16Wrap_borrow_cont(self) }
         }
     }
     impl MyEnum {
         pub fn into_value(self) -> i8 {
-            unsafe {}
+            unsafe { MyEnum_into_value(self) }
         }
         pub fn get_a() -> MyEnum {
-            unsafe {}
+            unsafe { MyEnum_get_a() }
         }
     }
     impl MyOpaqueEnum {
         pub fn new() -> Box<MyOpaqueEnum> {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
         pub fn to_string(&self, write: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { MyOpaqueEnum_to_string(self, write) }
         }
     }
     impl DefaultEnum {
         pub fn new() -> DefaultEnum {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
     }
     impl MyStruct {
         pub fn new() -> MyStruct {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
         pub fn takes_mut(&mut self, o: &mut Self) {
-            unsafe {}
+            unsafe { MyStruct_takes_mut(self, o) }
         }
         pub fn takes_const(&self, o: &mut Self) {
-            unsafe {}
+            unsafe { MyStruct_takes_const(self, o) }
         }
         pub fn into_a(self) -> u8 {
-            unsafe {}
+            unsafe { MyStruct_into_a(self) }
         }
         fn assert_value(&self) {
-            unsafe {}
+            unsafe { ScalarPairWithPadding_assert_value(self) }
         }
         pub fn returns_zst_result() -> Result<(), MyZst> {
-            unsafe {}
+            unsafe { MyStruct_returns_zst_result() }
         }
         pub fn fails_zst_result() -> Result<(), MyZst> {
-            unsafe {}
+            unsafe { MyStruct_fails_zst_result() }
         }
     }
     impl MyStructContainingAnOption {
         pub fn new() -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
         pub fn filled() -> Self {
-            unsafe {}
+            unsafe { MyStructContainingAnOption_filled() }
         }
     }
     #[derive(Default)]
@@ -187,35 +187,35 @@ pub mod ffi {
     }
     impl CyclicStructA {
         pub fn get_b() -> CyclicStructB {
-            unsafe {}
+            unsafe { CyclicStructA_get_b() }
         }
         pub fn cyclic_out(self, out: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { CyclicStructC_cyclic_out(self, out) }
         }
         pub fn nested_slice(sl: &[CyclicStructA]) -> u8 {
-            unsafe {}
+            unsafe { CyclicStructA_nested_slice(sl) }
         }
         pub fn double_cyclic_out(self, cyclic_struct_a: Self, out: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, out) }
         }
         pub fn getter_out(self, out: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { CyclicStructA_getter_out(self, out) }
         }
     }
     impl CyclicStructB {
         pub fn get_a() -> CyclicStructA {
-            unsafe {}
+            unsafe { MyEnum_get_a() }
         }
         pub fn get_a_option() -> Option<CyclicStructA> {
-            unsafe {}
+            unsafe { CyclicStructB_get_a_option() }
         }
     }
     impl CyclicStructC {
         pub fn takes_nested_parameters(c: CyclicStructC) -> CyclicStructC {
-            unsafe {}
+            unsafe { CyclicStructC_takes_nested_parameters(c) }
         }
         pub fn cyclic_out(self, out: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { CyclicStructC_cyclic_out(self, out) }
         }
     }
     /// Testing JS-specific layout/padding behavior
@@ -225,7 +225,7 @@ pub mod ffi {
     }
     impl ScalarPairWithPadding {
         pub fn assert_value(self) {
-            unsafe {}
+            unsafe { ScalarPairWithPadding_assert_value(self) }
         }
     }
     /// Testing JS-specific layout/padding behavior
@@ -239,10 +239,10 @@ pub mod ffi {
     }
     impl BigStructWithStuff {
         pub fn assert_value(self, extra_val: u16) {
-            unsafe {}
+            unsafe { ScalarPairWithPadding_assert_value(self, extra_val) }
         }
         pub fn assert_slice(slice: &[BigStructWithStuff], second_value: u16) {
-            unsafe {}
+            unsafe { BigStructWithStuff_assert_slice(slice, second_value) }
         }
     }
     struct StructArithmetic {
@@ -252,25 +252,25 @@ pub mod ffi {
     impl StructArithmetic {
         #[allow(non_snake_case)]
         pub fn ORIGIN() -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_ORIGIN() }
         }
         pub fn set_origin(_new_origin: StructArithmetic) {
-            unsafe {}
+            unsafe { StructArithmetic_set_origin(_new_origin) }
         }
         pub fn new(x: i32, y: i32) -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_new(x, y) }
         }
         pub fn add(self, o: Self) -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_add(self, o) }
         }
         pub fn sub(self, o: Self) -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_sub(self, o) }
         }
         pub fn mul(self, o: Self) -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_mul(self, o) }
         }
         pub fn div(self, o: Self) -> Self {
-            unsafe {}
+            unsafe { StructArithmetic_div(self, o) }
         }
     }
     pub struct StructWithSlices<'a> {
@@ -279,7 +279,7 @@ pub mod ffi {
     }
     impl<'a> StructWithSlices<'a> {
         pub fn return_last(self, w: &mut DiplomatWrite) {
-            unsafe {}
+            unsafe { StructWithSlices_return_last(self, w) }
         }
     }
     #[derive(Clone)]
@@ -293,36 +293,36 @@ pub mod ffi {
     }
     impl PrimitiveStruct {
         pub fn mutable_slice(a: &mut [PrimitiveStruct]) {
-            unsafe {}
+            unsafe { PrimitiveStruct_mutable_slice(a) }
         }
         pub fn mutable_ref(&mut self, a: &mut Self) {
-            unsafe {}
+            unsafe { PrimitiveStruct_mutable_ref(self, a) }
         }
     }
     pub struct PrimitiveStructVec(Vec<PrimitiveStruct>);
     impl PrimitiveStructVec {
         pub fn new() -> Box<Self> {
-            unsafe {}
+            unsafe { StructArithmetic_new() }
         }
         pub fn push(&mut self, value: PrimitiveStruct) {
-            unsafe {}
+            unsafe { PrimitiveStructVec_push(self, value) }
         }
         pub fn len(&self) -> usize {
-            unsafe {}
+            unsafe { PrimitiveStructVec_len(self) }
         }
         pub fn as_slice<'a>(&'a self) -> &'a [PrimitiveStruct] {
-            unsafe {}
+            unsafe { PrimitiveStructVec_as_slice(self) }
         }
         pub fn as_slice_mut<'a>(&'a mut self) -> &'a mut [PrimitiveStruct] {
-            unsafe {}
+            unsafe { PrimitiveStructVec_as_slice_mut(self) }
         }
         pub fn get(&self, idx: usize) -> PrimitiveStruct {
-            unsafe {}
+            unsafe { PrimitiveStructVec_get(self, idx) }
         }
         pub fn take_slice_from_other_namespace(
             _sl: &[crate::attrs::ffi::StructWithAttrs],
         ) {
-            unsafe {}
+            unsafe { PrimitiveStructVec_take_slice_from_other_namespace(_sl) }
         }
     }
 }
