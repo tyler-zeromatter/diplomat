@@ -117,6 +117,7 @@ pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
         files: &files,
         errors: &errors,
     };
+    // TODO: Lib.rs generation.
     main.visit_file_mut(&mut res);
 
     (files, errors)
