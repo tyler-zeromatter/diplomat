@@ -1,4 +1,4 @@
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 mod ffi {
     use crate::slices::ffi::MyString;
     pub struct CallbackWrapper {

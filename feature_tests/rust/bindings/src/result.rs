@@ -1,4 +1,4 @@
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
     pub struct ResultOpaque(i32);
     #[derive(PartialEq, Eq, Debug)]

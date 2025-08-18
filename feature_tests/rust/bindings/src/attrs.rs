@@ -1,4 +1,4 @@
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
     #[diplomat::macro_rules]
     macro_rules! impl_mac {

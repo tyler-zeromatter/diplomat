@@ -1,4 +1,4 @@
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
     use diplomat_runtime::{DiplomatStr, DiplomatStrSlice, DiplomatWrite};
     use std::fmt::Write as _;

@@ -1,4 +1,4 @@
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 mod ffi {
     pub struct TraitTestingStruct {
         x: i32,

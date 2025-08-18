@@ -1,5 +1,5 @@
 #[allow(clippy::needless_lifetimes)]
-#[diplomat_static_rust::bridge]
+#[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
     use diplomat_runtime::DiplomatStr16;
     use crate::imports::ffi::ImportedStruct;
