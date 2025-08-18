@@ -2,6 +2,7 @@
 pub mod ffi {
     use diplomat_runtime::{DiplomatStr, DiplomatStrSlice, DiplomatWrite};
     use std::fmt::Write as _;
+    #[repr(C)]
     pub struct MyString(String);
     impl MyString {
         pub fn new(v: &DiplomatStr) -> Box<MyString> {
@@ -32,6 +33,7 @@ pub mod ffi {
             unsafe { MyString_borrow(self) }
         }
     }
+    #[repr(C)]
     struct Float64Vec(Vec<f64>);
     impl Float64Vec {
         pub fn new(v: &[f64]) -> Box<Float64Vec> {
@@ -78,6 +80,7 @@ pub mod ffi {
             unsafe { Float64VecError_get(self, i) }
         }
     }
+    #[repr(C)]
     struct Float64VecError(Vec<f64>);
     impl Float64VecError {
         pub fn new(v: &[f64]) -> Box<Float64VecError> {

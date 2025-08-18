@@ -5,10 +5,14 @@ pub mod ffi {
     use crate::imports::ffi::ImportedStruct;
     use std::fmt::Write;
     use std::sync::Mutex;
+    #[repr(C)]
     pub struct Opaque(String);
+    #[repr(C)]
     pub struct OpaqueMutexedString(Mutex<String>);
+    #[repr(C)]
     pub struct Utf16Wrap(Vec<u16>);
     #[derive(Debug, PartialEq, Eq)]
+    #[repr(C)]
     pub enum MyEnum {
         A = -2,
         B = -1,
@@ -19,6 +23,7 @@ pub mod ffi {
         F = 3,
     }
     #[derive(Debug, PartialEq, Eq)]
+    #[repr(C)]
     pub enum ContiguousEnum {
         C = 0,
         D = 1,
@@ -26,16 +31,19 @@ pub mod ffi {
         E = 2,
         F = 3,
     }
+    #[repr(C)]
     pub enum MyOpaqueEnum {
         A(String),
         B(Utf16Wrap),
         C,
         D(i32, ImportedStruct),
     }
+    #[repr(C)]
     pub enum DefaultEnum {
         A,
         B,
     }
+    #[repr(C)]
     pub struct MyStruct {
         a: u8,
         b: bool,
@@ -45,10 +53,12 @@ pub mod ffi {
         f: DiplomatChar,
         g: MyEnum,
     }
+    #[repr(C)]
     pub struct MyStructContainingAnOption {
         pub(crate) a: DiplomatOption<MyStruct>,
         pub(crate) b: DiplomatOption<DefaultEnum>,
     }
+    #[repr(C)]
     pub struct MyZst;
     impl Opaque {
         pub fn new() -> Box<Opaque> {
@@ -174,14 +184,17 @@ pub mod ffi {
         }
     }
     #[derive(Default)]
+    #[repr(C)]
     pub struct CyclicStructA {
         pub a: CyclicStructB,
     }
     #[derive(Default)]
+    #[repr(C)]
     pub struct CyclicStructB {
         pub field: u8,
     }
     #[derive(Default)]
+    #[repr(C)]
     pub struct CyclicStructC {
         pub a: CyclicStructA,
     }
@@ -219,6 +232,7 @@ pub mod ffi {
         }
     }
     /// Testing JS-specific layout/padding behavior
+    #[repr(C)]
     pub struct ScalarPairWithPadding {
         pub first: u8,
         pub second: u32,
@@ -230,6 +244,7 @@ pub mod ffi {
     }
     /// Testing JS-specific layout/padding behavior
     /// Also being used to test CPP backends taking structs with primitive values.
+    #[repr(C)]
     pub struct BigStructWithStuff {
         pub first: u8,
         pub second: u16,
@@ -245,6 +260,7 @@ pub mod ffi {
             unsafe { BigStructWithStuff_assert_slice(slice, second_value) }
         }
     }
+    #[repr(C)]
     struct StructArithmetic {
         x: i32,
         y: i32,
@@ -273,6 +289,7 @@ pub mod ffi {
             unsafe { StructArithmetic_div(self, o) }
         }
     }
+    #[repr(C)]
     pub struct StructWithSlices<'a> {
         pub first: DiplomatStrSlice<'a>,
         pub second: DiplomatSlice<'a, u16>,
@@ -283,6 +300,7 @@ pub mod ffi {
         }
     }
     #[derive(Clone)]
+    #[repr(C)]
     pub struct PrimitiveStruct {
         x: f32,
         a: bool,
@@ -299,6 +317,7 @@ pub mod ffi {
             unsafe { PrimitiveStruct_mutable_ref(self, a) }
         }
     }
+    #[repr(C)]
     pub struct PrimitiveStructVec(Vec<PrimitiveStruct>);
     impl PrimitiveStructVec {
         pub fn new() -> Box<Self> {

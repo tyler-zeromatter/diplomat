@@ -21,6 +21,7 @@ pub mod ffi {
     }
     create_vec!(VectorTest contains "hello"; [f64]);
     #[derive(Clone)]
+    #[repr(C)]
     pub struct AttrOpaque1;
     impl AttrOpaque1 {
         pub fn new() -> Box<AttrOpaque1> {
@@ -46,13 +47,16 @@ pub mod ffi {
             unsafe { namespace_Unnamespaced_use_namespaced(self, _n) }
         }
     }
+    #[repr(C)]
     pub struct AttrOpaque2;
+    #[repr(C)]
     pub enum AttrEnum {
         A,
         B,
         #[diplomat::attr(*, rename = "Renamed")]
         C,
     }
+    #[repr(C)]
     pub struct Unnamespaced;
     impl Unnamespaced {
         pub fn make(_e: AttrEnum) -> Box<Self> {
@@ -62,8 +66,11 @@ pub mod ffi {
             unsafe { namespace_Unnamespaced_use_namespaced(self, _n) }
         }
     }
+    #[repr(C)]
     pub struct Nested;
+    #[repr(C)]
     pub struct Nested2;
+    #[repr(C)]
     pub struct Comparable(u8);
     impl Comparable {
         pub fn new(int: u8) -> Box<Self> {
@@ -73,7 +80,9 @@ pub mod ffi {
             unsafe { namespace_Comparable_cmp(self, other) }
         }
     }
+    #[repr(C)]
     pub struct MyIndexer(Vec<String>);
+    #[repr(C)]
     pub struct MyIterable(Vec<u8>);
     impl MyIterable {
         pub fn new(x: &[u8]) -> Box<Self> {
@@ -86,6 +95,7 @@ pub mod ffi {
             unsafe { namespace_VectorTest_len(self) }
         }
     }
+    #[repr(C)]
     pub struct MyIterator<'a>(std::slice::Iter<'a, u8>);
     impl<'a> MyIterator<'a> {
         pub fn next(&mut self) -> Option<u8> {
@@ -97,18 +107,21 @@ pub mod ffi {
             unsafe { namespace_VectorTest_get(self, i) }
         }
     }
+    #[repr(C)]
     struct OpaqueIterable(Vec<AttrOpaque1>);
     impl OpaqueIterable {
         pub fn iter<'a>(&'a self) -> Box<OpaqueIterator<'a>> {
             unsafe { namespace_OpaqueIterable_iter(self) }
         }
     }
+    #[repr(C)]
     struct OpaqueIterator<'a>(Box<dyn Iterator<Item = AttrOpaque1> + 'a>);
     impl<'a> OpaqueIterator<'a> {
         pub fn next(&'a mut self) -> Option<Box<AttrOpaque1>> {
             unsafe { namespace_OpaqueIterator_next(self) }
         }
     }
+    #[repr(C)]
     pub(crate) struct OpaqueArithmetic {
         x: i32,
         y: i32,
@@ -151,6 +164,7 @@ pub mod ffi {
             unsafe { namespace_OpaqueArithmetic_divassign(self, o) }
         }
     }
+    #[repr(C)]
     pub struct StructWithAttrs {
         a: bool,
         b: u32,

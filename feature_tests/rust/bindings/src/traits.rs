@@ -1,5 +1,6 @@
 #[diplomat_static_rust::bridge(lib_name = "somelib")]
 mod ffi {
+    #[repr(C)]
     pub struct TraitTestingStruct {
         x: i32,
         y: i32,
@@ -11,6 +12,7 @@ mod ffi {
         #[diplomat::attr(kotlin, disable)]
         fn test_result_output(&self) -> Result<u32, ()>;
     }
+    #[repr(C)]
     pub struct TraitWrapper {
         cant_be_empty: bool,
     }

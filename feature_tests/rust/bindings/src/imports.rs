@@ -1,10 +1,12 @@
 #[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
+    #[repr(C)]
     pub enum UnimportedEnum {
         A,
         B,
         C,
     }
+    #[repr(C)]
     pub struct ImportedStruct {
         foo: UnimportedEnum,
         count: u8,

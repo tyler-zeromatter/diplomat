@@ -2,18 +2,23 @@
 pub mod ffi {
     use std::fmt::Write;
     use diplomat_runtime::DiplomatStr16;
+    #[repr(C)]
     pub struct Foo<'a>(&'a DiplomatStr);
+    #[repr(C)]
     pub struct Bar<'b, 'a: 'b>(&'b Foo<'a>);
+    #[repr(C)]
     pub struct BorrowedFields<'a> {
         a: DiplomatStr16Slice<'a>,
         b: DiplomatStrSlice<'a>,
         c: DiplomatUtf8StrSlice<'a>,
     }
+    #[repr(C)]
     pub struct BorrowedFieldsWithBounds<'a, 'b: 'a, 'c: 'b> {
         field_a: DiplomatStr16Slice<'a>,
         field_b: DiplomatStrSlice<'b>,
         field_c: DiplomatUtf8StrSlice<'c>,
     }
+    #[repr(C)]
     pub struct BorrowedFieldsReturning<'a> {
         bytes: DiplomatStrSlice<'a>,
     }
@@ -61,6 +66,7 @@ pub mod ffi {
             }
         }
     }
+    #[repr(C)]
     pub struct NestedBorrowedFields<'x, 'y: 'x, 'z> {
         fields: BorrowedFields<'x>,
         bounds: BorrowedFieldsWithBounds<'x, 'y, 'y>,
@@ -93,8 +99,10 @@ pub mod ffi {
         }
     }
     #[derive(Copy, Clone)]
+    #[repr(C)]
     pub struct One<'a>(super::One<'a>);
     #[derive(Copy, Clone)]
+    #[repr(C)]
     pub struct Two<'a, 'b>(super::Two<'a, 'b>);
     impl<'o> One<'o> {
         #[allow(clippy::extra_unused_lifetimes)]
@@ -187,6 +195,7 @@ pub mod ffi {
             }
         }
     }
+    #[repr(C)]
     pub struct OpaqueThin(pub crate::lifetimes::Internal);
     impl OpaqueThin {
         pub fn a(&self) -> i32 {
@@ -199,12 +208,14 @@ pub mod ffi {
             unsafe { OpaqueThin_c(self, w) }
         }
     }
+    #[repr(C)]
     pub struct OpaqueThinIter<'a>(pub std::slice::Iter<'a, crate::lifetimes::Internal>);
     impl<'a> OpaqueThinIter<'a> {
         pub fn next(&'a mut self) -> Option<&'a OpaqueThin> {
             unsafe { OpaqueThinIter_next(self) }
         }
     }
+    #[repr(C)]
     pub struct OpaqueThinVec(std::vec::Vec<crate::lifetimes::Internal>);
     impl OpaqueThinVec {
         pub fn create(a: &[i32], b: &[f32], c: &DiplomatStr) -> Box<Self> {
@@ -227,9 +238,12 @@ pub mod ffi {
     }
 }
 #[derive(Copy, Clone)]
+#[repr(C)]
 pub struct One<'a>(&'a ());
 #[derive(Copy, Clone)]
+#[repr(C)]
 pub struct Two<'a, 'b>(&'a (), &'b ());
+#[repr(C)]
 pub struct Internal {
     a: i32,
     b: f32,

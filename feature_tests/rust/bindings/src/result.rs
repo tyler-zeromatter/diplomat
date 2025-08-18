@@ -1,12 +1,15 @@
 #[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
+    #[repr(C)]
     pub struct ResultOpaque(i32);
     #[derive(PartialEq, Eq, Debug)]
+    #[repr(C)]
     pub enum ErrorEnum {
         Foo,
         Bar,
     }
     #[derive(Debug)]
+    #[repr(C)]
     pub struct ErrorStruct {
         i: i32,
         j: i32,

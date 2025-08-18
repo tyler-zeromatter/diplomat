@@ -1,9 +1,11 @@
 #[diplomat_static_rust::bridge(lib_name = "somelib")]
 mod ffi {
     use crate::slices::ffi::MyString;
+    #[repr(C)]
     pub struct CallbackWrapper {
         cant_be_empty: bool,
     }
+    #[repr(C)]
     pub struct CallbackTestingStruct {
         x: i32,
         y: i32,
@@ -86,6 +88,7 @@ mod ffi {
             unsafe { CallbackWrapper_test_opaque_result_error(t, w) }
         }
     }
+    #[repr(C)]
     pub struct CallbackHolder {
         held: Box<dyn Fn(i32) -> i32>,
     }
@@ -97,6 +100,7 @@ mod ffi {
             unsafe { MutableCallbackHolder_call(self, a) }
         }
     }
+    #[repr(C)]
     pub struct MutableCallbackHolder {
         held: Box<dyn FnMut(i32) -> i32>,
     }

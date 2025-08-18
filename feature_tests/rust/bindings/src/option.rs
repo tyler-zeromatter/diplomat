@@ -1,8 +1,11 @@
 #[diplomat_static_rust::bridge(lib_name = "somelib")]
 pub mod ffi {
     use diplomat_runtime::{DiplomatChar, DiplomatOption, DiplomatWrite};
+    #[repr(C)]
     pub struct OptionOpaque(i32);
+    #[repr(C)]
     pub struct OptionOpaqueChar(char);
+    #[repr(C)]
     pub struct OptionString(String);
     impl OptionString {
         pub fn new<'a>(diplomat_str: &'a DiplomatStr) -> Option<Box<Self>> {
@@ -15,6 +18,7 @@ pub mod ffi {
             unsafe { OptionString_borrow(self) }
         }
     }
+    #[repr(C)]
     pub struct OptionStruct {
         a: Option<Box<OptionOpaque>>,
         b: Option<Box<OptionOpaqueChar>>,
@@ -22,6 +26,7 @@ pub mod ffi {
         d: Box<OptionOpaque>,
     }
     #[derive(Debug)]
+    #[repr(C)]
     pub struct OptionInputStruct {
         a: DiplomatOption<u8>,
         b: DiplomatOption<DiplomatChar>,
@@ -33,6 +38,7 @@ pub mod ffi {
         }
     }
     #[derive(Debug)]
+    #[repr(C)]
     pub enum OptionEnum {
         Foo,
         Bar,
