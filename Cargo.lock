@@ -431,6 +431,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "diplomat_static_rust"
+version = "0.12.0"
+dependencies = [
+ "diplomat_core",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "displaydoc"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
