@@ -140,11 +140,13 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
 
     fn visit_item_enum_mut(&mut self, i: &mut syn::ItemEnum) {
         Self::clear_attributes(&mut i.attrs);
+        i.attrs.push(syn::parse_quote!(#[repr(C)]));
     }
 
     fn visit_item_struct_mut(&mut self, i: &mut syn::ItemStruct) {
         // TODO: Do we have an Opaque? If so, we need to hide the type.
         Self::clear_attributes(&mut i.attrs);
+        i.attrs.push(syn::parse_quote!(#[repr(C)]));
     }
 
     fn visit_attribute_mut(&mut self, i: &mut syn::Attribute) {
