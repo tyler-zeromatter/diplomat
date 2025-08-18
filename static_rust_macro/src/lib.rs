@@ -1,15 +1,16 @@
 use diplomat_core::ast;
-use syn::{parse2, parse_macro_input, ItemMod};
+use syn::{parse::{Parse, Parser}, parse2, parse_macro_input, Attribute, ItemMod};
 use quote::{quote, ToTokens};
 
-fn gen_bridge(mut input : ItemMod) -> ItemMod {
+fn gen_bridge(mut input : ItemMod, attribute : StaticRustAttr) -> ItemMod {
     let module = ast::Module::from_syn(&input, true);
     
     let (brace, mut new_contents) = input.content.unwrap();
 
     let mut extern_block : syn::ItemForeignMod = parse2(quote!{ extern "C" {} }).unwrap();
-    // TODO: Linking.
-    extern_block.attrs.push(syn::parse_quote! { #[link(name="todo")] });
+    
+    let link_name = attribute.lib_name;
+    extern_block.attrs.push(syn::parse_quote! { #[link(name=#link_name)] });
         
     for custom_type in module.declared_types.values() {
         custom_type.methods().iter().for_each(|m| {
@@ -52,7 +53,28 @@ fn gen_bridge(mut input : ItemMod) -> ItemMod {
     }
 }
 
+struct StaticRustAttr {
+    lib_name : String,
+}
+
+impl Parse for StaticRustAttr {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let ident = input.parse::<syn::Ident>()?;
+        let eq = input.parse::<syn::Token![=]>()?;
+        let lib_name = input.parse::<syn::LitStr>()?;
+        Ok(Self {
+            lib_name:  lib_name.value()
+        })
+    }
+}
+
 #[proc_macro_attribute]
-pub fn bridge(_attr: proc_macro::TokenStream, input : proc_macro::TokenStream) -> proc_macro::TokenStream {
-    gen_bridge(parse_macro_input!(input)).to_token_stream().into()
+pub fn bridge(attr: proc_macro::TokenStream, input : proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let p = syn::parse::<StaticRustAttr>(attr);
+    
+    if let Err(e) = &p {
+        return e.to_compile_error().into();
+    }
+    
+    gen_bridge(parse_macro_input!(input), p.unwrap()).to_token_stream().into()
 }

@@ -6,7 +6,7 @@ use std::{
 };
 use syn::{visit_mut::VisitMut, Ident};
 
-use crate::{ErrorStore, FileMap};
+use crate::{config::Config, ErrorStore, FileMap};
 
 pub(crate) fn attr_support() -> BackendAttrSupport {
     BackendAttrSupport::all_true()
@@ -26,6 +26,7 @@ impl RustModules {
 
 struct DiplomatBridgeMod<'tcx, 'ccx> {
     filename : String,
+    lib_name : &'tcx str,
     entry: &'tcx Path,
     files: &'tcx FileMap,
     errors: &'tcx ErrorStore<'ccx, String>,
@@ -62,7 +63,8 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
                 self.get_module(i);
 
                 Self::clear_attributes(&mut i.attrs);
-                i.attrs.push(syn::parse_quote!(#[diplomat_static_rust::bridge]));
+                let lib_name = self.lib_name;
+                i.attrs.push(syn::parse_quote!(#[diplomat_static_rust::bridge(lib_name = #lib_name)]));
                 for item in &mut i.content.as_mut().unwrap().1 {
                     self.visit_item_mut(item);
                 }
@@ -89,6 +91,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
 
                 let mut module = DiplomatBridgeMod {
                     filename: i.ident.to_string(),
+                    lib_name: self.lib_name,
                     entry: self.entry,
                     files: self.files,
                     errors: self.errors,
@@ -164,7 +167,7 @@ impl<'tcx, 'ccx> DiplomatBridgeMod<'tcx, 'ccx> {
 // Stripping out #[diplomat] attributes.
 // Ignoring anything outside of #[diplomat::bridge] (and renaming #[diplomat::bridge] to #[diplomat::rust] or something like that)
 // Improved attribute support (renames and disables mostly)
-pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
+pub(crate) fn run<'tcx>(entry: &Path, config : Config) -> (FileMap, ErrorStore<'tcx, String>) {
     let files = FileMap::default();
     let errors = ErrorStore::default();
 
@@ -178,6 +181,7 @@ pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
 
     let mut main = DiplomatBridgeMod {
         filename: "".to_string(),
+        lib_name : &config.shared_config.lib_name.expect("Need a lib_name for Rust to link against."),
         // TODO: Better entry parsing.
         entry: entry.parent().unwrap_or(Path::new("./")),
         files: &files,
