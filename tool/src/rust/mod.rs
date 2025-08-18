@@ -1,7 +1,8 @@
+use askama::Template;
 use diplomat_core::{ast, hir::BackendAttrSupport};
 use quote::{quote, ToTokens};
 use std::{
-    collections::BTreeMap, env, fmt, io::Write, path::{Path, PathBuf}, process::{Command, Stdio}
+    cell::RefCell, collections::{BTreeMap, BTreeSet}, env, fmt, io::Write, path::{Path, PathBuf}, process::{Command, Stdio}
 };
 use syn::{visit_mut::VisitMut, Ident};
 
@@ -11,11 +12,25 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     BackendAttrSupport::all_true()
 }
 
+#[derive(Template)]
+#[template(path = "rust/lib.rs.jinja", escape="none")]
+struct RustModules {
+    modules : RefCell<BTreeSet<String>>,
+}
+
+impl RustModules {
+    fn add_module(&self, module : String) {
+        self.modules.borrow_mut().insert(module);
+    }
+}
+
 struct DiplomatBridgeMod<'tcx, 'ccx> {
+    filename : String,
     entry: &'tcx Path,
     files: &'tcx FileMap,
     errors: &'tcx ErrorStore<'ccx, String>,
     module : Option<ast::Module>,
+    modules : &'tcx RustModules,
     function_abis : BTreeMap<Ident, Ident>,
 }
 
@@ -43,6 +58,7 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
             // TODO: Remove `use::` expressions. We'll add those back in for any function definitions.
             let bridge = i.attrs.iter().find(|a| { a.meta == syn::parse_quote!(diplomat::bridge) });
             if bridge.is_some() {
+                self.modules.add_module(self.filename.clone());
                 self.get_module(i);
 
                 Self::clear_attributes(&mut i.attrs);
@@ -72,13 +88,16 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
                 }
 
                 let mut module = DiplomatBridgeMod {
+                    filename: i.ident.to_string(),
                     entry: self.entry,
                     files: self.files,
                     errors: self.errors,
                     module: None,
+                    modules: self.modules,
                     function_abis: BTreeMap::new(),
                 };
                 let mut file = file.unwrap();
+                // TODO: Cyclical dependencies?
                 module.visit_file_mut(&mut file);
 
                 self.files.add_file(
@@ -147,6 +166,7 @@ impl<'tcx, 'ccx> DiplomatBridgeMod<'tcx, 'ccx> {
 // Opaque conversions.
 // Stripping out #[diplomat] attributes.
 // Ignoring anything outside of #[diplomat::bridge] (and renaming #[diplomat::bridge] to #[diplomat::rust] or something like that)
+// Improved attribute support (renames and disables mostly)
 pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
     let files = FileMap::default();
     let errors = ErrorStore::default();
@@ -155,16 +175,23 @@ pub(crate) fn run<'tcx>(entry: &Path) -> (FileMap, ErrorStore<'tcx, String>) {
     let src = std::fs::read_to_string(entry).unwrap();
     let mut res = syn::parse_file(&src).unwrap();
 
+    let modules = RustModules {
+        modules: RefCell::new(BTreeSet::new()),
+    };
+
     let mut main = DiplomatBridgeMod {
+        filename: "".to_string(),
         // TODO: Better entry parsing.
         entry: entry.parent().unwrap_or(Path::new("./")),
         files: &files,
         errors: &errors,
         module: None,
+        modules: &modules,
         function_abis: BTreeMap::new(),
     };
-    // TODO: Lib.rs generation.
     main.visit_file_mut(&mut res);
+
+    files.add_file("lib.rs".into(), modules.render().unwrap());
 
     (files, errors)
 }

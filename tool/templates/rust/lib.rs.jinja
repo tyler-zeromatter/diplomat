@@ -1,0 +1,3 @@
+{% for m in modules.take() -%}
+pub mod {{m.clone()}};
+{% endfor %}
