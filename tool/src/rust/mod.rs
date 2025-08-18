@@ -1,5 +1,5 @@
 use diplomat_core::{ast, hir::BackendAttrSupport};
-use quote::ToTokens;
+use quote::{quote, ToTokens};
 use std::{
     collections::BTreeMap, env, fmt, io::Write, path::{Path, PathBuf}, process::{Command, Stdio}
 };
@@ -101,7 +101,22 @@ impl<'tcx, 'ccx> VisitMut for DiplomatBridgeMod<'tcx, 'ccx> {
         Self::clear_attributes(&mut i.attrs);
         // TODO: Use AST to get ABI name.
         let name = self.function_abis.get(&i.sig.ident).unwrap();
-        i.block = syn::parse_quote!({ unsafe { #name() } });
+        let mut call : syn::ExprCall = syn::parse_quote!(#name());
+        i.sig.inputs.iter().for_each(|p| {
+            let out = match p {
+                syn::FnArg::Receiver(r) => {
+                    let self_token = r.self_token;
+                    let mutable = r.mutability;
+                    let refs = r.reference.as_ref().map(|r| { r.0 });
+                    quote!(#refs #mutable #self_token)
+                }
+                syn::FnArg::Typed(ty) => {
+                    ty.pat.to_token_stream()
+                }
+            };
+            call.args.push(syn::parse_quote!(#out));
+         });
+        i.block = syn::parse_quote!({ unsafe { #call } });
     }
 
     fn visit_item_enum_mut(&mut self, i: &mut syn::ItemEnum) {
