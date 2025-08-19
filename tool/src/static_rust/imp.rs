@@ -21,6 +21,7 @@ struct ParamInfo<'a> {
 impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
+        // TODO: Self param, out type.
         for p in &method.params {
             params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty) });
         }
