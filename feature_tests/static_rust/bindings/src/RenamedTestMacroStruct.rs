@@ -13,3 +13,11 @@ impl RenamedTestMacroStruct {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn namespace_TestMacroStruct_test_func();
+
+    fn namespace_TestMacroStruct_test_meta();
+
+}

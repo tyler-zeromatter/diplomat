@@ -13,3 +13,11 @@ impl RenamedStructWithAttrs {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn namespace_StructWithAttrs_new_fallible();
+
+    fn namespace_StructWithAttrs_c();
+
+}

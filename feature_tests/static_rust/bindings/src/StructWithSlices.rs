@@ -9,3 +9,9 @@ impl StructWithSlices {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn StructWithSlices_return_last();
+
+}

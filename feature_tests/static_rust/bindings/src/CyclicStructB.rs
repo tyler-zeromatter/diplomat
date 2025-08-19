@@ -13,3 +13,11 @@ impl CyclicStructB {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn CyclicStructB_get_a();
+
+    fn CyclicStructB_get_a_option();
+
+}
