@@ -1,7 +1,7 @@
 use askama::Template;
 use diplomat_core::hir::{BackendAttrSupport, TypeContext};
 
-use crate::{config::Config, static_rust::{formatter::RustFormatter, ty::TyGenContext}, ErrorStore, FileMap};
+use crate::{config::Config, static_rust::{formatter::RustFormatter, ty::FileGenContext}, ErrorStore, FileMap};
 
 mod ty;
 mod imp;
@@ -25,7 +25,7 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
     for (id, ty) in tcx.all_types() {
         let name = formatter.fmt_symbol_name(id.into());
         match ty {
-            crate::hir::TypeDef::Struct(st) => files.add_file(format!("{}.rs", name), TyGenContext::from_type(&config, id, &formatter, tcx).render().unwrap()),
+            crate::hir::TypeDef::Struct(st) => files.add_file(format!("{}.rs", name), FileGenContext::from_type(&config, id, &formatter, tcx).render().unwrap()),
             _ => {}
         }
     }
