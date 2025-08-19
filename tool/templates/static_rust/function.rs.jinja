@@ -1,9 +1,13 @@
+{%- macro func_params(params) -%}
+{% for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}
+{%- endmacro -%}
+
 {%- block function_impl -%}
-fn {{name}}({% for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}) {
+fn {{name}}({% call func_params(params) %}) {
     unsafe { {{abi_name}}({% for p in params -%} {{p.var_name}} {%- if !loop.last %}, {% endif -%} {%- endfor %}) }
 }
 {%- endblock -%}
 
 {%- block function_def -%}
-    fn {{abi_name}}({% for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%});
+    fn {{abi_name}}({% call func_params(params) %});
 {%- endblock -%}
