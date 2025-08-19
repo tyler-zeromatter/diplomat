@@ -4,5 +4,8 @@ pub struct StructWithSlices {
 }
 
 impl StructWithSlices {
-    fn return_last() {}
+    fn return_last() {
+        unsafe { StructWithSlices_return_last() }
+    }
+
 }

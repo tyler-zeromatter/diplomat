@@ -4,4 +4,4 @@ pub struct TraitTestingStruct {
 }
 
 impl TraitTestingStruct {
-    }
+}

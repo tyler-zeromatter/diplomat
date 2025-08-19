@@ -4,6 +4,12 @@ pub struct MyStructContainingAnOption {
 }
 
 impl MyStructContainingAnOption {
-    fn new() {}
-    fn filled() {}
+    fn new() {
+        unsafe { MyStructContainingAnOption_new() }
+    }
+
+    fn filled() {
+        unsafe { MyStructContainingAnOption_filled() }
+    }
+
 }

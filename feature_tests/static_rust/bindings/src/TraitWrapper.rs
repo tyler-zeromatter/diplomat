@@ -4,4 +4,4 @@ pub struct TraitWrapper {
 }
 
 impl TraitWrapper {
-    }
+}

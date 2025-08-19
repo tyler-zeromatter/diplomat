@@ -4,4 +4,4 @@ pub struct BorrowedFieldsReturning {
 }
 
 impl BorrowedFieldsReturning {
-    }
+}

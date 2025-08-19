@@ -4,4 +4,4 @@ pub struct BigStructWithStuff {
 }
 
 impl BigStructWithStuff {
-    }
+}

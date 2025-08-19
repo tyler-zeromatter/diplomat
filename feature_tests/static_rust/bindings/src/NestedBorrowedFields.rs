@@ -4,5 +4,8 @@ pub struct NestedBorrowedFields {
 }
 
 impl NestedBorrowedFields {
-    fn from_bar_and_foo_and_strings() {}
+    fn from_bar_and_foo_and_strings() {
+        unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings() }
+    }
+
 }

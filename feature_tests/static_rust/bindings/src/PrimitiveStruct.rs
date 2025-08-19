@@ -4,4 +4,4 @@ pub struct PrimitiveStruct {
 }
 
 impl PrimitiveStruct {
-    }
+}
