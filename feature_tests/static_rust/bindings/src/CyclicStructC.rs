@@ -4,8 +4,8 @@ pub struct CyclicStructC {
 }
 
 impl CyclicStructC {
-    fn takes_nested_parameters() {
-        unsafe { CyclicStructC_takes_nested_parameters() }
+    fn takes_nested_parameters(c : CyclicStructC) {
+        unsafe { CyclicStructC_takes_nested_parameters(c) }
     }
 
     fn cyclic_out() {
@@ -16,7 +16,7 @@ impl CyclicStructC {
 
 #[link(name = "somelib")]
 extern "C" {
-    fn CyclicStructC_takes_nested_parameters();
+    fn CyclicStructC_takes_nested_parameters(c : CyclicStructC);
 
     fn CyclicStructC_cyclic_out();
 

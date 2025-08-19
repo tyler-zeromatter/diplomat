@@ -12,8 +12,8 @@ impl CyclicStructA {
         unsafe { CyclicStructA_cyclic_out() }
     }
 
-    fn double_cyclic_out() {
-        unsafe { CyclicStructA_double_cyclic_out() }
+    fn double_cyclic_out(cyclic_struct_a : CyclicStructA) {
+        unsafe { CyclicStructA_double_cyclic_out(cyclic_struct_a) }
     }
 
     fn getter_out() {
@@ -28,7 +28,7 @@ extern "C" {
 
     fn CyclicStructA_cyclic_out();
 
-    fn CyclicStructA_double_cyclic_out();
+    fn CyclicStructA_double_cyclic_out(cyclic_struct_a : CyclicStructA);
 
     fn CyclicStructA_getter_out();
 
