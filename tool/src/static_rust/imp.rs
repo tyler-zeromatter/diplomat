@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::Method;
+use diplomat_core::hir::{Method, Mutability};
 
 use crate::static_rust::FileGenContext;
 
@@ -10,12 +10,18 @@ use crate::static_rust::FileGenContext;
 pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,
+    // self_param : Option<SelfParamInfo<'tcx>>,
     params : Vec<ParamInfo<'tcx>>,
 }
 
+// struct SelfParamInfo<'a> {
+//     mutability : Mutability,
+
+// }
+
 struct ParamInfo<'a> {
     var_name : Cow<'a, str>,
-    type_name : String
+    type_name : Cow<'a, str>
 }
 
 impl<'tcx> FunctionInfo<'tcx> {
@@ -25,6 +31,8 @@ impl<'tcx> FunctionInfo<'tcx> {
         for p in &method.params {
             params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty) });
         }
+
+        // let self_param = 
         FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params }
     }
 
