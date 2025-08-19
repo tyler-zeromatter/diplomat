@@ -116,7 +116,7 @@ pub fn gen(
             demo_gen::run(entry, &tcx, docs_url_gen, config.clone())
         }
         "kotlin" => kotlin::run(&tcx, config.clone(), docs_url_gen),
-        "static_rust" => static_rust::run(&tcx),
+        "static_rust" => static_rust::run(&tcx, config.clone()),
         o => panic!("Unknown target: {}", o),
     };
 
