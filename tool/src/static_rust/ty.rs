@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{StructDef, TypeContext, TypeDef, TypeId};
 
-use crate::static_rust::{imp::FunctionBlock, RustFormatter};
+use crate::static_rust::{imp::FunctionInfo, RustFormatter};
 
 pub(super) struct TyGenContext<'tcx> {
     formatter : &'tcx RustFormatter<'tcx>,
@@ -34,10 +34,10 @@ impl<'tcx, 'rcx> TyGenContext<'tcx> {
         #[template(path = "static_rust/base.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
             struct_name : Cow<'a, str>,
-            methods : FunctionBlock<'a>,
+            methods : Vec<FunctionInfo<'a>>,
         }
 
-        let methods = FunctionBlock::gen_function_block(ty.methods.iter());
+        let methods = FunctionInfo::gen_function_block(ty.methods.iter());
 
         impl<'a> TypeTemplate<'a> for StructTemplate<'a> {}
 

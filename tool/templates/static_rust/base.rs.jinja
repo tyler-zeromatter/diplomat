@@ -4,5 +4,7 @@ pub struct {{struct_name}} {
 }
 
 impl {{struct_name}} {
-    {{ methods | indent(4) -}}
+{%- for m in methods %}
+    {{ m|indent(4) }}
+{% endfor %}
 }
