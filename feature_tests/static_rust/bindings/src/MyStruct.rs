@@ -8,8 +8,16 @@ impl MyStruct {
         unsafe { MyStruct_new() }
     }
 
-    fn into_a() {
-        unsafe { MyStruct_into_a() }
+    fn takes_mut(&self, o : MyStruct) {
+        unsafe { MyStruct_takes_mut(self, o) }
+    }
+
+    fn takes_const(&mut self, o : MyStruct) {
+        unsafe { MyStruct_takes_const(self, o) }
+    }
+
+    fn into_a(self) {
+        unsafe { MyStruct_into_a(self) }
     }
 
     fn returns_zst_result() {
@@ -26,7 +34,11 @@ impl MyStruct {
 extern "C" {
     fn MyStruct_new();
 
-    fn MyStruct_into_a();
+    fn MyStruct_takes_mut(&self, o : MyStruct);
+
+    fn MyStruct_takes_const(&mut self, o : MyStruct);
+
+    fn MyStruct_into_a(self);
 
     fn MyStruct_returns_zst_result();
 
