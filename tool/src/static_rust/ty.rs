@@ -53,11 +53,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    pub(super) fn gen_type_name<P: TyPosition>(&mut self, ty : &Type<P>) -> String {
+    pub(super) fn gen_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Cow<'tcx, str> {
         match ty {
             Type::Struct(st) => {
-                let st_name : String = self.formatter.fmt_symbol_name(st.id().into()).into();
-                self.imports.insert(st_name.clone());
+                let st_name = self.formatter.fmt_symbol_name(st.id().into());
+                self.imports.insert(st_name.clone().into());
                 st_name
             }
             Type::Primitive(p) => {
