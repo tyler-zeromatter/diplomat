@@ -1,3 +1,9 @@
+{%- block function_impl -%}
 fn {{name}}() {
     unsafe { {{abi_name}}() }
 }
+{%- endblock -%}
+
+{%- block function_def -%}
+    fn {{abi_name}}();
+{%- endblock -%}

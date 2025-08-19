@@ -4,7 +4,7 @@ use askama::Template;
 use diplomat_core::hir::Method;
 
 #[derive(Template)]
-#[template(path = "static_rust/function.rs.jinja", escape = "none")]
+#[template(path = "static_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,

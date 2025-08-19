@@ -5,6 +5,12 @@ pub struct {{struct_name}} {
 
 impl {{struct_name}} {
 {%- for m in methods %}
-    {{ m|indent(4) }}
+    {{ m.as_function_impl()|indent(4) }}
+{% endfor %}
+}
+
+extern "C" {
+{%- for m in methods %}
+    {{ m.as_function_def()|indent(4) }}
 {% endfor %}
 }
