@@ -4,5 +4,4 @@ pub struct StructArithmetic {
 }
 
 impl StructArithmetic {
-    
-}
+    }
