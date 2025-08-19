@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{Method, Mutability};
+use diplomat_core::hir::{MaybeOwn, Method, Mutability, SelfType, Type};
 
 use crate::static_rust::FileGenContext;
 
@@ -10,14 +10,9 @@ use crate::static_rust::FileGenContext;
 pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,
-    // self_param : Option<SelfParamInfo<'tcx>>,
+    self_param : Option<MaybeOwn>,
     params : Vec<ParamInfo<'tcx>>,
 }
-
-// struct SelfParamInfo<'a> {
-//     mutability : Mutability,
-
-// }
 
 struct ParamInfo<'a> {
     var_name : Cow<'a, str>,
@@ -32,8 +27,15 @@ impl<'tcx> FunctionInfo<'tcx> {
             params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty) });
         }
 
-        // let self_param = 
-        FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params }
+        let self_param = method.param_self.as_ref().map(|s| { 
+            match &s.ty {
+                SelfType::Opaque(o) => MaybeOwn::Borrow(o.owner),
+                SelfType::Struct(st) => st.owner,
+                SelfType::Enum(e) => MaybeOwn::Own,
+                _ => unreachable!("Unknown SelfType: {:?}", s.ty)
+            }
+        });
+        FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params, self_param }
     }
 
     pub(super) fn gen_function_block(ctx : &mut FileGenContext<'tcx>, functions : impl Iterator<Item = &'tcx Method>) -> Vec<FunctionInfo<'tcx>> {
