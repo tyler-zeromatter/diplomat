@@ -8,8 +8,8 @@ impl RenamedStructWithAttrs {
         unsafe { namespace_StructWithAttrs_new_fallible(a, b) }
     }
 
-    fn c() {
-        unsafe { namespace_StructWithAttrs_c() }
+    fn c(self) {
+        unsafe { namespace_StructWithAttrs_c(self) }
     }
 
 }
@@ -18,6 +18,6 @@ impl RenamedStructWithAttrs {
 extern "C" {
     fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32);
 
-    fn namespace_StructWithAttrs_c();
+    fn namespace_StructWithAttrs_c(self);
 
 }

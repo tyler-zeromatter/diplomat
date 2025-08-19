@@ -4,14 +4,14 @@ pub struct StructWithSlices {
 }
 
 impl StructWithSlices {
-    fn return_last() {
-        unsafe { StructWithSlices_return_last() }
+    fn return_last(self) {
+        unsafe { StructWithSlices_return_last(self) }
     }
 
 }
 
 #[link(name = "somelib")]
 extern "C" {
-    fn StructWithSlices_return_last();
+    fn StructWithSlices_return_last(self);
 
 }

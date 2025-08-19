@@ -8,8 +8,8 @@ impl CyclicStructC {
         unsafe { CyclicStructC_takes_nested_parameters(c) }
     }
 
-    fn cyclic_out() {
-        unsafe { CyclicStructC_cyclic_out() }
+    fn cyclic_out(self) {
+        unsafe { CyclicStructC_cyclic_out(self) }
     }
 
 }
@@ -18,6 +18,6 @@ impl CyclicStructC {
 extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructC);
 
-    fn CyclicStructC_cyclic_out();
+    fn CyclicStructC_cyclic_out(self);
 
 }
