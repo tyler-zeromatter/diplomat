@@ -4,7 +4,7 @@ use diplomat_core::hir::{BackendAttrSupport, TypeContext};
 use crate::{config::Config, static_rust::{formatter::RustFormatter, ty::FileGenContext}, ErrorStore, FileMap};
 
 mod ty;
-mod imp;
+mod func;
 mod formatter;
 
 pub(crate) fn attr_support() -> BackendAttrSupport {

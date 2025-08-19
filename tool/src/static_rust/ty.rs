@@ -3,7 +3,7 @@ use std::{borrow::Cow, collections::BTreeSet};
 use askama::Template;
 use diplomat_core::hir::{StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
-use crate::{config::Config, static_rust::{imp::FunctionInfo, RustFormatter}};
+use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
 
 pub(super) struct FileGenContext<'tcx> {
     formatter : &'tcx RustFormatter<'tcx>,
