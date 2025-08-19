@@ -1,9 +1,9 @@
 {%- block function_impl -%}
-fn {{name}}() {
-    unsafe { {{abi_name}}() }
+fn {{name}}({% for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}) {
+    unsafe { {{abi_name}}({% for p in params -%} {{p.var_name}} {%- if !loop.last %}, {% endif -%} {%- endfor %}) }
 }
 {%- endblock -%}
 
 {%- block function_def -%}
-    fn {{abi_name}}();
+    fn {{abi_name}}({% for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%});
 {%- endblock -%}

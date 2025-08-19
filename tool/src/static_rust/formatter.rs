@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use diplomat_core::hir::{SymbolId, TypeContext};
+use diplomat_core::hir::{PrimitiveType, SymbolId, TypeContext};
 
 pub(super) struct RustFormatter<'tcx> {
     pub(super) tcx : &'tcx TypeContext,
@@ -22,5 +22,9 @@ impl<'tcx> RustFormatter<'tcx> {
             }
             _ => panic!("Symbol {id:?} unrecognized.")
         }
+    }
+
+    pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
+        primitive.as_str()
     }
 }
