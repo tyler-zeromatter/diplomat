@@ -9,6 +9,7 @@ impl {{struct_name}} {
 {% endfor %}
 }
 
+#[link(name = "{{lib_name}}")]
 extern "C" {
 {%- for m in methods %}
     {{ m.as_function_def()|indent(4) }}
