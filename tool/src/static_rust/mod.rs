@@ -10,6 +10,7 @@ mod formatter;
 pub(crate) fn attr_support() -> BackendAttrSupport {
     let mut support = BackendAttrSupport::default();
     support.option = true;
+    support.struct_refs = true;
     
     support
 }
