@@ -4,5 +4,4 @@ pub struct ImportedStruct {
 }
 
 impl ImportedStruct {
-    
-}
+    }

@@ -4,5 +4,4 @@ pub struct CallbackTestingStruct {
 }
 
 impl CallbackTestingStruct {
-    
-}
+    }

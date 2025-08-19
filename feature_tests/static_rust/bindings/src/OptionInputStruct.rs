@@ -4,5 +4,4 @@ pub struct OptionInputStruct {
 }
 
 impl OptionInputStruct {
-    
-}
+    }

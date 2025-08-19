@@ -4,5 +4,4 @@ pub struct ScalarPairWithPadding {
 }
 
 impl ScalarPairWithPadding {
-    
-}
+    }
