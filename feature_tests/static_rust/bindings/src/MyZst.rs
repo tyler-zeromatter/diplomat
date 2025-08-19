@@ -4,4 +4,4 @@ pub struct MyZst {
 }
 
 impl MyZst {
-    }
+}

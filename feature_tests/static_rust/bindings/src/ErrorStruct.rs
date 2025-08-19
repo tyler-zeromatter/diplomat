@@ -4,4 +4,4 @@ pub struct ErrorStruct {
 }
 
 impl ErrorStruct {
-    }
+}

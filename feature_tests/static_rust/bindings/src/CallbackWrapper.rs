@@ -4,4 +4,4 @@ pub struct CallbackWrapper {
 }
 
 impl CallbackWrapper {
-    }
+}
