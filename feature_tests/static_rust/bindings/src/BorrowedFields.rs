@@ -9,3 +9,9 @@ impl BorrowedFields {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn BorrowedFields_from_bar_and_strings();
+
+}

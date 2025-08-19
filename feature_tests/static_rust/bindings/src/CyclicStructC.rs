@@ -13,3 +13,11 @@ impl CyclicStructC {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn CyclicStructC_takes_nested_parameters();
+
+    fn CyclicStructC_cyclic_out();
+
+}

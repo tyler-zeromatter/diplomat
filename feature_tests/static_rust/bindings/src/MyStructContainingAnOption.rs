@@ -13,3 +13,11 @@ impl MyStructContainingAnOption {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn MyStructContainingAnOption_new();
+
+    fn MyStructContainingAnOption_filled();
+
+}

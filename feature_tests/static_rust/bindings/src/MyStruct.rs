@@ -21,3 +21,15 @@ impl MyStruct {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn MyStruct_new();
+
+    fn MyStruct_into_a();
+
+    fn MyStruct_returns_zst_result();
+
+    fn MyStruct_fails_zst_result();
+
+}

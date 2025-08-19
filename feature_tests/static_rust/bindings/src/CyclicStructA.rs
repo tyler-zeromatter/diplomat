@@ -21,3 +21,15 @@ impl CyclicStructA {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn CyclicStructA_get_b();
+
+    fn CyclicStructA_cyclic_out();
+
+    fn CyclicStructA_double_cyclic_out();
+
+    fn CyclicStructA_getter_out();
+
+}

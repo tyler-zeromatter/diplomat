@@ -9,3 +9,9 @@ impl BorrowedFieldsWithBounds {
     }
 
 }
+
+#[link(name = "somelib")]
+extern "C" {
+    fn BorrowedFieldsWithBounds_from_foo_and_strings();
+
+}
