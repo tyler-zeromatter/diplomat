@@ -25,7 +25,10 @@ impl<'tcx> RustFormatter<'tcx> {
     }
 
     pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
-        primitive.as_str()
+        match primitive {
+            PrimitiveType::Char => "DiplomatChar",
+            _ => primitive.as_str()
+        }
     }
 
     pub(super) fn fmt_enum_variant_name(&self, enum_variant : &'tcx EnumVariant) -> Cow<'tcx, str> {
