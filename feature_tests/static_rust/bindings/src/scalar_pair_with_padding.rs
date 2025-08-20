@@ -7,5 +7,5 @@ impl ScalarPairWithPadding {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }

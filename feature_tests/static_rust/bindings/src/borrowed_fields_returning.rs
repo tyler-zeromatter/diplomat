@@ -7,5 +7,5 @@ impl BorrowedFieldsReturning {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }

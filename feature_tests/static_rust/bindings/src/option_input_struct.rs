@@ -7,5 +7,5 @@ impl OptionInputStruct {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }
