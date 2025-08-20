@@ -5,7 +5,7 @@ use super::{{i}};
 {%- block type_def -%}
 {%- endblock %}
 
-impl {{struct_name}} {
+impl {{type_name}} {
 {%- for m in methods %}
     {{ m.as_function_impl()|indent(4) }}
 {% endfor %}
