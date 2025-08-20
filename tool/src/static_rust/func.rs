@@ -82,7 +82,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
         });
 
-        // TODO: DiplomatOption and DiplomatResult conversion support.
+        // TODO: DiplomatOption and DiplomatResult conversion support using ParamInfo.
         let return_type = match &method.output {
             ReturnType::Fallible(ok, err) => {
                 let ok_ty = Self::gen_ok_type_name(&mut params, ctx, ok);
