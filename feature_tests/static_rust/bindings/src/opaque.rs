@@ -8,12 +8,12 @@ impl Opaque {
         unsafe { Opaque_new() }
     }
 
-    fn try_from_utf8(input : TODO()) -> Opaque {
+    fn try_from_utf8(input : &[TODO]) -> Opaque {
             // TODO: writeable conversions.
         unsafe { Opaque_try_from_utf8(input) }
     }
 
-    fn from_str(input : TODO()) -> Opaque {
+    fn from_str(input : &[TODO]) -> Opaque {
             // TODO: writeable conversions.
         unsafe { Opaque_from_str(input) }
     }
@@ -49,9 +49,9 @@ impl Opaque {
 unsafe extern "C" {
     fn Opaque_new() -> Opaque;
 
-    fn Opaque_try_from_utf8(input : TODO()) -> Opaque;
+    fn Opaque_try_from_utf8(input : &[TODO]) -> Opaque;
 
-    fn Opaque_from_str(input : TODO()) -> Opaque;
+    fn Opaque_from_str(input : &[TODO]) -> Opaque;
 
     fn Opaque_get_debug_str(this: &Opaque, output : &mut DiplomatWrite);
 

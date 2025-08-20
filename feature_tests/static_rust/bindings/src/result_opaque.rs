@@ -43,7 +43,7 @@ impl ResultOpaque {
         unsafe { ResultOpaque_new_in_enum_err(i) }
     }
 
-    fn takes_str(&mut self, _v : TODO()) -> ResultOpaque {
+    fn takes_str(&mut self, _v : &[TODO]) -> ResultOpaque {
             // TODO: writeable conversions.
         unsafe { ResultOpaque_takes_str(self, _v) }
     }
@@ -73,7 +73,7 @@ unsafe extern "C" {
 
     fn ResultOpaque_new_in_enum_err(i : i32) -> Result<ErrorEnum, ResultOpaque>;
 
-    fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : TODO()) -> ResultOpaque;
+    fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : &[TODO]) -> ResultOpaque;
 
     fn ResultOpaque_assert_integer(this: &ResultOpaque, i : i32);
 

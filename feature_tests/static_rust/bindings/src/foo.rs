@@ -5,7 +5,7 @@ use super::BorrowedFieldsWithBounds;
 pub struct Foo;
 
 impl Foo {
-    fn new(x : TODO()) -> Foo {
+    fn new(x : &[TODO]) -> Foo {
             // TODO: writeable conversions.
         unsafe { Foo_new(x) }
     }
@@ -25,7 +25,7 @@ impl Foo {
         unsafe { Foo_extract_from_fields(fields) }
     }
 
-    fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : TODO()) -> Foo {
+    fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Foo {
             // TODO: writeable conversions.
         unsafe { Foo_extract_from_bounds(bounds, another_string) }
     }
@@ -34,7 +34,7 @@ impl Foo {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Foo_new(x : TODO()) -> Foo;
+    fn Foo_new(x : &[TODO]) -> Foo;
 
     fn Foo_get_bar(this: &Foo) -> Bar;
 
@@ -42,6 +42,6 @@ unsafe extern "C" {
 
     fn Foo_extract_from_fields(fields : BorrowedFields) -> Foo;
 
-    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : TODO()) -> Foo;
+    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Foo;
 
 }

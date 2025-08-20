@@ -32,7 +32,7 @@ impl OpaqueMutexedString {
         unsafe { OpaqueMutexedString_get_len_and_add(self, other) }
     }
 
-    fn dummy_str(&self) -> TODO() {
+    fn dummy_str(&self) -> &[TODO] {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_dummy_str(self) }
     }
@@ -63,7 +63,7 @@ unsafe extern "C" {
 
     fn OpaqueMutexedString_get_len_and_add(this: &OpaqueMutexedString, other : usize) -> usize;
 
-    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> TODO();
+    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> &[TODO];
 
     fn OpaqueMutexedString_wrapper(this: &OpaqueMutexedString) -> Utf16Wrap;
 
