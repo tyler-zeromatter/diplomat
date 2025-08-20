@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use askama::Template;
 use diplomat_core::hir::{BackendAttrSupport, TypeContext, TypeDef};
 
-use crate::{config::Config, static_rust::{formatter::RustFormatter, ty::{FileGenContext, TypeTemplate}}, ErrorStore, FileMap};
+use crate::{config::Config, shared_rust::{formatter::RustFormatter, ty::{FileGenContext, TypeTemplate}}, ErrorStore, FileMap};
 
 mod ty;
 mod func;
@@ -33,7 +33,7 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
     }
 
     #[derive(Template)]
-    #[template(path="static_rust/lib.rs.jinja", escape="none")]
+    #[template(path="shared_rust/lib.rs.jinja", escape="none")]
     struct LibFile {
         mods : BTreeSet<ModImport>
     }

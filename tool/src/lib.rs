@@ -13,7 +13,7 @@ mod demo_gen;
 mod js;
 mod kotlin;
 mod nanobind;
-mod static_rust;
+mod shared_rust;
 
 use colored::*;
 use config::toml_value_from_str;
@@ -39,7 +39,7 @@ pub fn get_supported(target_language: &str) -> hir::BackendAttrSupport {
         "demo_gen" => demo_gen::attr_support(),
         "kotlin" => kotlin::attr_support(),
         "py-nanobind" | "nanobind" => nanobind::attr_support(),
-        "static_rust" => static_rust::attr_support(),
+        "shared_rust" => shared_rust::attr_support(),
         o => panic!("Unknown target: {}", o),
     }
 }
@@ -163,7 +163,7 @@ pub fn gen(
             demo_gen::run(entry, &tcx, docs_url_gen, config.clone())
         }
         "kotlin" => kotlin::run(&tcx, config.clone(), docs_url_gen),
-        "static_rust" => static_rust::run(&tcx, config.clone()),
+        "shared_rust" => shared_rust::run(&tcx, config.clone()),
         o => panic!("Unknown target: {}", o),
     };
 
