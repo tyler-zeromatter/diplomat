@@ -1,5 +1,5 @@
 {%- for i in imports -%}
-use {{i}};
+use super::{{i}};
 {% endfor -%}
 
 #[repr(C)]
