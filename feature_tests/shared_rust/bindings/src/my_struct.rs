@@ -7,7 +7,7 @@ pub struct MyStruct {
     pub c: u8,
     pub d: u64,
     pub e: i32,
-    pub f: char,
+    pub f: DiplomatChar,
     pub g: MyEnum,
 }
 

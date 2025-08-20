@@ -2,7 +2,7 @@ use super::OptionEnum;
 #[repr(C)]
 pub struct OptionInputStruct {
     pub a: Option<u8>,
-    pub b: Option<char>,
+    pub b: Option<DiplomatChar>,
     pub c: Option<OptionEnum>,
 }
 
