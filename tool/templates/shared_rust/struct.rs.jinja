@@ -2,7 +2,9 @@
 
 {%- block type_def -%}
 #[repr(C)]
-pub {%- if is_out -%}(super){%- endif %} struct {{type_name}} {
-
-}
+pub {%- if is_out -%}(super){%- endif %} struct {{type_name}} {% if fields.len() > 0 -%} {
+    {%- for f in fields %}
+    pub {{f.name}}: {{f.type_name}},
+    {%- endfor %}
+} {%- else -%};{%- endif -%}
 {%- endblock %}
