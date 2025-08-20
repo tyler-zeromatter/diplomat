@@ -40,7 +40,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     fn generate_struct(mut self, ty : &'tcx StructDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
-        #[template(path = "static_rust/base.rs.jinja", escape = "none")]
+        #[template(path = "static_rust/struct.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
             struct_name : Cow<'a, str>,
             methods : Vec<FunctionInfo<'a>>,
