@@ -4,7 +4,7 @@ pub struct PrimitiveStruct {
 }
 
 impl PrimitiveStruct {
-    fn mutable_ref(&self, a : PrimitiveStruct) {
+    fn mutable_ref(&mut self, a : PrimitiveStruct) {
             // TODO: writeable conversions.
         unsafe { PrimitiveStruct_mutable_ref(self, a) }
     }
@@ -13,6 +13,6 @@ impl PrimitiveStruct {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn PrimitiveStruct_mutable_ref(&self, a : PrimitiveStruct);
+    fn PrimitiveStruct_mutable_ref(this: &mut PrimitiveStruct, a : PrimitiveStruct);
 
 }
