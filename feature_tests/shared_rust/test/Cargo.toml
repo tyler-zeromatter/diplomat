@@ -1,6 +1,6 @@
 [package]
 name = "shared-rust-feature-tests"
-description = "shared Rust Feature Tests"
+description = "Shared Rust Feature Tests"
 edition = "2024"
 publish = false
 
