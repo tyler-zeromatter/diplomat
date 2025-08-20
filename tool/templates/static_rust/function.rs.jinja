@@ -19,6 +19,7 @@ fn {{name}}(
         {%- call func_params(self_param, params) -%}
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %} {
+        // TODO: writeable conversions.
     unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
