@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{OpaqueDef, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{EnumDef, OpaqueDef, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -38,6 +38,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods : Vec<FunctionInfo<'a>>,
             lib_name: String,
             imports : BTreeSet<String>,
+            // TODO: Fields.
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
@@ -91,6 +92,44 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
+        }
+    }
+
+    pub(super) fn generate_enum(mut self, ty : &'tcx EnumDef) -> impl TypeTemplate<'tcx> {
+        #[derive(Template)]
+        #[template(path = "static_rust/enum.rs.jinja", escape = "none")]
+        struct EnumTemplate<'a> {
+            type_name : Cow<'a, str>,
+            methods : Vec<FunctionInfo<'a>>,
+            lib_name: String,
+            imports : BTreeSet<String>,
+            variants : Vec<Cow<'a, str>>,
+        }
+
+        let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
+
+        let variants = ty.variants.iter().map(|v| {
+            self.formatter.fmt_enum_variant_name(v)
+        }).collect();
+
+        impl<'a> TypeTemplate<'a> for EnumTemplate<'a> {
+            fn render(&self) -> askama::Result<String> {
+                askama::Template::render(self)
+            }
+            fn imports(&mut self) -> &mut BTreeSet<String> {
+                &mut self.imports
+            }
+            fn mod_name(&self) -> String {
+                self.type_name.clone().into()
+            }
+        }
+
+        EnumTemplate {
+            type_name: self.formatter.fmt_symbol_name(self.id.into()),
+            methods,
+            lib_name: self.lib_name,
+            imports: self.imports,
+            variants,
         }
     }
 

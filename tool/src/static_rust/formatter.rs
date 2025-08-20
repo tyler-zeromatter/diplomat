@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use diplomat_core::hir::{PrimitiveType, SymbolId, TypeContext};
+use diplomat_core::hir::{EnumVariant, PrimitiveType, SymbolId, TypeContext};
 
 pub(super) struct RustFormatter<'tcx> {
     pub(super) tcx : &'tcx TypeContext,
@@ -26,5 +26,9 @@ impl<'tcx> RustFormatter<'tcx> {
 
     pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
         primitive.as_str()
+    }
+
+    pub(super) fn fmt_enum_variant_name(&self, enum_variant : &'tcx EnumVariant) -> Cow<'tcx, str> {
+        enum_variant.attrs.rename.apply(enum_variant.name.as_str().into())
     }
 }
