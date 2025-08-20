@@ -69,17 +69,17 @@ impl OptionOpaque {
         unsafe { OptionOpaque_option_opaque_argument(arg) }
     }
 
-    fn accepts_option_u8(arg : TODO(), sentinel : u8) -> Option<u8> {
+    fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_accepts_option_u8(arg, sentinel) }
     }
 
-    fn accepts_option_enum(arg : TODO(), sentinel : u8) -> Option<OptionEnum> {
+    fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_accepts_option_enum(arg, sentinel) }
     }
 
-    fn accepts_option_input_struct(arg : TODO(), sentinel : u8) -> Option<OptionInputStruct> {
+    fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_accepts_option_input_struct(arg, sentinel) }
     }
@@ -119,11 +119,11 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_opaque_argument(arg : OptionOpaque) -> bool;
 
-    fn OptionOpaque_accepts_option_u8(arg : TODO(), sentinel : u8) -> Option<u8>;
+    fn OptionOpaque_accepts_option_u8(arg : DiplomatOption<Option<u8>>, sentinel : u8) -> Option<u8>;
 
-    fn OptionOpaque_accepts_option_enum(arg : TODO(), sentinel : u8) -> Option<OptionEnum>;
+    fn OptionOpaque_accepts_option_enum(arg : DiplomatOption<Option<OptionEnum>>, sentinel : u8) -> Option<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : TODO(), sentinel : u8) -> Option<OptionInputStruct>;
+    fn OptionOpaque_accepts_option_input_struct(arg : DiplomatOption<Option<OptionInputStruct>>, sentinel : u8) -> Option<OptionInputStruct>;
 
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
 
