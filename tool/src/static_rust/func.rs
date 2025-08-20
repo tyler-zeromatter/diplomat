@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType};
+use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType, TypeId};
 
 use crate::static_rust::FileGenContext;
 
@@ -10,7 +10,7 @@ use crate::static_rust::FileGenContext;
 pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,
-    self_param : Option<MaybeOwn>,
+    self_param : Option<ParamInfo<'tcx>>,
     return_type : Option<Cow<'tcx, str>>,
     params : Vec<ParamInfo<'tcx>>,
     is_write : bool,
@@ -22,6 +22,16 @@ struct ParamInfo<'a> {
     abi_type_override : Option<Cow<'a, str>>,
 }
 
+impl<'a> ParamInfo<'a> {
+    fn type_name(&self, is_abi : &bool) -> Cow<'a, str> {
+        if *is_abi && self.abi_type_override.is_some() {
+            self.abi_type_override.clone().unwrap()
+        } else {
+            self.type_name.clone()
+        }
+    }
+}
+
 impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
@@ -29,13 +39,47 @@ impl<'tcx> FunctionInfo<'tcx> {
             params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: None });
         }
 
-        let self_param = method.param_self.as_ref().map(|s| { 
+        let self_param_own = method.param_self.as_ref().map(|s| { 
             match &s.ty {
-                SelfType::Opaque(o) => MaybeOwn::Borrow(o.owner),
-                SelfType::Struct(st) => st.owner,
-                SelfType::Enum(e) => MaybeOwn::Own,
+                SelfType::Opaque(o) => (MaybeOwn::Borrow(o.owner), s.ty.clone()),
+                SelfType::Struct(st) => (st.owner, s.ty.clone()),
+                SelfType::Enum(e) => (MaybeOwn::Own, s.ty.clone()),
                 _ => unreachable!("Unknown SelfType: {:?}", s.ty)
             }
+        });
+
+        let self_param = self_param_own.map(|(s, ty)| {
+            let mutable = if s.mutability().is_mutable() {
+                "mut "
+            } else { 
+                "" 
+            };
+
+            let mutable_self = format!("{mutable}self");
+
+            let type_name = match ty {
+                SelfType::Enum(e) => { 
+                    let type_id : TypeId = e.tcx_id.into();
+                    ctx.formatter.fmt_symbol_name(type_id.into()) 
+                }
+                SelfType::Opaque(op) => {
+                    let type_id : TypeId = op.tcx_id.into();
+                    ctx.formatter.fmt_symbol_name(type_id.into())
+                }
+                SelfType::Struct(st) => {
+                    let type_id : TypeId = st.tcx_id.into();
+                    ctx.formatter.fmt_symbol_name(type_id.into())
+                }
+                _ => unreachable!("Unknown SelfType {ty:?}")
+            };
+
+            let (type_name, abi_type) = if s.is_owned() {
+                (mutable_self, format!("{mutable}this : {type_name}"))
+            } else {
+                (format!("&{mutable_self}"), format!("this: &{mutable}{type_name}"))
+            };
+
+            ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
         });
 
         // TODO: DiplomatOption and DiplomatResult conversion support.

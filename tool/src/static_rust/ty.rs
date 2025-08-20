@@ -6,7 +6,7 @@ use diplomat_core::hir::{StructDef, StructPathLike, SymbolId, TyPosition, Type, 
 use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
 
 pub(super) struct FileGenContext<'tcx> {
-    formatter : &'tcx RustFormatter<'tcx>,
+    pub(super) formatter : &'tcx RustFormatter<'tcx>,
     tcx : &'tcx TypeContext,
     id: SymbolId,
     lib_name : String,
