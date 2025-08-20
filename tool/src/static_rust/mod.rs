@@ -43,7 +43,7 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
 
     for (id, ty) in tcx.all_types() {
         let name = formatter.fmt_symbol_name(id.into());
-        
+
         let ctx = FileGenContext::from_type(&config, id, &formatter, tcx);
         let template : &mut dyn TypeTemplate = match ty {
             TypeDef::Struct(st) => {
@@ -51,6 +51,9 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
             }
             TypeDef::Opaque(op) => {
                 &mut ctx.generate_opaque(op)
+            }
+            TypeDef::Enum(e) => {
+                &mut ctx.generate_enum(e)
             }
             _ => { continue; unreachable!("Unsupported HIR type {ty:?}") }
         };
