@@ -7,7 +7,7 @@ pub struct MyStruct {
     pub c: u8,
     pub d: u64,
     pub e: i32,
-    pub f: DiplomatChar,
+    pub f: diplomat_runtime::DiplomatChar,
     pub g: MyEnum,
 }
 

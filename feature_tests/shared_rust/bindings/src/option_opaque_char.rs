@@ -1,7 +1,7 @@
 pub struct OptionOpaqueChar;
 
 impl OptionOpaqueChar {
-    pub fn assert_char(&self, ch : DiplomatChar) {
+    pub fn assert_char(&self, ch : diplomat_runtime::DiplomatChar) {
             // TODO: writeable conversions.
         unsafe { OptionOpaqueChar_assert_char(self, ch) }
     }
@@ -10,6 +10,6 @@ impl OptionOpaqueChar {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OptionOpaqueChar_assert_char(this: &OptionOpaqueChar, ch : DiplomatChar);
+    fn OptionOpaqueChar_assert_char(this: &OptionOpaqueChar, ch : diplomat_runtime::DiplomatChar);
 
 }
