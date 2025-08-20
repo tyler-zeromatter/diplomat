@@ -4,11 +4,11 @@ pub struct MyStructContainingAnOption {
 }
 
 impl MyStructContainingAnOption {
-    fn new() {
+    fn new() -> MyStructContainingAnOption {
         unsafe { MyStructContainingAnOption_new() }
     }
 
-    fn filled() {
+    fn filled() -> MyStructContainingAnOption {
         unsafe { MyStructContainingAnOption_filled() }
     }
 
@@ -16,8 +16,8 @@ impl MyStructContainingAnOption {
 
 #[link(name = "somelib")]
 extern "C" {
-    fn MyStructContainingAnOption_new();
+    fn MyStructContainingAnOption_new() -> MyStructContainingAnOption;
 
-    fn MyStructContainingAnOption_filled();
+    fn MyStructContainingAnOption_filled() -> MyStructContainingAnOption;
 
 }

@@ -1,10 +1,11 @@
+use super::MyZst;
 #[repr(C)]
 pub struct MyStruct {
 
 }
 
 impl MyStruct {
-    fn new() {
+    fn new() -> MyStruct {
         unsafe { MyStruct_new() }
     }
 
@@ -16,15 +17,15 @@ impl MyStruct {
         unsafe { MyStruct_takes_const(self, o) }
     }
 
-    fn into_a(self) {
+    fn into_a(self) -> u8 {
         unsafe { MyStruct_into_a(self) }
     }
 
-    fn returns_zst_result() {
+    fn returns_zst_result() -> Result<(), MyZst> {
         unsafe { MyStruct_returns_zst_result() }
     }
 
-    fn fails_zst_result() {
+    fn fails_zst_result() -> Result<(), MyZst> {
         unsafe { MyStruct_fails_zst_result() }
     }
 
@@ -32,16 +33,16 @@ impl MyStruct {
 
 #[link(name = "somelib")]
 extern "C" {
-    fn MyStruct_new();
+    fn MyStruct_new() -> MyStruct;
 
     fn MyStruct_takes_mut(&self, o : MyStruct);
 
     fn MyStruct_takes_const(&mut self, o : MyStruct);
 
-    fn MyStruct_into_a(self);
+    fn MyStruct_into_a(self) -> u8;
 
-    fn MyStruct_returns_zst_result();
+    fn MyStruct_returns_zst_result() -> Result<(), MyZst>;
 
-    fn MyStruct_fails_zst_result();
+    fn MyStruct_fails_zst_result() -> Result<(), MyZst>;
 
 }
