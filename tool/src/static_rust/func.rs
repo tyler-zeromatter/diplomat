@@ -36,7 +36,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
-            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: None });
+            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: ctx.gen_abi_type_name(&p.ty) });
         }
 
         let self_param_own = method.param_self.as_ref().map(|s| { 
@@ -73,7 +73,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 } else { 
                     "" 
                 };
-                
+
                 (format!("&{mutable}self"), format!("this: &{mutable}{type_name}"))
             };
 

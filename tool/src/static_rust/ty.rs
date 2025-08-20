@@ -157,7 +157,19 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 self.imports.insert(op_name.clone().into());
                 op_name
             }
+            Type::DiplomatOption(op) => {
+                format!("Option<{}>", self.gen_type_name(op)).into()
+            }
             _ => "TODO()".into()
+        }
+    }
+
+    pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
+        match ty {
+            Type::DiplomatOption(op) => {
+                Some(format!("DiplomatOption<{}>", self.gen_type_name(ty)).into())
+            }
+            _ => None
         }
     }
 }
