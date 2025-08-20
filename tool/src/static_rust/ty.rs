@@ -155,7 +155,19 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 let type_id : TypeId = op.tcx_id.into();
                 let op_name = self.formatter.fmt_symbol_name(type_id.into());
                 self.imports.insert(op_name.clone().into());
-                op_name
+
+                let op_name = if op.is_optional() {
+                    format!("Option<{}>", op_name)
+                } else {
+                    op_name.into()
+                };
+
+                if op.is_owned() {
+                    format!("Box<{op_name}>").into()
+                } else {
+                    // TODO: Lifetimes?
+                    format!("&{op_name}").into()
+                }
             }
             Type::DiplomatOption(op) => {
                 format!("Option<{}>", self.gen_type_name(op)).into()
