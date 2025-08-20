@@ -1,0 +1,5 @@
+{%- for m in mods -%}
+pub mod {{m.mod_name}};
+pub use {{m.mod_name}}::{{m.type_name}};
+
+{% endfor -%}

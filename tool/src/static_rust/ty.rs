@@ -15,6 +15,7 @@ pub(super) struct FileGenContext<'tcx> {
 
 pub(super) trait TypeTemplate<'a> : Template {
     fn imports(&mut self) -> &mut BTreeSet<String>;
+    fn mod_name(&self) -> String;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
@@ -52,6 +53,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         impl<'a> TypeTemplate<'a> for StructTemplate<'a> {
             fn imports(&mut self) -> &mut BTreeSet<String> {
                 &mut self.imports
+            }
+            fn mod_name(&self) -> String {
+                self.struct_name.clone().into()
             }
         }
 
