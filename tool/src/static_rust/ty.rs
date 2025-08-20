@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{EnumDef, OpaqueDef, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{EnumDef, OpaqueDef, Slice, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -159,6 +159,30 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             Type::DiplomatOption(op) => {
                 format!("Option<{}>", self.gen_type_name(op)).into()
+            }
+            Type::Slice(sl) => {
+                let (mt, type_name) = match sl {
+                    Slice::Primitive(b, p) => {
+                        if b.is_owned() {
+                            return format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p)).into();
+                        }
+                        (b.mutability(), self.formatter.fmt_primitive_name(*p).to_string())
+                    }
+                    Slice::Struct(b, str) => {
+                        let name = self.formatter.fmt_symbol_name(str.id().into());
+                        if b.is_owned() {
+                            return format!("Box<[{name}]>").into();
+                        }
+                        (b.mutability(), name.into())
+                    }
+                    _ => (diplomat_core::hir::Mutability::Immutable, format!("TODO")),
+                };
+
+                format!("&{}[{type_name}]", if mt.is_mutable() {
+                    "mut "
+                } else {
+                    ""
+                }).into()
             }
             _ => "TODO()".into()
         }

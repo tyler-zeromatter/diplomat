@@ -43,7 +43,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             match &s.ty {
                 SelfType::Opaque(o) => (MaybeOwn::Borrow(o.owner), s.ty.clone()),
                 SelfType::Struct(st) => (st.owner, s.ty.clone()),
-                SelfType::Enum(e) => (MaybeOwn::Own, s.ty.clone()),
+                SelfType::Enum(..) => (MaybeOwn::Own, s.ty.clone()),
                 _ => unreachable!("Unknown SelfType: {:?}", s.ty)
             }
         });
@@ -108,7 +108,8 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn gen_ok_type_name(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Cow<'tcx, str>  {
         match ok {
             SuccessType::Unit => "()".into(),
-            SuccessType::OutType(o) => { 
+            SuccessType::OutType(o) => {
+                // TODO: Opaques.
                 ctx.gen_type_name(o)
             }
             SuccessType::Write => {
