@@ -1,3 +1,7 @@
+{%- for i in imports -%}
+use {{i}};
+{% endfor -%}
+
 #[repr(C)]
 pub struct {{struct_name}} {
 
