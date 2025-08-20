@@ -7,7 +7,7 @@
 {%- endmacro -%}
 
 {%- block function_impl -%}
-fn {{name}}(
+pub fn {{name}}(
         {%- if is_write -%}
         {%- call func_params(self_param, &params[..params.len() - 1]) -%}
         {%- else -%}
