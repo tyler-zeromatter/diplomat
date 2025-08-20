@@ -1,6 +1,6 @@
 #[repr(C)]
 pub enum MyEnum {
-    A = -2,
+    A = -2, 
     B = -1, 
     C = 0, 
     D = 1, 

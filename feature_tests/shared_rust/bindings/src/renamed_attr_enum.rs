@@ -1,8 +1,8 @@
 #[repr(C)]
 pub enum RenamedAttrEnum {
-    A, 
-    B, 
-    Renamed
+    A = 0, 
+    B = 1, 
+    Renamed = 2
 }
 
 impl RenamedAttrEnum {
