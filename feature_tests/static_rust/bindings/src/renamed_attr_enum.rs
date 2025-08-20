@@ -1,3 +1,4 @@
+#[repr(C)]
 pub enum RenamedAttrEnum {
     A, 
     B, 

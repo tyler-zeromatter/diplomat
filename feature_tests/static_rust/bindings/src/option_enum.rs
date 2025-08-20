@@ -1,3 +1,4 @@
+#[repr(C)]
 pub enum OptionEnum {
     Foo, 
     Bar

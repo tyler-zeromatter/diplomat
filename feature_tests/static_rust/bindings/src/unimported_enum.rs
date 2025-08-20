@@ -1,3 +1,4 @@
+#[repr(C)]
 pub enum UnimportedEnum {
     A, 
     B, 
