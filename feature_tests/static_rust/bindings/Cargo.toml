@@ -1,0 +1,10 @@
+[package]
+name = "static-rust-feature-test-bindings"
+description = "Static Rust Feature Test bindings"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lib]
+path = "src/lib.rs"
