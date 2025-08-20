@@ -26,7 +26,7 @@ impl<'tcx> RustFormatter<'tcx> {
 
     pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
         match primitive {
-            PrimitiveType::Char => "DiplomatChar",
+            PrimitiveType::Char => "diplomat_runtime::DiplomatChar",
             _ => primitive.as_str()
         }
     }
