@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct TraitTestingStruct {
-
-}
+pub struct TraitTestingStruct;
 
 impl TraitTestingStruct {
 }

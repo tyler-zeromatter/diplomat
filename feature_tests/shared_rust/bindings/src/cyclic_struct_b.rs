@@ -1,7 +1,7 @@
 use super::CyclicStructA;
 #[repr(C)]
 pub struct CyclicStructB {
-
+    pub field: u8,
 }
 
 impl CyclicStructB {

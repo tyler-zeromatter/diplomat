@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct CallbackWrapper {
-
-}
+pub struct CallbackWrapper;
 
 impl CallbackWrapper {
 }

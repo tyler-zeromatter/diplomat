@@ -1,6 +1,6 @@
 #[repr(C)]
 pub struct RenamedTestMacroStruct {
-
+    pub a: usize,
 }
 
 impl RenamedTestMacroStruct {

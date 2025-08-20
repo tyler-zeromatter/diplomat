@@ -1,6 +1,11 @@
 #[repr(C)]
 pub struct PrimitiveStruct {
-
+    pub x: f32,
+    pub a: bool,
+    pub b: char,
+    pub c: i64,
+    pub d: isize,
+    pub e: byte,
 }
 
 impl PrimitiveStruct {

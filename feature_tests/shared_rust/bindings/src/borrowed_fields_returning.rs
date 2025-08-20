@@ -1,6 +1,6 @@
 #[repr(C)]
 pub struct BorrowedFieldsReturning {
-
+    pub bytes: &[TODO],
 }
 
 impl BorrowedFieldsReturning {

@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct MyZst {
-
-}
+pub struct MyZst;
 
 impl MyZst {
 }

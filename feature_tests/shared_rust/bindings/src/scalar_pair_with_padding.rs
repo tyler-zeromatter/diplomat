@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct ScalarPairWithPadding {
-
-}
+pub struct ScalarPairWithPadding;
 
 impl ScalarPairWithPadding {
 }

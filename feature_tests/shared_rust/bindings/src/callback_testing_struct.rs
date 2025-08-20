@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct CallbackTestingStruct {
-
-}
+pub struct CallbackTestingStruct;
 
 impl CallbackTestingStruct {
 }

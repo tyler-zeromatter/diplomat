@@ -1,7 +1,14 @@
+use super::MyEnum;
 use super::MyZst;
 #[repr(C)]
 pub struct MyStruct {
-
+    pub a: u8,
+    pub b: bool,
+    pub c: u8,
+    pub d: u64,
+    pub e: i32,
+    pub f: char,
+    pub g: MyEnum,
 }
 
 impl MyStruct {

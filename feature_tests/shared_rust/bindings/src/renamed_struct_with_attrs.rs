@@ -1,6 +1,7 @@
 #[repr(C)]
 pub struct RenamedStructWithAttrs {
-
+    pub a: bool,
+    pub b: u32,
 }
 
 impl RenamedStructWithAttrs {

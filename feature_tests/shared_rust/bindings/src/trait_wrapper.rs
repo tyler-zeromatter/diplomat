@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct TraitWrapper {
-
-}
+pub struct TraitWrapper;
 
 impl TraitWrapper {
 }
