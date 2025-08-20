@@ -30,7 +30,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    pub(super) fn generate_struct(mut self, ty : &'tcx StructDef) -> impl TypeTemplate<'tcx> {
+    pub(super) fn generate_struct<P: TyPosition>(mut self, ty : &'tcx StructDef<P>, is_out : bool) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
         #[template(path = "static_rust/struct.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
@@ -38,6 +38,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods : Vec<FunctionInfo<'a>>,
             lib_name: String,
             imports : BTreeSet<String>,
+            is_out : bool,
             // TODO: Fields.
         }
 
@@ -59,7 +60,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             type_name: self.formatter.fmt_symbol_name(self.id.into()),
             methods,
             lib_name: self.lib_name,
-            imports: self.imports
+            imports: self.imports,
+            is_out
         }
     }
 
