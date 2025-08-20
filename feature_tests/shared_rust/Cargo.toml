@@ -1,3 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["bindings", "test"]
+
+[workspace.dependencies]
+shared-rust-feature-test-bindings = { path= "bindings" }
+diplomat-feature-tests = { path = "../" }

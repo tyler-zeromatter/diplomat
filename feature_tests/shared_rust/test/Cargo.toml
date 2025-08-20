@@ -4,7 +4,5 @@ description = "Shared Rust Feature Tests"
 edition = "2024"
 publish = false
 
-[lib]
-path = "src/lib.rs"
-
 [dependencies]
+shared-rust-feature-test-bindings = { workspace = true }
