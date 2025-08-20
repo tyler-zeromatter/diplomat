@@ -1,37 +1,37 @@
 pub struct Float64Vec;
 
 impl Float64Vec {
-    fn new_bool(v : &[bool]) -> Float64Vec {
+    fn new_bool(v : &[bool]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_bool(v) }
     }
 
-    fn new_i16(v : &[i16]) -> Float64Vec {
+    fn new_i16(v : &[i16]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_i16(v) }
     }
 
-    fn new_u16(v : &[u16]) -> Float64Vec {
+    fn new_u16(v : &[u16]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_u16(v) }
     }
 
-    fn new_isize(v : &[isize]) -> Float64Vec {
+    fn new_isize(v : &[isize]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_isize(v) }
     }
 
-    fn new_usize(v : &[usize]) -> Float64Vec {
+    fn new_usize(v : &[usize]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_usize(v) }
     }
 
-    fn new_f64_be_bytes(v : &[byte]) -> Float64Vec {
+    fn new_f64_be_bytes(v : &[byte]) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_f64_be_bytes(v) }
     }
 
-    fn new_from_owned(v : Box<[f64]>) -> Float64Vec {
+    fn new_from_owned(v : Box<[f64]>) -> Box<Float64Vec> {
             // TODO: writeable conversions.
         unsafe { Float64Vec_new_from_owned(v) }
     }
@@ -70,19 +70,19 @@ impl Float64Vec {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Float64Vec_new_bool(v : &[bool]) -> Float64Vec;
+    fn Float64Vec_new_bool(v : &[bool]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_i16(v : &[i16]) -> Float64Vec;
+    fn Float64Vec_new_i16(v : &[i16]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_u16(v : &[u16]) -> Float64Vec;
+    fn Float64Vec_new_u16(v : &[u16]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_isize(v : &[isize]) -> Float64Vec;
+    fn Float64Vec_new_isize(v : &[isize]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_usize(v : &[usize]) -> Float64Vec;
+    fn Float64Vec_new_usize(v : &[usize]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_f64_be_bytes(v : &[byte]) -> Float64Vec;
+    fn Float64Vec_new_f64_be_bytes(v : &[byte]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_from_owned(v : Box<[f64]>) -> Float64Vec;
+    fn Float64Vec_new_from_owned(v : Box<[f64]>) -> Box<Float64Vec>;
 
     fn Float64Vec_as_slice(this: &Float64Vec) -> &[f64];
 

@@ -1,7 +1,7 @@
 pub struct MyOpaqueEnum;
 
 impl MyOpaqueEnum {
-    fn new() -> MyOpaqueEnum {
+    fn new() -> Box<MyOpaqueEnum> {
             // TODO: writeable conversions.
         unsafe { MyOpaqueEnum_new() }
     }
@@ -15,7 +15,7 @@ impl MyOpaqueEnum {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn MyOpaqueEnum_new() -> MyOpaqueEnum;
+    fn MyOpaqueEnum_new() -> Box<MyOpaqueEnum>;
 
     fn MyOpaqueEnum_to_string(this: &MyOpaqueEnum, output : &mut DiplomatWrite);
 

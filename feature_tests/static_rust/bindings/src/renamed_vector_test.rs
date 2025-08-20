@@ -1,7 +1,7 @@
 pub struct RenamedVectorTest;
 
 impl RenamedVectorTest {
-    fn new() -> RenamedVectorTest {
+    fn new() -> Box<RenamedVectorTest> {
             // TODO: writeable conversions.
         unsafe { namespace_VectorTest_new() }
     }
@@ -25,7 +25,7 @@ impl RenamedVectorTest {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn namespace_VectorTest_new() -> RenamedVectorTest;
+    fn namespace_VectorTest_new() -> Box<RenamedVectorTest>;
 
     fn namespace_VectorTest_len(this: &RenamedVectorTest) -> usize;
 

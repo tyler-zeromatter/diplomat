@@ -1,7 +1,7 @@
 pub struct OptionString;
 
 impl OptionString {
-    fn new(diplomat_str : &[TODO]) -> OptionString {
+    fn new(diplomat_str : &[TODO]) -> Box<Option<OptionString>> {
             // TODO: writeable conversions.
         unsafe { OptionString_new(diplomat_str) }
     }
@@ -20,7 +20,7 @@ impl OptionString {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OptionString_new(diplomat_str : &[TODO]) -> OptionString;
+    fn OptionString_new(diplomat_str : &[TODO]) -> Box<Option<OptionString>>;
 
     fn OptionString_write(this: &OptionString, output : &mut DiplomatWrite) -> Result<(), ()>;
 

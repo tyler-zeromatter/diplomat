@@ -1,22 +1,22 @@
 pub struct MyString;
 
 impl MyString {
-    fn new(v : &[TODO]) -> MyString {
+    fn new(v : &[TODO]) -> Box<MyString> {
             // TODO: writeable conversions.
         unsafe { MyString_new(v) }
     }
 
-    fn new_unsafe(v : &[TODO]) -> MyString {
+    fn new_unsafe(v : &[TODO]) -> Box<MyString> {
             // TODO: writeable conversions.
         unsafe { MyString_new_unsafe(v) }
     }
 
-    fn new_owned(v : &[TODO]) -> MyString {
+    fn new_owned(v : &[TODO]) -> Box<MyString> {
             // TODO: writeable conversions.
         unsafe { MyString_new_owned(v) }
     }
 
-    fn new_from_first(v : &[TODO]) -> MyString {
+    fn new_from_first(v : &[TODO]) -> Box<MyString> {
             // TODO: writeable conversions.
         unsafe { MyString_new_from_first(v) }
     }
@@ -50,13 +50,13 @@ impl MyString {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn MyString_new(v : &[TODO]) -> MyString;
+    fn MyString_new(v : &[TODO]) -> Box<MyString>;
 
-    fn MyString_new_unsafe(v : &[TODO]) -> MyString;
+    fn MyString_new_unsafe(v : &[TODO]) -> Box<MyString>;
 
-    fn MyString_new_owned(v : &[TODO]) -> MyString;
+    fn MyString_new_owned(v : &[TODO]) -> Box<MyString>;
 
-    fn MyString_new_from_first(v : &[TODO]) -> MyString;
+    fn MyString_new_from_first(v : &[TODO]) -> Box<MyString>;
 
     fn MyString_set_str(this: &mut MyString, new_str : &[TODO]);
 

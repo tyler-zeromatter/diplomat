@@ -3,17 +3,17 @@ use super::MyStruct;
 pub struct Opaque;
 
 impl Opaque {
-    fn new() -> Opaque {
+    fn new() -> Box<Opaque> {
             // TODO: writeable conversions.
         unsafe { Opaque_new() }
     }
 
-    fn try_from_utf8(input : &[TODO]) -> Opaque {
+    fn try_from_utf8(input : &[TODO]) -> Box<Option<Opaque>> {
             // TODO: writeable conversions.
         unsafe { Opaque_try_from_utf8(input) }
     }
 
-    fn from_str(input : &[TODO]) -> Opaque {
+    fn from_str(input : &[TODO]) -> Box<Opaque> {
             // TODO: writeable conversions.
         unsafe { Opaque_from_str(input) }
     }
@@ -47,11 +47,11 @@ impl Opaque {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Opaque_new() -> Opaque;
+    fn Opaque_new() -> Box<Opaque>;
 
-    fn Opaque_try_from_utf8(input : &[TODO]) -> Opaque;
+    fn Opaque_try_from_utf8(input : &[TODO]) -> Box<Option<Opaque>>;
 
-    fn Opaque_from_str(input : &[TODO]) -> Opaque;
+    fn Opaque_from_str(input : &[TODO]) -> Box<Opaque>;
 
     fn Opaque_get_debug_str(this: &Opaque, output : &mut DiplomatWrite);
 
