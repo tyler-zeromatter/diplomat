@@ -20,7 +20,7 @@ impl MyStruct {
         unsafe { MyStruct_takes_const(self, o) }
     }
 
-    fn into_a(mut self) -> u8 {
+    fn into_a(self) -> u8 {
             // TODO: writeable conversions.
         unsafe { MyStruct_into_a(self) }
     }
@@ -45,7 +45,7 @@ unsafe extern "C" {
 
     fn MyStruct_takes_const(this: &MyStruct, o : MyStruct);
 
-    fn MyStruct_into_a(mut this : MyStruct) -> u8;
+    fn MyStruct_into_a(this : MyStruct) -> u8;
 
     fn MyStruct_returns_zst_result() -> Result<(), MyZst>;
 

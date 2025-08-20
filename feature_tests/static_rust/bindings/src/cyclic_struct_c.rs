@@ -9,7 +9,7 @@ impl CyclicStructC {
         unsafe { CyclicStructC_takes_nested_parameters(c) }
     }
 
-    fn cyclic_out(mut self) {
+    fn cyclic_out(self) {
             // TODO: writeable conversions.
         unsafe { CyclicStructC_cyclic_out(self, output) }
     }
@@ -20,6 +20,6 @@ impl CyclicStructC {
 unsafe extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructC) -> CyclicStructC;
 
-    fn CyclicStructC_cyclic_out(mut this : CyclicStructC, output : &mut DiplomatWrite);
+    fn CyclicStructC_cyclic_out(this : CyclicStructC, output : &mut DiplomatWrite);
 
 }
