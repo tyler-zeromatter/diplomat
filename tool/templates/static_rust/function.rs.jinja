@@ -12,7 +12,7 @@
 {%- endmacro -%}
 
 {%- block function_impl -%}
-fn {{name}}({% call func_params(self_param, params) %}) {
+fn {{name}}({% call func_params(self_param, params) %}) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %} {
     unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
@@ -25,5 +25,5 @@ fn {{name}}({% call func_params(self_param, params) %}) {
 {%- endblock -%}
 
 {%- block function_def -%}
-    fn {{abi_name}}({% call func_params(self_param, params) %});
+    fn {{abi_name}}({% call func_params(self_param, params) %}) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %};
 {%- endblock -%}
