@@ -2,10 +2,8 @@
 use super::{{i}};
 {% endfor -%}
 
-#[repr(C)]
-pub struct {{struct_name}} {
-
-}
+{%- block type_def -%}
+{%- endblock %}
 
 impl {{struct_name}} {
 {%- for m in methods %}
