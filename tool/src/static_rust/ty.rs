@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{OpaqueDef, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -13,36 +13,28 @@ pub(super) struct FileGenContext<'tcx> {
     imports : BTreeSet<String>,
 }
 
-pub(super) trait TypeTemplate<'a> : Template {
+pub(super) trait TypeTemplate<'a> {
+    fn render(&self) -> askama::Result<String>;
     fn imports(&mut self) -> &mut BTreeSet<String>;
     fn mod_name(&self) -> String;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
-    pub(super) fn from_type<'a>(config : &Config, id : TypeId, formatter : &'a RustFormatter, tcx : &'a TypeContext) -> impl TypeTemplate<'a> {
-        let ctx = FileGenContext {
+    pub(super) fn from_type<'a>(config : &Config, id : TypeId, formatter : &'a RustFormatter, tcx : &'a TypeContext) -> FileGenContext<'a> {
+        FileGenContext {
             formatter,
             id: id.into(),
             tcx,
             lib_name: config.shared_config.lib_name.clone().expect("Rust static backend needs lib_name to link against."),
             imports: BTreeSet::new(),
-        };
-        let ty = ctx.tcx.resolve_type(id);
-        let mut template = match ty {
-            TypeDef::Struct(st) => {
-                ctx.generate_struct(st)
-            }
-            _ => panic!("Unsupported HIR type {ty:?}")
-        };
-        template.imports().remove::<str>(&formatter.fmt_symbol_name(id.into()));
-        template
+        }
     }
 
-    fn generate_struct(mut self, ty : &'tcx StructDef) -> impl TypeTemplate<'tcx> {
+    pub(super) fn generate_struct(mut self, ty : &'tcx StructDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
         #[template(path = "static_rust/struct.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
-            struct_name : Cow<'a, str>,
+            type_name : Cow<'a, str>,
             methods : Vec<FunctionInfo<'a>>,
             lib_name: String,
             imports : BTreeSet<String>,
@@ -51,19 +43,54 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
         impl<'a> TypeTemplate<'a> for StructTemplate<'a> {
+            fn render(&self) -> askama::Result<String> {
+                askama::Template::render(self)
+            }
             fn imports(&mut self) -> &mut BTreeSet<String> {
                 &mut self.imports
             }
             fn mod_name(&self) -> String {
-                self.struct_name.clone().into()
+                self.type_name.clone().into()
             }
         }
 
         StructTemplate {
-            struct_name: self.formatter.fmt_symbol_name(self.id.into()),
+            type_name: self.formatter.fmt_symbol_name(self.id.into()),
             methods,
             lib_name: self.lib_name,
             imports: self.imports
+        }
+    }
+
+    pub(super) fn generate_opaque(mut self, ty : &'tcx OpaqueDef) -> impl TypeTemplate<'tcx> {
+        #[derive(Template)]
+        #[template(path = "static_rust/opaque.rs.jinja", escape = "none")]
+        struct OpaqueTemplate<'a> {
+            type_name : Cow<'a, str>,
+            methods : Vec<FunctionInfo<'a>>,
+            lib_name: String,
+            imports : BTreeSet<String>,
+        }
+
+        let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
+
+        impl<'a> TypeTemplate<'a> for OpaqueTemplate<'a> {
+            fn render(&self) -> askama::Result<String> {
+                askama::Template::render(self)
+            }
+            fn imports(&mut self) -> &mut BTreeSet<String> {
+                &mut self.imports
+            }
+            fn mod_name(&self) -> String {
+                self.type_name.clone().into()
+            }
+        }
+
+        OpaqueTemplate {
+            type_name: self.formatter.fmt_symbol_name(self.id.into()),
+            methods,
+            lib_name: self.lib_name,
+            imports: self.imports,
         }
     }
 
