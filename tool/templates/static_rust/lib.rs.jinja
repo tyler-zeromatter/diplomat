@@ -1,5 +1,6 @@
 {%- for m in mods -%}
-pub mod {{m.mod_name}};
-pub use {{m.mod_name}}::{{m.type_name}};
+{%- let vis = m.vis.clone().unwrap_or_default() -%}
+pub{{vis}} mod {{m.mod_name}};
+pub{{vis}} use {{m.mod_name}}::{{m.type_name}};
 
 {% endfor -%}

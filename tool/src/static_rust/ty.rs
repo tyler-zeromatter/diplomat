@@ -17,6 +17,7 @@ pub(super) trait TypeTemplate<'a> {
     fn render(&self) -> askama::Result<String>;
     fn imports(&mut self) -> &mut BTreeSet<String>;
     fn mod_name(&self) -> String;
+    fn crate_vis(&self) -> Option<String>;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
@@ -54,6 +55,13 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
             }
+            fn crate_vis(&self) -> Option<String> {
+                if self.is_out {
+                    Some("(crate)".into())
+                } else {
+                    None
+                }
+            }
         }
 
         StructTemplate {
@@ -86,6 +94,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
+            }
+            fn crate_vis(&self) -> Option<String> {
+                None
             }
         }
 
@@ -123,6 +134,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
+            }
+            fn crate_vis(&self) -> Option<String> {
+                None
             }
         }
 

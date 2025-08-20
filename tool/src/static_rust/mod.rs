@@ -28,7 +28,8 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
     #[derive(PartialEq, PartialOrd, Eq, Ord)]
     struct ModImport {
         mod_name : String,
-        type_name : String
+        type_name : String,
+        vis : Option<String>
     }
 
     #[derive(Template)]
@@ -65,7 +66,7 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
 
         
         let mod_name = heck::AsSnakeCase(name).to_string();
-        lib.mods.insert(ModImport { mod_name: mod_name.clone(), type_name: template.mod_name() });
+        lib.mods.insert(ModImport { mod_name: mod_name.clone(), type_name: template.mod_name(), vis: template.crate_vis() });
         files.add_file(format!("{}.rs", mod_name), template.render().unwrap())
     }
 
