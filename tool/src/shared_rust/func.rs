@@ -3,10 +3,10 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType, TypeId};
 
-use crate::static_rust::FileGenContext;
+use crate::shared_rust::FileGenContext;
 
 #[derive(Template)]
-#[template(path = "static_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
+#[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,

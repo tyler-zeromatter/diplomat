@@ -3,7 +3,7 @@ use std::{borrow::Cow, collections::BTreeSet};
 use askama::Template;
 use diplomat_core::hir::{EnumDef, OpaqueDef, Slice, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
-use crate::{config::Config, static_rust::{func::FunctionInfo, RustFormatter}};
+use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
 pub(super) struct FileGenContext<'tcx> {
     pub(super) formatter : &'tcx RustFormatter<'tcx>,
@@ -33,7 +33,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     pub(super) fn generate_struct<P: TyPosition>(mut self, ty : &'tcx StructDef<P>, is_out : bool) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
-        #[template(path = "static_rust/struct.rs.jinja", escape = "none")]
+        #[template(path = "shared_rust/struct.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
             type_name : Cow<'a, str>,
             methods : Vec<FunctionInfo<'a>>,
@@ -75,7 +75,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     pub(super) fn generate_opaque(mut self, ty : &'tcx OpaqueDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
-        #[template(path = "static_rust/opaque.rs.jinja", escape = "none")]
+        #[template(path = "shared_rust/opaque.rs.jinja", escape = "none")]
         struct OpaqueTemplate<'a> {
             type_name : Cow<'a, str>,
             methods : Vec<FunctionInfo<'a>>,
@@ -110,7 +110,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     pub(super) fn generate_enum(mut self, ty : &'tcx EnumDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
-        #[template(path = "static_rust/enum.rs.jinja", escape = "none")]
+        #[template(path = "shared_rust/enum.rs.jinja", escape = "none")]
         struct EnumTemplate<'a> {
             type_name : Cow<'a, str>,
             methods : Vec<FunctionInfo<'a>>,
