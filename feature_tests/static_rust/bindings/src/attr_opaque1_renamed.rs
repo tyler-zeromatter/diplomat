@@ -3,7 +3,7 @@ use super::Unnamespaced;
 pub struct AttrOpaque1Renamed;
 
 impl AttrOpaque1Renamed {
-    fn new() -> AttrOpaque1Renamed {
+    fn new() -> Box<AttrOpaque1Renamed> {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_new() }
     }
@@ -28,7 +28,7 @@ impl AttrOpaque1Renamed {
         unsafe { renamed_on_abi_only(self) }
     }
 
-    fn use_unnamespaced(&self, _un : Unnamespaced) {
+    fn use_unnamespaced(&self, _un : &Unnamespaced) {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) }
     }
@@ -42,7 +42,7 @@ impl AttrOpaque1Renamed {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn namespace_AttrOpaque1_new() -> AttrOpaque1Renamed;
+    fn namespace_AttrOpaque1_new() -> Box<AttrOpaque1Renamed>;
 
     fn namespace_AttrOpaque1_mac_test() -> i32;
 
@@ -52,7 +52,7 @@ unsafe extern "C" {
 
     fn renamed_on_abi_only(this: &AttrOpaque1Renamed) -> u8;
 
-    fn namespace_AttrOpaque1_use_unnamespaced(this: &AttrOpaque1Renamed, _un : Unnamespaced);
+    fn namespace_AttrOpaque1_use_unnamespaced(this: &AttrOpaque1Renamed, _un : &Unnamespaced);
 
     fn namespace_AttrOpaque1_use_namespaced(this: &AttrOpaque1Renamed, _n : RenamedAttrEnum);
 
