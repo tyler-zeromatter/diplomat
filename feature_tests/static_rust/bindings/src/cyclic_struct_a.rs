@@ -10,17 +10,17 @@ impl CyclicStructA {
         unsafe { CyclicStructA_get_b() }
     }
 
-    fn cyclic_out(mut self) {
+    fn cyclic_out(self) {
             // TODO: writeable conversions.
         unsafe { CyclicStructA_cyclic_out(self, output) }
     }
 
-    fn double_cyclic_out(mut self, cyclic_struct_a : CyclicStructA) {
+    fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) {
             // TODO: writeable conversions.
         unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, output) }
     }
 
-    fn getter_out(mut self) {
+    fn getter_out(self) {
             // TODO: writeable conversions.
         unsafe { CyclicStructA_getter_out(self, output) }
     }
@@ -31,10 +31,10 @@ impl CyclicStructA {
 unsafe extern "C" {
     fn CyclicStructA_get_b() -> CyclicStructB;
 
-    fn CyclicStructA_cyclic_out(mut this : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_cyclic_out(this : CyclicStructA, output : &mut DiplomatWrite);
 
-    fn CyclicStructA_double_cyclic_out(mut this : CyclicStructA, cyclic_struct_a : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, output : &mut DiplomatWrite);
 
-    fn CyclicStructA_getter_out(mut this : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_getter_out(this : CyclicStructA, output : &mut DiplomatWrite);
 
 }

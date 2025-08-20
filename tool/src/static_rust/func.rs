@@ -49,14 +49,6 @@ impl<'tcx> FunctionInfo<'tcx> {
         });
 
         let self_param = self_param_own.map(|(s, ty)| {
-            let mutable = if s.mutability().is_mutable() {
-                "mut "
-            } else { 
-                "" 
-            };
-
-            let mutable_self = format!("{mutable}self");
-
             let type_name = match ty {
                 SelfType::Enum(e) => { 
                     let type_id : TypeId = e.tcx_id.into();
@@ -74,9 +66,15 @@ impl<'tcx> FunctionInfo<'tcx> {
             };
 
             let (type_name, abi_type) = if s.is_owned() {
-                (mutable_self, format!("{mutable}this : {type_name}"))
+                ("self".into(), format!("this : {type_name}"))
             } else {
-                (format!("&{mutable_self}"), format!("this: &{mutable}{type_name}"))
+                let mutable = if s.mutability().is_mutable() {
+                    "mut "
+                } else { 
+                    "" 
+                };
+                
+                (format!("&{mutable}self"), format!("this: &{mutable}{type_name}"))
             };
 
             ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
