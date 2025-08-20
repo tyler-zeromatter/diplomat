@@ -3,7 +3,7 @@ use super::OpaqueThinIter;
 pub struct OpaqueThinVec;
 
 impl OpaqueThinVec {
-    fn create(a : TODO(), b : TODO(), c : TODO()) -> OpaqueThinVec {
+    fn create(a : &[i32], b : &[f32], c : &[TODO]) -> OpaqueThinVec {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_create(a, b, c) }
     }
@@ -32,7 +32,7 @@ impl OpaqueThinVec {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OpaqueThinVec_create(a : TODO(), b : TODO(), c : TODO()) -> OpaqueThinVec;
+    fn OpaqueThinVec_create(a : &[i32], b : &[f32], c : &[TODO]) -> OpaqueThinVec;
 
     fn OpaqueThinVec_iter(this: &OpaqueThinVec) -> OpaqueThinIter;
 
