@@ -4,7 +4,7 @@ pub struct StructWithSlices {
 }
 
 impl StructWithSlices {
-    fn return_last(self) {
+    fn return_last(mut self) {
             // TODO: writeable conversions.
         unsafe { StructWithSlices_return_last(self, output) }
     }
@@ -13,6 +13,6 @@ impl StructWithSlices {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn StructWithSlices_return_last(self, output : &mut DiplomatWrite);
+    fn StructWithSlices_return_last(mut this : StructWithSlices, output : &mut DiplomatWrite);
 
 }
