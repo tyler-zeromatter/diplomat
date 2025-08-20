@@ -5,12 +5,12 @@ use super::BorrowedFieldsWithBounds;
 pub struct Foo;
 
 impl Foo {
-    fn new(x : &[TODO]) -> Foo {
+    fn new(x : &[TODO]) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_new(x) }
     }
 
-    fn get_bar(&self) -> Bar {
+    fn get_bar(&self) -> Box<Bar> {
             // TODO: writeable conversions.
         unsafe { Foo_get_bar(self) }
     }
@@ -20,12 +20,12 @@ impl Foo {
         unsafe { Foo_as_returning(self) }
     }
 
-    fn extract_from_fields(fields : BorrowedFields) -> Foo {
+    fn extract_from_fields(fields : BorrowedFields) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_extract_from_fields(fields) }
     }
 
-    fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Foo {
+    fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_extract_from_bounds(bounds, another_string) }
     }
@@ -34,14 +34,14 @@ impl Foo {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Foo_new(x : &[TODO]) -> Foo;
+    fn Foo_new(x : &[TODO]) -> Box<Foo>;
 
-    fn Foo_get_bar(this: &Foo) -> Bar;
+    fn Foo_get_bar(this: &Foo) -> Box<Bar>;
 
     fn Foo_as_returning(this: &Foo) -> BorrowedFieldsReturning;
 
-    fn Foo_extract_from_fields(fields : BorrowedFields) -> Foo;
+    fn Foo_extract_from_fields(fields : BorrowedFields) -> Box<Foo>;
 
-    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Foo;
+    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo>;
 
 }

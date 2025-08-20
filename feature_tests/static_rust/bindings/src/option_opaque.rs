@@ -4,12 +4,12 @@ use super::OptionStruct;
 pub struct OptionOpaque;
 
 impl OptionOpaque {
-    fn new(i : i32) -> OptionOpaque {
+    fn new(i : i32) -> Box<Option<OptionOpaque>> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_new(i) }
     }
 
-    fn new_none() -> OptionOpaque {
+    fn new_none() -> Box<Option<OptionOpaque>> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_new_none() }
     }
@@ -49,12 +49,12 @@ impl OptionOpaque {
         unsafe { OptionOpaque_new_struct_nones() }
     }
 
-    fn returns_none_self(&self) -> OptionOpaque {
+    fn returns_none_self(&self) -> &Option<OptionOpaque> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_returns_none_self(self) }
     }
 
-    fn returns_some_self(&self) -> OptionOpaque {
+    fn returns_some_self(&self) -> &Option<OptionOpaque> {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_returns_some_self(self) }
     }
@@ -64,7 +64,7 @@ impl OptionOpaque {
         unsafe { OptionOpaque_assert_integer(self, i) }
     }
 
-    fn option_opaque_argument(arg : OptionOpaque) -> bool {
+    fn option_opaque_argument(arg : &Option<OptionOpaque>) -> bool {
             // TODO: writeable conversions.
         unsafe { OptionOpaque_option_opaque_argument(arg) }
     }
@@ -93,9 +93,9 @@ impl OptionOpaque {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OptionOpaque_new(i : i32) -> OptionOpaque;
+    fn OptionOpaque_new(i : i32) -> Box<Option<OptionOpaque>>;
 
-    fn OptionOpaque_new_none() -> OptionOpaque;
+    fn OptionOpaque_new_none() -> Box<Option<OptionOpaque>>;
 
     fn OptionOpaque_returns() -> Option<OptionStruct>;
 
@@ -111,13 +111,13 @@ unsafe extern "C" {
 
     fn OptionOpaque_new_struct_nones() -> OptionStruct;
 
-    fn OptionOpaque_returns_none_self(this: &OptionOpaque) -> OptionOpaque;
+    fn OptionOpaque_returns_none_self(this: &OptionOpaque) -> &Option<OptionOpaque>;
 
-    fn OptionOpaque_returns_some_self(this: &OptionOpaque) -> OptionOpaque;
+    fn OptionOpaque_returns_some_self(this: &OptionOpaque) -> &Option<OptionOpaque>;
 
     fn OptionOpaque_assert_integer(this: &OptionOpaque, i : i32);
 
-    fn OptionOpaque_option_opaque_argument(arg : OptionOpaque) -> bool;
+    fn OptionOpaque_option_opaque_argument(arg : &Option<OptionOpaque>) -> bool;
 
     fn OptionOpaque_accepts_option_u8(arg : DiplomatOption<Option<u8>>, sentinel : u8) -> Option<u8>;
 

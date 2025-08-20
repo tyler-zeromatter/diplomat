@@ -1,7 +1,7 @@
 pub struct Utf16Wrap;
 
 impl Utf16Wrap {
-    fn from_utf16(input : &[TODO]) -> Utf16Wrap {
+    fn from_utf16(input : &[TODO]) -> Box<Utf16Wrap> {
             // TODO: writeable conversions.
         unsafe { Utf16Wrap_from_utf16(input) }
     }
@@ -20,7 +20,7 @@ impl Utf16Wrap {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Utf16Wrap_from_utf16(input : &[TODO]) -> Utf16Wrap;
+    fn Utf16Wrap_from_utf16(input : &[TODO]) -> Box<Utf16Wrap>;
 
     fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, output : &mut DiplomatWrite);
 

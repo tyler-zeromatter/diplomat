@@ -2,7 +2,7 @@ use super::RefListParameter;
 pub struct RefList;
 
 impl RefList {
-    fn node(data : RefListParameter) -> RefList {
+    fn node(data : &RefListParameter) -> Box<RefList> {
             // TODO: writeable conversions.
         unsafe { RefList_node(data) }
     }
@@ -11,6 +11,6 @@ impl RefList {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RefList_node(data : RefListParameter) -> RefList;
+    fn RefList_node(data : &RefListParameter) -> Box<RefList>;
 
 }
