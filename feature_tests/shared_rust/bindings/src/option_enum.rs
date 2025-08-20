@@ -1,7 +1,7 @@
 #[repr(C)]
 pub enum OptionEnum {
-    Foo, 
-    Bar
+    Foo = 0, 
+    Bar = 1
 }
 
 impl OptionEnum {

@@ -1,8 +1,8 @@
 #[repr(C)]
 pub enum UnimportedEnum {
-    A, 
-    B, 
-    C
+    A = 0, 
+    B = 1, 
+    C = 2
 }
 
 impl UnimportedEnum {

@@ -1,9 +1,9 @@
 #[repr(C)]
 pub enum ContiguousEnum {
-    C, 
-    D, 
-    E, 
-    F
+    C = 0, 
+    D = 1, 
+    E = 2, 
+    F = 3
 }
 
 impl ContiguousEnum {

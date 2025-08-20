@@ -1,7 +1,7 @@
 #[repr(C)]
 pub enum DefaultEnum {
-    A, 
-    B
+    A = 0, 
+    B = 1
 }
 
 impl DefaultEnum {
