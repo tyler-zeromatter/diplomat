@@ -3,42 +3,42 @@ use super::MyStruct;
 pub struct Opaque;
 
 impl Opaque {
-    fn new() -> Box<Opaque> {
+    pub fn new() -> Box<Opaque> {
             // TODO: writeable conversions.
         unsafe { Opaque_new() }
     }
 
-    fn try_from_utf8(input : &[TODO]) -> Box<Option<Opaque>> {
+    pub fn try_from_utf8(input : &[TODO]) -> Box<Option<Opaque>> {
             // TODO: writeable conversions.
         unsafe { Opaque_try_from_utf8(input) }
     }
 
-    fn from_str(input : &[TODO]) -> Box<Opaque> {
+    pub fn from_str(input : &[TODO]) -> Box<Opaque> {
             // TODO: writeable conversions.
         unsafe { Opaque_from_str(input) }
     }
 
-    fn get_debug_str(&self) {
+    pub fn get_debug_str(&self) {
             // TODO: writeable conversions.
         unsafe { Opaque_get_debug_str(self, output) }
     }
 
-    fn assert_struct(&self, s : MyStruct) {
+    pub fn assert_struct(&self, s : MyStruct) {
             // TODO: writeable conversions.
         unsafe { Opaque_assert_struct(self, s) }
     }
 
-    fn returns_usize() -> usize {
+    pub fn returns_usize() -> usize {
             // TODO: writeable conversions.
         unsafe { Opaque_returns_usize() }
     }
 
-    fn returns_imported() -> ImportedStruct {
+    pub fn returns_imported() -> ImportedStruct {
             // TODO: writeable conversions.
         unsafe { Opaque_returns_imported() }
     }
 
-    fn cmp() -> ordering {
+    pub fn cmp() -> ordering {
             // TODO: writeable conversions.
         unsafe { Opaque_cmp() }
     }

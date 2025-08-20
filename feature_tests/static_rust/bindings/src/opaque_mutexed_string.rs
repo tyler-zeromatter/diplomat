@@ -2,47 +2,47 @@ use super::Utf16Wrap;
 pub struct OpaqueMutexedString;
 
 impl OpaqueMutexedString {
-    fn from_usize(number : usize) -> Box<OpaqueMutexedString> {
+    pub fn from_usize(number : usize) -> Box<OpaqueMutexedString> {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_from_usize(number) }
     }
 
-    fn change(&self, number : usize) {
+    pub fn change(&self, number : usize) {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_change(self, number) }
     }
 
-    fn borrow(&self) -> &OpaqueMutexedString {
+    pub fn borrow(&self) -> &OpaqueMutexedString {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_borrow(self) }
     }
 
-    fn borrow_other(other : &OpaqueMutexedString) -> &OpaqueMutexedString {
+    pub fn borrow_other(other : &OpaqueMutexedString) -> &OpaqueMutexedString {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_borrow_other(other) }
     }
 
-    fn borrow_self_or_other(&self, other : &OpaqueMutexedString) -> &OpaqueMutexedString {
+    pub fn borrow_self_or_other(&self, other : &OpaqueMutexedString) -> &OpaqueMutexedString {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_borrow_self_or_other(self, other) }
     }
 
-    fn get_len_and_add(&self, other : usize) -> usize {
+    pub fn get_len_and_add(&self, other : usize) -> usize {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_get_len_and_add(self, other) }
     }
 
-    fn dummy_str(&self) -> &[TODO] {
+    pub fn dummy_str(&self) -> &[TODO] {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_dummy_str(self) }
     }
 
-    fn wrapper(&self) -> Box<Utf16Wrap> {
+    pub fn wrapper(&self) -> Box<Utf16Wrap> {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_wrapper(self) }
     }
 
-    fn to_unsigned_from_unsigned(&self, input : u16) -> u16 {
+    pub fn to_unsigned_from_unsigned(&self, input : u16) -> u16 {
             // TODO: writeable conversions.
         unsafe { OpaqueMutexedString_to_unsigned_from_unsigned(self, input) }
     }

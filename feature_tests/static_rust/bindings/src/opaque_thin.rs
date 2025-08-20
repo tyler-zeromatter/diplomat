@@ -1,17 +1,17 @@
 pub struct OpaqueThin;
 
 impl OpaqueThin {
-    fn a(&self) -> i32 {
+    pub fn a(&self) -> i32 {
             // TODO: writeable conversions.
         unsafe { OpaqueThin_a(self) }
     }
 
-    fn b(&self) -> f32 {
+    pub fn b(&self) -> f32 {
             // TODO: writeable conversions.
         unsafe { OpaqueThin_b(self) }
     }
 
-    fn c(&self) {
+    pub fn c(&self) {
             // TODO: writeable conversions.
         unsafe { OpaqueThin_c(self, output) }
     }

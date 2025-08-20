@@ -5,7 +5,7 @@ pub struct BorrowedFields {
 }
 
 impl BorrowedFields {
-    fn from_bar_and_strings(bar : &Bar, dstr16 : &[TODO], utf8_str : &[TODO]) -> BorrowedFields {
+    pub fn from_bar_and_strings(bar : &Bar, dstr16 : &[TODO], utf8_str : &[TODO]) -> BorrowedFields {
             // TODO: writeable conversions.
         unsafe { BorrowedFields_from_bar_and_strings(bar, dstr16, utf8_str) }
     }

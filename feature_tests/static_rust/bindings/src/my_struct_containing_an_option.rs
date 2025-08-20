@@ -4,12 +4,12 @@ pub struct MyStructContainingAnOption {
 }
 
 impl MyStructContainingAnOption {
-    fn new() -> MyStructContainingAnOption {
+    pub fn new() -> MyStructContainingAnOption {
             // TODO: writeable conversions.
         unsafe { MyStructContainingAnOption_new() }
     }
 
-    fn filled() -> MyStructContainingAnOption {
+    pub fn filled() -> MyStructContainingAnOption {
             // TODO: writeable conversions.
         unsafe { MyStructContainingAnOption_filled() }
     }

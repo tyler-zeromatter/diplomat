@@ -5,27 +5,27 @@ use super::BorrowedFieldsWithBounds;
 pub struct Foo;
 
 impl Foo {
-    fn new(x : &[TODO]) -> Box<Foo> {
+    pub fn new(x : &[TODO]) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_new(x) }
     }
 
-    fn get_bar(&self) -> Box<Bar> {
+    pub fn get_bar(&self) -> Box<Bar> {
             // TODO: writeable conversions.
         unsafe { Foo_get_bar(self) }
     }
 
-    fn as_returning(&self) -> BorrowedFieldsReturning {
+    pub fn as_returning(&self) -> BorrowedFieldsReturning {
             // TODO: writeable conversions.
         unsafe { Foo_as_returning(self) }
     }
 
-    fn extract_from_fields(fields : BorrowedFields) -> Box<Foo> {
+    pub fn extract_from_fields(fields : BorrowedFields) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_extract_from_fields(fields) }
     }
 
-    fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo> {
+    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo> {
             // TODO: writeable conversions.
         unsafe { Foo_extract_from_bounds(bounds, another_string) }
     }

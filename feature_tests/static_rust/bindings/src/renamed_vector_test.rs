@@ -1,22 +1,22 @@
 pub struct RenamedVectorTest;
 
 impl RenamedVectorTest {
-    fn new() -> Box<RenamedVectorTest> {
+    pub fn new() -> Box<RenamedVectorTest> {
             // TODO: writeable conversions.
         unsafe { namespace_VectorTest_new() }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
             // TODO: writeable conversions.
         unsafe { namespace_VectorTest_len(self) }
     }
 
-    fn get(&self, idx : usize) -> Option<f64> {
+    pub fn get(&self, idx : usize) -> Option<f64> {
             // TODO: writeable conversions.
         unsafe { namespace_VectorTest_get(self, idx) }
     }
 
-    fn push(&mut self, value : f64) {
+    pub fn push(&mut self, value : f64) {
             // TODO: writeable conversions.
         unsafe { namespace_VectorTest_push(self, value) }
     }

@@ -1,17 +1,17 @@
 pub struct Utf16Wrap;
 
 impl Utf16Wrap {
-    fn from_utf16(input : &[TODO]) -> Box<Utf16Wrap> {
+    pub fn from_utf16(input : &[TODO]) -> Box<Utf16Wrap> {
             // TODO: writeable conversions.
         unsafe { Utf16Wrap_from_utf16(input) }
     }
 
-    fn get_debug_str(&self) {
+    pub fn get_debug_str(&self) {
             // TODO: writeable conversions.
         unsafe { Utf16Wrap_get_debug_str(self, output) }
     }
 
-    fn borrow_cont(&self) -> &[TODO] {
+    pub fn borrow_cont(&self) -> &[TODO] {
             // TODO: writeable conversions.
         unsafe { Utf16Wrap_borrow_cont(self) }
     }

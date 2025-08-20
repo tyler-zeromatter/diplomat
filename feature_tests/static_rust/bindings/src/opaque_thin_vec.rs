@@ -3,27 +3,27 @@ use super::OpaqueThinIter;
 pub struct OpaqueThinVec;
 
 impl OpaqueThinVec {
-    fn create(a : &[i32], b : &[f32], c : &[TODO]) -> Box<OpaqueThinVec> {
+    pub fn create(a : &[i32], b : &[f32], c : &[TODO]) -> Box<OpaqueThinVec> {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_create(a, b, c) }
     }
 
-    fn iter(&self) -> Box<OpaqueThinIter> {
+    pub fn iter(&self) -> Box<OpaqueThinIter> {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_iter(self) }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_len(self) }
     }
 
-    fn get(&self, idx : usize) -> &Option<OpaqueThin> {
+    pub fn get(&self, idx : usize) -> &Option<OpaqueThin> {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_get(self, idx) }
     }
 
-    fn first(&self) -> &Option<OpaqueThin> {
+    pub fn first(&self) -> &Option<OpaqueThin> {
             // TODO: writeable conversions.
         unsafe { OpaqueThinVec_first(self) }
     }

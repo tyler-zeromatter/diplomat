@@ -4,7 +4,7 @@ pub enum DefaultEnum {
 }
 
 impl DefaultEnum {
-    fn new() -> DefaultEnum {
+    pub fn new() -> DefaultEnum {
             // TODO: writeable conversions.
         unsafe { DefaultEnum_new() }
     }

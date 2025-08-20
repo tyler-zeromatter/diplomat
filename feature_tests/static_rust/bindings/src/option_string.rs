@@ -1,17 +1,17 @@
 pub struct OptionString;
 
 impl OptionString {
-    fn new(diplomat_str : &[TODO]) -> Box<Option<OptionString>> {
+    pub fn new(diplomat_str : &[TODO]) -> Box<Option<OptionString>> {
             // TODO: writeable conversions.
         unsafe { OptionString_new(diplomat_str) }
     }
 
-    fn write(&self) -> Result<(), ()> {
+    pub fn write(&self) -> Result<(), ()> {
             // TODO: writeable conversions.
         unsafe { OptionString_write(self, output) }
     }
 
-    fn borrow(&self) -> Option<&[TODO]> {
+    pub fn borrow(&self) -> Option<&[TODO]> {
             // TODO: writeable conversions.
         unsafe { OptionString_borrow(self) }
     }

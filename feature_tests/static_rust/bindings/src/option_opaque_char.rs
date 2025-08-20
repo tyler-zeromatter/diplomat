@@ -1,7 +1,7 @@
 pub struct OptionOpaqueChar;
 
 impl OptionOpaqueChar {
-    fn assert_char(&self, ch : char) {
+    pub fn assert_char(&self, ch : char) {
             // TODO: writeable conversions.
         unsafe { OptionOpaqueChar_assert_char(self, ch) }
     }
