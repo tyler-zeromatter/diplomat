@@ -1,3 +1,4 @@
+#[repr(C)]
 pub enum ErrorEnum {
     Foo, 
     Bar

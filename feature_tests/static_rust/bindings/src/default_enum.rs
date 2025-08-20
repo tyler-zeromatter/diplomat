@@ -1,3 +1,4 @@
+#[repr(C)]
 pub enum DefaultEnum {
     A, 
     B
