@@ -2,7 +2,7 @@ use super::Foo;
 pub struct Bar;
 
 impl Bar {
-    fn foo(&self) -> &Foo {
+    pub fn foo(&self) -> &Foo {
             // TODO: writeable conversions.
         unsafe { Bar_foo(self) }
     }

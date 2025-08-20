@@ -2,7 +2,7 @@ use super::OpaqueThin;
 pub struct OpaqueThinIter;
 
 impl OpaqueThinIter {
-    fn next(&mut self) -> &Option<OpaqueThin> {
+    pub fn next(&mut self) -> &Option<OpaqueThin> {
             // TODO: writeable conversions.
         unsafe { OpaqueThinIter_next(self) }
     }

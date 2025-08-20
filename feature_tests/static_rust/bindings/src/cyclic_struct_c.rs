@@ -4,12 +4,12 @@ pub struct CyclicStructC {
 }
 
 impl CyclicStructC {
-    fn takes_nested_parameters(c : CyclicStructC) -> CyclicStructC {
+    pub fn takes_nested_parameters(c : CyclicStructC) -> CyclicStructC {
             // TODO: writeable conversions.
         unsafe { CyclicStructC_takes_nested_parameters(c) }
     }
 
-    fn cyclic_out(self) {
+    pub fn cyclic_out(self) {
             // TODO: writeable conversions.
         unsafe { CyclicStructC_cyclic_out(self, output) }
     }

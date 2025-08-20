@@ -4,7 +4,7 @@ pub struct StructWithSlices {
 }
 
 impl StructWithSlices {
-    fn return_last(self) {
+    pub fn return_last(self) {
             // TODO: writeable conversions.
         unsafe { StructWithSlices_return_last(self, output) }
     }

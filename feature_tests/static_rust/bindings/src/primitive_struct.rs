@@ -4,7 +4,7 @@ pub struct PrimitiveStruct {
 }
 
 impl PrimitiveStruct {
-    fn mutable_ref(&mut self, a : PrimitiveStruct) {
+    pub fn mutable_ref(&mut self, a : PrimitiveStruct) {
             // TODO: writeable conversions.
         unsafe { PrimitiveStruct_mutable_ref(self, a) }
     }

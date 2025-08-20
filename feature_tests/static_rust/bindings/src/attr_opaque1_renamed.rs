@@ -3,37 +3,37 @@ use super::Unnamespaced;
 pub struct AttrOpaque1Renamed;
 
 impl AttrOpaque1Renamed {
-    fn new() -> Box<AttrOpaque1Renamed> {
+    pub fn new() -> Box<AttrOpaque1Renamed> {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_new() }
     }
 
-    fn mac_test() -> i32 {
+    pub fn mac_test() -> i32 {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_mac_test() }
     }
 
-    fn hello() -> i32 {
+    pub fn hello() -> i32 {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_hello() }
     }
 
-    fn method(&self) -> u8 {
+    pub fn method(&self) -> u8 {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_method(self) }
     }
 
-    fn abirenamed(&self) -> u8 {
+    pub fn abirenamed(&self) -> u8 {
             // TODO: writeable conversions.
         unsafe { renamed_on_abi_only(self) }
     }
 
-    fn use_unnamespaced(&self, _un : &Unnamespaced) {
+    pub fn use_unnamespaced(&self, _un : &Unnamespaced) {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) }
     }
 
-    fn use_namespaced(&self, _n : RenamedAttrEnum) {
+    pub fn use_namespaced(&self, _n : RenamedAttrEnum) {
             // TODO: writeable conversions.
         unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) }
     }

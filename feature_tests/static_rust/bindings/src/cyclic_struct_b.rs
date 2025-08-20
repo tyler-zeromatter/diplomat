@@ -5,12 +5,12 @@ pub struct CyclicStructB {
 }
 
 impl CyclicStructB {
-    fn get_a() -> CyclicStructA {
+    pub fn get_a() -> CyclicStructA {
             // TODO: writeable conversions.
         unsafe { CyclicStructB_get_a() }
     }
 
-    fn get_a_option() -> Option<CyclicStructA> {
+    pub fn get_a_option() -> Option<CyclicStructA> {
             // TODO: writeable conversions.
         unsafe { CyclicStructB_get_a_option() }
     }

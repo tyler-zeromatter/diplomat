@@ -1,12 +1,12 @@
 pub struct MyOpaqueEnum;
 
 impl MyOpaqueEnum {
-    fn new() -> Box<MyOpaqueEnum> {
+    pub fn new() -> Box<MyOpaqueEnum> {
             // TODO: writeable conversions.
         unsafe { MyOpaqueEnum_new() }
     }
 
-    fn to_string(&self) {
+    pub fn to_string(&self) {
             // TODO: writeable conversions.
         unsafe { MyOpaqueEnum_to_string(self, output) }
     }
