@@ -7,5 +7,5 @@ impl CallbackTestingStruct {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }

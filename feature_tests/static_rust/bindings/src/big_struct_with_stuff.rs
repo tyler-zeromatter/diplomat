@@ -7,5 +7,5 @@ impl BigStructWithStuff {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }

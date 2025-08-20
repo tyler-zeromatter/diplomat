@@ -7,5 +7,5 @@ impl CallbackWrapper {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }

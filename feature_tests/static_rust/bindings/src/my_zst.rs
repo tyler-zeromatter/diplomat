@@ -7,5 +7,5 @@ impl MyZst {
 }
 
 #[link(name = "somelib")]
-extern "C" {
+unsafe extern "C" {
 }
