@@ -1,18 +1,24 @@
-{%- macro func_params(self_param, params) -%}
+{%- macro func_params(self_param, pa) -%}
 {%- if let Some(s) = self_param -%}
 {%- match (s.is_owned(), s.mutability()) -%}
 {%- when (false, Mutability::Mutable) -%}
 &
 {%- when (false, Mutability::Immutable) -%}
 &mut {% when _ -%}
-{% endmatch -%} self {%- if params.len() > 0 -%}, {% endif -%}
+{% endmatch -%} self {%- if pa.len() > 0 -%}, {% endif -%}
 {%- endif -%}
 
-{%- for p in params -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}
+{%- for p in pa -%} {{p.var_name}} : {{p.type_name}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}
 {%- endmacro -%}
 
 {%- block function_impl -%}
-fn {{name}}({% call func_params(self_param, params) %}) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %} {
+fn {{name}}(
+        {%- if is_write -%}
+        {%- call func_params(self_param, &params[..params.len() - 1]) -%}
+        {%- else -%}
+        {%- call func_params(self_param, params) -%}
+        {%- endif -%}
+    ) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %} {
     unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
@@ -25,5 +31,9 @@ fn {{name}}({% call func_params(self_param, params) %}) {%- if let Some(r) = ret
 {%- endblock -%}
 
 {%- block function_def -%}
-    fn {{abi_name}}({% call func_params(self_param, params) %}) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %};
+    fn {{abi_name}}(
+        {%- call func_params(self_param, params) -%}
+    ) 
+        
+        {%- if let Some(r) = return_type %} -> {{r}} {%- endif %};
 {%- endblock -%}

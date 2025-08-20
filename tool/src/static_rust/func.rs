@@ -13,19 +13,20 @@ pub(super) struct FunctionInfo<'tcx> {
     self_param : Option<MaybeOwn>,
     return_type : Option<Cow<'tcx, str>>,
     params : Vec<ParamInfo<'tcx>>,
+    is_write : bool,
 }
 
 struct ParamInfo<'a> {
     var_name : Cow<'a, str>,
-    type_name : Cow<'a, str>
+    type_name : Cow<'a, str>,
+    abi_type_override : Option<Cow<'a, str>>,
 }
 
 impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
-        // TODO: out type.
         for p in &method.params {
-            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty) });
+            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: None });
         }
 
         let self_param = method.param_self.as_ref().map(|s| { 
@@ -58,7 +59,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         };
 
-        FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params, self_param, return_type }
+        FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params, self_param, return_type, is_write: method.output.is_write() }
     }
     
     // TODO: &mut DiplomatWrite should only be true for the ABI version of params, not the return.
@@ -69,7 +70,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 ctx.gen_type_name(o)
             }
             SuccessType::Write => {
-                params.push(ParamInfo { var_name: "output".into(), type_name: "&mut DiplomatWrite".into() });
+                params.push(ParamInfo { var_name: "output".into(), type_name: "&mut DiplomatWrite".into(), abi_type_override: None });
                 "()".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
