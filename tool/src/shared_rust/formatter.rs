@@ -29,6 +29,6 @@ impl<'tcx> RustFormatter<'tcx> {
     }
 
     pub(super) fn fmt_enum_variant_name(&self, enum_variant : &'tcx EnumVariant) -> Cow<'tcx, str> {
-        enum_variant.attrs.rename.apply(enum_variant.name.as_str().into())
+        format!("{} = {}", enum_variant.attrs.rename.apply(enum_variant.name.as_str().into()), enum_variant.discriminant).into()
     }
 }

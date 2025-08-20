@@ -1,11 +1,11 @@
 #[repr(C)]
 pub enum MyEnum {
-    A, 
-    B, 
-    C, 
-    D, 
-    E, 
-    F
+    A = -2,
+    B = -1, 
+    C = 0, 
+    D = 1, 
+    E = 2, 
+    F = 3
 }
 
 impl MyEnum {
