@@ -25,6 +25,9 @@ pub use callback_testing_struct::CallbackTestingStruct;
 pub mod callback_wrapper;
 pub use callback_wrapper::CallbackWrapper;
 
+pub mod contiguous_enum;
+pub use contiguous_enum::ContiguousEnum;
+
 pub mod cyclic_struct_a;
 pub use cyclic_struct_a::CyclicStructA;
 
@@ -33,6 +36,12 @@ pub use cyclic_struct_b::CyclicStructB;
 
 pub mod cyclic_struct_c;
 pub use cyclic_struct_c::CyclicStructC;
+
+pub mod default_enum;
+pub use default_enum::DefaultEnum;
+
+pub mod error_enum;
+pub use error_enum::ErrorEnum;
 
 pub mod error_struct;
 pub use error_struct::ErrorStruct;
@@ -51,6 +60,9 @@ pub use imported_struct::ImportedStruct;
 
 pub mod mutable_callback_holder;
 pub use mutable_callback_holder::MutableCallbackHolder;
+
+pub mod my_enum;
+pub use my_enum::MyEnum;
 
 pub mod my_opaque_enum;
 pub use my_opaque_enum::MyOpaqueEnum;
@@ -88,6 +100,9 @@ pub use opaque_thin_iter::OpaqueThinIter;
 pub mod opaque_thin_vec;
 pub use opaque_thin_vec::OpaqueThinVec;
 
+pub mod option_enum;
+pub use option_enum::OptionEnum;
+
 pub mod option_input_struct;
 pub use option_input_struct::OptionInputStruct;
 
@@ -111,6 +126,9 @@ pub use ref_list::RefList;
 
 pub mod ref_list_parameter;
 pub use ref_list_parameter::RefListParameter;
+
+pub mod renamed_attr_enum;
+pub use renamed_attr_enum::RenamedAttrEnum;
 
 pub mod renamed_attr_opaque2;
 pub use renamed_attr_opaque2::RenamedAttrOpaque2;
@@ -174,6 +192,9 @@ pub use trait_wrapper::TraitWrapper;
 
 pub mod two;
 pub use two::Two;
+
+pub mod unimported_enum;
+pub use unimported_enum::UnimportedEnum;
 
 pub mod unnamespaced;
 pub use unnamespaced::Unnamespaced;
