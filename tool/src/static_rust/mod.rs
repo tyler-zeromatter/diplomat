@@ -47,7 +47,10 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
         let ctx = FileGenContext::from_type(&config, id, &formatter, tcx);
         let template : &mut dyn TypeTemplate = match ty {
             TypeDef::Struct(st) => {
-                &mut ctx.generate_struct(st)
+                &mut ctx.generate_struct(st, false)
+            }
+            TypeDef::OutStruct(st) => {
+                &mut ctx.generate_struct(st, true)
             }
             TypeDef::Opaque(op) => {
                 &mut ctx.generate_opaque(op)
@@ -55,7 +58,7 @@ pub(crate) fn run<'tcx>(tcx : &'tcx TypeContext, config : Config) -> (FileMap, E
             TypeDef::Enum(e) => {
                 &mut ctx.generate_enum(e)
             }
-            _ => { continue; unreachable!("Unsupported HIR type {ty:?}") }
+            _ => unreachable!("Unsupported HIR type {ty:?}")
         };
 
         template.imports().remove::<str>(&formatter.fmt_symbol_name(id.into()));

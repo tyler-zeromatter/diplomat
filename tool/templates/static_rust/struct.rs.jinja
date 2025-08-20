@@ -2,7 +2,7 @@
 
 {%- block type_def -%}
 #[repr(C)]
-pub struct {{type_name}} {
+pub {%- if is_out -%}(super){%- endif %} struct {{type_name}} {
 
 }
 {%- endblock %}
