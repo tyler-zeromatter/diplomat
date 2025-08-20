@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct StructArithmetic {
-
-}
+pub struct StructArithmetic;
 
 impl StructArithmetic {
 }

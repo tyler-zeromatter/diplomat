@@ -1,6 +1,9 @@
+use super::DefaultEnum;
+use super::MyStruct;
 #[repr(C)]
 pub struct MyStructContainingAnOption {
-
+    pub a: Option<MyStruct>,
+    pub b: Option<DefaultEnum>,
 }
 
 impl MyStructContainingAnOption {

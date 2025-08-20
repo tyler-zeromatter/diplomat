@@ -1,7 +1,5 @@
 #[repr(C)]
-pub struct BigStructWithStuff {
-
-}
+pub struct BigStructWithStuff;
 
 impl BigStructWithStuff {
 }

@@ -1,7 +1,9 @@
 use super::Bar;
 #[repr(C)]
 pub struct BorrowedFields {
-
+    pub a: &[TODO],
+    pub b: &[TODO],
+    pub c: &[TODO],
 }
 
 impl BorrowedFields {

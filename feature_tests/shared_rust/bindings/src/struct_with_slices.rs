@@ -1,6 +1,7 @@
 #[repr(C)]
 pub struct StructWithSlices {
-
+    pub first: &[TODO],
+    pub second: &[u16],
 }
 
 impl StructWithSlices {

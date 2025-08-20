@@ -1,8 +1,12 @@
 use super::Bar;
+use super::BorrowedFields;
+use super::BorrowedFieldsWithBounds;
 use super::Foo;
 #[repr(C)]
 pub struct NestedBorrowedFields {
-
+    pub fields: BorrowedFields,
+    pub bounds: BorrowedFieldsWithBounds,
+    pub bounds2: BorrowedFieldsWithBounds,
 }
 
 impl NestedBorrowedFields {

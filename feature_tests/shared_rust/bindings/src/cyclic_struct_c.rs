@@ -1,6 +1,7 @@
+use super::CyclicStructA;
 #[repr(C)]
 pub struct CyclicStructC {
-
+    pub a: CyclicStructA,
 }
 
 impl CyclicStructC {

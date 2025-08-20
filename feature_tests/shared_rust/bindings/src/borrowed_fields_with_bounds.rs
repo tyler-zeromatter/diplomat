@@ -1,7 +1,9 @@
 use super::Foo;
 #[repr(C)]
 pub struct BorrowedFieldsWithBounds {
-
+    pub field_a: &[TODO],
+    pub field_b: &[TODO],
+    pub field_c: &[TODO],
 }
 
 impl BorrowedFieldsWithBounds {
