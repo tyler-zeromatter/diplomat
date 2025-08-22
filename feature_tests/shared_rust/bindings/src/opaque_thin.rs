@@ -12,10 +12,9 @@ impl OpaqueThin {
     }
 
     pub fn c(&self) -> String {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { OpaqueThin_c(self, write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

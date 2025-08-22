@@ -27,10 +27,9 @@ impl MyString {
     }
 
     pub fn get_str(&self) -> String {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { MyString_get_str(self, write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -55,10 +54,9 @@ impl MyString {
     }
 
     pub fn string_transform(foo : &String) -> String {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { MyString_string_transform(foo.into(), write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

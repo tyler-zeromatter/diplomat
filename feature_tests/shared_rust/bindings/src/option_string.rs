@@ -7,10 +7,9 @@ impl OptionString {
     }
 
     pub fn write(&self) -> Result<String, ()> {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { OptionString_write(self, write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -26,12 +25,15 @@ impl OptionString {
         unsafe {
             diplomat_runtime::diplomat_buffer_write_destroy(write);
         }
-        out_str
+        // TODO: Check DiplomatOption with this method.
+        ret.map(|_| {
+            out_str
+        }).into()
     }
 
     pub fn borrow(&self) -> Option<&[u8]> {
         let ret = unsafe { OptionString_borrow(self) };
-        ret.into()
+        ret.into_converted_option()
     }
 
 }

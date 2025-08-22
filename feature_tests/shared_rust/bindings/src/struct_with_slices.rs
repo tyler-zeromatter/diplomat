@@ -6,10 +6,9 @@ pub struct StructWithSlices {
 
 impl StructWithSlices {
     pub fn return_last(self) -> String {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { StructWithSlices_return_last(self, write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

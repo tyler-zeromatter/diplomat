@@ -11,10 +11,9 @@ impl CyclicStructC {
     }
 
     pub fn cyclic_out(self) -> String {
-        let write = unsafe {
-            diplomat_runtime::diplomat_buffer_write_create(0)
-        };
+        let write = diplomat_runtime::diplomat_buffer_write_create(0);
         let ret = unsafe { CyclicStructC_cyclic_out(self, write.as_mut().unwrap()) };
+        // TODO: Create a helper in `lib.rs`.
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

@@ -13,7 +13,7 @@ impl RenamedVectorTest {
 
     pub fn get(&self, idx : usize) -> Option<f64> {
         let ret = unsafe { namespace_VectorTest_get(self, idx) };
-        ret.into()
+        ret.into_converted_option()
     }
 
     pub fn push(&mut self, value : f64) {
