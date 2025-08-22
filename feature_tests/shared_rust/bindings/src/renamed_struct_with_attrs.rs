@@ -19,7 +19,7 @@ impl RenamedStructWithAttrs {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> DiplomatResult<RenamedStructWithAttrs, ()>;
+    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> diplomat_runtime::DiplomatResult<RenamedStructWithAttrs, ()>;
 
     fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrs) -> u32;
 

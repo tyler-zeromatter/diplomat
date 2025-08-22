@@ -94,6 +94,6 @@ unsafe extern "C" {
 
     fn Float64Vec_borrow(this: &Float64Vec) -> &[f64];
 
-    fn Float64Vec_get(this: &Float64Vec, i : usize) -> DiplomatOption<f64>;
+    fn Float64Vec_get(this: &Float64Vec, i : usize) -> diplomat_runtime::DiplomatOption<f64>;
 
 }
