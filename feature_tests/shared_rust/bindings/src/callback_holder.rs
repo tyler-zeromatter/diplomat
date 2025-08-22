@@ -7,8 +7,12 @@ impl Drop for CallbackHolder {
 }
 
 impl CallbackHolder {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn CallbackHolder_destroy(this : *mut CallbackHolder);
+
 }

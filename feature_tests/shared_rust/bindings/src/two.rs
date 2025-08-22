@@ -7,8 +7,12 @@ impl Drop for Two {
 }
 
 impl Two {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn Two_destroy(this : *mut Two);
+
 }

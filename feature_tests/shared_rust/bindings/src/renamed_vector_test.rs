@@ -27,6 +27,8 @@ impl RenamedVectorTest {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -38,5 +40,7 @@ unsafe extern "C" {
     fn namespace_VectorTest_get(this: &RenamedVectorTest, idx : usize) -> diplomat_runtime::DiplomatOption<f64>;
 
     fn namespace_VectorTest_push(this: &mut RenamedVectorTest, value : f64);
+
+    fn RenamedVectorTest_destroy(this : *mut RenamedVectorTest);
 
 }

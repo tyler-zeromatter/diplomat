@@ -36,6 +36,8 @@ impl OpaqueThin {
         out_str
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -45,5 +47,7 @@ unsafe extern "C" {
     fn OpaqueThin_b(this: &OpaqueThin) -> f32;
 
     fn OpaqueThin_c(this: &OpaqueThin, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+
+    fn OpaqueThin_destroy(this : *mut OpaqueThin);
 
 }

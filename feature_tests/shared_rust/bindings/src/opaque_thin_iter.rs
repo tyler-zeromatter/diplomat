@@ -13,10 +13,14 @@ impl OpaqueThinIter {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn OpaqueThinIter_next(this: &mut OpaqueThinIter) -> Option<&OpaqueThin>;
+
+    fn OpaqueThinIter_destroy(this : *mut OpaqueThinIter);
 
 }

@@ -7,8 +7,12 @@ impl Drop for RenamedNested2 {
 }
 
 impl RenamedNested2 {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn RenamedNested2_destroy(this : *mut RenamedNested2);
+
 }

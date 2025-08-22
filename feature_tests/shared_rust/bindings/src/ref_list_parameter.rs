@@ -7,8 +7,12 @@ impl Drop for RefListParameter {
 }
 
 impl RefListParameter {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn RefListParameter_destroy(this : *mut RefListParameter);
+
 }

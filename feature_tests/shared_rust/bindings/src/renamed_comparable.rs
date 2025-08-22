@@ -7,8 +7,12 @@ impl Drop for RenamedComparable {
 }
 
 impl RenamedComparable {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn RenamedComparable_destroy(this : *mut RenamedComparable);
+
 }
