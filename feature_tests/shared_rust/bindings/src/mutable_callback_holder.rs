@@ -7,8 +7,12 @@ impl Drop for MutableCallbackHolder {
 }
 
 impl MutableCallbackHolder {
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
+    fn MutableCallbackHolder_destroy(this : *mut MutableCallbackHolder);
+
 }

@@ -59,6 +59,8 @@ impl ResultOpaque {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -82,5 +84,7 @@ unsafe extern "C" {
     fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : diplomat_runtime::DiplomatStrSlice) -> &ResultOpaque;
 
     fn ResultOpaque_assert_integer(this: &ResultOpaque, i : i32);
+
+    fn ResultOpaque_destroy(this : *mut ResultOpaque);
 
 }

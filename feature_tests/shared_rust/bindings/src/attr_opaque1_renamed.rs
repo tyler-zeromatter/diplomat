@@ -44,6 +44,8 @@ impl AttrOpaque1Renamed {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -61,5 +63,7 @@ unsafe extern "C" {
     fn namespace_AttrOpaque1_use_unnamespaced(this: &AttrOpaque1Renamed, _un : &Unnamespaced);
 
     fn namespace_AttrOpaque1_use_namespaced(this: &AttrOpaque1Renamed, _n : RenamedAttrEnum);
+
+    fn AttrOpaque1Renamed_destroy(this : *mut AttrOpaque1Renamed);
 
 }

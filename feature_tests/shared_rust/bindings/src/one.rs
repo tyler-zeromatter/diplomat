@@ -63,6 +63,8 @@ impl One {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -88,5 +90,7 @@ unsafe extern "C" {
     fn One_implicit_bounds(explicit_hold : &One, implicit_hold : &One, nohold : &One) -> Box<One>;
 
     fn One_implicit_bounds_deep(explicit_ : &One, implicit_1 : &One, implicit_2 : &One, nohold : &One) -> Box<One>;
+
+    fn One_destroy(this : *mut One);
 
 }

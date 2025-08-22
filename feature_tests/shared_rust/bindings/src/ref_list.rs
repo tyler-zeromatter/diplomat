@@ -13,10 +13,14 @@ impl RefList {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RefList_node(data : &RefListParameter) -> Box<RefList>;
+
+    fn RefList_destroy(this : *mut RefList);
 
 }

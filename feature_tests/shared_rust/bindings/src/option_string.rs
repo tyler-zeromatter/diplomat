@@ -39,6 +39,8 @@ impl OptionString {
         ret.into_converted_option()
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -48,5 +50,7 @@ unsafe extern "C" {
     fn OptionString_write(this: &OptionString, write : &mut diplomat_runtime::DiplomatWrite) -> diplomat_runtime::DiplomatResult<(), ()>;
 
     fn OptionString_borrow(this: &OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice>;
+
+    fn OptionString_destroy(this : *mut OptionString);
 
 }

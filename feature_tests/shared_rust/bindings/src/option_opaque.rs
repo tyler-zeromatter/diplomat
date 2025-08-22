@@ -95,6 +95,8 @@ impl OptionOpaque {
         ret
     }
 
+    
+
 }
 
 #[link(name = "somelib")]
@@ -132,5 +134,7 @@ unsafe extern "C" {
     fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStruct>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStruct>;
 
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
+
+    fn OptionOpaque_destroy(this : *mut OptionOpaque);
 
 }
