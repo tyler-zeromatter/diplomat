@@ -11,5 +11,5 @@ impl RenamedMyIterator {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedMyIterator_destroy(this : *mut RenamedMyIterator);
+    fn namespace_MyIterator_destroy(this : *mut RenamedMyIterator);
 }

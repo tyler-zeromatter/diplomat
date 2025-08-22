@@ -11,5 +11,5 @@ impl RenamedTestOpaque {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedTestOpaque_destroy(this : *mut RenamedTestOpaque);
+    fn namespace_TestOpaque_destroy(this : *mut RenamedTestOpaque);
 }

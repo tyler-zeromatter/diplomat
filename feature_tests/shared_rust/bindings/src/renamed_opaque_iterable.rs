@@ -11,5 +11,5 @@ impl RenamedOpaqueIterable {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedOpaqueIterable_destroy(this : *mut RenamedOpaqueIterable);
+    fn namespace_OpaqueIterable_destroy(this : *mut RenamedOpaqueIterable);
 }

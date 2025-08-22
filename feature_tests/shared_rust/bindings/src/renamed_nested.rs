@@ -11,5 +11,5 @@ impl RenamedNested {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedNested_destroy(this : *mut RenamedNested);
+    fn namespace_Nested_destroy(this : *mut RenamedNested);
 }

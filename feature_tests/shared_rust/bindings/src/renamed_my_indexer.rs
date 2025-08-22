@@ -11,5 +11,5 @@ impl RenamedMyIndexer {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedMyIndexer_destroy(this : *mut RenamedMyIndexer);
+    fn namespace_MyIndexer_destroy(this : *mut RenamedMyIndexer);
 }
