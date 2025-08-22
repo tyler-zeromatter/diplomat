@@ -14,7 +14,11 @@ pub fn {{name}}(
         {%- call func_params(self_param, params) -%}
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r.type_name(false)}} {%- endif %} {
-        // TODO: writeable conversions.
+    {% if is_write -%}
+    let write = unsafe {
+        diplomat_runtime::diplomat_buffer_write_create(0)
+    };
+    {% endif -%}
     let ret = unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
@@ -24,7 +28,22 @@ pub fn {{name}}(
         {%- endfor -%}
         ) };
     {% if is_write -%}
-    output
+    let out_str = unsafe {
+        let write_ref = write.as_ref().unwrap();
+        let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+        let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+
+        if !buf.is_null() {
+            String::from_raw_parts(buf, len, len)
+        } else {
+            panic!("Could not read buffer, growth failed.")
+        }
+    };
+
+    unsafe {
+        diplomat_runtime::diplomat_buffer_write_destroy(write);
+    }
+    out_str
     {%- else -%}
     ret
     {%- endif %}
