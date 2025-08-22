@@ -127,7 +127,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
                 let err_ty_abi = err.as_ref().map(|e| { ctx.gen_abi_type_name(e) }).unwrap_or(None);
 
-                let abi_override = format!("DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
+                let abi_override = format!("diplomat_runtime::DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
                 let info = ParamInfo {
                     var_name: "".into(),
                     type_name: format!("Result<{ok_ty}, {err_ty}>").into(),
@@ -139,7 +139,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
 
                 let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
-                let abi_override = format!("DiplomatOption<{}>", ok_ty_abi.unwrap_or(ok_ty.clone()));
+                let abi_override = format!("diplomat_runtime::DiplomatOption<{}>", ok_ty_abi.unwrap_or(ok_ty.clone()));
 
                 Some(ParamInfo {
                     var_name: "".into(),
