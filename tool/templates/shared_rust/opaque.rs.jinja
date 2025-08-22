@@ -2,4 +2,10 @@
 
 {%- block type_def -%}
 pub struct {{type_name}};
+
+impl Drop for {{type_name}} {
+    fn drop(&mut self) {
+        unsafe { {{type_name}}_destroy(self) }
+    }
+}
 {%- endblock %}
