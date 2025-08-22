@@ -8,20 +8,20 @@ use crate::shared_rust::FileGenContext;
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
-    name : Cow<'tcx, str>,
-    abi_name : Cow<'tcx, str>,
-    self_param : Option<ParamInfo<'tcx>>,
-    return_type : Option<ParamInfo<'tcx>>,
-    params : Vec<ParamInfo<'tcx>>,
-    is_write : bool,
-    is_infallible : bool,
+    pub(super) name : Option<Cow<'tcx, str>>,
+    pub(super) abi_name : Cow<'tcx, str>,
+    pub(super) self_param : Option<ParamInfo<'tcx>>,
+    pub(super) return_type : Option<ParamInfo<'tcx>>,
+    pub(super) params : Vec<ParamInfo<'tcx>>,
+    pub(super) is_write : bool,
+    pub(super) is_infallible : bool,
 }
 
-struct ParamInfo<'a> {
-    var_name : Cow<'a, str>,
-    type_name : Cow<'a, str>,
-    abi_type_override : Option<Cow<'a, str>>,
-    conversion : Option<Cow<'a, str>>,
+pub(super) struct ParamInfo<'a> {
+    pub(super) var_name : Cow<'a, str>,
+    pub(super) type_name : Cow<'a, str>,
+    pub(super) abi_type_override : Option<Cow<'a, str>>,
+    pub(super) conversion : Option<Cow<'a, str>>,
 }
 
 impl<'a> ParamInfo<'a> {
@@ -95,7 +95,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
         
         FunctionInfo {
-            name: method.name.as_str().into(),
+            name: Some(method.name.as_str().into()),
             abi_name: method.abi_name.as_str().into(),
             params,
             self_param,
