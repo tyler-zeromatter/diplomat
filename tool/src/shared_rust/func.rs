@@ -11,7 +11,7 @@ pub(super) struct FunctionInfo<'tcx> {
     name : Cow<'tcx, str>,
     abi_name : Cow<'tcx, str>,
     self_param : Option<ParamInfo<'tcx>>,
-    return_type : Option<Cow<'tcx, str>>,
+    return_type : Option<ParamInfo<'tcx>>,
     params : Vec<ParamInfo<'tcx>>,
     is_write : bool,
 }
@@ -23,8 +23,8 @@ struct ParamInfo<'a> {
 }
 
 impl<'a> ParamInfo<'a> {
-    fn type_name(&self, is_abi : &bool) -> Cow<'a, str> {
-        if *is_abi && self.abi_type_override.is_some() {
+    fn type_name(&self, is_abi : bool) -> Cow<'a, str> {
+        if is_abi && self.abi_type_override.is_some() {
             self.abi_type_override.clone().unwrap()
         } else {
             self.type_name.clone()
@@ -80,28 +80,18 @@ impl<'tcx> FunctionInfo<'tcx> {
             ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
         });
 
-        // TODO: DiplomatOption and DiplomatResult conversion support using ParamInfo.
-        let return_type = match &method.output {
-            ReturnType::Fallible(ok, err) => {
-                let ok_ty = Self::gen_ok_type_name(&mut params, ctx, ok);
-                let err_ty = err.as_ref().map(|e| { ctx.gen_type_name(e) }).unwrap_or("()".into());
-                Some(format!("Result<{ok_ty}, {err_ty}>").into())
-            }
-            ReturnType::Nullable(ok) => {
-                let ok_ty = Self::gen_ok_type_name(&mut params, ctx, ok);
-                Some(format!("Option<{ok_ty}>").into())
-            }
-            ReturnType::Infallible(ok) => {
-                let type_name = Self::gen_ok_type_name(&mut params, ctx, ok);
-                if let SuccessType::OutType(o) = ok {
-                    Some(type_name)
-                } else {
-                    None
-                }
-            }
-        };
 
-        FunctionInfo { name: method.name.as_str().into(), abi_name: method.abi_name.as_str().into(), params, self_param, return_type, is_write: method.output.is_write() }
+        // TODO: DiplomatOption and DiplomatResult conversion support using ParamInfo.
+        let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
+        
+        FunctionInfo {
+            name: method.name.as_str().into(),
+            abi_name: method.abi_name.as_str().into(),
+            params,
+            self_param,
+            return_type,
+            is_write: method.output.is_write() 
+        }
     }
     
     // TODO: &mut DiplomatWrite should only be true for the ABI version of params, not the return.
@@ -117,6 +107,54 @@ impl<'tcx> FunctionInfo<'tcx> {
                 "()".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
+        }
+    }
+
+    fn gen_ok_abi_name(ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Option<Cow<'tcx, str>> {
+        match ok {
+            SuccessType::OutType(o) => ctx.gen_abi_type_name(o),
+            _ => None
+        }
+    }
+
+    fn gen_return_type_info(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ret : &'tcx ReturnType) -> Option<ParamInfo<'tcx>> {
+         match ret {
+            ReturnType::Fallible(ok, err) => {
+                let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
+                let err_ty = err.as_ref().map(|e| { ctx.gen_type_name(e) }).unwrap_or("()".into());
+
+                let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
+                let err_ty_abi = err.as_ref().map(|e| { ctx.gen_abi_type_name(e) }).unwrap_or(None);
+
+                let abi_override = format!("DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
+                let info = ParamInfo {
+                    var_name: "".into(),
+                    type_name: format!("Result<{ok_ty}, {err_ty}>").into(),
+                    abi_type_override: Some(abi_override.into())
+                };
+                Some(info)
+            }
+            ReturnType::Nullable(ok) => {
+                let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
+
+                let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
+                let abi_override = format!("DiplomatOption<{}>", ok_ty_abi.unwrap_or(ok_ty.clone()));
+
+                Some(ParamInfo {
+                    var_name: "".into(),
+                    type_name: format!("Option<{ok_ty}>").into(),
+                    abi_type_override: Some(abi_override.into())
+                })
+            }
+            ReturnType::Infallible(ok) => {
+                let type_name = Self::gen_ok_type_name(params, ctx, ok);
+                let abi_name = Self::gen_ok_abi_name(ctx, ok);
+                if let SuccessType::OutType(..) = ok {
+                    Some(ParamInfo { var_name: "".into(), type_name, abi_type_override: abi_name })
+                } else {
+                    None
+                }
+            }
         }
     }
 

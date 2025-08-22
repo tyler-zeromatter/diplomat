@@ -230,7 +230,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
         match ty {
             Type::DiplomatOption(op) => {
-                Some(format!("DiplomatOption<{}>", self.gen_type_name(ty)).into())
+                Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_type_name(ty)).into())
             }
             _ => None
         }
