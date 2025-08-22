@@ -4,7 +4,7 @@ pub struct Unnamespaced;
 
 impl Drop for Unnamespaced {
     fn drop(&mut self) {
-        unsafe { Unnamespaced_destroy(self) }
+        unsafe { namespace_Unnamespaced_destroy(self) }
     }
 }
 

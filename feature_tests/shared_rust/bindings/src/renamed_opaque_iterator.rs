@@ -2,7 +2,7 @@ pub struct RenamedOpaqueIterator;
 
 impl Drop for RenamedOpaqueIterator {
     fn drop(&mut self) {
-        unsafe { RenamedOpaqueIterator_destroy(self) }
+        unsafe { namespace_OpaqueIterator_destroy(self) }
     }
 }
 

@@ -4,7 +4,7 @@ pub struct AttrOpaque1Renamed;
 
 impl Drop for AttrOpaque1Renamed {
     fn drop(&mut self) {
-        unsafe { AttrOpaque1Renamed_destroy(self) }
+        unsafe { namespace_AttrOpaque1_destroy(self) }
     }
 }
 

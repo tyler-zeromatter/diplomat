@@ -2,7 +2,7 @@ pub struct RenamedTestOpaque;
 
 impl Drop for RenamedTestOpaque {
     fn drop(&mut self) {
-        unsafe { RenamedTestOpaque_destroy(self) }
+        unsafe { namespace_TestOpaque_destroy(self) }
     }
 }
 
