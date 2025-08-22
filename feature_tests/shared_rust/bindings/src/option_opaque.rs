@@ -16,27 +16,27 @@ impl OptionOpaque {
 
     pub fn returns() -> Option<OptionStruct> {
         let ret = unsafe { OptionOpaque_returns() };
-        ret
+        ret.into()
     }
 
     pub fn option_isize(&self) -> Option<isize> {
         let ret = unsafe { OptionOpaque_option_isize(self) };
-        ret
+        ret.into()
     }
 
     pub fn option_usize(&self) -> Option<usize> {
         let ret = unsafe { OptionOpaque_option_usize(self) };
-        ret
+        ret.into()
     }
 
     pub fn option_i32(&self) -> Option<i32> {
         let ret = unsafe { OptionOpaque_option_i32(self) };
-        ret
+        ret.into()
     }
 
     pub fn option_u32(&self) -> Option<u32> {
         let ret = unsafe { OptionOpaque_option_u32(self) };
-        ret
+        ret.into()
     }
 
     pub fn new_struct() -> OptionStruct {
@@ -71,17 +71,17 @@ impl OptionOpaque {
 
     pub fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
         let ret = unsafe { OptionOpaque_accepts_option_u8(arg, sentinel) };
-        ret
+        ret.into()
     }
 
     pub fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
         let ret = unsafe { OptionOpaque_accepts_option_enum(arg, sentinel) };
-        ret
+        ret.into()
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
         let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg, sentinel) };
-        ret
+        ret.into()
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
