@@ -3,7 +3,7 @@ use std::{borrow::Cow, collections::BTreeSet};
 use askama::Template;
 use diplomat_core::hir::{EnumDef, MaybeStatic, Mutability, OpaqueDef, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
-use crate::{config::Config, shared_rust::{func::{FunctionInfo, ParamInfo}, RustFormatter}};
+use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
 pub(super) struct FileGenContext<'tcx> {
     pub(super) formatter : &'tcx RustFormatter<'tcx>,
@@ -98,22 +98,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
         let type_name = self.formatter.fmt_symbol_name(self.id.into());
 
-        let mut methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
-        methods.push(FunctionInfo {
-            name: None,
-            abi_name: format!("{type_name}_destroy").into(),
-            self_param: Some(ParamInfo {
-                var_name: "".into(),
-                type_name: "".into(),
-                // In the Rust macro, this is a Box<>, but this should be the same thing:
-                abi_type_override: Some(format!("this : *mut {}", type_name).into()),
-                conversion: None
-            }),
-            return_type: None,
-            params: Vec::new(),
-            is_write: false,
-            is_infallible: true,
-        });
+        let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
         impl<'a> TypeTemplate<'a> for OpaqueTemplate<'a> {
             fn render(&self) -> askama::Result<String> {
