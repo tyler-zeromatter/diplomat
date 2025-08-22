@@ -7,6 +7,8 @@
 {%- endmacro -%}
 
 {%- block function_impl -%}
+{%- if name.is_some() -%}
+{%- let name = name.as_ref().unwrap() -%}
 pub fn {{name}}(
         {%- if is_write -%}
         {%- call func_params(self_param, &params[..params.len() - 1]) -%}
@@ -52,6 +54,7 @@ pub fn {{name}}(
     ret{% if let Some(r) = return_type %}{{r.convert()}}{% endif %}
     {%- endif %}
 }
+{%- endif -%}
 {%- endblock -%}
 
 {%- block function_def -%}
