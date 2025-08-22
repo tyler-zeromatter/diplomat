@@ -251,7 +251,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
         match ty {
             Type::DiplomatOption(op) => {
-                Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_type_name(op)).into())
+                let regular_type = self.gen_type_name(op);
+                Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_abi_type_name(op).unwrap_or(regular_type)).into())
             }
             Type::Slice(sl) => match sl {
                 // TODO: Lifetimes.
