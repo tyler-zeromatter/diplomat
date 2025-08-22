@@ -26,6 +26,11 @@ impl CyclicStructC {
                 panic!("Could not read buffer, growth failed.")
             }
         };
+        
+        // Drop the write object, since we no longer need it:
+        unsafe {
+            drop(Box::from_raw(write))
+        }
         out_str
     }
 
