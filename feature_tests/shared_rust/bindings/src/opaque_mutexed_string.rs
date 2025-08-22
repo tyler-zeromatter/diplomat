@@ -32,7 +32,7 @@ impl OpaqueMutexedString {
         ret
     }
 
-    pub fn dummy_str(&self) -> &[TODO] {
+    pub fn dummy_str(&self) -> &[u8] {
         let ret = unsafe { OpaqueMutexedString_dummy_str(self) };
         ret
     }
@@ -63,7 +63,7 @@ unsafe extern "C" {
 
     fn OpaqueMutexedString_get_len_and_add(this: &OpaqueMutexedString, other : usize) -> usize;
 
-    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> &[TODO];
+    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> diplomat_runtime::DiplomatStrSlice;
 
     fn OpaqueMutexedString_wrapper(this: &OpaqueMutexedString) -> Box<Utf16Wrap>;
 

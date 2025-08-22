@@ -43,7 +43,7 @@ impl ResultOpaque {
         ret
     }
 
-    pub fn takes_str(&mut self, _v : &[TODO]) -> &ResultOpaque {
+    pub fn takes_str(&mut self, _v : &String) -> &ResultOpaque {
         let ret = unsafe { ResultOpaque_takes_str(self, _v) };
         ret
     }
@@ -73,7 +73,7 @@ unsafe extern "C" {
 
     fn ResultOpaque_new_in_enum_err(i : i32) -> diplomat_runtime::DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
 
-    fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : &[TODO]) -> &ResultOpaque;
+    fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : diplomat_runtime::DiplomatStrSlice) -> &ResultOpaque;
 
     fn ResultOpaque_assert_integer(this: &ResultOpaque, i : i32);
 

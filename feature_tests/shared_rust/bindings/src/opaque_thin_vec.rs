@@ -3,7 +3,7 @@ use super::OpaqueThinIter;
 pub struct OpaqueThinVec;
 
 impl OpaqueThinVec {
-    pub fn create(a : &[i32], b : &[f32], c : &[TODO]) -> Box<OpaqueThinVec> {
+    pub fn create(a : &[i32], b : &[f32], c : &[u8]) -> Box<OpaqueThinVec> {
         let ret = unsafe { OpaqueThinVec_create(a, b, c) };
         ret
     }
@@ -32,7 +32,7 @@ impl OpaqueThinVec {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OpaqueThinVec_create(a : &[i32], b : &[f32], c : &[TODO]) -> Box<OpaqueThinVec>;
+    fn OpaqueThinVec_create(a : &[i32], b : &[f32], c : diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
 
     fn OpaqueThinVec_iter(this: &OpaqueThinVec) -> Box<OpaqueThinIter>;
 

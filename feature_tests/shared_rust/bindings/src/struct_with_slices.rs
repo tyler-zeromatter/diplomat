@@ -1,6 +1,6 @@
 #[repr(C)]
 pub struct StructWithSlices {
-    pub first: &[TODO],
+    pub first: &[u8],
     pub second: &[u16],
 }
 
