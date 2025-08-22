@@ -27,5 +27,5 @@ unsafe extern "C" {
 
     fn namespace_Unnamespaced_use_namespaced(this: &Unnamespaced, _n : &AttrOpaque1Renamed);
 
-    fn Unnamespaced_destroy(this : *mut Unnamespaced);
+    fn namespace_Unnamespaced_destroy(this : *mut Unnamespaced);
 }

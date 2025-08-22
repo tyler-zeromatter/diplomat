@@ -11,5 +11,5 @@ impl RenamedComparable {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedComparable_destroy(this : *mut RenamedComparable);
+    fn namespace_Comparable_destroy(this : *mut RenamedComparable);
 }

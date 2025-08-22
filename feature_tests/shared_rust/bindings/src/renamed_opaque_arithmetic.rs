@@ -11,5 +11,5 @@ impl RenamedOpaqueArithmetic {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedOpaqueArithmetic_destroy(this : *mut RenamedOpaqueArithmetic);
+    fn namespace_OpaqueArithmetic_destroy(this : *mut RenamedOpaqueArithmetic);
 }

@@ -62,5 +62,5 @@ unsafe extern "C" {
 
     fn namespace_AttrOpaque1_use_namespaced(this: &AttrOpaque1Renamed, _n : RenamedAttrEnum);
 
-    fn AttrOpaque1Renamed_destroy(this : *mut AttrOpaque1Renamed);
+    fn namespace_AttrOpaque1_destroy(this : *mut AttrOpaque1Renamed);
 }

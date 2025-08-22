@@ -11,5 +11,5 @@ impl RenamedAttrOpaque2 {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn RenamedAttrOpaque2_destroy(this : *mut RenamedAttrOpaque2);
+    fn namespace_AttrOpaque2_destroy(this : *mut RenamedAttrOpaque2);
 }

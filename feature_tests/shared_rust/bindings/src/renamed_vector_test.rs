@@ -39,5 +39,5 @@ unsafe extern "C" {
 
     fn namespace_VectorTest_push(this: &mut RenamedVectorTest, value : f64);
 
-    fn RenamedVectorTest_destroy(this : *mut RenamedVectorTest);
+    fn namespace_VectorTest_destroy(this : *mut RenamedVectorTest);
 }
