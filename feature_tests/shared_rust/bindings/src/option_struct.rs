@@ -2,8 +2,8 @@ use super::OptionOpaque;
 use super::OptionOpaqueChar;
 #[repr(C)]
 pub(super) struct OptionStruct {
-    pub a: Box<Option<OptionOpaque>>,
-    pub b: Box<Option<OptionOpaqueChar>>,
+    pub a: Option<Box<OptionOpaque>>,
+    pub b: Option<Box<OptionOpaqueChar>>,
     pub c: u32,
     pub d: Box<OptionOpaque>,
 }

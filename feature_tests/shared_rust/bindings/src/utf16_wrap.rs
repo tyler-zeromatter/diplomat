@@ -40,7 +40,7 @@ impl Utf16Wrap {
 unsafe extern "C" {
     fn Utf16Wrap_from_utf16(input : diplomat_runtime::DiplomatStrSlice) -> Box<Utf16Wrap>;
 
-    fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn Utf16Wrap_borrow_cont(this: &Utf16Wrap) -> diplomat_runtime::DiplomatStrSlice;
 

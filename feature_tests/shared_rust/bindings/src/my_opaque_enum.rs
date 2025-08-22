@@ -35,6 +35,6 @@ impl MyOpaqueEnum {
 unsafe extern "C" {
     fn MyOpaqueEnum_new() -> Box<MyOpaqueEnum>;
 
-    fn MyOpaqueEnum_to_string(this: &MyOpaqueEnum, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn MyOpaqueEnum_to_string(this: &MyOpaqueEnum, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
 }

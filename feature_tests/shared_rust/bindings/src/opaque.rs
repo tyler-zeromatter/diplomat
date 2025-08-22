@@ -8,7 +8,7 @@ impl Opaque {
         ret
     }
 
-    pub fn try_from_utf8(input : &[u8]) -> Box<Option<Opaque>> {
+    pub fn try_from_utf8(input : &[u8]) -> Option<Box<Opaque>> {
         let ret = unsafe { Opaque_try_from_utf8(input.into()) };
         ret
     }
@@ -67,11 +67,11 @@ impl Opaque {
 unsafe extern "C" {
     fn Opaque_new() -> Box<Opaque>;
 
-    fn Opaque_try_from_utf8(input : diplomat_runtime::DiplomatStrSlice) -> Box<Option<Opaque>>;
+    fn Opaque_try_from_utf8(input : diplomat_runtime::DiplomatStrSlice) -> Option<Box<Opaque>>;
 
     fn Opaque_from_str(input : diplomat_runtime::DiplomatStrSlice) -> Box<Opaque>;
 
-    fn Opaque_get_debug_str(this: &Opaque, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn Opaque_get_debug_str(this: &Opaque, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn Opaque_assert_struct(this: &Opaque, s : MyStruct);
 

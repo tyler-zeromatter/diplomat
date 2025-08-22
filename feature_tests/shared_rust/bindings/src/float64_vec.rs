@@ -108,7 +108,7 @@ unsafe extern "C" {
 
     fn Float64Vec_set_value(this: &mut Float64Vec, new_slice : &[f64]);
 
-    fn Float64Vec_to_string(this: &Float64Vec, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn Float64Vec_to_string(this: &Float64Vec, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn Float64Vec_borrow(this: &Float64Vec) -> &[f64];
 

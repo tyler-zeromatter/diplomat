@@ -39,6 +39,6 @@ impl CyclicStructC {
 unsafe extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructC) -> CyclicStructC;
 
-    fn CyclicStructC_cyclic_out(this : CyclicStructC, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn CyclicStructC_cyclic_out(this : CyclicStructC, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
 }
