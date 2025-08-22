@@ -5,6 +5,7 @@ mod tests {
     #[test]
     fn test_opaque() {
         let e = MyOpaqueEnum::new();
-        assert_eq!(String::from("MyOpaqueEnum::A"), e.to_string());
+        let a = e.to_string();
+        assert_eq!(String::from("MyOpaqueEnum::A"), a);
     }
 }
