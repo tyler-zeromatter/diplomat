@@ -214,6 +214,17 @@ exit_on_error true
 exec --fail-on-error uvx --with feature_tests/nanobind --refresh-package somelib pytest feature_tests/nanobind/test/
 '''
 
+[tasks.test-rust-feature]
+category = "Tests"
+dependencies = ["build-feature"]
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+cd ./feature_tests/shared_rust
+exec --fail-on-error cargo test
+'''
+
+
 [tasks.check-c-example]
 category = "Tests"
 script_runner = "@duckscript"
