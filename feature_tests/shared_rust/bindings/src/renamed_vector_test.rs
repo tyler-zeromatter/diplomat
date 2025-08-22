@@ -1,5 +1,11 @@
 pub struct RenamedVectorTest;
 
+impl Drop for RenamedVectorTest {
+    fn drop(&mut self) {
+        unsafe { RenamedVectorTest_destroy(self) }
+    }
+}
+
 impl RenamedVectorTest {
     pub fn new() -> Box<RenamedVectorTest> {
         let ret = unsafe { namespace_VectorTest_new() };

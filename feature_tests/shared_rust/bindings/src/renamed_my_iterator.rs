@@ -1,5 +1,11 @@
 pub struct RenamedMyIterator;
 
+impl Drop for RenamedMyIterator {
+    fn drop(&mut self) {
+        unsafe { RenamedMyIterator_destroy(self) }
+    }
+}
+
 impl RenamedMyIterator {
 }
 

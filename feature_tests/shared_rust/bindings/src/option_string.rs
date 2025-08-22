@@ -1,5 +1,11 @@
 pub struct OptionString;
 
+impl Drop for OptionString {
+    fn drop(&mut self) {
+        unsafe { OptionString_destroy(self) }
+    }
+}
+
 impl OptionString {
     pub fn new(diplomat_str : &[u8]) -> Option<Box<OptionString>> {
         let ret = unsafe { OptionString_new(diplomat_str.into()) };

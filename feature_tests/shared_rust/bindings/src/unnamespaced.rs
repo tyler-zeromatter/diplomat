@@ -2,6 +2,12 @@ use super::AttrOpaque1Renamed;
 use super::RenamedAttrEnum;
 pub struct Unnamespaced;
 
+impl Drop for Unnamespaced {
+    fn drop(&mut self) {
+        unsafe { Unnamespaced_destroy(self) }
+    }
+}
+
 impl Unnamespaced {
     pub fn make(_e : RenamedAttrEnum) -> Box<Unnamespaced> {
         let ret = unsafe { namespace_Unnamespaced_make(_e) };

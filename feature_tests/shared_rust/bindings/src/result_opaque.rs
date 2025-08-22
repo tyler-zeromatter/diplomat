@@ -2,6 +2,12 @@ use super::ErrorEnum;
 use super::ErrorStruct;
 pub struct ResultOpaque;
 
+impl Drop for ResultOpaque {
+    fn drop(&mut self) {
+        unsafe { ResultOpaque_destroy(self) }
+    }
+}
+
 impl ResultOpaque {
     pub fn new(i : i32) -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new(i) };

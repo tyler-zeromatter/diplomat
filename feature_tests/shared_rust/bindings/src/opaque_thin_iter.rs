@@ -1,6 +1,12 @@
 use super::OpaqueThin;
 pub struct OpaqueThinIter;
 
+impl Drop for OpaqueThinIter {
+    fn drop(&mut self) {
+        unsafe { OpaqueThinIter_destroy(self) }
+    }
+}
+
 impl OpaqueThinIter {
     pub fn next(&mut self) -> Option<&OpaqueThin> {
         let ret = unsafe { OpaqueThinIter_next(self) };

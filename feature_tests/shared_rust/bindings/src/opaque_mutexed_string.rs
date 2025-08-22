@@ -1,6 +1,12 @@
 use super::Utf16Wrap;
 pub struct OpaqueMutexedString;
 
+impl Drop for OpaqueMutexedString {
+    fn drop(&mut self) {
+        unsafe { OpaqueMutexedString_destroy(self) }
+    }
+}
+
 impl OpaqueMutexedString {
     pub fn from_usize(number : usize) -> Box<OpaqueMutexedString> {
         let ret = unsafe { OpaqueMutexedString_from_usize(number) };

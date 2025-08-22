@@ -1,6 +1,12 @@
 use super::Foo;
 pub struct Bar;
 
+impl Drop for Bar {
+    fn drop(&mut self) {
+        unsafe { Bar_destroy(self) }
+    }
+}
+
 impl Bar {
     pub fn foo(&self) -> &Foo {
         let ret = unsafe { Bar_foo(self) };

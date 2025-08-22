@@ -1,5 +1,11 @@
 pub struct RefListParameter;
 
+impl Drop for RefListParameter {
+    fn drop(&mut self) {
+        unsafe { RefListParameter_destroy(self) }
+    }
+}
+
 impl RefListParameter {
 }
 

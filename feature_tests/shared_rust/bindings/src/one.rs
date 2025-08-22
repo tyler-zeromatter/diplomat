@@ -1,6 +1,12 @@
 use super::Two;
 pub struct One;
 
+impl Drop for One {
+    fn drop(&mut self) {
+        unsafe { One_destroy(self) }
+    }
+}
+
 impl One {
     pub fn transitivity(hold : &One, nohold : &One) -> Box<One> {
         let ret = unsafe { One_transitivity(hold, nohold) };

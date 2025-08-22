@@ -1,5 +1,11 @@
 pub struct MyOpaqueEnum;
 
+impl Drop for MyOpaqueEnum {
+    fn drop(&mut self) {
+        unsafe { MyOpaqueEnum_destroy(self) }
+    }
+}
+
 impl MyOpaqueEnum {
     pub fn new() -> Box<MyOpaqueEnum> {
         let ret = unsafe { MyOpaqueEnum_new() };

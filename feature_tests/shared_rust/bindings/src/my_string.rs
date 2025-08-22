@@ -1,5 +1,11 @@
 pub struct MyString;
 
+impl Drop for MyString {
+    fn drop(&mut self) {
+        unsafe { MyString_destroy(self) }
+    }
+}
+
 impl MyString {
     pub fn new(v : &[u8]) -> Box<MyString> {
         let ret = unsafe { MyString_new(v.into()) };
