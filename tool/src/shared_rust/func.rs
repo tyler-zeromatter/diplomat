@@ -103,7 +103,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 ctx.gen_type_name(o)
             }
             SuccessType::Write => {
-                params.push(ParamInfo { var_name: "output".into(), type_name: "&mut DiplomatWrite".into(), abi_type_override: None });
+                params.push(ParamInfo { var_name: "write".into(), type_name: "&mut diplomat_runtime::DiplomatWrite".into(), abi_type_override: None });
                 "()".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
