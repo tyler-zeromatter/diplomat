@@ -3,8 +3,8 @@ pub struct RefList;
 
 impl RefList {
     pub fn node(data : &RefListParameter) -> Box<RefList> {
-            // TODO: writeable conversions.
-        unsafe { RefList_node(data) }
+        let ret = unsafe { RefList_node(data) };
+        ret
     }
 
 }

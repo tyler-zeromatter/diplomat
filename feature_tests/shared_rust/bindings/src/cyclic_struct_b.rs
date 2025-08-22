@@ -6,13 +6,13 @@ pub struct CyclicStructB {
 
 impl CyclicStructB {
     pub fn get_a() -> CyclicStructA {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructB_get_a() }
+        let ret = unsafe { CyclicStructB_get_a() };
+        ret
     }
 
     pub fn get_a_option() -> Option<CyclicStructA> {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructB_get_a_option() }
+        let ret = unsafe { CyclicStructB_get_a_option() };
+        ret
     }
 
 }

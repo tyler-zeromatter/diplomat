@@ -4,13 +4,13 @@ pub struct Unnamespaced;
 
 impl Unnamespaced {
     pub fn make(_e : RenamedAttrEnum) -> Box<Unnamespaced> {
-            // TODO: writeable conversions.
-        unsafe { namespace_Unnamespaced_make(_e) }
+        let ret = unsafe { namespace_Unnamespaced_make(_e) };
+        ret
     }
 
     pub fn use_namespaced(&self, _n : &AttrOpaque1Renamed) {
-            // TODO: writeable conversions.
-        unsafe { namespace_Unnamespaced_use_namespaced(self, _n) }
+        let ret = unsafe { namespace_Unnamespaced_use_namespaced(self, _n) };
+        ret
     }
 
 }

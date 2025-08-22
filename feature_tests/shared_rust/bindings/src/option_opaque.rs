@@ -5,88 +5,88 @@ pub struct OptionOpaque;
 
 impl OptionOpaque {
     pub fn new(i : i32) -> Box<Option<OptionOpaque>> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_new(i) }
+        let ret = unsafe { OptionOpaque_new(i) };
+        ret
     }
 
     pub fn new_none() -> Box<Option<OptionOpaque>> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_new_none() }
+        let ret = unsafe { OptionOpaque_new_none() };
+        ret
     }
 
     pub fn returns() -> Option<OptionStruct> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_returns() }
+        let ret = unsafe { OptionOpaque_returns() };
+        ret
     }
 
     pub fn option_isize(&self) -> Option<isize> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_option_isize(self) }
+        let ret = unsafe { OptionOpaque_option_isize(self) };
+        ret
     }
 
     pub fn option_usize(&self) -> Option<usize> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_option_usize(self) }
+        let ret = unsafe { OptionOpaque_option_usize(self) };
+        ret
     }
 
     pub fn option_i32(&self) -> Option<i32> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_option_i32(self) }
+        let ret = unsafe { OptionOpaque_option_i32(self) };
+        ret
     }
 
     pub fn option_u32(&self) -> Option<u32> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_option_u32(self) }
+        let ret = unsafe { OptionOpaque_option_u32(self) };
+        ret
     }
 
     pub fn new_struct() -> OptionStruct {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_new_struct() }
+        let ret = unsafe { OptionOpaque_new_struct() };
+        ret
     }
 
     pub fn new_struct_nones() -> OptionStruct {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_new_struct_nones() }
+        let ret = unsafe { OptionOpaque_new_struct_nones() };
+        ret
     }
 
     pub fn returns_none_self(&self) -> &Option<OptionOpaque> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_returns_none_self(self) }
+        let ret = unsafe { OptionOpaque_returns_none_self(self) };
+        ret
     }
 
     pub fn returns_some_self(&self) -> &Option<OptionOpaque> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_returns_some_self(self) }
+        let ret = unsafe { OptionOpaque_returns_some_self(self) };
+        ret
     }
 
     pub fn assert_integer(&self, i : i32) {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_assert_integer(self, i) }
+        let ret = unsafe { OptionOpaque_assert_integer(self, i) };
+        ret
     }
 
     pub fn option_opaque_argument(arg : &Option<OptionOpaque>) -> bool {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_option_opaque_argument(arg) }
+        let ret = unsafe { OptionOpaque_option_opaque_argument(arg) };
+        ret
     }
 
     pub fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_accepts_option_u8(arg, sentinel) }
+        let ret = unsafe { OptionOpaque_accepts_option_u8(arg, sentinel) };
+        ret
     }
 
     pub fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_accepts_option_enum(arg, sentinel) }
+        let ret = unsafe { OptionOpaque_accepts_option_enum(arg, sentinel) };
+        ret
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_accepts_option_input_struct(arg, sentinel) }
+        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg, sentinel) };
+        ret
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaque_returns_option_input_struct() }
+        let ret = unsafe { OptionOpaque_returns_option_input_struct() };
+        ret
     }
 
 }

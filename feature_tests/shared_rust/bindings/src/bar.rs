@@ -3,8 +3,8 @@ pub struct Bar;
 
 impl Bar {
     pub fn foo(&self) -> &Foo {
-            // TODO: writeable conversions.
-        unsafe { Bar_foo(self) }
+        let ret = unsafe { Bar_foo(self) };
+        ret
     }
 
 }

@@ -6,23 +6,77 @@ pub struct CyclicStructA {
 
 impl CyclicStructA {
     pub fn get_b() -> CyclicStructB {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructA_get_b() }
+        let ret = unsafe { CyclicStructA_get_b() };
+        ret
     }
 
-    pub fn cyclic_out(self) {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructA_cyclic_out(self, output) }
+    pub fn cyclic_out(self) -> String {
+        let write = unsafe {
+            diplomat_runtime::diplomat_buffer_write_create(0)
+        };
+        let ret = unsafe { CyclicStructA_cyclic_out(self, write) };
+        let out_str = unsafe {
+            let write_ref = write.as_ref().unwrap();
+            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+    
+            if !buf.is_null() {
+                String::from_raw_parts(buf, len, len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        };
+    
+        unsafe {
+            diplomat_runtime::diplomat_buffer_write_destroy(write);
+        }
+        out_str
     }
 
-    pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, output) }
+    pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
+        let write = unsafe {
+            diplomat_runtime::diplomat_buffer_write_create(0)
+        };
+        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write) };
+        let out_str = unsafe {
+            let write_ref = write.as_ref().unwrap();
+            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+    
+            if !buf.is_null() {
+                String::from_raw_parts(buf, len, len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        };
+    
+        unsafe {
+            diplomat_runtime::diplomat_buffer_write_destroy(write);
+        }
+        out_str
     }
 
-    pub fn getter_out(self) {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructA_getter_out(self, output) }
+    pub fn getter_out(self) -> String {
+        let write = unsafe {
+            diplomat_runtime::diplomat_buffer_write_create(0)
+        };
+        let ret = unsafe { CyclicStructA_getter_out(self, write) };
+        let out_str = unsafe {
+            let write_ref = write.as_ref().unwrap();
+            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+    
+            if !buf.is_null() {
+                String::from_raw_parts(buf, len, len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        };
+    
+        unsafe {
+            diplomat_runtime::diplomat_buffer_write_destroy(write);
+        }
+        out_str
     }
 
 }
@@ -31,10 +85,10 @@ impl CyclicStructA {
 unsafe extern "C" {
     fn CyclicStructA_get_b() -> CyclicStructB;
 
-    fn CyclicStructA_cyclic_out(this : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_cyclic_out(this : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
-    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
-    fn CyclicStructA_getter_out(this : CyclicStructA, output : &mut DiplomatWrite);
+    fn CyclicStructA_getter_out(this : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
 }

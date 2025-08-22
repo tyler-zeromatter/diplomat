@@ -6,13 +6,13 @@ pub struct RenamedStructWithAttrs {
 
 impl RenamedStructWithAttrs {
     pub fn new_fallible(a : bool, b : u32) -> Result<RenamedStructWithAttrs, ()> {
-            // TODO: writeable conversions.
-        unsafe { namespace_StructWithAttrs_new_fallible(a, b) }
+        let ret = unsafe { namespace_StructWithAttrs_new_fallible(a, b) };
+        ret
     }
 
     pub fn c(self) -> u32 {
-            // TODO: writeable conversions.
-        unsafe { namespace_StructWithAttrs_c(self) }
+        let ret = unsafe { namespace_StructWithAttrs_c(self) };
+        ret
     }
 
 }

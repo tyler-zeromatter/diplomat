@@ -10,13 +10,13 @@ pub enum MyEnum {
 
 impl MyEnum {
     pub fn into_value(self) -> i8 {
-            // TODO: writeable conversions.
-        unsafe { MyEnum_into_value(self) }
+        let ret = unsafe { MyEnum_into_value(self) };
+        ret
     }
 
     pub fn get_a() -> MyEnum {
-            // TODO: writeable conversions.
-        unsafe { MyEnum_get_a() }
+        let ret = unsafe { MyEnum_get_a() };
+        ret
     }
 
 }

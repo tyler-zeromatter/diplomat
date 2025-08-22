@@ -8,13 +8,13 @@ pub struct MyStructContainingAnOption {
 
 impl MyStructContainingAnOption {
     pub fn new() -> MyStructContainingAnOption {
-            // TODO: writeable conversions.
-        unsafe { MyStructContainingAnOption_new() }
+        let ret = unsafe { MyStructContainingAnOption_new() };
+        ret
     }
 
     pub fn filled() -> MyStructContainingAnOption {
-            // TODO: writeable conversions.
-        unsafe { MyStructContainingAnOption_filled() }
+        let ret = unsafe { MyStructContainingAnOption_filled() };
+        ret
     }
 
 }

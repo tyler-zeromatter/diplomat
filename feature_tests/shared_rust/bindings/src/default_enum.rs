@@ -6,8 +6,8 @@ pub enum DefaultEnum {
 
 impl DefaultEnum {
     pub fn new() -> DefaultEnum {
-            // TODO: writeable conversions.
-        unsafe { DefaultEnum_new() }
+        let ret = unsafe { DefaultEnum_new() };
+        ret
     }
 
 }

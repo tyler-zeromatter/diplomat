@@ -5,13 +5,13 @@ pub struct RenamedTestMacroStruct {
 
 impl RenamedTestMacroStruct {
     pub fn test_func() -> usize {
-            // TODO: writeable conversions.
-        unsafe { namespace_TestMacroStruct_test_func() }
+        let ret = unsafe { namespace_TestMacroStruct_test_func() };
+        ret
     }
 
     pub fn test_meta() -> RenamedTestMacroStruct {
-            // TODO: writeable conversions.
-        unsafe { namespace_TestMacroStruct_test_meta() }
+        let ret = unsafe { namespace_TestMacroStruct_test_meta() };
+        ret
     }
 
 }

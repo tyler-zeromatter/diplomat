@@ -4,28 +4,28 @@ pub struct OpaqueThinVec;
 
 impl OpaqueThinVec {
     pub fn create(a : &[i32], b : &[f32], c : &[TODO]) -> Box<OpaqueThinVec> {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinVec_create(a, b, c) }
+        let ret = unsafe { OpaqueThinVec_create(a, b, c) };
+        ret
     }
 
     pub fn iter(&self) -> Box<OpaqueThinIter> {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinVec_iter(self) }
+        let ret = unsafe { OpaqueThinVec_iter(self) };
+        ret
     }
 
     pub fn len(&self) -> usize {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinVec_len(self) }
+        let ret = unsafe { OpaqueThinVec_len(self) };
+        ret
     }
 
     pub fn get(&self, idx : usize) -> &Option<OpaqueThin> {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinVec_get(self, idx) }
+        let ret = unsafe { OpaqueThinVec_get(self, idx) };
+        ret
     }
 
     pub fn first(&self) -> &Option<OpaqueThin> {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinVec_first(self) }
+        let ret = unsafe { OpaqueThinVec_first(self) };
+        ret
     }
 
 }
