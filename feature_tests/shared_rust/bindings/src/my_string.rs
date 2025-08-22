@@ -96,11 +96,11 @@ unsafe extern "C" {
 
     fn MyString_set_str(this: &mut MyString, new_str : diplomat_runtime::DiplomatStrSlice);
 
-    fn MyString_get_str(this: &MyString, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn MyString_get_str(this: &MyString, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn MyString_get_static_str() -> diplomat_runtime::DiplomatStrSlice;
 
-    fn MyString_string_transform(foo : diplomat_runtime::DiplomatStrSlice, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn MyString_string_transform(foo : diplomat_runtime::DiplomatStrSlice, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn MyString_borrow(this: &MyString) -> diplomat_runtime::DiplomatStrSlice;
 

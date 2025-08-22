@@ -2,7 +2,7 @@ use super::OpaqueThin;
 pub struct OpaqueThinIter;
 
 impl OpaqueThinIter {
-    pub fn next(&mut self) -> &Option<OpaqueThin> {
+    pub fn next(&mut self) -> Option<&OpaqueThin> {
         let ret = unsafe { OpaqueThinIter_next(self) };
         ret
     }
@@ -11,6 +11,6 @@ impl OpaqueThinIter {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OpaqueThinIter_next(this: &mut OpaqueThinIter) -> &Option<OpaqueThin>;
+    fn OpaqueThinIter_next(this: &mut OpaqueThinIter) -> Option<&OpaqueThin>;
 
 }

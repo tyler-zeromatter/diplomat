@@ -18,12 +18,12 @@ impl OpaqueThinVec {
         ret
     }
 
-    pub fn get(&self, idx : usize) -> &Option<OpaqueThin> {
+    pub fn get(&self, idx : usize) -> Option<&OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_get(self, idx) };
         ret
     }
 
-    pub fn first(&self) -> &Option<OpaqueThin> {
+    pub fn first(&self) -> Option<&OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_first(self) };
         ret
     }
@@ -38,8 +38,8 @@ unsafe extern "C" {
 
     fn OpaqueThinVec_len(this: &OpaqueThinVec) -> usize;
 
-    fn OpaqueThinVec_get(this: &OpaqueThinVec, idx : usize) -> &Option<OpaqueThin>;
+    fn OpaqueThinVec_get(this: &OpaqueThinVec, idx : usize) -> Option<&OpaqueThin>;
 
-    fn OpaqueThinVec_first(this: &OpaqueThinVec) -> &Option<OpaqueThin>;
+    fn OpaqueThinVec_first(this: &OpaqueThinVec) -> Option<&OpaqueThin>;
 
 }

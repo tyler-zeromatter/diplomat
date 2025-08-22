@@ -32,6 +32,6 @@ impl StructWithSlices {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn StructWithSlices_return_last(this : StructWithSlices, write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn StructWithSlices_return_last(this : StructWithSlices, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
 }
