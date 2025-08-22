@@ -33,6 +33,24 @@ impl<T, E> DiplomatResult<T, E> {
             }
         }
     }
+
+    pub fn map<U, F: FnOnce(T) -> U>(mut self, op: F) -> DiplomatResult<U, E> {
+        if self.is_ok {
+            DiplomatResult {
+                value: DiplomatResultValue {
+                    ok: unsafe { ManuallyDrop::new(op(ManuallyDrop::take(&mut self.value.ok))) }
+                },
+                is_ok: true
+            }
+        } else {
+            DiplomatResult {
+                value: DiplomatResultValue {
+                    err: unsafe { ManuallyDrop::new(ManuallyDrop::take(&mut self.value.err)) }
+                },
+                is_ok: false
+            }
+        }
+    }
 }
 
 impl<T> DiplomatOption<T> {
