@@ -48,7 +48,8 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         });
 
-        // TODO: Param/Return type conversions.
+        // TODO: Param/Return type conversions (DiplomatResult and DiplomatOption, basically).
+        // I think with `.into()` would be just fine
         let self_param = self_param_own.map(|(s, ty)| {
             let type_name = match ty {
                 SelfType::Enum(e) => { 
@@ -81,8 +82,6 @@ impl<'tcx> FunctionInfo<'tcx> {
             ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
         });
 
-
-        // TODO: DiplomatOption and DiplomatResult conversion support using ParamInfo.
         let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
         
         FunctionInfo {
