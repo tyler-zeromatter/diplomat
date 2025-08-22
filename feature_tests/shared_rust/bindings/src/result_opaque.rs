@@ -5,42 +5,42 @@ pub struct ResultOpaque;
 impl ResultOpaque {
     pub fn new(i : i32) -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new(i) };
-        ret
+        ret.into()
     }
 
     pub fn new_failing_foo() -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_foo() };
-        ret
+        ret.into()
     }
 
     pub fn new_failing_bar() -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_bar() };
-        ret
+        ret.into()
     }
 
     pub fn new_failing_unit() -> Result<Box<ResultOpaque>, ()> {
         let ret = unsafe { ResultOpaque_new_failing_unit() };
-        ret
+        ret.into()
     }
 
     pub fn new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct> {
         let ret = unsafe { ResultOpaque_new_failing_struct(i) };
-        ret
+        ret.into()
     }
 
     pub fn new_in_err(i : i32) -> Result<(), Box<ResultOpaque>> {
         let ret = unsafe { ResultOpaque_new_in_err(i) };
-        ret
+        ret.into()
     }
 
     pub fn new_int(i : i32) -> Result<i32, ()> {
         let ret = unsafe { ResultOpaque_new_int(i) };
-        ret
+        ret.into()
     }
 
     pub fn new_in_enum_err(i : i32) -> Result<ErrorEnum, Box<ResultOpaque>> {
         let ret = unsafe { ResultOpaque_new_in_enum_err(i) };
-        ret
+        ret.into()
     }
 
     pub fn takes_str(&mut self, _v : &String) -> &ResultOpaque {

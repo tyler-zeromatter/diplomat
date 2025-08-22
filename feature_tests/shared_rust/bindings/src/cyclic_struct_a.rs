@@ -14,7 +14,7 @@ impl CyclicStructA {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { CyclicStructA_cyclic_out(self, write) };
+        let ret = unsafe { CyclicStructA_cyclic_out(self, write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -37,7 +37,7 @@ impl CyclicStructA {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write) };
+        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -60,7 +60,7 @@ impl CyclicStructA {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { CyclicStructA_getter_out(self, write) };
+        let ret = unsafe { CyclicStructA_getter_out(self, write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

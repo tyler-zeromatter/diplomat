@@ -22,7 +22,7 @@ impl Opaque {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { Opaque_get_debug_str(self, write) };
+        let ret = unsafe { Opaque_get_debug_str(self, write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

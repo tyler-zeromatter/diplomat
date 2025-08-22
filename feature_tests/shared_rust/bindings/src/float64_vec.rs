@@ -55,7 +55,7 @@ impl Float64Vec {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { Float64Vec_to_string(self, write) };
+        let ret = unsafe { Float64Vec_to_string(self, write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -81,7 +81,7 @@ impl Float64Vec {
 
     pub fn get(&self, i : usize) -> Option<f64> {
         let ret = unsafe { Float64Vec_get(self, i) };
-        ret
+        ret.into()
     }
 
 }
