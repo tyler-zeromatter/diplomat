@@ -31,8 +31,6 @@ impl MyOpaqueEnum {
         out_str
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -42,5 +40,4 @@ unsafe extern "C" {
     fn MyOpaqueEnum_to_string(this: &MyOpaqueEnum, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn MyOpaqueEnum_destroy(this : *mut MyOpaqueEnum);
-
 }

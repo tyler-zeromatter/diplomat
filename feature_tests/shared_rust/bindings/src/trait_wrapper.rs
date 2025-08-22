@@ -5,5 +5,4 @@ impl TraitWrapper {
 }
 
 #[link(name = "somelib")]
-unsafe extern "C" {
-}
+unsafe extern "C" {}

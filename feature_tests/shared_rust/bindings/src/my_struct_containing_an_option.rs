@@ -24,5 +24,4 @@ unsafe extern "C" {
     fn MyStructContainingAnOption_new() -> MyStructContainingAnOption;
 
     fn MyStructContainingAnOption_filled() -> MyStructContainingAnOption;
-
 }

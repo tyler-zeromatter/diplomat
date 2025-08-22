@@ -80,8 +80,6 @@ impl MyString {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -105,5 +103,4 @@ unsafe extern "C" {
     fn MyString_borrow(this: &MyString) -> diplomat_runtime::DiplomatStrSlice;
 
     fn MyString_destroy(this : *mut MyString);
-
 }

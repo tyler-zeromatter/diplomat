@@ -7,12 +7,9 @@ impl Drop for Float64VecError {
 }
 
 impl Float64VecError {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn Float64VecError_destroy(this : *mut Float64VecError);
-
 }

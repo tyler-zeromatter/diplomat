@@ -7,12 +7,9 @@ impl Drop for RenamedOpaqueArithmetic {
 }
 
 impl RenamedOpaqueArithmetic {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RenamedOpaqueArithmetic_destroy(this : *mut RenamedOpaqueArithmetic);
-
 }

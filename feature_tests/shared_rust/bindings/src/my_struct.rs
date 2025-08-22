@@ -57,5 +57,4 @@ unsafe extern "C" {
     fn MyStruct_returns_zst_result() -> diplomat_runtime::DiplomatResult<(), MyZst>;
 
     fn MyStruct_fails_zst_result() -> diplomat_runtime::DiplomatResult<(), MyZst>;
-
 }

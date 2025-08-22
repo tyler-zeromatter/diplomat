@@ -21,5 +21,4 @@ unsafe extern "C" {
     fn namespace_TestMacroStruct_test_func() -> usize;
 
     fn namespace_TestMacroStruct_test_meta() -> RenamedTestMacroStruct;
-
 }

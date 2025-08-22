@@ -12,8 +12,6 @@ impl OptionOpaqueChar {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -21,5 +19,4 @@ unsafe extern "C" {
     fn OptionOpaqueChar_assert_char(this: &OptionOpaqueChar, ch : diplomat_runtime::DiplomatChar);
 
     fn OptionOpaqueChar_destroy(this : *mut OptionOpaqueChar);
-
 }

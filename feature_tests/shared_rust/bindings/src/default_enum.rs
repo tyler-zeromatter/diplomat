@@ -15,5 +15,4 @@ impl DefaultEnum {
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn DefaultEnum_new() -> DefaultEnum;
-
 }

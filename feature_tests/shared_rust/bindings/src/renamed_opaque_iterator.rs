@@ -7,12 +7,9 @@ impl Drop for RenamedOpaqueIterator {
 }
 
 impl RenamedOpaqueIterator {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RenamedOpaqueIterator_destroy(this : *mut RenamedOpaqueIterator);
-
 }

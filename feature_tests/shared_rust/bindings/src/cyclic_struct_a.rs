@@ -78,5 +78,4 @@ unsafe extern "C" {
     fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 
     fn CyclicStructA_getter_out(this : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> ();
-
 }

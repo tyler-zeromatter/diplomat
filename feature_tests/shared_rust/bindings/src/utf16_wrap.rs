@@ -36,8 +36,6 @@ impl Utf16Wrap {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -49,5 +47,4 @@ unsafe extern "C" {
     fn Utf16Wrap_borrow_cont(this: &Utf16Wrap) -> diplomat_runtime::DiplomatStrSlice;
 
     fn Utf16Wrap_destroy(this : *mut Utf16Wrap);
-
 }

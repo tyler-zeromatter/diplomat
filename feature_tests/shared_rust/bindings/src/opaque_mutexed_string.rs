@@ -53,8 +53,6 @@ impl OpaqueMutexedString {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -78,5 +76,4 @@ unsafe extern "C" {
     fn OpaqueMutexedString_to_unsigned_from_unsigned(this: &OpaqueMutexedString, input : u16) -> u16;
 
     fn OpaqueMutexedString_destroy(this : *mut OpaqueMutexedString);
-
 }

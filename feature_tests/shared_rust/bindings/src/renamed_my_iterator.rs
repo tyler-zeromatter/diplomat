@@ -7,12 +7,9 @@ impl Drop for RenamedMyIterator {
 }
 
 impl RenamedMyIterator {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RenamedMyIterator_destroy(this : *mut RenamedMyIterator);
-
 }

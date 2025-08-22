@@ -7,12 +7,9 @@ impl Drop for RenamedMyIndexer {
 }
 
 impl RenamedMyIndexer {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RenamedMyIndexer_destroy(this : *mut RenamedMyIndexer);
-
 }

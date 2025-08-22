@@ -34,8 +34,6 @@ impl OpaqueThinVec {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -51,5 +49,4 @@ unsafe extern "C" {
     fn OpaqueThinVec_first(this: &OpaqueThinVec) -> Option<&OpaqueThin>;
 
     fn OpaqueThinVec_destroy(this : *mut OpaqueThinVec);
-
 }
