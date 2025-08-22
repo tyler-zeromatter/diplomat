@@ -119,11 +119,11 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_opaque_argument(arg : &Option<OptionOpaque>) -> bool;
 
-    fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption<Option<u8>>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
+    fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption<u8>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
 
-    fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<Option<OptionEnum>>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
+    fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<Option<OptionInputStruct>>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStruct>;
+    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStruct>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStruct>;
 
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
 
