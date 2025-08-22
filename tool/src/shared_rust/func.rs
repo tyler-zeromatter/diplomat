@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType, TyPosition, Type, TypeId};
+use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId};
 
 use crate::shared_rust::FileGenContext;
 
@@ -105,6 +105,10 @@ impl<'tcx> FunctionInfo<'tcx> {
 
     fn param_conversion<P: TyPosition>(ty : &Type<P>) -> Option<Cow<'tcx, str>> {
         match ty {
+            Type::Slice(sl) => match sl {
+                Slice::Str(..) => Some(".into()".into()),
+                _ => None,
+            }
             _ => None
         }
     }
