@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{EnumDef, OpaqueDef, Slice, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{EnumDef, MaybeStatic, Mutability, OpaqueDef, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -214,6 +214,27 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         }
                         (b.mutability(), name.into())
                     }
+                    Slice::Str(lt, enc) => {
+                        // TODO: Lifetimes
+                        let lifetimes = if let Some(lt) = lt {
+                            match lt {
+                                MaybeStatic::Static => "&'static".into(),
+                                MaybeStatic::NonStatic(ns) => {
+                                    format!("&")
+                                }
+                            }
+                        } else {
+                            "".into()
+                        };
+                        let encoding = match enc {
+                            StringEncoding::Utf8 => "String",
+                            StringEncoding::UnvalidatedUtf8 => "[u8]",
+                            StringEncoding::UnvalidatedUtf16 => "[u16]",
+                            _ => unreachable!("Unrecognized string encoding.")
+                        };
+                        let name = format!("{lifetimes}{encoding}");
+                        return name.into();
+                    }
                     _ => (diplomat_core::hir::Mutability::Immutable, format!("TODO")),
                 };
 
@@ -231,6 +252,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         match ty {
             Type::DiplomatOption(op) => {
                 Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_type_name(op)).into())
+            }
+            Type::Slice(sl) => match sl {
+                // TODO: Lifetimes.
+                Slice::Str(..) => Some(format!("diplomat_runtime::DiplomatStrSlice").into()),
+                _ => None
             }
             _ => None
         }
