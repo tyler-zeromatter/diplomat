@@ -2,6 +2,12 @@ use super::ImportedStruct;
 use super::MyStruct;
 pub struct Opaque;
 
+impl Drop for Opaque {
+    fn drop(&mut self) {
+        unsafe { Opaque_destroy(self) }
+    }
+}
+
 impl Opaque {
     pub fn new() -> Box<Opaque> {
         let ret = unsafe { Opaque_new() };

@@ -1,5 +1,11 @@
 pub struct OpaqueThin;
 
+impl Drop for OpaqueThin {
+    fn drop(&mut self) {
+        unsafe { OpaqueThin_destroy(self) }
+    }
+}
+
 impl OpaqueThin {
     pub fn a(&self) -> i32 {
         let ret = unsafe { OpaqueThin_a(self) };

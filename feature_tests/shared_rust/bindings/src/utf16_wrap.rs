@@ -1,5 +1,11 @@
 pub struct Utf16Wrap;
 
+impl Drop for Utf16Wrap {
+    fn drop(&mut self) {
+        unsafe { Utf16Wrap_destroy(self) }
+    }
+}
+
 impl Utf16Wrap {
     pub fn from_utf16(input : &[u16]) -> Box<Utf16Wrap> {
         let ret = unsafe { Utf16Wrap_from_utf16(input.into()) };

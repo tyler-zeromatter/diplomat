@@ -1,5 +1,11 @@
 pub struct PrimitiveStructVec;
 
+impl Drop for PrimitiveStructVec {
+    fn drop(&mut self) {
+        unsafe { PrimitiveStructVec_destroy(self) }
+    }
+}
+
 impl PrimitiveStructVec {
 }
 

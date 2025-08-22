@@ -3,6 +3,12 @@ use super::OptionInputStruct;
 use super::OptionStruct;
 pub struct OptionOpaque;
 
+impl Drop for OptionOpaque {
+    fn drop(&mut self) {
+        unsafe { OptionOpaque_destroy(self) }
+    }
+}
+
 impl OptionOpaque {
     pub fn new(i : i32) -> Option<Box<OptionOpaque>> {
         let ret = unsafe { OptionOpaque_new(i) };

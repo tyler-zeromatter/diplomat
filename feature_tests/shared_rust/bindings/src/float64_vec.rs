@@ -1,5 +1,11 @@
 pub struct Float64Vec;
 
+impl Drop for Float64Vec {
+    fn drop(&mut self) {
+        unsafe { Float64Vec_destroy(self) }
+    }
+}
+
 impl Float64Vec {
     pub fn new_bool(v : &[bool]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_bool(v) };

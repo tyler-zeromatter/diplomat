@@ -4,6 +4,12 @@ use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
 pub struct Foo;
 
+impl Drop for Foo {
+    fn drop(&mut self) {
+        unsafe { Foo_destroy(self) }
+    }
+}
+
 impl Foo {
     pub fn new(x : &[u8]) -> Box<Foo> {
         let ret = unsafe { Foo_new(x.into()) };
