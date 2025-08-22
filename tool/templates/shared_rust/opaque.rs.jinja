@@ -9,3 +9,7 @@ impl Drop for {{type_name}} {
     }
 }
 {%- endblock %}
+
+{%- block abi_methods %}
+    fn {{type_name}}_destroy(this : *mut {{type_name}});
+{% endblock -%}
