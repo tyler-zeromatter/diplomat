@@ -13,8 +13,6 @@ impl Bar {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -22,5 +20,4 @@ unsafe extern "C" {
     fn Bar_foo(this: &Bar) -> &Foo;
 
     fn Bar_destroy(this : *mut Bar);
-
 }

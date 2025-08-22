@@ -63,8 +63,6 @@ impl Opaque {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -86,5 +84,4 @@ unsafe extern "C" {
     fn Opaque_cmp() -> ordering;
 
     fn Opaque_destroy(this : *mut Opaque);
-
 }

@@ -22,5 +22,4 @@ unsafe extern "C" {
     fn CyclicStructB_get_a() -> CyclicStructA;
 
     fn CyclicStructB_get_a_option() -> diplomat_runtime::DiplomatOption<CyclicStructA>;
-
 }

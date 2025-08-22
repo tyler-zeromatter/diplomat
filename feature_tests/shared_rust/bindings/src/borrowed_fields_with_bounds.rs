@@ -17,5 +17,4 @@ impl BorrowedFieldsWithBounds {
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn BorrowedFieldsWithBounds_from_foo_and_strings(foo : &Foo, dstr16_x : diplomat_runtime::DiplomatStrSlice, utf8_str_z : diplomat_runtime::DiplomatStrSlice) -> BorrowedFieldsWithBounds;
-
 }

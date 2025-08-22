@@ -7,12 +7,9 @@ impl Drop for RenamedTestOpaque {
 }
 
 impl RenamedTestOpaque {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn RenamedTestOpaque_destroy(this : *mut RenamedTestOpaque);
-
 }

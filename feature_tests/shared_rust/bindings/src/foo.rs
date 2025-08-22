@@ -36,8 +36,6 @@ impl Foo {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -53,5 +51,4 @@ unsafe extern "C" {
     fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
 
     fn Foo_destroy(this : *mut Foo);
-
 }

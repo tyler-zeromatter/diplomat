@@ -95,8 +95,6 @@ impl OptionOpaque {
         ret
     }
 
-    
-
 }
 
 #[link(name = "somelib")]
@@ -136,5 +134,4 @@ unsafe extern "C" {
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
 
     fn OptionOpaque_destroy(this : *mut OptionOpaque);
-
 }

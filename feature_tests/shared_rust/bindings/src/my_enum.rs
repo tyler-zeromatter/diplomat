@@ -26,5 +26,4 @@ unsafe extern "C" {
     fn MyEnum_into_value(this : MyEnum) -> i8;
 
     fn MyEnum_get_a() -> MyEnum;
-
 }

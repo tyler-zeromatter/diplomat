@@ -7,12 +7,9 @@ impl Drop for PrimitiveStructVec {
 }
 
 impl PrimitiveStructVec {
-    
-
 }
 
 #[link(name = "somelib")]
 unsafe extern "C" {
     fn PrimitiveStructVec_destroy(this : *mut PrimitiveStructVec);
-
 }
