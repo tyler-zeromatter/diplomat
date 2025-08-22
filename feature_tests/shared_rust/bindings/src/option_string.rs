@@ -1,7 +1,7 @@
 pub struct OptionString;
 
 impl OptionString {
-    pub fn new(diplomat_str : &[TODO]) -> Box<Option<OptionString>> {
+    pub fn new(diplomat_str : &[u8]) -> Box<Option<OptionString>> {
         let ret = unsafe { OptionString_new(diplomat_str) };
         ret
     }
@@ -29,7 +29,7 @@ impl OptionString {
         out_str
     }
 
-    pub fn borrow(&self) -> Option<&[TODO]> {
+    pub fn borrow(&self) -> Option<&[u8]> {
         let ret = unsafe { OptionString_borrow(self) };
         ret
     }
@@ -38,10 +38,10 @@ impl OptionString {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn OptionString_new(diplomat_str : &[TODO]) -> Box<Option<OptionString>>;
+    fn OptionString_new(diplomat_str : diplomat_runtime::DiplomatStrSlice) -> Box<Option<OptionString>>;
 
     fn OptionString_write(this: &OptionString, write : &mut diplomat_runtime::DiplomatWrite) -> diplomat_runtime::DiplomatResult<String, ()>;
 
-    fn OptionString_borrow(this: &OptionString) -> diplomat_runtime::DiplomatOption<&[TODO]>;
+    fn OptionString_borrow(this: &OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice>;
 
 }

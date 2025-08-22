@@ -1,17 +1,17 @@
 pub struct MyString;
 
 impl MyString {
-    pub fn new(v : &[TODO]) -> Box<MyString> {
+    pub fn new(v : &[u8]) -> Box<MyString> {
         let ret = unsafe { MyString_new(v) };
         ret
     }
 
-    pub fn new_unsafe(v : &[TODO]) -> Box<MyString> {
+    pub fn new_unsafe(v : &String) -> Box<MyString> {
         let ret = unsafe { MyString_new_unsafe(v) };
         ret
     }
 
-    pub fn new_owned(v : &[TODO]) -> Box<MyString> {
+    pub fn new_owned(v : [u8]) -> Box<MyString> {
         let ret = unsafe { MyString_new_owned(v) };
         ret
     }
@@ -21,7 +21,7 @@ impl MyString {
         ret
     }
 
-    pub fn set_str(&mut self, new_str : &[TODO]) {
+    pub fn set_str(&mut self, new_str : &[u8]) {
         let ret = unsafe { MyString_set_str(self, new_str) };
         ret
     }
@@ -49,12 +49,12 @@ impl MyString {
         out_str
     }
 
-    pub fn get_static_str() -> &[TODO] {
+    pub fn get_static_str() -> &'staticString {
         let ret = unsafe { MyString_get_static_str() };
         ret
     }
 
-    pub fn string_transform(foo : &[TODO]) -> String {
+    pub fn string_transform(foo : &String) -> String {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
@@ -77,7 +77,7 @@ impl MyString {
         out_str
     }
 
-    pub fn borrow(&self) -> &[TODO] {
+    pub fn borrow(&self) -> &[u8] {
         let ret = unsafe { MyString_borrow(self) };
         ret
     }
@@ -86,22 +86,22 @@ impl MyString {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn MyString_new(v : &[TODO]) -> Box<MyString>;
+    fn MyString_new(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
-    fn MyString_new_unsafe(v : &[TODO]) -> Box<MyString>;
+    fn MyString_new_unsafe(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
-    fn MyString_new_owned(v : &[TODO]) -> Box<MyString>;
+    fn MyString_new_owned(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
     fn MyString_new_from_first(v : &[TODO]) -> Box<MyString>;
 
-    fn MyString_set_str(this: &mut MyString, new_str : &[TODO]);
+    fn MyString_set_str(this: &mut MyString, new_str : diplomat_runtime::DiplomatStrSlice);
 
     fn MyString_get_str(this: &MyString, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
-    fn MyString_get_static_str() -> &[TODO];
+    fn MyString_get_static_str() -> diplomat_runtime::DiplomatStrSlice;
 
-    fn MyString_string_transform(foo : &[TODO], write : &mut diplomat_runtime::DiplomatWrite) -> String;
+    fn MyString_string_transform(foo : diplomat_runtime::DiplomatStrSlice, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
-    fn MyString_borrow(this: &MyString) -> &[TODO];
+    fn MyString_borrow(this: &MyString) -> diplomat_runtime::DiplomatStrSlice;
 
 }

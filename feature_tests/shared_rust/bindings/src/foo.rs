@@ -5,7 +5,7 @@ use super::BorrowedFieldsWithBounds;
 pub struct Foo;
 
 impl Foo {
-    pub fn new(x : &[TODO]) -> Box<Foo> {
+    pub fn new(x : &[u8]) -> Box<Foo> {
         let ret = unsafe { Foo_new(x) };
         ret
     }
@@ -25,7 +25,7 @@ impl Foo {
         ret
     }
 
-    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo> {
+    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[u8]) -> Box<Foo> {
         let ret = unsafe { Foo_extract_from_bounds(bounds, another_string) };
         ret
     }
@@ -34,7 +34,7 @@ impl Foo {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Foo_new(x : &[TODO]) -> Box<Foo>;
+    fn Foo_new(x : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
 
     fn Foo_get_bar(this: &Foo) -> Box<Bar>;
 
@@ -42,6 +42,6 @@ unsafe extern "C" {
 
     fn Foo_extract_from_fields(fields : BorrowedFields) -> Box<Foo>;
 
-    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[TODO]) -> Box<Foo>;
+    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
 
 }

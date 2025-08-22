@@ -1,7 +1,7 @@
 pub struct Utf16Wrap;
 
 impl Utf16Wrap {
-    pub fn from_utf16(input : &[TODO]) -> Box<Utf16Wrap> {
+    pub fn from_utf16(input : &[u16]) -> Box<Utf16Wrap> {
         let ret = unsafe { Utf16Wrap_from_utf16(input) };
         ret
     }
@@ -29,7 +29,7 @@ impl Utf16Wrap {
         out_str
     }
 
-    pub fn borrow_cont(&self) -> &[TODO] {
+    pub fn borrow_cont(&self) -> &[u16] {
         let ret = unsafe { Utf16Wrap_borrow_cont(self) };
         ret
     }
@@ -38,10 +38,10 @@ impl Utf16Wrap {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn Utf16Wrap_from_utf16(input : &[TODO]) -> Box<Utf16Wrap>;
+    fn Utf16Wrap_from_utf16(input : diplomat_runtime::DiplomatStrSlice) -> Box<Utf16Wrap>;
 
     fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
-    fn Utf16Wrap_borrow_cont(this: &Utf16Wrap) -> &[TODO];
+    fn Utf16Wrap_borrow_cont(this: &Utf16Wrap) -> diplomat_runtime::DiplomatStrSlice;
 
 }
