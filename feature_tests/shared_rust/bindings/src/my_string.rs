@@ -2,17 +2,17 @@ pub struct MyString;
 
 impl MyString {
     pub fn new(v : &[u8]) -> Box<MyString> {
-        let ret = unsafe { MyString_new(v) };
+        let ret = unsafe { MyString_new(v.into()) };
         ret
     }
 
     pub fn new_unsafe(v : &String) -> Box<MyString> {
-        let ret = unsafe { MyString_new_unsafe(v) };
+        let ret = unsafe { MyString_new_unsafe(v.into()) };
         ret
     }
 
     pub fn new_owned(v : [u8]) -> Box<MyString> {
-        let ret = unsafe { MyString_new_owned(v) };
+        let ret = unsafe { MyString_new_owned(v.into()) };
         ret
     }
 
@@ -22,7 +22,7 @@ impl MyString {
     }
 
     pub fn set_str(&mut self, new_str : &[u8]) {
-        let ret = unsafe { MyString_set_str(self, new_str) };
+        let ret = unsafe { MyString_set_str(self, new_str.into()) };
         ret
     }
 
@@ -58,7 +58,7 @@ impl MyString {
         let write = unsafe {
             diplomat_runtime::diplomat_buffer_write_create(0)
         };
-        let ret = unsafe { MyString_string_transform(foo, write.as_mut().unwrap()) };
+        let ret = unsafe { MyString_string_transform(foo.into(), write.as_mut().unwrap()) };
         let out_str = unsafe {
             let write_ref = write.as_ref().unwrap();
             let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);

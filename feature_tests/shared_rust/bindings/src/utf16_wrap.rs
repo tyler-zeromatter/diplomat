@@ -2,7 +2,7 @@ pub struct Utf16Wrap;
 
 impl Utf16Wrap {
     pub fn from_utf16(input : &[u16]) -> Box<Utf16Wrap> {
-        let ret = unsafe { Utf16Wrap_from_utf16(input) };
+        let ret = unsafe { Utf16Wrap_from_utf16(input.into()) };
         ret
     }
 

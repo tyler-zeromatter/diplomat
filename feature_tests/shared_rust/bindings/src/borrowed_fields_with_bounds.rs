@@ -8,7 +8,7 @@ pub struct BorrowedFieldsWithBounds {
 
 impl BorrowedFieldsWithBounds {
     pub fn from_foo_and_strings(foo : &Foo, dstr16_x : &[u16], utf8_str_z : &String) -> BorrowedFieldsWithBounds {
-        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x, utf8_str_z) };
+        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.into()) };
         ret
     }
 

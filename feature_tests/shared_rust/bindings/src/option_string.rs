@@ -2,7 +2,7 @@ pub struct OptionString;
 
 impl OptionString {
     pub fn new(diplomat_str : &[u8]) -> Box<Option<OptionString>> {
-        let ret = unsafe { OptionString_new(diplomat_str) };
+        let ret = unsafe { OptionString_new(diplomat_str.into()) };
         ret
     }
 

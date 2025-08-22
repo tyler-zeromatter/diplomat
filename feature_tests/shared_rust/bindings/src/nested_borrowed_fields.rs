@@ -11,7 +11,7 @@ pub struct NestedBorrowedFields {
 
 impl NestedBorrowedFields {
     pub fn from_bar_and_foo_and_strings(bar : &Bar, foo : &Foo, dstr16_x : &[u16], dstr16_z : &[u16], utf8_str_y : &String, utf8_str_z : &String) -> NestedBorrowedFields {
-        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x, dstr16_z, utf8_str_y, utf8_str_z) };
+        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x.into(), dstr16_z.into(), utf8_str_y.into(), utf8_str_z.into()) };
         ret
     }
 

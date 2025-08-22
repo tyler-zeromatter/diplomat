@@ -44,7 +44,7 @@ impl ResultOpaque {
     }
 
     pub fn takes_str(&mut self, _v : &String) -> &ResultOpaque {
-        let ret = unsafe { ResultOpaque_takes_str(self, _v) };
+        let ret = unsafe { ResultOpaque_takes_str(self, _v.into()) };
         ret
     }
 

@@ -9,12 +9,12 @@ impl Opaque {
     }
 
     pub fn try_from_utf8(input : &[u8]) -> Box<Option<Opaque>> {
-        let ret = unsafe { Opaque_try_from_utf8(input) };
+        let ret = unsafe { Opaque_try_from_utf8(input.into()) };
         ret
     }
 
     pub fn from_str(input : &String) -> Box<Opaque> {
-        let ret = unsafe { Opaque_from_str(input) };
+        let ret = unsafe { Opaque_from_str(input.into()) };
         ret
     }
 

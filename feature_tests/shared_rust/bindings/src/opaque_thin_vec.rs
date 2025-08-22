@@ -4,7 +4,7 @@ pub struct OpaqueThinVec;
 
 impl OpaqueThinVec {
     pub fn create(a : &[i32], b : &[f32], c : &[u8]) -> Box<OpaqueThinVec> {
-        let ret = unsafe { OpaqueThinVec_create(a, b, c) };
+        let ret = unsafe { OpaqueThinVec_create(a, b, c.into()) };
         ret
     }
 
