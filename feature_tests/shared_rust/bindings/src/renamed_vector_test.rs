@@ -2,7 +2,7 @@ pub struct RenamedVectorTest;
 
 impl Drop for RenamedVectorTest {
     fn drop(&mut self) {
-        unsafe { RenamedVectorTest_destroy(self) }
+        unsafe { namespace_VectorTest_destroy(self) }
     }
 }
 

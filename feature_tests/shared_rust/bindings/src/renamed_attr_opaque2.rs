@@ -2,7 +2,7 @@ pub struct RenamedAttrOpaque2;
 
 impl Drop for RenamedAttrOpaque2 {
     fn drop(&mut self) {
-        unsafe { RenamedAttrOpaque2_destroy(self) }
+        unsafe { namespace_AttrOpaque2_destroy(self) }
     }
 }
 

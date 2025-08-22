@@ -2,7 +2,7 @@ pub struct RenamedMyIterable;
 
 impl Drop for RenamedMyIterable {
     fn drop(&mut self) {
-        unsafe { RenamedMyIterable_destroy(self) }
+        unsafe { namespace_MyIterable_destroy(self) }
     }
 }
 

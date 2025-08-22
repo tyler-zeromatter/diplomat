@@ -2,7 +2,7 @@ pub struct RenamedNested;
 
 impl Drop for RenamedNested {
     fn drop(&mut self) {
-        unsafe { RenamedNested_destroy(self) }
+        unsafe { namespace_Nested_destroy(self) }
     }
 }
 
