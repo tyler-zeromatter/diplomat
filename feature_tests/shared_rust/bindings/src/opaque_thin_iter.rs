@@ -3,8 +3,8 @@ pub struct OpaqueThinIter;
 
 impl OpaqueThinIter {
     pub fn next(&mut self) -> &Option<OpaqueThin> {
-            // TODO: writeable conversions.
-        unsafe { OpaqueThinIter_next(self) }
+        let ret = unsafe { OpaqueThinIter_next(self) };
+        ret
     }
 
 }

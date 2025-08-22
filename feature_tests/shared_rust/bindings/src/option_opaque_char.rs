@@ -2,8 +2,8 @@ pub struct OptionOpaqueChar;
 
 impl OptionOpaqueChar {
     pub fn assert_char(&self, ch : diplomat_runtime::DiplomatChar) {
-            // TODO: writeable conversions.
-        unsafe { OptionOpaqueChar_assert_char(self, ch) }
+        let ret = unsafe { OptionOpaqueChar_assert_char(self, ch) };
+        ret
     }
 
 }

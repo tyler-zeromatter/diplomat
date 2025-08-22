@@ -4,53 +4,53 @@ pub struct ResultOpaque;
 
 impl ResultOpaque {
     pub fn new(i : i32) -> Result<Box<ResultOpaque>, ErrorEnum> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new(i) }
+        let ret = unsafe { ResultOpaque_new(i) };
+        ret
     }
 
     pub fn new_failing_foo() -> Result<Box<ResultOpaque>, ErrorEnum> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_failing_foo() }
+        let ret = unsafe { ResultOpaque_new_failing_foo() };
+        ret
     }
 
     pub fn new_failing_bar() -> Result<Box<ResultOpaque>, ErrorEnum> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_failing_bar() }
+        let ret = unsafe { ResultOpaque_new_failing_bar() };
+        ret
     }
 
     pub fn new_failing_unit() -> Result<Box<ResultOpaque>, ()> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_failing_unit() }
+        let ret = unsafe { ResultOpaque_new_failing_unit() };
+        ret
     }
 
     pub fn new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_failing_struct(i) }
+        let ret = unsafe { ResultOpaque_new_failing_struct(i) };
+        ret
     }
 
     pub fn new_in_err(i : i32) -> Result<(), Box<ResultOpaque>> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_in_err(i) }
+        let ret = unsafe { ResultOpaque_new_in_err(i) };
+        ret
     }
 
     pub fn new_int(i : i32) -> Result<i32, ()> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_int(i) }
+        let ret = unsafe { ResultOpaque_new_int(i) };
+        ret
     }
 
     pub fn new_in_enum_err(i : i32) -> Result<ErrorEnum, Box<ResultOpaque>> {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_new_in_enum_err(i) }
+        let ret = unsafe { ResultOpaque_new_in_enum_err(i) };
+        ret
     }
 
     pub fn takes_str(&mut self, _v : &[TODO]) -> &ResultOpaque {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_takes_str(self, _v) }
+        let ret = unsafe { ResultOpaque_takes_str(self, _v) };
+        ret
     }
 
     pub fn assert_integer(&self, i : i32) {
-            // TODO: writeable conversions.
-        unsafe { ResultOpaque_assert_integer(self, i) }
+        let ret = unsafe { ResultOpaque_assert_integer(self, i) };
+        ret
     }
 
 }

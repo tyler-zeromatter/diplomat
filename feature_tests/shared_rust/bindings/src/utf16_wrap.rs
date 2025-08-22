@@ -2,18 +2,36 @@ pub struct Utf16Wrap;
 
 impl Utf16Wrap {
     pub fn from_utf16(input : &[TODO]) -> Box<Utf16Wrap> {
-            // TODO: writeable conversions.
-        unsafe { Utf16Wrap_from_utf16(input) }
+        let ret = unsafe { Utf16Wrap_from_utf16(input) };
+        ret
     }
 
-    pub fn get_debug_str(&self) {
-            // TODO: writeable conversions.
-        unsafe { Utf16Wrap_get_debug_str(self, output) }
+    pub fn get_debug_str(&self) -> String {
+        let write = unsafe {
+            diplomat_runtime::diplomat_buffer_write_create(0)
+        };
+        let ret = unsafe { Utf16Wrap_get_debug_str(self, write) };
+        let out_str = unsafe {
+            let write_ref = write.as_ref().unwrap();
+            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+    
+            if !buf.is_null() {
+                String::from_raw_parts(buf, len, len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        };
+    
+        unsafe {
+            diplomat_runtime::diplomat_buffer_write_destroy(write);
+        }
+        out_str
     }
 
     pub fn borrow_cont(&self) -> &[TODO] {
-            // TODO: writeable conversions.
-        unsafe { Utf16Wrap_borrow_cont(self) }
+        let ret = unsafe { Utf16Wrap_borrow_cont(self) };
+        ret
     }
 
 }
@@ -22,7 +40,7 @@ impl Utf16Wrap {
 unsafe extern "C" {
     fn Utf16Wrap_from_utf16(input : &[TODO]) -> Box<Utf16Wrap>;
 
-    fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, output : &mut DiplomatWrite);
+    fn Utf16Wrap_get_debug_str(this: &Utf16Wrap, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
     fn Utf16Wrap_borrow_cont(this: &Utf16Wrap) -> &[TODO];
 

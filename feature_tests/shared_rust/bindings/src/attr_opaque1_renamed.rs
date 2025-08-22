@@ -4,38 +4,38 @@ pub struct AttrOpaque1Renamed;
 
 impl AttrOpaque1Renamed {
     pub fn new() -> Box<AttrOpaque1Renamed> {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_new() }
+        let ret = unsafe { namespace_AttrOpaque1_new() };
+        ret
     }
 
     pub fn mac_test() -> i32 {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_mac_test() }
+        let ret = unsafe { namespace_AttrOpaque1_mac_test() };
+        ret
     }
 
     pub fn hello() -> i32 {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_hello() }
+        let ret = unsafe { namespace_AttrOpaque1_hello() };
+        ret
     }
 
     pub fn method(&self) -> u8 {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_method(self) }
+        let ret = unsafe { namespace_AttrOpaque1_method(self) };
+        ret
     }
 
     pub fn abirenamed(&self) -> u8 {
-            // TODO: writeable conversions.
-        unsafe { renamed_on_abi_only(self) }
+        let ret = unsafe { renamed_on_abi_only(self) };
+        ret
     }
 
     pub fn use_unnamespaced(&self, _un : &Unnamespaced) {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) }
+        let ret = unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) };
+        ret
     }
 
     pub fn use_namespaced(&self, _n : RenamedAttrEnum) {
-            // TODO: writeable conversions.
-        unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) }
+        let ret = unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) };
+        ret
     }
 
 }

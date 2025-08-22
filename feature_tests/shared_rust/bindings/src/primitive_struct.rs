@@ -10,8 +10,8 @@ pub struct PrimitiveStruct {
 
 impl PrimitiveStruct {
     pub fn mutable_ref(&mut self, a : PrimitiveStruct) {
-            // TODO: writeable conversions.
-        unsafe { PrimitiveStruct_mutable_ref(self, a) }
+        let ret = unsafe { PrimitiveStruct_mutable_ref(self, a) };
+        ret
     }
 
 }

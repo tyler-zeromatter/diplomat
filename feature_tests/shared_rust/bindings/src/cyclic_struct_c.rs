@@ -6,13 +6,31 @@ pub struct CyclicStructC {
 
 impl CyclicStructC {
     pub fn takes_nested_parameters(c : CyclicStructC) -> CyclicStructC {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructC_takes_nested_parameters(c) }
+        let ret = unsafe { CyclicStructC_takes_nested_parameters(c) };
+        ret
     }
 
-    pub fn cyclic_out(self) {
-            // TODO: writeable conversions.
-        unsafe { CyclicStructC_cyclic_out(self, output) }
+    pub fn cyclic_out(self) -> String {
+        let write = unsafe {
+            diplomat_runtime::diplomat_buffer_write_create(0)
+        };
+        let ret = unsafe { CyclicStructC_cyclic_out(self, write) };
+        let out_str = unsafe {
+            let write_ref = write.as_ref().unwrap();
+            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
+            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
+    
+            if !buf.is_null() {
+                String::from_raw_parts(buf, len, len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        };
+    
+        unsafe {
+            diplomat_runtime::diplomat_buffer_write_destroy(write);
+        }
+        out_str
     }
 
 }
@@ -21,6 +39,6 @@ impl CyclicStructC {
 unsafe extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructC) -> CyclicStructC;
 
-    fn CyclicStructC_cyclic_out(this : CyclicStructC, output : &mut DiplomatWrite);
+    fn CyclicStructC_cyclic_out(this : CyclicStructC, write : &mut diplomat_runtime::DiplomatWrite) -> String;
 
 }
