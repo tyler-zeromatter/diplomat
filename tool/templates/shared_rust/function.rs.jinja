@@ -1,9 +1,9 @@
 {%- macro func_params(self_param, pa, is_abi = false) -%}
 {%- if let Some(s) = self_param -%}
-{{s.type_name(is_abi)}} {%- if pa.len() > 0 -%}, {% endif -%}
+{{s.type_name(*is_abi)}} {%- if pa.len() > 0 -%}, {% endif -%}
 {%- endif -%}
 
-{%- for p in pa -%} {{p.var_name}} : {{p.type_name(is_abi)}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}
+{%- for p in pa -%} {{p.var_name}} : {{p.type_name(*is_abi)}} {%- if !loop.last %}, {% endif -%} {%- endfor -%}
 {%- endmacro -%}
 
 {%- block function_impl -%}
@@ -13,7 +13,7 @@ pub fn {{name}}(
         {%- else -%}
         {%- call func_params(self_param, params) -%}
         {%- endif -%}
-    ) {%- if let Some(r) = return_type %} -> {{r}} {%- endif %} {
+    ) {%- if let Some(r) = return_type %} -> {{r.type_name(false)}} {%- endif %} {
         // TODO: writeable conversions.
     unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
@@ -31,5 +31,5 @@ pub fn {{name}}(
         {%- call func_params(self_param, params, true) -%}
     ) 
         
-        {%- if let Some(r) = return_type %} -> {{r}} {%- endif %};
+        {%- if let Some(r) = return_type %} -> {{r.type_name(true)}} {%- endif %};
 {%- endblock -%}
