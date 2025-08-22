@@ -15,9 +15,7 @@ pub fn {{name}}(
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r.type_name(false)}} {%- endif %} {
     {% if is_write -%}
-    let write = unsafe {
-        diplomat_runtime::diplomat_buffer_write_create(0)
-    };
+    let write = diplomat_runtime::diplomat_buffer_write_create(0);
     {% endif -%}
     let ret = unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
@@ -28,6 +26,7 @@ pub fn {{name}}(
         {%- endfor -%}
         ) };
     {% if is_write -%}
+    // TODO: Create a helper in `lib.rs`.
     let out_str = unsafe {
         let write_ref = write.as_ref().unwrap();
         let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
@@ -43,7 +42,15 @@ pub fn {{name}}(
     unsafe {
         diplomat_runtime::diplomat_buffer_write_destroy(write);
     }
+
+    {%- if !is_infallible %}
+    // TODO: Check DiplomatOption with this method.
+    ret.map(|_| {
+        out_str
+    }){{return_type.as_ref().unwrap().convert()}}
+    {%- else %}
     out_str
+    {%- endif -%}
     {%- else -%}
     ret{% if let Some(r) = return_type %}{{r.convert()}}{% endif %}
     {%- endif %}
