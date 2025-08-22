@@ -14,6 +14,7 @@ pub(super) struct FunctionInfo<'tcx> {
     return_type : Option<ParamInfo<'tcx>>,
     params : Vec<ParamInfo<'tcx>>,
     is_write : bool,
+    is_infallible : bool,
 }
 
 struct ParamInfo<'a> {
@@ -99,7 +100,11 @@ impl<'tcx> FunctionInfo<'tcx> {
             params,
             self_param,
             return_type,
-            is_write: method.output.is_write() 
+            is_write: method.output.is_write(),
+            is_infallible: match method.output {
+                ReturnType::Fallible(..) | ReturnType::Nullable(..) => false,
+                ReturnType::Infallible(..) => true
+            }
         }
     }
 
@@ -165,7 +170,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                     var_name: "".into(),
                     type_name: format!("Option<{ok_ty}>").into(),
                     abi_type_override: Some(abi_override.into()),
-                    conversion: Some(".into()".into()),
+                    conversion: Some(".into_converted_option()".into()),
                 })
             }
             ReturnType::Infallible(ok) => {
