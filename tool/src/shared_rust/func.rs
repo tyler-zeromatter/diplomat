@@ -48,6 +48,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         });
 
+        // TODO: Param/Return type conversions.
         let self_param = self_param_own.map(|(s, ty)| {
             let type_name = match ty {
                 SelfType::Enum(e) => { 
