@@ -94,7 +94,6 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
     
-    // TODO: &mut DiplomatWrite should only be true for the ABI version of params, not the return.
     fn gen_ok_type_name(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Cow<'tcx, str>  {
         match ok {
             SuccessType::Unit => "()".into(),
@@ -104,7 +103,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
             SuccessType::Write => {
                 params.push(ParamInfo { var_name: "write".into(), type_name: "&mut diplomat_runtime::DiplomatWrite".into(), abi_type_override: None });
-                "()".into()
+                "String".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
         }
@@ -149,7 +148,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             ReturnType::Infallible(ok) => {
                 let type_name = Self::gen_ok_type_name(params, ctx, ok);
                 let abi_name = Self::gen_ok_abi_name(ctx, ok);
-                if let SuccessType::OutType(..) = ok {
+                if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
                     Some(ParamInfo { var_name: "".into(), type_name, abi_type_override: abi_name })
                 } else {
                     None
