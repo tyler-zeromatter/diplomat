@@ -22,8 +22,8 @@ impl OptionString {
 unsafe extern "C" {
     fn OptionString_new(diplomat_str : &[TODO]) -> Box<Option<OptionString>>;
 
-    fn OptionString_write(this: &OptionString, output : &mut DiplomatWrite) -> Result<(), ()>;
+    fn OptionString_write(this: &OptionString, output : &mut DiplomatWrite) -> DiplomatResult<(), ()>;
 
-    fn OptionString_borrow(this: &OptionString) -> Option<&[TODO]>;
+    fn OptionString_borrow(this: &OptionString) -> DiplomatOption<&[TODO]>;
 
 }

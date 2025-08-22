@@ -57,21 +57,21 @@ impl ResultOpaque {
 
 #[link(name = "somelib")]
 unsafe extern "C" {
-    fn ResultOpaque_new(i : i32) -> Result<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new(i : i32) -> DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_foo() -> Result<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_foo() -> DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_bar() -> Result<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_bar() -> DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_unit() -> Result<Box<ResultOpaque>, ()>;
+    fn ResultOpaque_new_failing_unit() -> DiplomatResult<Box<ResultOpaque>, ()>;
 
-    fn ResultOpaque_new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct>;
+    fn ResultOpaque_new_failing_struct(i : i32) -> DiplomatResult<Box<ResultOpaque>, ErrorStruct>;
 
-    fn ResultOpaque_new_in_err(i : i32) -> Result<(), Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_err(i : i32) -> DiplomatResult<(), Box<ResultOpaque>>;
 
-    fn ResultOpaque_new_int(i : i32) -> Result<i32, ()>;
+    fn ResultOpaque_new_int(i : i32) -> DiplomatResult<i32, ()>;
 
-    fn ResultOpaque_new_in_enum_err(i : i32) -> Result<ErrorEnum, Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_enum_err(i : i32) -> DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
 
     fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : &[TODO]) -> &ResultOpaque;
 
