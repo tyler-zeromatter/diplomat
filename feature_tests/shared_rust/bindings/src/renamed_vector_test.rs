@@ -29,7 +29,7 @@ unsafe extern "C" {
 
     fn namespace_VectorTest_len(this: &RenamedVectorTest) -> usize;
 
-    fn namespace_VectorTest_get(this: &RenamedVectorTest, idx : usize) -> DiplomatOption<f64>;
+    fn namespace_VectorTest_get(this: &RenamedVectorTest, idx : usize) -> diplomat_runtime::DiplomatOption<f64>;
 
     fn namespace_VectorTest_push(this: &mut RenamedVectorTest, value : f64);
 

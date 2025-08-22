@@ -54,8 +54,8 @@ unsafe extern "C" {
 
     fn MyStruct_into_a(this : MyStruct) -> u8;
 
-    fn MyStruct_returns_zst_result() -> DiplomatResult<(), MyZst>;
+    fn MyStruct_returns_zst_result() -> diplomat_runtime::DiplomatResult<(), MyZst>;
 
-    fn MyStruct_fails_zst_result() -> DiplomatResult<(), MyZst>;
+    fn MyStruct_fails_zst_result() -> diplomat_runtime::DiplomatResult<(), MyZst>;
 
 }
