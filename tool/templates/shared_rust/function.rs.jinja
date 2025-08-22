@@ -15,14 +15,19 @@ pub fn {{name}}(
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r.type_name(false)}} {%- endif %} {
         // TODO: writeable conversions.
-    unsafe { {{abi_name}}(
+    let ret = unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
         {%- for p in params -%} 
         {{p.var_name}}
         {%- if !loop.last %}, {% endif -%}
         {%- endfor -%}
-        ) }
+        ) };
+    {% if is_write -%}
+    output
+    {%- else -%}
+    ret
+    {%- endif %}
 }
 {%- endblock -%}
 
