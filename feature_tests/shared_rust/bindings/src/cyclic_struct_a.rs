@@ -20,15 +20,12 @@ impl CyclicStructA {
             let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
     
             if !buf.is_null() {
+                // String takes ownership of the buffer:
                 String::from_raw_parts(buf, len, len)
             } else {
                 panic!("Could not read buffer, growth failed.")
             }
         };
-    
-        unsafe {
-            diplomat_runtime::diplomat_buffer_write_destroy(write);
-        }
         out_str
     }
 
@@ -42,15 +39,12 @@ impl CyclicStructA {
             let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
     
             if !buf.is_null() {
+                // String takes ownership of the buffer:
                 String::from_raw_parts(buf, len, len)
             } else {
                 panic!("Could not read buffer, growth failed.")
             }
         };
-    
-        unsafe {
-            diplomat_runtime::diplomat_buffer_write_destroy(write);
-        }
         out_str
     }
 
@@ -64,15 +58,12 @@ impl CyclicStructA {
             let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
     
             if !buf.is_null() {
+                // String takes ownership of the buffer:
                 String::from_raw_parts(buf, len, len)
             } else {
                 panic!("Could not read buffer, growth failed.")
             }
         };
-    
-        unsafe {
-            diplomat_runtime::diplomat_buffer_write_destroy(write);
-        }
         out_str
     }
 
