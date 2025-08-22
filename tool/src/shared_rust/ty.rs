@@ -94,9 +94,12 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods : Vec<FunctionInfo<'a>>,
             lib_name: String,
             imports : BTreeSet<String>,
+            dtor_abi : Cow<'a, str>,
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id.into());
+
+        let dtor_abi = ty.attrs.abi_rename.apply(format!("{}_destroy", ty.name.as_str()).into());
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
@@ -120,6 +123,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
+            dtor_abi
         }
     }
 
