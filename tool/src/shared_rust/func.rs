@@ -131,6 +131,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn gen_ok_abi_name(ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Option<Cow<'tcx, str>> {
         match ok {
             SuccessType::OutType(o) => ctx.gen_abi_type_name(o),
+            SuccessType::Write => Some("()".into()),
             _ => None
         }
     }
