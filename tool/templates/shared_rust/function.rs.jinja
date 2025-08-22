@@ -23,7 +23,7 @@ pub fn {{name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
         {%- for p in params -%} 
-        {{p.var_name}}
+        {{p.var_name}}{{p.convert()}}
         {%- if !loop.last %}, {% endif -%}
         {%- endfor -%}
         ) };
@@ -45,7 +45,7 @@ pub fn {{name}}(
     }
     out_str
     {%- else -%}
-    ret
+    ret{% if let Some(r) = return_type %}{{r.convert()}}{% endif %}
     {%- endif %}
 }
 {%- endblock -%}

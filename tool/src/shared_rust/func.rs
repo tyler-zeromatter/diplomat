@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType, TypeId};
+use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, SuccessType, TyPosition, Type, TypeId};
 
 use crate::shared_rust::FileGenContext;
 
@@ -20,6 +20,7 @@ struct ParamInfo<'a> {
     var_name : Cow<'a, str>,
     type_name : Cow<'a, str>,
     abi_type_override : Option<Cow<'a, str>>,
+    conversion : Option<Cow<'a, str>>,
 }
 
 impl<'a> ParamInfo<'a> {
@@ -30,13 +31,21 @@ impl<'a> ParamInfo<'a> {
             self.type_name.clone()
         }
     }
+
+    fn convert(&self) -> Cow<'a, str> {
+        if let Some(c) = &self.conversion {
+            c.clone()
+        } else {
+            "".into()
+        }
+    }
 }
 
 impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
-            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: ctx.gen_abi_type_name(&p.ty) });
+            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: ctx.gen_abi_type_name(&p.ty), conversion: Self::param_conversion(&p.ty) });
         }
 
         let self_param_own = method.param_self.as_ref().map(|s| { 
@@ -79,7 +88,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 (format!("&{mutable}self"), format!("this: &{mutable}{type_name}"))
             };
 
-            ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()) }
+            ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()), conversion: None }
         });
 
         let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
@@ -93,6 +102,12 @@ impl<'tcx> FunctionInfo<'tcx> {
             is_write: method.output.is_write() 
         }
     }
+
+    fn param_conversion<P: TyPosition>(ty : &Type<P>) -> Option<Cow<'tcx, str>> {
+        match ty {
+            _ => None
+        }
+    }
     
     fn gen_ok_type_name(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Cow<'tcx, str>  {
         match ok {
@@ -102,7 +117,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 ctx.gen_type_name(o)
             }
             SuccessType::Write => {
-                params.push(ParamInfo { var_name: "write".into(), type_name: "&mut diplomat_runtime::DiplomatWrite".into(), abi_type_override: None });
+                params.push(ParamInfo { var_name: "write".into(), type_name: "&mut diplomat_runtime::DiplomatWrite".into(), abi_type_override: None, conversion: Some(".as_mut().unwrap()".into()), });
                 "String".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
@@ -129,7 +144,9 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let info = ParamInfo {
                     var_name: "".into(),
                     type_name: format!("Result<{ok_ty}, {err_ty}>").into(),
-                    abi_type_override: Some(abi_override.into())
+                    abi_type_override: Some(abi_override.into()),
+                    // TODO: More advanced conversions for inner types.
+                    conversion: Some(".into()".into())
                 };
                 Some(info)
             }
@@ -142,14 +159,15 @@ impl<'tcx> FunctionInfo<'tcx> {
                 Some(ParamInfo {
                     var_name: "".into(),
                     type_name: format!("Option<{ok_ty}>").into(),
-                    abi_type_override: Some(abi_override.into())
+                    abi_type_override: Some(abi_override.into()),
+                    conversion: Some(".into()".into()),
                 })
             }
             ReturnType::Infallible(ok) => {
                 let type_name = Self::gen_ok_type_name(params, ctx, ok);
                 let abi_name = Self::gen_ok_abi_name(ctx, ok);
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
-                    Some(ParamInfo { var_name: "".into(), type_name, abi_type_override: abi_name })
+                    Some(ParamInfo { var_name: "".into(), type_name, abi_type_override: abi_name, conversion: None })
                 } else {
                     None
                 }
