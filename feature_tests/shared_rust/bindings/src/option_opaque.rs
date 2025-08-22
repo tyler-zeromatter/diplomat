@@ -97,15 +97,15 @@ unsafe extern "C" {
 
     fn OptionOpaque_new_none() -> Box<Option<OptionOpaque>>;
 
-    fn OptionOpaque_returns() -> Option<OptionStruct>;
+    fn OptionOpaque_returns() -> DiplomatOption<OptionStruct>;
 
-    fn OptionOpaque_option_isize(this: &OptionOpaque) -> Option<isize>;
+    fn OptionOpaque_option_isize(this: &OptionOpaque) -> DiplomatOption<isize>;
 
-    fn OptionOpaque_option_usize(this: &OptionOpaque) -> Option<usize>;
+    fn OptionOpaque_option_usize(this: &OptionOpaque) -> DiplomatOption<usize>;
 
-    fn OptionOpaque_option_i32(this: &OptionOpaque) -> Option<i32>;
+    fn OptionOpaque_option_i32(this: &OptionOpaque) -> DiplomatOption<i32>;
 
-    fn OptionOpaque_option_u32(this: &OptionOpaque) -> Option<u32>;
+    fn OptionOpaque_option_u32(this: &OptionOpaque) -> DiplomatOption<u32>;
 
     fn OptionOpaque_new_struct() -> OptionStruct;
 
@@ -119,11 +119,11 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_opaque_argument(arg : &Option<OptionOpaque>) -> bool;
 
-    fn OptionOpaque_accepts_option_u8(arg : DiplomatOption<Option<u8>>, sentinel : u8) -> Option<u8>;
+    fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption<Option<u8>>, sentinel : u8) -> DiplomatOption<u8>;
 
-    fn OptionOpaque_accepts_option_enum(arg : DiplomatOption<Option<OptionEnum>>, sentinel : u8) -> Option<OptionEnum>;
+    fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<Option<OptionEnum>>, sentinel : u8) -> DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : DiplomatOption<Option<OptionInputStruct>>, sentinel : u8) -> Option<OptionInputStruct>;
+    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<Option<OptionInputStruct>>, sentinel : u8) -> DiplomatOption<OptionInputStruct>;
 
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
 
