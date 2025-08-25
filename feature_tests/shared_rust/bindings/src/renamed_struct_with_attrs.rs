@@ -20,7 +20,7 @@ impl RenamedStructWithAttrs {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> diplomat_runtime::DiplomatResult<RenamedStructWithAttrs, ()>;
+    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> crate::DiplomatResult<RenamedStructWithAttrs, ()>;
 
     fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrs) -> u32;
 }

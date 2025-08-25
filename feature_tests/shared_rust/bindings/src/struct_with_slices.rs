@@ -6,26 +6,10 @@ pub struct StructWithSlices {
 
 impl StructWithSlices {
     pub fn return_last(self) -> String {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { StructWithSlices_return_last(self, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
-        }
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { StructWithSlices_return_last(self, write_mut) };
+        let out_str = write.to_string();
         out_str
     }
 
@@ -34,5 +18,5 @@ impl StructWithSlices {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn StructWithSlices_return_last(this : StructWithSlices, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+    fn StructWithSlices_return_last(this : StructWithSlices, write_mut : &mut crate::DiplomatWrite) -> ();
 }

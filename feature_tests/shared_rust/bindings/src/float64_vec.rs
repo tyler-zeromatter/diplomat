@@ -58,26 +58,10 @@ impl Float64Vec {
     }
 
     pub fn to_string(&self) -> String {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { Float64Vec_to_string(self, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
-        }
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { Float64Vec_to_string(self, write_mut) };
+        let out_str = write.to_string();
         out_str
     }
 
@@ -116,7 +100,7 @@ unsafe extern "C" {
 
     fn Float64Vec_set_value(this: &mut Float64Vec, new_slice : &[f64]);
 
-    fn Float64Vec_to_string(this: &Float64Vec, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+    fn Float64Vec_to_string(this: &Float64Vec, write_mut : &mut crate::DiplomatWrite) -> ();
 
     fn Float64Vec_borrow(this: &Float64Vec) -> &[f64];
 

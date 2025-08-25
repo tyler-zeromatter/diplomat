@@ -11,74 +11,26 @@ impl CyclicStructA {
     }
 
     pub fn cyclic_out(self) -> String {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { CyclicStructA_cyclic_out(self, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
-        }
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { CyclicStructA_cyclic_out(self, write_mut) };
+        let out_str = write.to_string();
         out_str
     }
 
     pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
-        }
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write_mut) };
+        let out_str = write.to_string();
         out_str
     }
 
     pub fn getter_out(self) -> String {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { CyclicStructA_getter_out(self, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
-        }
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { CyclicStructA_getter_out(self, write_mut) };
+        let out_str = write.to_string();
         out_str
     }
 
@@ -89,9 +41,9 @@ impl CyclicStructA {
 unsafe extern "C" {
     fn CyclicStructA_get_b() -> CyclicStructB;
 
-    fn CyclicStructA_cyclic_out(this : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+    fn CyclicStructA_cyclic_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn CyclicStructA_getter_out(this : CyclicStructA, write : &mut diplomat_runtime::DiplomatWrite) -> ();
+    fn CyclicStructA_getter_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
 }

@@ -64,21 +64,21 @@ impl ResultOpaque {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn ResultOpaque_new(i : i32) -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_foo() -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_foo() -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_bar() -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_bar() -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_unit() -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ()>;
+    fn ResultOpaque_new_failing_unit() -> crate::DiplomatResult<Box<ResultOpaque>, ()>;
 
-    fn ResultOpaque_new_failing_struct(i : i32) -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ErrorStruct>;
+    fn ResultOpaque_new_failing_struct(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorStruct>;
 
-    fn ResultOpaque_new_in_err(i : i32) -> diplomat_runtime::DiplomatResult<(), Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_err(i : i32) -> crate::DiplomatResult<(), Box<ResultOpaque>>;
 
-    fn ResultOpaque_new_int(i : i32) -> diplomat_runtime::DiplomatResult<i32, ()>;
+    fn ResultOpaque_new_int(i : i32) -> crate::DiplomatResult<i32, ()>;
 
-    fn ResultOpaque_new_in_enum_err(i : i32) -> diplomat_runtime::DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_enum_err(i : i32) -> crate::DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
 
     fn ResultOpaque_takes_str(this: &mut ResultOpaque, _v : diplomat_runtime::DiplomatStrSlice) -> &ResultOpaque;
 
