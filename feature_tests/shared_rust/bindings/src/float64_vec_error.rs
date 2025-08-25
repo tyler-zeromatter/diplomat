@@ -10,6 +10,7 @@ impl Float64VecError {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Float64VecError_destroy(this : *mut Float64VecError);
 }

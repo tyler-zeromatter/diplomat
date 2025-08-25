@@ -85,6 +85,7 @@ impl CyclicStructA {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn CyclicStructA_get_b() -> CyclicStructB;
 

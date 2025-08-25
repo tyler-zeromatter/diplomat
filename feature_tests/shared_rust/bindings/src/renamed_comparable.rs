@@ -10,6 +10,7 @@ impl RenamedComparable {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_Comparable_destroy(this : *mut RenamedComparable);
 }

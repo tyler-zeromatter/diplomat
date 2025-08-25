@@ -17,6 +17,7 @@ impl PrimitiveStruct {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn PrimitiveStruct_mutable_ref(this: &mut PrimitiveStruct, a : PrimitiveStruct);
 }

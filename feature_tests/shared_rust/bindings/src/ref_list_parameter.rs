@@ -10,6 +10,7 @@ impl RefListParameter {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn RefListParameter_destroy(this : *mut RefListParameter);
 }

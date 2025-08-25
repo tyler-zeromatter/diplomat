@@ -12,6 +12,8 @@ impl {{type_name}} {
 }
 
 #[link(name = "{{lib_name}}")]
+{#- Opaques generate warnings: #}
+#[allow(improper_ctypes)]
 unsafe extern "C" {
 {%- for m in methods %}
     {{ m.as_function_def()|indent(4) }}

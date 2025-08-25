@@ -22,6 +22,7 @@ impl Unnamespaced {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_Unnamespaced_make(_e : RenamedAttrEnum) -> Box<Unnamespaced>;
 

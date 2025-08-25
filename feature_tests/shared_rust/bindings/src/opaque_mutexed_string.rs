@@ -56,6 +56,7 @@ impl OpaqueMutexedString {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OpaqueMutexedString_from_usize(number : usize) -> Box<OpaqueMutexedString>;
 

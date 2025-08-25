@@ -22,6 +22,7 @@ impl MyEnum {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn MyEnum_into_value(this : MyEnum) -> i8;
 

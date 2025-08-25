@@ -47,6 +47,7 @@ impl AttrOpaque1Renamed {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_AttrOpaque1_new() -> Box<AttrOpaque1Renamed>;
 

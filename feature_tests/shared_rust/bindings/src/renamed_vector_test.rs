@@ -30,6 +30,7 @@ impl RenamedVectorTest {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_VectorTest_new() -> Box<RenamedVectorTest>;
 

@@ -47,6 +47,7 @@ impl OptionString {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OptionString_new(diplomat_str : diplomat_runtime::DiplomatStrSlice) -> Option<Box<OptionString>>;
 

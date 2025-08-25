@@ -20,6 +20,7 @@ impl MyStructContainingAnOption {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn MyStructContainingAnOption_new() -> MyStructContainingAnOption;
 

@@ -66,6 +66,7 @@ impl One {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn One_transitivity(hold : &One, nohold : &One) -> Box<One>;
 

@@ -39,6 +39,7 @@ impl Foo {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Foo_new(x : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
 

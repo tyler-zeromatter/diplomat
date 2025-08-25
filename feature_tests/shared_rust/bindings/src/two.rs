@@ -10,6 +10,7 @@ impl Two {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Two_destroy(this : *mut Two);
 }

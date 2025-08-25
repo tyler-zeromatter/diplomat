@@ -37,6 +37,7 @@ impl OpaqueThinVec {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OpaqueThinVec_create(a : &[i32], b : &[f32], c : diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
 

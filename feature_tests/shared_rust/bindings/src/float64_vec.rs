@@ -94,6 +94,7 @@ impl Float64Vec {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Float64Vec_new_bool(v : &[bool]) -> Box<Float64Vec>;
 

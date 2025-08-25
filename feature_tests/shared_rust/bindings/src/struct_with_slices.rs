@@ -32,6 +32,7 @@ impl StructWithSlices {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn StructWithSlices_return_last(this : StructWithSlices, write : &mut diplomat_runtime::DiplomatWrite) -> ();
 }

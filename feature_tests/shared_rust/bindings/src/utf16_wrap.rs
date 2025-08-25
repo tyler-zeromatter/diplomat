@@ -44,6 +44,7 @@ impl Utf16Wrap {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Utf16Wrap_from_utf16(input : diplomat_runtime::DiplomatStrSlice) -> Box<Utf16Wrap>;
 

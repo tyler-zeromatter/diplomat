@@ -16,6 +16,7 @@ impl Bar {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Bar_foo(this: &Bar) -> &Foo;
 

@@ -10,6 +10,7 @@ impl RenamedNested {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_Nested_destroy(this : *mut RenamedNested);
 }

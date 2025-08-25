@@ -10,6 +10,7 @@ impl RenamedAttrOpaque2 {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_AttrOpaque2_destroy(this : *mut RenamedAttrOpaque2);
 }

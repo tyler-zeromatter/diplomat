@@ -8,4 +8,5 @@ impl ErrorEnum {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {}
