@@ -14,7 +14,7 @@ pub(super) struct FunctionInfo<'tcx> {
     return_type : Option<ParamInfo<'tcx>>,
     params : Vec<ParamInfo<'tcx>>,
     is_write : bool,
-    is_infallible : bool,
+    return_info : ReturnType,
 }
 
 struct ParamInfo<'a> {
@@ -101,10 +101,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             self_param,
             return_type,
             is_write: method.output.is_write(),
-            is_infallible: match method.output {
-                ReturnType::Fallible(..) | ReturnType::Nullable(..) => false,
-                ReturnType::Infallible(..) => true
-            }
+            return_info: method.output.clone(),
         }
     }
 
@@ -126,7 +123,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 ctx.gen_type_name(o)
             }
             SuccessType::Write => {
-                params.push(ParamInfo { var_name: "write".into(), type_name: "&mut diplomat_runtime::DiplomatWrite".into(), abi_type_override: None, conversion: Some(".as_mut().unwrap()".into()), });
+                params.push(ParamInfo { var_name: "write_mut".into(), type_name: "&mut crate::DiplomatWrite".into(), abi_type_override: None, conversion: None, });
                 "String".into()
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
@@ -150,7 +147,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
                 let err_ty_abi = err.as_ref().map(|e| { ctx.gen_abi_type_name(e) }).unwrap_or(None);
 
-                let abi_override = format!("diplomat_runtime::DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
+                let abi_override = format!("crate::DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
                 let info = ParamInfo {
                     var_name: "".into(),
                     type_name: format!("Result<{ok_ty}, {err_ty}>").into(),

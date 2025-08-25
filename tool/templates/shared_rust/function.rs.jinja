@@ -15,7 +15,8 @@ pub fn {{name}}(
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r.type_name(false)}} {%- endif %} {
     {% if is_write -%}
-    let write = diplomat_runtime::diplomat_buffer_write_create(0);
+    let mut write = crate::DiplomatWrite::new();
+    let write_mut = &mut write;
     {% endif -%}
     let ret = unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
@@ -26,33 +27,23 @@ pub fn {{name}}(
         {%- endfor -%}
         ) };
     {% if is_write -%}
-    // TODO: Create a helper in `lib.rs`.
-    let out_str = unsafe {
-        let write_ref = write.as_ref().unwrap();
-        let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-        let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-
-        if !buf.is_null() {
-            // String takes ownership of the buffer:
-            String::from_raw_parts(buf, len, len)
-        } else {
-            panic!("Could not read buffer, growth failed.")
-        }
-    };
-    
-    // Drop the write object, since we no longer need it:
-    unsafe {
-        drop(Box::from_raw(write))
+    let out_str = write.to_string();
+    {%- match return_info  -%}
+    {%- when ReturnType::Fallible(..) %}
+    if ret.is_ok {
+        Ok(out_str)
+    } else {
+        Err(ret.unwrap_err())
     }
-
-    {%- if !is_infallible %}
-    // TODO: Check DiplomatOption with this method.
-    ret.map(|_| {
-        out_str
-    }){{return_type.as_ref().unwrap().convert()}}
-    {%- else %}
+    {%- when ReturnType::Nullable(..) %}
+    if ret.is_ok {
+        Some(out_str)
+    } else {
+        None
+    }
+    {%- when _ %}
     out_str
-    {%- endif -%}
+    {%- endmatch -%}
     {%- else -%}
     ret{% if let Some(r) = return_type %}{{r.convert()}}{% endif %}
     {%- endif %}
