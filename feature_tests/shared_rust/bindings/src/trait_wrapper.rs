@@ -5,4 +5,5 @@ impl TraitWrapper {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {}

@@ -10,6 +10,7 @@ impl RenamedMyIterable {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_MyIterable_destroy(this : *mut RenamedMyIterable);
 }

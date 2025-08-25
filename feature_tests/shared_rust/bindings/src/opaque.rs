@@ -71,6 +71,7 @@ impl Opaque {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn Opaque_new() -> Box<Opaque>;
 

@@ -5,4 +5,5 @@ impl CallbackWrapper {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {}

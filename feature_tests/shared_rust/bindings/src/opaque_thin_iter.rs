@@ -16,6 +16,7 @@ impl OpaqueThinIter {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OpaqueThinIter_next(this: &mut OpaqueThinIter) -> Option<&OpaqueThin>;
 

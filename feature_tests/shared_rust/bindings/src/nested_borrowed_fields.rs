@@ -18,6 +18,7 @@ impl NestedBorrowedFields {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn NestedBorrowedFields_from_bar_and_foo_and_strings(bar : &Bar, foo : &Foo, dstr16_x : diplomat_runtime::DiplomatStrSlice, dstr16_z : diplomat_runtime::DiplomatStrSlice, utf8_str_y : diplomat_runtime::DiplomatStrSlice, utf8_str_z : diplomat_runtime::DiplomatStrSlice) -> NestedBorrowedFields;
 }

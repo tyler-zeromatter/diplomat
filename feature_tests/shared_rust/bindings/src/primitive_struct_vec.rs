@@ -10,6 +10,7 @@ impl PrimitiveStructVec {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn PrimitiveStructVec_destroy(this : *mut PrimitiveStructVec);
 }

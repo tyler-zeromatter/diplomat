@@ -10,6 +10,7 @@ impl RenamedMyIndexer {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_MyIndexer_destroy(this : *mut RenamedMyIndexer);
 }

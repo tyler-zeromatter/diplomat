@@ -16,6 +16,7 @@ impl RefList {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn RefList_node(data : &RefListParameter) -> Box<RefList>;
 

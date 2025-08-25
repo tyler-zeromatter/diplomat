@@ -17,6 +17,7 @@ impl RenamedTestMacroStruct {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_TestMacroStruct_test_func() -> usize;
 

@@ -93,6 +93,7 @@ impl MyString {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn MyString_new(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 

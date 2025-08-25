@@ -39,6 +39,7 @@ impl MyOpaqueEnum {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn MyOpaqueEnum_new() -> Box<MyOpaqueEnum>;
 

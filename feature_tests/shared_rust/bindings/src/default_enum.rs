@@ -13,6 +13,7 @@ impl DefaultEnum {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn DefaultEnum_new() -> DefaultEnum;
 }

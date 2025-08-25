@@ -62,6 +62,7 @@ impl ResultOpaque {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn ResultOpaque_new(i : i32) -> diplomat_runtime::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
 

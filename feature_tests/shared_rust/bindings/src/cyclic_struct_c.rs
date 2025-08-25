@@ -37,6 +37,7 @@ impl CyclicStructC {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructC) -> CyclicStructC;
 

@@ -98,6 +98,7 @@ impl OptionOpaque {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OptionOpaque_new(i : i32) -> Option<Box<OptionOpaque>>;
 

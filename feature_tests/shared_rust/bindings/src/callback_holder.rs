@@ -10,6 +10,7 @@ impl CallbackHolder {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn CallbackHolder_destroy(this : *mut CallbackHolder);
 }

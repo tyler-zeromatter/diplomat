@@ -10,6 +10,7 @@ impl RenamedOpaqueIterable {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn namespace_OpaqueIterable_destroy(this : *mut RenamedOpaqueIterable);
 }

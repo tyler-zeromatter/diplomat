@@ -44,6 +44,7 @@ impl OpaqueThin {
 }
 
 #[link(name = "somelib")]
+#[allow(improper_ctypes)]
 unsafe extern "C" {
     fn OpaqueThin_a(this: &OpaqueThin) -> i32;
 
