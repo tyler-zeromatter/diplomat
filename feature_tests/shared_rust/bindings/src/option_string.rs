@@ -13,30 +13,15 @@ impl OptionString {
     }
 
     pub fn write(&self) -> Result<String, ()> {
-        let write = diplomat_runtime::diplomat_buffer_write_create(0);
-        let ret = unsafe { OptionString_write(self, write.as_mut().unwrap()) };
-        // TODO: Create a helper in `lib.rs`.
-        let out_str = unsafe {
-            let write_ref = write.as_ref().unwrap();
-            let buf = diplomat_runtime::diplomat_buffer_write_get_bytes(write_ref);
-            let len = diplomat_runtime::diplomat_buffer_write_len(write_ref);
-    
-            if !buf.is_null() {
-                // String takes ownership of the buffer:
-                String::from_raw_parts(buf, len, len)
-            } else {
-                panic!("Could not read buffer, growth failed.")
-            }
-        };
-        
-        // Drop the write object, since we no longer need it:
-        unsafe {
-            drop(Box::from_raw(write))
+        let mut write = crate::DiplomatWrite::new();
+        let write_mut = &mut write;
+        let ret = unsafe { OptionString_write(self, write_mut) };
+        let out_str = write.to_string();
+        if ret.is_ok {
+            Ok(out_str)
+        } else {
+            Err(ret.unwrap_err())
         }
-        // TODO: Check DiplomatOption with this method.
-        ret.map(|_| {
-            out_str
-        }).into()
     }
 
     pub fn borrow(&self) -> Option<&[u8]> {
@@ -51,7 +36,7 @@ impl OptionString {
 unsafe extern "C" {
     fn OptionString_new(diplomat_str : diplomat_runtime::DiplomatStrSlice) -> Option<Box<OptionString>>;
 
-    fn OptionString_write(this: &OptionString, write : &mut diplomat_runtime::DiplomatWrite) -> diplomat_runtime::DiplomatResult<(), ()>;
+    fn OptionString_write(this: &OptionString, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), ()>;
 
     fn OptionString_borrow(this: &OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice>;
 
