@@ -1,6 +1,106 @@
-{%- for m in mods -%}
+use std::mem::ManuallyDrop;
+use std::ffi::c_void;
+
+{% for m in mods -%}
 {%- let vis = m.vis.clone().unwrap_or_default() -%}
 pub{{vis}} mod {{m.mod_name}};
 pub{{vis}} use {{m.mod_name}}::{{m.type_name}};
 
 {% endfor -%}
+
+#[repr(C)]
+struct DiplomatWrite {
+    /// Context pointer for additional data needed by `grow()` and `flush()`. May be `null`.
+    ///
+    /// The pointer may reference structured data on the foreign side,
+    /// such as C++ std::string, used to reallocate buf.
+    context: *mut c_void,
+    /// The raw string buffer, which will be mutated on the Rust side.
+    buf: *mut u8,
+    /// The current filled size of the buffer
+    len: usize,
+    /// The current capacity of the buffer
+    cap: usize,
+    /// Set to true if `grow` ever fails.
+    grow_failed: bool,
+    /// Called by Rust to indicate that there is no more data to write.
+    ///
+    /// May be called multiple times.
+    ///
+    /// Arguments:
+    /// - `self` (`*mut DiplomatWrite`): This `DiplomatWrite`
+    flush: extern "C" fn(*mut DiplomatWrite),
+    /// Called by Rust to request more capacity in the buffer. The implementation should allocate a new
+    /// buffer and copy the contents of the old buffer into the new buffer, updating `self.buf` and `self.cap`
+    ///
+    /// Arguments:
+    /// - `self` (`*mut DiplomatWrite`): This `DiplomatWrite`
+    /// - `capacity` (`usize`): The requested capacity.
+    ///
+    /// Returns: `true` if the allocation succeeded. Should not update any state if it failed.
+    grow: extern "C" fn(*mut DiplomatWrite, usize) -> bool,
+}
+
+impl DiplomatWrite {
+    fn new() -> Self {
+        let mut str = String::with_capacity(0);
+
+        extern "C" fn grow(this : *mut DiplomatWrite, new_cap : usize) -> bool {
+            unsafe {
+                let this = this.as_mut().unwrap();
+                let mut str = String::from_raw_parts(this.buf, this.len, this.cap);
+                str.reserve(new_cap);
+                this.cap = str.capacity();
+                this.buf = str.as_mut_ptr();
+                core::mem::forget(str);
+            }
+            true
+        }
+        
+        extern "C" fn flush(_: *mut DiplomatWrite) {}
+
+        let out = DiplomatWrite { context: std::ptr::null_mut(),
+            buf: str.as_mut_ptr(),
+            len: str.len(), cap: str.capacity(),
+            grow_failed: false,
+            flush, grow };
+        
+        core::mem::forget(str);
+        out
+    }
+
+    fn to_string(self) -> String {
+        unsafe {
+            if !self.buf.is_null() {
+                // String takes ownership of the buffer:
+                String::from_raw_parts(self.buf, self.len, self.len)
+            } else {
+                panic!("Could not read buffer, growth failed.")
+            }
+        }
+    }
+}
+
+#[repr(C)]
+union DiplomatResultValue<T, E> {
+    ok: ManuallyDrop<T>,
+    err: ManuallyDrop<E>,
+}
+
+/// A [`Result`]-like type that can be passed across the FFI boundary
+/// as a value. Used internally to return [`Result`]s and [`Option`]s
+/// from functions.
+#[repr(C)]
+struct DiplomatResult<T, E> {
+    value: DiplomatResultValue<T, E>,
+    pub is_ok: bool,
+}
+
+impl<T, E> DiplomatResult<T, E> {
+    pub fn unwrap_err(mut self) -> E {
+        if !self.is_ok {
+            panic!("Tried to unwrap_err a non-error.");
+        }
+        unsafe { ManuallyDrop::take(&mut self.value.err) }
+    }
+}
