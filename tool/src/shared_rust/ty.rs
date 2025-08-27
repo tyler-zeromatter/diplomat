@@ -38,7 +38,11 @@ impl<'a> TypeInfo<'a> {
     }
 
     pub(super) fn render(&self, env : &LifetimeEnv) -> String {
-        let maybe_borrow = match self.borrow {
+        self.render_with_override(env, None)
+    }
+
+    pub(super) fn render_with_override(&self, env : &LifetimeEnv, over : Option<String> ) -> String {
+        let maybe_borrow: Cow<'_, str> = match self.borrow {
             MaybeOwn::Own => "".into(),
             MaybeOwn::Borrow(b) => match b.lifetime {
                 MaybeStatic::Static => "static".into(),
@@ -47,6 +51,7 @@ impl<'a> TypeInfo<'a> {
         };
         let borrow_stmt = match self.borrow {
             MaybeOwn::Own => "".into(),
+            // TODO: Would be nice to have a LifetimeEnv helper to avoid formatting anonymous lifetimes.
             MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut "),
             _ => format!("&'{maybe_borrow} ")
         };
@@ -60,7 +65,9 @@ impl<'a> TypeInfo<'a> {
 
         let generic_lifetimes_string = generic_lifetimes.join(", ");
 
-        format!("{borrow_stmt}{}{}", self.name, if generic_lifetimes.len() > 0 {
+        let name = over.unwrap_or(self.name.clone().into());
+
+        format!("{borrow_stmt}{name}{}", if generic_lifetimes.len() > 0 {
             format!("<{generic_lifetimes_string}>")
         } else {
             "".into()
@@ -321,7 +328,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         match lt {
                             Some(lt) => (&MaybeOwn::from_immutable_lifetime(lt.clone()), name),
                             None => (&MaybeOwn::Own, format!("Box<{name}>")),
-                            _ => (&MaybeOwn::Own, name)
                         }
                     }
                     Slice::Strs(enc) => {

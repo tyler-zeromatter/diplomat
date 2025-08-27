@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId};
+use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId, LifetimeEnv};
 
 use crate::shared_rust::{ty::TypeInfo, FileGenContext};
 
@@ -15,6 +15,7 @@ pub(super) struct FunctionInfo<'tcx> {
     params : Vec<ParamInfo<'tcx>>,
     is_write : bool,
     return_info : ReturnType,
+    lifetime_env : &'tcx LifetimeEnv,
 }
 
 struct ParamInfo<'a> {
@@ -30,6 +31,14 @@ impl<'a> ParamInfo<'a> {
             self.abi_type_override.clone().unwrap()
         } else {
             self.type_info.name.clone()
+        }
+    }
+
+    fn render(&self, env : &LifetimeEnv, is_abi : bool) -> String {
+        if is_abi && self.abi_type_override.is_some() {
+            self.type_info.render_with_override(env, Some(self.abi_type_override.clone().unwrap().into()))
+        } else {
+            self.type_info.render(env)
         }
     }
 
@@ -102,6 +111,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             return_type,
             is_write: method.output.is_write(),
             return_info: method.output.clone(),
+            lifetime_env: &method.lifetime_env,
         }
     }
 
