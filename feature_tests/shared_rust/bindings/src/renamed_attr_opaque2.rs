@@ -1,5 +1,3 @@
-
-
 pub struct RenamedAttrOpaque2;
 
 impl Drop for RenamedAttrOpaque2 {

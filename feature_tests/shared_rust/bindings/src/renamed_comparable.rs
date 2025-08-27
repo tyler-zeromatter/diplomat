@@ -1,5 +1,3 @@
-
-
 pub struct RenamedComparable;
 
 impl Drop for RenamedComparable {

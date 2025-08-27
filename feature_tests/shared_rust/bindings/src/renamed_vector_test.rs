@@ -1,5 +1,3 @@
-
-
 pub struct RenamedVectorTest;
 
 impl Drop for RenamedVectorTest {

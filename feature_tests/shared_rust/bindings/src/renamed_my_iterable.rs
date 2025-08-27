@@ -1,5 +1,3 @@
-
-
 pub struct RenamedMyIterable;
 
 impl Drop for RenamedMyIterable {

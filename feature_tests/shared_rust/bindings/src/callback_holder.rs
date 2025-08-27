@@ -1,5 +1,3 @@
-
-
 pub struct CallbackHolder;
 
 impl Drop for CallbackHolder {

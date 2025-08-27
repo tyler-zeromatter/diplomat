@@ -1,5 +1,3 @@
-
-
 pub struct Float64VecError;
 
 impl Drop for Float64VecError {

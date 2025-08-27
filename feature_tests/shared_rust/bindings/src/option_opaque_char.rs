@@ -1,5 +1,3 @@
-
-
 pub struct OptionOpaqueChar;
 
 impl Drop for OptionOpaqueChar {

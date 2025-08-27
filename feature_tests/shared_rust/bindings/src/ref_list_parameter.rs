@@ -1,5 +1,3 @@
-
-
 pub struct RefListParameter;
 
 impl Drop for RefListParameter {

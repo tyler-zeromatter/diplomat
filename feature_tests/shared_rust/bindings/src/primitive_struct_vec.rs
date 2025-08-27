@@ -1,5 +1,3 @@
-
-
 pub struct PrimitiveStructVec;
 
 impl Drop for PrimitiveStructVec {

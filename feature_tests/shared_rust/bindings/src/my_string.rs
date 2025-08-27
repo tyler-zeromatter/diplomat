@@ -1,5 +1,3 @@
-
-
 pub struct MyString;
 
 impl Drop for MyString {

@@ -1,5 +1,3 @@
-
-
 pub struct OptionString;
 
 impl Drop for OptionString {

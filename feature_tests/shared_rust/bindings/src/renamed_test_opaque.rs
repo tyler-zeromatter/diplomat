@@ -1,5 +1,3 @@
-
-
 pub struct RenamedTestOpaque;
 
 impl Drop for RenamedTestOpaque {

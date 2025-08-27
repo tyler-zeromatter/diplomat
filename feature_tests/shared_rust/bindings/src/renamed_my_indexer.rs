@@ -1,5 +1,3 @@
-
-
 pub struct RenamedMyIndexer;
 
 impl Drop for RenamedMyIndexer {

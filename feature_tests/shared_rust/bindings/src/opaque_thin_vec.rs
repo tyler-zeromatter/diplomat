@@ -1,7 +1,5 @@
 use super::OpaqueThin;
 use super::OpaqueThinIter;
-
-
 pub struct OpaqueThinVec;
 
 impl Drop for OpaqueThinVec {

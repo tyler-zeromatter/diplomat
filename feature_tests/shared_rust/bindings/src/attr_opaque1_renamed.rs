@@ -1,7 +1,5 @@
 use super::RenamedAttrEnum;
 use super::Unnamespaced;
-
-
 pub struct AttrOpaque1Renamed;
 
 impl Drop for AttrOpaque1Renamed {

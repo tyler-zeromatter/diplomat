@@ -1,6 +1,4 @@
 use super::Utf16Wrap;
-
-
 pub struct OpaqueMutexedString;
 
 impl Drop for OpaqueMutexedString {
