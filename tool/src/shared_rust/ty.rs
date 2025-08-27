@@ -248,11 +248,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
                 self.imports.insert(st_name.clone().into());
-
-                let owned = match st.owner() {
-                    MaybeOwn::Own => None,
-                    MaybeOwn::Borrow(b) => Some(b.lifetime)
-                };
                 
                 TypeInfo {
                     borrow: st.owner(),
@@ -298,21 +293,23 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 }
             }
             Type::Slice(sl) => {
-                let type_name = match sl {
+                let (borrow, type_name) = match sl {
                     Slice::Primitive(b, p) => {
-                        if b.is_owned() {
+                        let name = if b.is_owned() {
                             format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p)).into()
                         } else {
                             format!("[{}]", self.formatter.fmt_primitive_name(*p)).into()
-                        }
+                        };
+                        (b, name)
                     }
                     Slice::Struct(b, str) => {
                         let name = self.formatter.fmt_symbol_name(str.id().into());
-                        if b.is_owned() {
+                        let name = if b.is_owned() {
                             format!("Box<[{name}]>").into()
                         } else {
                             format!("[{name}]").into()
-                        }
+                        };
+                        (b, name)
                     }
                     Slice::Str(lt, enc) => {
                         let name = match enc {
@@ -322,22 +319,20 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                             _ => panic!("Unknown encoding {enc:?}")
                         }.into();
 
-                        let (name, borrow) = match lt {
-                            Some(lt) => (name, MaybeOwn::from_immutable_lifetime(lt.clone())),
-                            None => (format!("Box<{name}>"), MaybeOwn::Own),
-                            _ => (name, MaybeOwn::Own)
-                        };
-
-                        return TypeInfo {
-                            name: name.into(),
-                            generic_lifetimes: Vec::new(),
-                            borrow
-                        };
+                        match lt {
+                            Some(lt) => (&MaybeOwn::from_immutable_lifetime(lt.clone()), name),
+                            None => (&MaybeOwn::Own, format!("Box<{name}>")),
+                            _ => (&MaybeOwn::Own, name)
+                        }
                     }
-                    _ => format!("TODO"),
+                    _ => (&MaybeOwn::Own, format!("TODO")),
                 };
 
-                TypeInfo::new(type_name.into())
+                TypeInfo { 
+                    name: type_name.into(),
+                    generic_lifetimes: Vec::new(),
+                    borrow: *borrow,
+                }
             }
             _ => TypeInfo::new("TODO()".into())
         }
