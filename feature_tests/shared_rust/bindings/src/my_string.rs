@@ -22,7 +22,7 @@ impl MyString {
         ret
     }
 
-    pub fn new_from_first(v : TODO) -> Box<MyString> {
+    pub fn new_from_first(v : &[String]) -> Box<MyString> {
         let ret = unsafe { MyString_new_from_first(v) };
         ret
     }
@@ -69,7 +69,7 @@ unsafe extern "C" {
 
     fn MyString_new_owned(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
-    fn MyString_new_from_first(v : TODO) -> Box<MyString>;
+    fn MyString_new_from_first(v : &[String]) -> Box<MyString>;
 
     fn MyString_set_str(this: &mut MyString, new_str : diplomat_runtime::DiplomatStrSlice);
 

@@ -325,7 +325,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                             _ => (&MaybeOwn::Own, name)
                         }
                     }
-                    _ => (&MaybeOwn::Own, format!("TODO")),
+                    Slice::Strs(enc) => {
+                        // TODO: Need to read encoding properly.
+                        return TypeInfo::new("&[String]".into());
+                    }
+                    _ => unreachable!("Unknown slice type {sl:?}"),
                 };
 
                 TypeInfo { 
