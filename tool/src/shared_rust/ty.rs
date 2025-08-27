@@ -37,6 +37,23 @@ impl<'a> TypeInfo<'a> {
         }
     }
 
+    pub(super) fn fmt_generic_lifetimes(generic_lifetimes : Vec<MaybeStatic<Lifetime>>, env : &LifetimeEnv) -> String {
+        let generic_lifetimes : Vec<String> = generic_lifetimes.iter().map(|lt| {
+            match lt {
+                MaybeStatic::Static => "'static".into(),
+                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns))
+            }
+        }).collect();
+
+        let generic_lifetimes_string = generic_lifetimes.join(", ");
+
+        if generic_lifetimes.len() > 0 {
+            format!("<{generic_lifetimes_string}>")
+        } else {
+            "".into()
+        }
+    }
+
     pub(super) fn render(&self, env : &LifetimeEnv) -> String {
         self.render_with_override(env, None)
     }
@@ -56,22 +73,11 @@ impl<'a> TypeInfo<'a> {
             _ => format!("&'{maybe_borrow} ")
         };
 
-        let generic_lifetimes : Vec<String> = self.generic_lifetimes.iter().map(|lt| {
-            match lt {
-                MaybeStatic::Static => "'static".into(),
-                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns))
-            }
-        }).collect();
-
-        let generic_lifetimes_string = generic_lifetimes.join(", ");
-
         let name = over.unwrap_or(self.name.clone().into());
 
-        format!("{borrow_stmt}{name}{}", if generic_lifetimes.len() > 0 {
-            format!("<{generic_lifetimes_string}>")
-        } else {
-            "".into()
-        })
+        let generic_lifetimes = Self::fmt_generic_lifetimes(self.generic_lifetimes.clone(), env);
+
+        format!("{borrow_stmt}{name}{generic_lifetimes}")
     }
 }
 
