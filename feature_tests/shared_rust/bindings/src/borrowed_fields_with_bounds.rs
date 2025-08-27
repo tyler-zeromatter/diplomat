@@ -1,9 +1,9 @@
 use super::Foo;
 #[repr(C)]
 pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
-    pub field_a: [u16]<'a>,
-    pub field_b: [u8]<'b>,
-    pub field_c: String<'c>,
+    pub field_a: &'a [u16],
+    pub field_b: &'b [u8],
+    pub field_c: &'c String,
 }
 
 impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {

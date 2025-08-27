@@ -17,7 +17,7 @@ impl MyString {
         ret
     }
 
-    pub fn new_owned(v : [u8]) -> Box<MyString> {
+    pub fn new_owned(v : Box<[u8]>) -> Box<MyString> {
         let ret = unsafe { MyString_new_owned(v.into()) };
         ret
     }
