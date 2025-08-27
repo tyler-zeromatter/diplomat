@@ -18,4 +18,8 @@ pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
     pub {{f.name}}: {{f.type_name}}{%- call draw_formatted_lifetimes(f.generic_lifetimes(lifetime_env)) -%},
     {%- endfor %}
 } {%- else -%};{%- endif -%}
-{%- endblock %}
+{%- endblock -%}
+
+{%- block impl_generics -%}
+{%- call draw_formatted_lifetimes(lifetimes) -%}
+{%- endblock -%}
