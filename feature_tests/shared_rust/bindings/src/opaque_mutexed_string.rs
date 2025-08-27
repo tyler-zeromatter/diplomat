@@ -18,17 +18,17 @@ impl OpaqueMutexedString {
         ret
     }
 
-    pub fn borrow(&self) -> OpaqueMutexedString {
+    pub fn borrow(&self) -> &'a OpaqueMutexedString {
         let ret = unsafe { OpaqueMutexedString_borrow(self) };
         ret
     }
 
-    pub fn borrow_other(other : OpaqueMutexedString) -> OpaqueMutexedString {
+    pub fn borrow_other(other : &'a OpaqueMutexedString) -> &'a OpaqueMutexedString {
         let ret = unsafe { OpaqueMutexedString_borrow_other(other) };
         ret
     }
 
-    pub fn borrow_self_or_other(&self, other : OpaqueMutexedString) -> OpaqueMutexedString {
+    pub fn borrow_self_or_other(&self, other : &'a OpaqueMutexedString) -> &'a OpaqueMutexedString {
         let ret = unsafe { OpaqueMutexedString_borrow_self_or_other(self, other) };
         ret
     }
@@ -38,7 +38,7 @@ impl OpaqueMutexedString {
         ret
     }
 
-    pub fn dummy_str(&self) -> [u8] {
+    pub fn dummy_str(&self) -> &'a [u8] {
         let ret = unsafe { OpaqueMutexedString_dummy_str(self) };
         ret
     }
@@ -62,15 +62,15 @@ unsafe extern "C" {
 
     fn OpaqueMutexedString_change(this: &OpaqueMutexedString, number : usize);
 
-    fn OpaqueMutexedString_borrow(this: &OpaqueMutexedString) -> OpaqueMutexedString;
+    fn OpaqueMutexedString_borrow(this: &OpaqueMutexedString) -> &'a OpaqueMutexedString;
 
-    fn OpaqueMutexedString_borrow_other(other : OpaqueMutexedString) -> OpaqueMutexedString;
+    fn OpaqueMutexedString_borrow_other(other : &'a OpaqueMutexedString) -> &'a OpaqueMutexedString;
 
-    fn OpaqueMutexedString_borrow_self_or_other(this: &OpaqueMutexedString, other : OpaqueMutexedString) -> OpaqueMutexedString;
+    fn OpaqueMutexedString_borrow_self_or_other(this: &OpaqueMutexedString, other : &'a OpaqueMutexedString) -> &'a OpaqueMutexedString;
 
     fn OpaqueMutexedString_get_len_and_add(this: &OpaqueMutexedString, other : usize) -> usize;
 
-    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> diplomat_runtime::DiplomatStrSlice;
+    fn OpaqueMutexedString_dummy_str(this: &OpaqueMutexedString) -> &'a diplomat_runtime::DiplomatStrSlice;
 
     fn OpaqueMutexedString_wrapper(this: &OpaqueMutexedString) -> Box<Utf16Wrap>;
 

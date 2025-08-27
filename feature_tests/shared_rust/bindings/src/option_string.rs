@@ -7,7 +7,7 @@ impl Drop for OptionString {
 }
 
 impl OptionString {
-    pub fn new(diplomat_str : [u8]) -> Option<Box<OptionString>> {
+    pub fn new(diplomat_str : &'a [u8]) -> Option<Box<OptionString>> {
         let ret = unsafe { OptionString_new(diplomat_str.into()) };
         ret
     }
@@ -34,7 +34,7 @@ impl OptionString {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OptionString_new(diplomat_str : diplomat_runtime::DiplomatStrSlice) -> Option<Box<OptionString>>;
+    fn OptionString_new(diplomat_str : &'a diplomat_runtime::DiplomatStrSlice) -> Option<Box<OptionString>>;
 
     fn OptionString_write(this: &OptionString, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), ()>;
 

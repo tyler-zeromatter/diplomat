@@ -7,32 +7,32 @@ impl Drop for Float64Vec {
 }
 
 impl Float64Vec {
-    pub fn new_bool(v : [bool]) -> Box<Float64Vec> {
+    pub fn new_bool(v : &'anon_0 [bool]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_bool(v) };
         ret
     }
 
-    pub fn new_i16(v : [i16]) -> Box<Float64Vec> {
+    pub fn new_i16(v : &'anon_0 [i16]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_i16(v) };
         ret
     }
 
-    pub fn new_u16(v : [u16]) -> Box<Float64Vec> {
+    pub fn new_u16(v : &'anon_0 [u16]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_u16(v) };
         ret
     }
 
-    pub fn new_isize(v : [isize]) -> Box<Float64Vec> {
+    pub fn new_isize(v : &'anon_0 [isize]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_isize(v) };
         ret
     }
 
-    pub fn new_usize(v : [usize]) -> Box<Float64Vec> {
+    pub fn new_usize(v : &'anon_0 [usize]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_usize(v) };
         ret
     }
 
-    pub fn new_f64_be_bytes(v : [byte]) -> Box<Float64Vec> {
+    pub fn new_f64_be_bytes(v : &'anon_0 [byte]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_f64_be_bytes(v) };
         ret
     }
@@ -42,17 +42,17 @@ impl Float64Vec {
         ret
     }
 
-    pub fn as_slice(&self) -> [f64] {
+    pub fn as_slice(&self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_as_slice(self) };
         ret
     }
 
-    pub fn fill_slice(&self, v : [f64]) {
+    pub fn fill_slice(&self, v : &'anon_1 mut [f64]) {
         let ret = unsafe { Float64Vec_fill_slice(self, v) };
         ret
     }
 
-    pub fn set_value(&mut self, new_slice : [f64]) {
+    pub fn set_value(&mut self, new_slice : &'anon_1 [f64]) {
         let ret = unsafe { Float64Vec_set_value(self, new_slice) };
         ret
     }
@@ -65,7 +65,7 @@ impl Float64Vec {
         out_str
     }
 
-    pub fn borrow(&self) -> [f64] {
+    pub fn borrow(&self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_borrow(self) };
         ret
     }
@@ -80,29 +80,29 @@ impl Float64Vec {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Float64Vec_new_bool(v : [bool]) -> Box<Float64Vec>;
+    fn Float64Vec_new_bool(v : &'anon_0 [bool]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_i16(v : [i16]) -> Box<Float64Vec>;
+    fn Float64Vec_new_i16(v : &'anon_0 [i16]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_u16(v : [u16]) -> Box<Float64Vec>;
+    fn Float64Vec_new_u16(v : &'anon_0 [u16]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_isize(v : [isize]) -> Box<Float64Vec>;
+    fn Float64Vec_new_isize(v : &'anon_0 [isize]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_usize(v : [usize]) -> Box<Float64Vec>;
+    fn Float64Vec_new_usize(v : &'anon_0 [usize]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_f64_be_bytes(v : [byte]) -> Box<Float64Vec>;
+    fn Float64Vec_new_f64_be_bytes(v : &'anon_0 [byte]) -> Box<Float64Vec>;
 
     fn Float64Vec_new_from_owned(v : Box<[f64]>) -> Box<Float64Vec>;
 
-    fn Float64Vec_as_slice(this: &Float64Vec) -> [f64];
+    fn Float64Vec_as_slice(this: &Float64Vec) -> &'a [f64];
 
-    fn Float64Vec_fill_slice(this: &Float64Vec, v : [f64]);
+    fn Float64Vec_fill_slice(this: &Float64Vec, v : &'anon_1 mut [f64]);
 
-    fn Float64Vec_set_value(this: &mut Float64Vec, new_slice : [f64]);
+    fn Float64Vec_set_value(this: &mut Float64Vec, new_slice : &'anon_1 [f64]);
 
     fn Float64Vec_to_string(this: &Float64Vec, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Float64Vec_borrow(this: &Float64Vec) -> [f64];
+    fn Float64Vec_borrow(this: &Float64Vec) -> &'a [f64];
 
     fn Float64Vec_get(this: &Float64Vec, i : usize) -> diplomat_runtime::DiplomatOption<f64>;
 
