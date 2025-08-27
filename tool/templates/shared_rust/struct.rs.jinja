@@ -1,10 +1,21 @@
 {% extends "base.rs.jinja" %}
+{%- macro draw_formatted_lifetimes(lifetimes) -%}
+
+{%- if lifetimes.len() > 0 -%}
+<{%- for lt in lifetimes -%} '{{lt}} {%- if !loop.last -%}, {% endif -%} {%- endfor -%}>
+
+{%- endif -%}
+{%- endmacro -%}
 
 {%- block type_def -%}
 #[repr(C)]
-pub {%- if is_out -%}(super){%- endif %} struct {{type_name}} {%- if fields.len() > 0 %} {
+pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
+
+{%- call draw_formatted_lifetimes(lifetimes) -%}
+
+{%- if fields.len() > 0 %} {
     {%- for f in fields %}
-    pub {{f.name}}: {{f.type_name}},
+    pub {{f.name}}: {{f.type_name}}{%- call draw_formatted_lifetimes(f.generic_lifetimes(lifetime_env)) -%},
     {%- endfor %}
 } {%- else -%};{%- endif -%}
 {%- endblock %}
