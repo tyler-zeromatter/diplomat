@@ -1,17 +1,24 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{Borrow, EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, OpaqueDef, OpaqueOwner, OpaquePath, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{
+    Borrow, EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, OpaqueDef,
+    OpaqueOwner, OpaquePath, Slice, StringEncoding, StructDef, StructPathLike, SymbolId,
+    TyPosition, Type, TypeContext, TypeDef, TypeId,
+};
 use itertools::Itertools;
 
-use crate::{config::Config, shared_rust::{formatter::TypeInfo, func::FunctionInfo, RustFormatter}};
+use crate::{
+    config::Config,
+    shared_rust::{formatter::TypeInfo, func::FunctionInfo, RustFormatter},
+};
 
 pub(super) struct FileGenContext<'tcx> {
-    pub(super) formatter : &'tcx RustFormatter<'tcx>,
-    tcx : &'tcx TypeContext,
+    pub(super) formatter: &'tcx RustFormatter<'tcx>,
+    tcx: &'tcx TypeContext,
     id: SymbolId,
-    lib_name : String,
-    imports : BTreeSet<String>,
+    lib_name: String,
+    imports: BTreeSet<String>,
 }
 
 pub(super) trait TypeTemplate<'a> {
@@ -22,48 +29,63 @@ pub(super) trait TypeTemplate<'a> {
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
-    pub(super) fn from_type<'a>(config : &Config, id : TypeId, formatter : &'a RustFormatter, tcx : &'a TypeContext) -> FileGenContext<'a> {
+    pub(super) fn from_type<'a>(
+        config: &Config,
+        id: TypeId,
+        formatter: &'a RustFormatter,
+        tcx: &'a TypeContext,
+    ) -> FileGenContext<'a> {
         FileGenContext {
             formatter,
             id: id.into(),
             tcx,
-            lib_name: config.shared_config.lib_name.clone().expect("Rust static backend needs lib_name to link against."),
+            lib_name: config
+                .shared_config
+                .lib_name
+                .clone()
+                .expect("Rust static backend needs lib_name to link against."),
             imports: BTreeSet::new(),
         }
     }
 
-    pub(super) fn generate_struct<P: TyPosition>(mut self, ty : &'tcx StructDef<P>, is_out : bool) -> impl TypeTemplate<'tcx> {
+    pub(super) fn generate_struct<P: TyPosition>(
+        mut self,
+        ty: &'tcx StructDef<P>,
+        is_out: bool,
+    ) -> impl TypeTemplate<'tcx> {
         struct FieldInfo<'a> {
-            type_info : TypeInfo<'a>,
-            name : Cow<'a, str>,
+            type_info: TypeInfo<'a>,
+            name: Cow<'a, str>,
         }
 
         #[derive(Template)]
         #[template(path = "shared_rust/struct.rs.jinja", escape = "none")]
         struct StructTemplate<'a> {
-            type_name : Cow<'a, str>,
-            methods : Vec<FunctionInfo<'a>>,
+            type_name: Cow<'a, str>,
+            methods: Vec<FunctionInfo<'a>>,
             lib_name: String,
-            imports : BTreeSet<String>,
-            is_out : bool,
-            fields : Vec<FieldInfo<'a>>,
-            lifetime_env : &'a LifetimeEnv,
-            lifetimes : Vec<String>,
+            imports: BTreeSet<String>,
+            is_out: bool,
+            fields: Vec<FieldInfo<'a>>,
+            lifetime_env: &'a LifetimeEnv,
+            lifetimes: Vec<String>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
         let lifetime_env = &ty.lifetimes;
-        let lifetimes = lifetime_env.all_lifetimes().map(|lt| {
-            lifetime_env.fmt_lifetime(lt).into()
-        });
+        let lifetimes = lifetime_env
+            .all_lifetimes()
+            .map(|lt| lifetime_env.fmt_lifetime(lt).into());
 
-        let fields = ty.fields.iter().map(|f| {
-            FieldInfo {
+        let fields = ty
+            .fields
+            .iter()
+            .map(|f| FieldInfo {
                 type_info: self.gen_type_info(&f.ty),
                 name: f.name.as_str().into(),
-            }
-        }).collect();
+            })
+            .collect();
 
         impl<'a> TypeTemplate<'a> for StructTemplate<'a> {
             fn render(&self) -> askama::Result<String> {
@@ -96,27 +118,33 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    pub(super) fn generate_opaque(mut self, ty : &'tcx OpaqueDef) -> impl TypeTemplate<'tcx> {
+    pub(super) fn generate_opaque(mut self, ty: &'tcx OpaqueDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
         #[template(path = "shared_rust/opaque.rs.jinja", escape = "none")]
         struct OpaqueTemplate<'a> {
-            type_name : Cow<'a, str>,
-            methods : Vec<FunctionInfo<'a>>,
+            type_name: Cow<'a, str>,
+            methods: Vec<FunctionInfo<'a>>,
             lib_name: String,
-            imports : BTreeSet<String>,
-            dtor_abi : Cow<'a, str>,
-            lifetime_env : &'a LifetimeEnv,
+            imports: BTreeSet<String>,
+            dtor_abi: Cow<'a, str>,
+            lifetime_env: &'a LifetimeEnv,
         }
 
         impl<'a> OpaqueTemplate<'a> {
             fn render_generic_lifetimes(&self) -> String {
-                TypeInfo::fmt_generic_lifetimes(self.lifetime_env.lifetimes().lifetimes().collect(), self.lifetime_env)
+                TypeInfo::fmt_generic_lifetimes(
+                    self.lifetime_env.lifetimes().lifetimes().collect(),
+                    self.lifetime_env,
+                )
             }
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id.into());
 
-        let dtor_abi = ty.attrs.abi_rename.apply(format!("{}_destroy", ty.name.as_str()).into());
+        let dtor_abi = ty
+            .attrs
+            .abi_rename
+            .apply(format!("{}_destroy", ty.name.as_str()).into());
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
@@ -145,22 +173,24 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    pub(super) fn generate_enum(mut self, ty : &'tcx EnumDef) -> impl TypeTemplate<'tcx> {
+    pub(super) fn generate_enum(mut self, ty: &'tcx EnumDef) -> impl TypeTemplate<'tcx> {
         #[derive(Template)]
         #[template(path = "shared_rust/enum.rs.jinja", escape = "none")]
         struct EnumTemplate<'a> {
-            type_name : Cow<'a, str>,
-            methods : Vec<FunctionInfo<'a>>,
+            type_name: Cow<'a, str>,
+            methods: Vec<FunctionInfo<'a>>,
             lib_name: String,
-            imports : BTreeSet<String>,
-            variants : Vec<Cow<'a, str>>,
+            imports: BTreeSet<String>,
+            variants: Vec<Cow<'a, str>>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
-        let variants = ty.variants.iter().map(|v| {
-            self.formatter.fmt_enum_variant_name(v)
-        }).collect();
+        let variants = ty
+            .variants
+            .iter()
+            .map(|v| self.formatter.fmt_enum_variant_name(v))
+            .collect();
 
         impl<'a> TypeTemplate<'a> for EnumTemplate<'a> {
             fn render(&self) -> askama::Result<String> {
@@ -186,15 +216,13 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    pub(super) fn gen_type_info<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> TypeInfo<'tcx> {
+    pub(super) fn gen_type_info<P: TyPosition>(&'rcx mut self, ty: &Type<P>) -> TypeInfo<'tcx> {
         match ty {
-            Type::Primitive(p) => {
-                TypeInfo::new(self.formatter.fmt_primitive_name(*p).into())
-            }
+            Type::Primitive(p) => TypeInfo::new(self.formatter.fmt_primitive_name(*p).into()),
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
                 self.imports.insert(st_name.clone().into());
-                
+
                 TypeInfo {
                     borrow: st.owner(),
                     name: st_name,
@@ -202,14 +230,14 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 }
             }
             Type::Enum(e) => {
-                let type_id : TypeId = e.tcx_id.into();
+                let type_id: TypeId = e.tcx_id.into();
                 let enum_name = self.formatter.fmt_symbol_name(type_id.into());
                 self.imports.insert(enum_name.clone().into());
-                
+
                 TypeInfo::new(enum_name)
             }
             Type::Opaque(op) => {
-                let type_id : TypeId = op.tcx_id.into();
+                let type_id: TypeId = op.tcx_id.into();
                 let op_name = self.formatter.fmt_symbol_name(type_id.into());
                 self.imports.insert(op_name.clone().into());
 
@@ -234,7 +262,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 TypeInfo {
                     name: format!("Option<{}>", info.name).into(),
                     generic_lifetimes: info.generic_lifetimes,
-                    borrow: info.borrow
+                    borrow: info.borrow,
                 }
             }
             Type::Slice(sl) => {
@@ -261,8 +289,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                             StringEncoding::Utf8 => "String",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
                             StringEncoding::UnvalidatedUtf16 => "[u16]",
-                            _ => panic!("Unknown encoding {enc:?}")
-                        }.into();
+                            _ => panic!("Unknown encoding {enc:?}"),
+                        }
+                        .into();
 
                         match lt {
                             Some(lt) => (&MaybeOwn::from_immutable_lifetime(lt.clone()), name),
@@ -276,28 +305,37 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     _ => unreachable!("Unknown slice type {sl:?}"),
                 };
 
-                TypeInfo { 
+                TypeInfo {
                     name: type_name.into(),
                     generic_lifetimes: Vec::new(),
                     borrow: *borrow,
                 }
             }
-            _ => TypeInfo::new("TODO()".into())
+            _ => TypeInfo::new("TODO()".into()),
         }
-    } 
+    }
 
-    pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
+    pub(super) fn gen_abi_type_name<P: TyPosition>(
+        &'rcx mut self,
+        ty: &Type<P>,
+    ) -> Option<Cow<'tcx, str>> {
         match ty {
             Type::DiplomatOption(op) => {
                 let regular_type = self.gen_type_info(op).name;
-                Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_abi_type_name(op).unwrap_or(regular_type)).into())
+                Some(
+                    format!(
+                        "diplomat_runtime::DiplomatOption<{}>",
+                        self.gen_abi_type_name(op).unwrap_or(regular_type)
+                    )
+                    .into(),
+                )
             }
             Type::Slice(sl) => match sl {
                 // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
                 Slice::Str(..) => Some(format!("diplomat_runtime::DiplomatStrSlice").into()),
-                _ => None
-            }
-            _ => None
+                _ => None,
+            },
+            _ => None,
         }
     }
 }

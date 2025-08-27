@@ -100,7 +100,7 @@ impl Config {
             if SharedConfig::overrides_shared(key) {
                 self.language_overrides.insert(key.to_string(), value);
             }
-         } else {
+        } else {
             self.shared_config.set(key, value)
         }
     }

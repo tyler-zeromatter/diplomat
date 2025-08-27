@@ -130,10 +130,10 @@ impl MaybeOwn {
         matches!(*self, Self::Own)
     }
 
-    pub fn from_immutable_lifetime(lt : super::MaybeStatic<super::Lifetime>) -> Self {
+    pub fn from_immutable_lifetime(lt: super::MaybeStatic<super::Lifetime>) -> Self {
         MaybeOwn::Borrow(Borrow {
             lifetime: lt,
-            mutability: Mutability::Immutable
+            mutability: Mutability::Immutable,
         })
     }
 

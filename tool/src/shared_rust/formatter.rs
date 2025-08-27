@@ -1,18 +1,19 @@
 use std::borrow::Cow;
 
-use diplomat_core::hir::{EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, SymbolId, TypeContext};
-
-
+use diplomat_core::hir::{
+    EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, SymbolId,
+    TypeContext,
+};
 
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
 pub(super) struct TypeInfo<'a> {
-    pub(super) name : Cow<'a, str>,
-    pub(super) generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
-    pub(super) borrow : MaybeOwn,
+    pub(super) name: Cow<'a, str>,
+    pub(super) generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
+    pub(super) borrow: MaybeOwn,
 }
 
 impl<'a> TypeInfo<'a> {
-    pub(super) fn new(name : Cow<'a, str>) -> Self {
+    pub(super) fn new(name: Cow<'a, str>) -> Self {
         Self {
             name,
             generic_lifetimes: Vec::new(),
@@ -20,14 +21,18 @@ impl<'a> TypeInfo<'a> {
         }
     }
 
-    pub(super) fn fmt_generic_lifetimes(generic_lifetimes : Vec<MaybeStatic<Lifetime>>, env : &LifetimeEnv) -> String {
+    pub(super) fn fmt_generic_lifetimes(
+        generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
+        env: &LifetimeEnv,
+    ) -> String {
         // TODO: I'm pretty sure bounds also need to be captured here?
-        let generic_lifetimes : Vec<String> = generic_lifetimes.iter().map(|lt| {
-            match lt {
+        let generic_lifetimes: Vec<String> = generic_lifetimes
+            .iter()
+            .map(|lt| match lt {
                 MaybeStatic::Static => "'static".into(),
-                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns))
-            }
-        }).collect();
+                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns)),
+            })
+            .collect();
 
         let generic_lifetimes_string = generic_lifetimes.join(", ");
 
@@ -38,23 +43,25 @@ impl<'a> TypeInfo<'a> {
         }
     }
 
-    pub(super) fn render(&self, env : &LifetimeEnv) -> String {
+    pub(super) fn render(&self, env: &LifetimeEnv) -> String {
         self.render_with_override(env, None)
     }
 
-    pub(super) fn render_with_override(&self, env : &LifetimeEnv, over : Option<String> ) -> String {
+    pub(super) fn render_with_override(&self, env: &LifetimeEnv, over: Option<String>) -> String {
         let maybe_borrow: Cow<'_, str> = match self.borrow {
             MaybeOwn::Own => "".into(),
             MaybeOwn::Borrow(b) => match b.lifetime {
                 MaybeStatic::Static => "static".into(),
                 MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns),
-            }
+            },
         };
         let borrow_stmt = match self.borrow {
             MaybeOwn::Own => "".into(),
             // TODO: Would be nice to have a LifetimeEnv helper to avoid formatting anonymous lifetimes.
-            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut "),
-            _ => format!("&'{maybe_borrow} ")
+            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => {
+                format!("&'{maybe_borrow} mut ")
+            }
+            _ => format!("&'{maybe_borrow} "),
         };
 
         let name = over.unwrap_or(self.name.clone().into());
@@ -66,36 +73,40 @@ impl<'a> TypeInfo<'a> {
 }
 
 pub(super) struct RustFormatter<'tcx> {
-    pub(super) tcx : &'tcx TypeContext,
+    pub(super) tcx: &'tcx TypeContext,
 }
 
 impl<'tcx> RustFormatter<'tcx> {
-    pub(super) fn fmt_symbol_name(&self, id : SymbolId) -> Cow<'tcx, str> {
+    pub(super) fn fmt_symbol_name(&self, id: SymbolId) -> Cow<'tcx, str> {
         match id {
-            SymbolId::FunctionId(f) => {
-                self.tcx.resolve_function(f).name.as_str().into()
-            }
+            SymbolId::FunctionId(f) => self.tcx.resolve_function(f).name.as_str().into(),
             SymbolId::TypeId(ty) => {
                 let resolved = self.tcx.resolve_type(ty);
                 let name = resolved.name();
                 resolved.attrs().rename.apply(name.as_str().into())
             }
-            SymbolId::TraitId(tr) => {
-                self.tcx.resolve_trait(tr).name.as_str().into()
-            }
-            _ => panic!("Symbol {id:?} unrecognized.")
+            SymbolId::TraitId(tr) => self.tcx.resolve_trait(tr).name.as_str().into(),
+            _ => panic!("Symbol {id:?} unrecognized."),
         }
     }
 
-    pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
+    pub(super) fn fmt_primitive_name(&self, primitive: PrimitiveType) -> &'static str {
         match primitive {
             PrimitiveType::Char => "diplomat_runtime::DiplomatChar",
             PrimitiveType::Byte => "u8",
-            _ => primitive.as_str()
+            _ => primitive.as_str(),
         }
     }
 
-    pub(super) fn fmt_enum_variant_name(&self, enum_variant : &'tcx EnumVariant) -> Cow<'tcx, str> {
-        format!("{} = {}", enum_variant.attrs.rename.apply(enum_variant.name.as_str().into()), enum_variant.discriminant).into()
+    pub(super) fn fmt_enum_variant_name(&self, enum_variant: &'tcx EnumVariant) -> Cow<'tcx, str> {
+        format!(
+            "{} = {}",
+            enum_variant
+                .attrs
+                .rename
+                .apply(enum_variant.name.as_str().into()),
+            enum_variant.discriminant
+        )
+        .into()
     }
 }

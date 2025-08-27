@@ -10,7 +10,10 @@ mod wasm_glue;
 
 mod write;
 pub use write::DiplomatWrite;
-pub use write::{diplomat_buffer_write_create, diplomat_buffer_write_destroy, diplomat_buffer_write_get_bytes, diplomat_buffer_write_len};
+pub use write::{
+    diplomat_buffer_write_create, diplomat_buffer_write_destroy, diplomat_buffer_write_get_bytes,
+    diplomat_buffer_write_len,
+};
 mod slices;
 pub use slices::{
     DiplomatOwnedSlice, DiplomatOwnedStr16Slice, DiplomatOwnedStrSlice, DiplomatOwnedUTF8StrSlice,
