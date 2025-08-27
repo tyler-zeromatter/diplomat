@@ -6,7 +6,7 @@ pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
     pub field_c: String<'c>,
 }
 
-impl BorrowedFieldsWithBounds {
+impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
     pub fn from_foo_and_strings(foo : Foo, dstr16_x : [u16], utf8_str_z : String) -> BorrowedFieldsWithBounds {
         let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.into()) };
         ret
