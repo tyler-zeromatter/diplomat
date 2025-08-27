@@ -1,7 +1,7 @@
 use super::Two;
 pub struct One<'a>;
 
-impl Drop for One {
+impl<'a> Drop for One<'a> {
     fn drop(&mut self) {
         unsafe { One_destroy(self) }
     }

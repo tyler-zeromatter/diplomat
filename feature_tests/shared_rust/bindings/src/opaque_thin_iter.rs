@@ -1,7 +1,7 @@
 use super::OpaqueThin;
 pub struct OpaqueThinIter<'a>;
 
-impl Drop for OpaqueThinIter {
+impl<'a> Drop for OpaqueThinIter<'a> {
     fn drop(&mut self) {
         unsafe { OpaqueThinIter_destroy(self) }
     }

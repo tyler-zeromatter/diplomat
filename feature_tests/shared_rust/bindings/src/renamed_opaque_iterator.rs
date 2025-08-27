@@ -1,6 +1,6 @@
 pub struct RenamedOpaqueIterator<'a>;
 
-impl Drop for RenamedOpaqueIterator {
+impl<'a> Drop for RenamedOpaqueIterator<'a> {
     fn drop(&mut self) {
         unsafe { namespace_OpaqueIterator_destroy(self) }
     }

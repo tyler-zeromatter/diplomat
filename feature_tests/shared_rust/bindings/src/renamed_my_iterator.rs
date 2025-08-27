@@ -1,6 +1,6 @@
 pub struct RenamedMyIterator<'a>;
 
-impl Drop for RenamedMyIterator {
+impl<'a> Drop for RenamedMyIterator<'a> {
     fn drop(&mut self) {
         unsafe { namespace_MyIterator_destroy(self) }
     }

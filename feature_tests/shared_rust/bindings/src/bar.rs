@@ -1,7 +1,7 @@
 use super::Foo;
 pub struct Bar<'b, 'a>;
 
-impl Drop for Bar {
+impl<'b, 'a> Drop for Bar<'b, 'a> {
     fn drop(&mut self) {
         unsafe { Bar_destroy(self) }
     }

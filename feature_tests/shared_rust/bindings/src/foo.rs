@@ -4,7 +4,7 @@ use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
 pub struct Foo<'a>;
 
-impl Drop for Foo {
+impl<'a> Drop for Foo<'a> {
     fn drop(&mut self) {
         unsafe { Foo_destroy(self) }
     }
