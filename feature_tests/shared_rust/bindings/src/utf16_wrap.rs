@@ -7,7 +7,7 @@ impl Drop for Utf16Wrap {
 }
 
 impl Utf16Wrap {
-    pub fn from_utf16(input : &[u16]) -> Box<Utf16Wrap> {
+    pub fn from_utf16(input : [u16]) -> Box<Utf16Wrap> {
         let ret = unsafe { Utf16Wrap_from_utf16(input.into()) };
         ret
     }
@@ -20,7 +20,7 @@ impl Utf16Wrap {
         out_str
     }
 
-    pub fn borrow_cont(&self) -> &[u16] {
+    pub fn borrow_cont(&self) -> [u16] {
         let ret = unsafe { Utf16Wrap_borrow_cont(self) };
         ret
     }

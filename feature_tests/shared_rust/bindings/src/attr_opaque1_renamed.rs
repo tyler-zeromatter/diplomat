@@ -34,7 +34,7 @@ impl AttrOpaque1Renamed {
         ret
     }
 
-    pub fn use_unnamespaced(&self, _un : &Unnamespaced) {
+    pub fn use_unnamespaced(&self, _un : Unnamespaced) {
         let ret = unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) };
         ret
     }
@@ -59,7 +59,7 @@ unsafe extern "C" {
 
     fn renamed_on_abi_only(this: &AttrOpaque1Renamed) -> u8;
 
-    fn namespace_AttrOpaque1_use_unnamespaced(this: &AttrOpaque1Renamed, _un : &Unnamespaced);
+    fn namespace_AttrOpaque1_use_unnamespaced(this: &AttrOpaque1Renamed, _un : Unnamespaced);
 
     fn namespace_AttrOpaque1_use_namespaced(this: &AttrOpaque1Renamed, _n : RenamedAttrEnum);
 

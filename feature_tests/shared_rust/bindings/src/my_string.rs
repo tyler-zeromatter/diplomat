@@ -7,12 +7,12 @@ impl Drop for MyString {
 }
 
 impl MyString {
-    pub fn new(v : &[u8]) -> Box<MyString> {
+    pub fn new(v : [u8]) -> Box<MyString> {
         let ret = unsafe { MyString_new(v.into()) };
         ret
     }
 
-    pub fn new_unsafe(v : &String) -> Box<MyString> {
+    pub fn new_unsafe(v : String) -> Box<MyString> {
         let ret = unsafe { MyString_new_unsafe(v.into()) };
         ret
     }
@@ -22,12 +22,12 @@ impl MyString {
         ret
     }
 
-    pub fn new_from_first(v : &[TODO]) -> Box<MyString> {
+    pub fn new_from_first(v : TODO) -> Box<MyString> {
         let ret = unsafe { MyString_new_from_first(v) };
         ret
     }
 
-    pub fn set_str(&mut self, new_str : &[u8]) {
+    pub fn set_str(&mut self, new_str : [u8]) {
         let ret = unsafe { MyString_set_str(self, new_str.into()) };
         ret
     }
@@ -40,12 +40,12 @@ impl MyString {
         out_str
     }
 
-    pub fn get_static_str() -> &'staticString {
+    pub fn get_static_str() -> String {
         let ret = unsafe { MyString_get_static_str() };
         ret
     }
 
-    pub fn string_transform(foo : &String) -> String {
+    pub fn string_transform(foo : String) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { MyString_string_transform(foo.into(), write_mut) };
@@ -53,7 +53,7 @@ impl MyString {
         out_str
     }
 
-    pub fn borrow(&self) -> &[u8] {
+    pub fn borrow(&self) -> [u8] {
         let ret = unsafe { MyString_borrow(self) };
         ret
     }
@@ -69,7 +69,7 @@ unsafe extern "C" {
 
     fn MyString_new_owned(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
-    fn MyString_new_from_first(v : &[TODO]) -> Box<MyString>;
+    fn MyString_new_from_first(v : TODO) -> Box<MyString>;
 
     fn MyString_set_str(this: &mut MyString, new_str : diplomat_runtime::DiplomatStrSlice);
 

@@ -11,7 +11,7 @@ impl Drop for Foo {
 }
 
 impl Foo {
-    pub fn new(x : &[u8]) -> Box<Foo> {
+    pub fn new(x : [u8]) -> Box<Foo> {
         let ret = unsafe { Foo_new(x.into()) };
         ret
     }
@@ -31,7 +31,7 @@ impl Foo {
         ret
     }
 
-    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : &[u8]) -> Box<Foo> {
+    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : [u8]) -> Box<Foo> {
         let ret = unsafe { Foo_extract_from_bounds(bounds, another_string.into()) };
         ret
     }

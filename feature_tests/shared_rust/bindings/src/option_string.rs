@@ -7,7 +7,7 @@ impl Drop for OptionString {
 }
 
 impl OptionString {
-    pub fn new(diplomat_str : &[u8]) -> Option<Box<OptionString>> {
+    pub fn new(diplomat_str : [u8]) -> Option<Box<OptionString>> {
         let ret = unsafe { OptionString_new(diplomat_str.into()) };
         ret
     }
@@ -24,7 +24,7 @@ impl OptionString {
         }
     }
 
-    pub fn borrow(&self) -> Option<&[u8]> {
+    pub fn borrow(&self) -> Option<[u8]> {
         let ret = unsafe { OptionString_borrow(self) };
         ret.into_converted_option()
     }
