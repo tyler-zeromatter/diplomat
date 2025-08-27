@@ -4,7 +4,7 @@ pub struct StructWithSlices<'a> {
     pub second: [u16]<'a>,
 }
 
-impl StructWithSlices {
+impl<'a> StructWithSlices<'a> {
     pub fn return_last(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;

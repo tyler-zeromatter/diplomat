@@ -3,7 +3,7 @@ pub struct BorrowedFieldsReturning<'a> {
     pub bytes: [u8]<'a>,
 }
 
-impl BorrowedFieldsReturning {
+impl<'a> BorrowedFieldsReturning<'a> {
 }
 
 #[link(name = "somelib")]
