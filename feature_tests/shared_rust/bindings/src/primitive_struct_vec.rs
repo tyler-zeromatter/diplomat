@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct PrimitiveStructVec;
 
 impl Drop for PrimitiveStructVec {

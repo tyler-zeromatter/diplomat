@@ -2,7 +2,11 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
-pub struct Foo<'a>;
+use std::marker::PhantomData;
+
+pub struct Foo<'a> {
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'a> Drop for Foo<'a> {
     fn drop(&mut self) {

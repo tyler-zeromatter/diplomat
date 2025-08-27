@@ -1,5 +1,7 @@
 use super::ImportedStruct;
 use super::MyStruct;
+use std::marker::PhantomData;
+
 pub struct Opaque;
 
 impl Drop for Opaque {

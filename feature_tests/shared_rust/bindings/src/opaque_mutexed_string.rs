@@ -1,4 +1,6 @@
 use super::Utf16Wrap;
+use std::marker::PhantomData;
+
 pub struct OpaqueMutexedString;
 
 impl Drop for OpaqueMutexedString {

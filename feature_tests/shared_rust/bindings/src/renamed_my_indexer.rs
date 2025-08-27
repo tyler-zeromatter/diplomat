@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedMyIndexer;
 
 impl Drop for RenamedMyIndexer {

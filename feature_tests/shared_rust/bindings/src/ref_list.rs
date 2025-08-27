@@ -1,5 +1,9 @@
 use super::RefListParameter;
-pub struct RefList<'a>;
+use std::marker::PhantomData;
+
+pub struct RefList<'a> {
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'a> Drop for RefList<'a> {
     fn drop(&mut self) {

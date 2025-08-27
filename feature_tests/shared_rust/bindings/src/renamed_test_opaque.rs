@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedTestOpaque;
 
 impl Drop for RenamedTestOpaque {

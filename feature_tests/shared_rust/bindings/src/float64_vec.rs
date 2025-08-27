@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct Float64Vec;
 
 impl Drop for Float64Vec {

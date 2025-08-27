@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedOpaqueIterable;
 
 impl Drop for RenamedOpaqueIterable {

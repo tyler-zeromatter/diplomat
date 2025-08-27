@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct OptionString;
 
 impl Drop for OptionString {

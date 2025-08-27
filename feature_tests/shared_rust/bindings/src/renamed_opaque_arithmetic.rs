@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedOpaqueArithmetic;
 
 impl Drop for RenamedOpaqueArithmetic {

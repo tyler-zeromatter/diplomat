@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedComparable;
 
 impl Drop for RenamedComparable {
