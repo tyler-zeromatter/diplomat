@@ -1,6 +1,69 @@
 use std::borrow::Cow;
 
-use diplomat_core::hir::{EnumVariant, PrimitiveType, SymbolId, TypeContext};
+use diplomat_core::hir::{EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, SymbolId, TypeContext};
+
+
+
+/// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
+pub(super) struct TypeInfo<'a> {
+    pub(super) name : Cow<'a, str>,
+    pub(super) generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
+    pub(super) borrow : MaybeOwn,
+}
+
+impl<'a> TypeInfo<'a> {
+    pub(super) fn new(name : Cow<'a, str>) -> Self {
+        Self {
+            name,
+            generic_lifetimes: Vec::new(),
+            borrow: MaybeOwn::Own,
+        }
+    }
+
+    pub(super) fn fmt_generic_lifetimes(generic_lifetimes : Vec<MaybeStatic<Lifetime>>, env : &LifetimeEnv) -> String {
+        // TODO: I'm pretty sure bounds also need to be captured here?
+        let generic_lifetimes : Vec<String> = generic_lifetimes.iter().map(|lt| {
+            match lt {
+                MaybeStatic::Static => "'static".into(),
+                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns))
+            }
+        }).collect();
+
+        let generic_lifetimes_string = generic_lifetimes.join(", ");
+
+        if generic_lifetimes.len() > 0 {
+            format!("<{generic_lifetimes_string}>")
+        } else {
+            "".into()
+        }
+    }
+
+    pub(super) fn render(&self, env : &LifetimeEnv) -> String {
+        self.render_with_override(env, None)
+    }
+
+    pub(super) fn render_with_override(&self, env : &LifetimeEnv, over : Option<String> ) -> String {
+        let maybe_borrow: Cow<'_, str> = match self.borrow {
+            MaybeOwn::Own => "".into(),
+            MaybeOwn::Borrow(b) => match b.lifetime {
+                MaybeStatic::Static => "static".into(),
+                MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns),
+            }
+        };
+        let borrow_stmt = match self.borrow {
+            MaybeOwn::Own => "".into(),
+            // TODO: Would be nice to have a LifetimeEnv helper to avoid formatting anonymous lifetimes.
+            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut "),
+            _ => format!("&'{maybe_borrow} ")
+        };
+
+        let name = over.unwrap_or(self.name.clone().into());
+
+        let generic_lifetimes = Self::fmt_generic_lifetimes(self.generic_lifetimes.clone(), env);
+
+        format!("{borrow_stmt}{name}{generic_lifetimes}")
+    }
+}
 
 pub(super) struct RustFormatter<'tcx> {
     pub(super) tcx : &'tcx TypeContext,
@@ -27,6 +90,7 @@ impl<'tcx> RustFormatter<'tcx> {
     pub(super) fn fmt_primitive_name(&self, primitive : PrimitiveType) -> &'static str {
         match primitive {
             PrimitiveType::Char => "diplomat_runtime::DiplomatChar",
+            PrimitiveType::Byte => "u8",
             _ => primitive.as_str()
         }
     }

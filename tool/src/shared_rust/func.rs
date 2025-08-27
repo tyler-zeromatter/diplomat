@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId};
 
-use crate::shared_rust::{ty::TypeInfo, FileGenContext};
+use crate::shared_rust::{formatter::TypeInfo, FileGenContext};
 
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
@@ -56,7 +56,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn render_generic_lifetimes(&self) -> String {
         TypeInfo::fmt_generic_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
     }
-    
+
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
