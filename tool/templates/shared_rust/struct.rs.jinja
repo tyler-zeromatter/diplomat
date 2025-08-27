@@ -15,7 +15,7 @@ pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
 
 {%- if fields.len() > 0 %} {
     {%- for f in fields %}
-    pub {{f.name}}: {{f.type_info.name}}{%- call draw_formatted_lifetimes(f.generic_lifetimes(lifetime_env)) -%},
+    pub {{f.name}}: {{f.type_info.render(lifetime_env)}},
     {%- endfor %}
 } {%- else -%};{%- endif -%}
 {%- endblock -%}

@@ -1,7 +1,8 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{EnumDef, Lifetime, LifetimeEnv, MaybeStatic, Mutability, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{Borrow, EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, OpaqueDef, OpaqueOwner, OpaquePath, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use itertools::Itertools;
 
 use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -24,7 +25,7 @@ pub(super) trait TypeTemplate<'a> {
 pub(super) struct TypeInfo<'a> {
     pub(super) name : Cow<'a, str>,
     pub(super) generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
-    pub(super) borrow : Option<MaybeStatic<Lifetime>>,
+    pub(super) borrow : MaybeOwn,
 }
 
 impl<'a> TypeInfo<'a> {
@@ -32,8 +33,38 @@ impl<'a> TypeInfo<'a> {
         Self {
             name,
             generic_lifetimes: Vec::new(),
-            borrow: None,
+            borrow: MaybeOwn::Own,
         }
+    }
+
+    pub(super) fn render(&self, env : &LifetimeEnv) -> String {
+        let maybe_borrow = match self.borrow {
+            MaybeOwn::Own => "".into(),
+            MaybeOwn::Borrow(b) => match b.lifetime {
+                MaybeStatic::Static => "static".into(),
+                MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns),
+            }
+        };
+        let borrow_stmt = match self.borrow {
+            MaybeOwn::Own => "".into(),
+            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut"),
+            _ => format!("&'{maybe_borrow}")
+        };
+
+        let generic_lifetimes : Vec<String> = self.generic_lifetimes.iter().map(|lt| {
+            match lt {
+                MaybeStatic::Static => "'static".into(),
+                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns))
+            }
+        }).collect();
+
+        let generic_lifetimes_string = generic_lifetimes.join(", ");
+
+        format!("{borrow_stmt}{}{}", self.name, if generic_lifetimes.len() > 0 {
+            format!("<{generic_lifetimes_string}>")
+        } else {
+            "".into()
+        })
     }
 }
 
@@ -217,8 +248,17 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
                 self.imports.insert(st_name.clone().into());
+
+                let owned = match st.owner() {
+                    MaybeOwn::Own => None,
+                    MaybeOwn::Borrow(b) => Some(b.lifetime)
+                };
                 
-                TypeInfo::new(st_name)
+                TypeInfo {
+                    borrow: st.owner(),
+                    name: st_name,
+                    generic_lifetimes: st.lifetimes().lifetimes().collect(),
+                }
             }
             Type::Enum(e) => {
                 let type_id : TypeId = e.tcx_id.into();
@@ -245,7 +285,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     } else {
                         op_name
                     },
-                    borrow: op.owner.lifetime(),
+                    borrow: op.owner.get_borrow(),
                     generic_lifetimes: op.lifetimes.lifetimes().collect(),
                 }
             }
