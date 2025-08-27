@@ -11,6 +11,7 @@ pub enum TypeInfoWrapper {
 }
 
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
+/// This is *NOT* meant to include conversion information or ABI-specific info. That should be handled mostly by the `func` module.
 pub(super) struct TypeInfo<'a> {
     pub(super) name: Cow<'a, str>,
     pub(super) generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
