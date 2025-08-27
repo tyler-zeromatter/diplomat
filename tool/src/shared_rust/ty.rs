@@ -47,8 +47,8 @@ impl<'a> TypeInfo<'a> {
         };
         let borrow_stmt = match self.borrow {
             MaybeOwn::Own => "".into(),
-            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut"),
-            _ => format!("&'{maybe_borrow}")
+            MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => format!("&'{maybe_borrow} mut "),
+            _ => format!("&'{maybe_borrow} ")
         };
 
         let generic_lifetimes : Vec<String> = self.generic_lifetimes.iter().map(|lt| {
@@ -315,24 +315,24 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         }
                     }
                     Slice::Str(lt, enc) => {
-                        // TODO: Lifetimes
-                        // let lifetimes = if let Some(lt) = lt {
-                        //     match lt {
-                        //         MaybeStatic::Static => "&'static".into(),
-                        //         MaybeStatic::NonStatic(ns) => {
-                        //             format!("&")
-                        //         }
-                        //     }
-                        // } else {
-                        //     "".into()
-                        // };
-                        let encoding = match enc {
+                        let name = match enc {
                             StringEncoding::Utf8 => "String",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
                             StringEncoding::UnvalidatedUtf16 => "[u16]",
-                            _ => unreachable!("Unrecognized string encoding.")
+                            _ => panic!("Unknown encoding {enc:?}")
+                        }.into();
+
+                        let (name, borrow) = match lt {
+                            Some(lt) => (name, MaybeOwn::from_immutable_lifetime(lt.clone())),
+                            None => (format!("Box<{name}>"), MaybeOwn::Own),
+                            _ => (name, MaybeOwn::Own)
                         };
-                        format!("{encoding}").into()
+
+                        return TypeInfo {
+                            name: name.into(),
+                            generic_lifetimes: Vec::new(),
+                            borrow
+                        };
                     }
                     _ => format!("TODO"),
                 };
