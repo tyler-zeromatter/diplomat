@@ -130,6 +130,13 @@ impl MaybeOwn {
         matches!(*self, Self::Own)
     }
 
+    pub fn from_immutable_lifetime(lt : super::MaybeStatic<super::Lifetime>) -> Self {
+        MaybeOwn::Borrow(Borrow {
+            lifetime: lt,
+            mutability: Mutability::Immutable
+        })
+    }
+
     /// Returns the mutability of this potential-borrow
     ///
     /// Owned types are mutable
