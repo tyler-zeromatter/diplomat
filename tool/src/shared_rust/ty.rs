@@ -180,6 +180,13 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             lib_name: String,
             imports : BTreeSet<String>,
             dtor_abi : Cow<'a, str>,
+            lifetime_env : &'a LifetimeEnv,
+        }
+
+        impl<'a> OpaqueTemplate<'a> {
+            fn render_generic_lifetimes(&self) -> String {
+                TypeInfo::fmt_generic_lifetimes(self.lifetime_env.lifetimes().lifetimes().collect(), self.lifetime_env)
+            }
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id.into());
@@ -208,7 +215,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
-            dtor_abi
+            dtor_abi,
+            lifetime_env: &ty.lifetimes,
         }
     }
 

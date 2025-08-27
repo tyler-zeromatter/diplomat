@@ -1,7 +1,7 @@
 {% extends "base.rs.jinja" %}
 
 {%- block type_def -%}
-pub struct {{type_name}};
+pub struct {{type_name}}{{self.render_generic_lifetimes()}};
 
 impl Drop for {{type_name}} {
     fn drop(&mut self) {
@@ -13,3 +13,7 @@ impl Drop for {{type_name}} {
 {%- block abi_methods %}
     fn {{dtor_abi}}(this : *mut {{type_name}});
 {% endblock -%}
+
+{%- block impl_generics -%}
+{{self.render_generic_lifetimes()}}
+{%- endblock -%}
