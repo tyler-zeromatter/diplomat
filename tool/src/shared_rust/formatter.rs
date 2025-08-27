@@ -36,7 +36,7 @@ impl<'a> TypeInfo<'a> {
 
         let generic_lifetimes_string = generic_lifetimes.join(", ");
 
-        if generic_lifetimes.len() > 0 {
+        if !generic_lifetimes.is_empty() {
             format!("<{generic_lifetimes_string}>")
         } else {
             "".into()
