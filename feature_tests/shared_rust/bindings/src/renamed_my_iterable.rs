@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct RenamedMyIterable;
 
 impl Drop for RenamedMyIterable {

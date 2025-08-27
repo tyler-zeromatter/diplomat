@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct OpaqueThin;
 
 impl Drop for OpaqueThin {

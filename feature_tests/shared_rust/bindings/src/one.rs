@@ -1,5 +1,9 @@
 use super::Two;
-pub struct One<'a>;
+use std::marker::PhantomData;
+
+pub struct One<'a> {
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'a> Drop for One<'a> {
     fn drop(&mut self) {

@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct MyOpaqueEnum;
 
 impl Drop for MyOpaqueEnum {

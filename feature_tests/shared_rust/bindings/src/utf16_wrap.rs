@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 pub struct Utf16Wrap;
 
 impl Drop for Utf16Wrap {

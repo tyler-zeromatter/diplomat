@@ -1,5 +1,9 @@
 use super::OpaqueThin;
-pub struct OpaqueThinIter<'a>;
+use std::marker::PhantomData;
+
+pub struct OpaqueThinIter<'a> {
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'a> Drop for OpaqueThinIter<'a> {
     fn drop(&mut self) {

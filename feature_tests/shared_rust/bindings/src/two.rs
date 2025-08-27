@@ -1,4 +1,9 @@
-pub struct Two<'a, 'b>;
+use std::marker::PhantomData;
+
+pub struct Two<'a, 'b> {
+    a_marker : PhantomData<&'a ()>,
+    b_marker : PhantomData<&'b ()>,
+}
 
 impl<'a, 'b> Drop for Two<'a, 'b> {
     fn drop(&mut self) {

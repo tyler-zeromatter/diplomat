@@ -1,5 +1,10 @@
 use super::Foo;
-pub struct Bar<'b, 'a>;
+use std::marker::PhantomData;
+
+pub struct Bar<'b, 'a> {
+    b_marker : PhantomData<&'b ()>,
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'b, 'a> Drop for Bar<'b, 'a> {
     fn drop(&mut self) {

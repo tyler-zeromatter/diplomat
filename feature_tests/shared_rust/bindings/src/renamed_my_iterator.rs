@@ -1,4 +1,8 @@
-pub struct RenamedMyIterator<'a>;
+use std::marker::PhantomData;
+
+pub struct RenamedMyIterator<'a> {
+    a_marker : PhantomData<&'a ()>,
+}
 
 impl<'a> Drop for RenamedMyIterator<'a> {
     fn drop(&mut self) {

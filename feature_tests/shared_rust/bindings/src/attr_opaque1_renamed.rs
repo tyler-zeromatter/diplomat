@@ -1,5 +1,7 @@
 use super::RenamedAttrEnum;
 use super::Unnamespaced;
+use std::marker::PhantomData;
+
 pub struct AttrOpaque1Renamed;
 
 impl Drop for AttrOpaque1Renamed {

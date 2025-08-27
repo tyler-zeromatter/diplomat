@@ -1,6 +1,8 @@
 use super::OptionEnum;
 use super::OptionInputStruct;
 use super::OptionStruct;
+use std::marker::PhantomData;
+
 pub struct OptionOpaque;
 
 impl Drop for OptionOpaque {
