@@ -9,12 +9,12 @@ impl Drop for OpaqueThinVec {
 }
 
 impl OpaqueThinVec {
-    pub fn create(a : [i32], b : [f32], c : [u8]) -> Box<OpaqueThinVec> {
+    pub fn create(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 [u8]) -> Box<OpaqueThinVec> {
         let ret = unsafe { OpaqueThinVec_create(a, b, c.into()) };
         ret
     }
 
-    pub fn iter(&self) -> Box<OpaqueThinIter> {
+    pub fn iter(&self) -> Box<OpaqueThinIter><'a> {
         let ret = unsafe { OpaqueThinVec_iter(self) };
         ret
     }
@@ -24,12 +24,12 @@ impl OpaqueThinVec {
         ret
     }
 
-    pub fn get(&self, idx : usize) -> Option<OpaqueThin> {
+    pub fn get(&self, idx : usize) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_get(self, idx) };
         ret
     }
 
-    pub fn first(&self) -> Option<OpaqueThin> {
+    pub fn first(&self) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_first(self) };
         ret
     }
@@ -39,15 +39,15 @@ impl OpaqueThinVec {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OpaqueThinVec_create(a : [i32], b : [f32], c : diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
+    fn OpaqueThinVec_create(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
 
-    fn OpaqueThinVec_iter(this: &OpaqueThinVec) -> Box<OpaqueThinIter>;
+    fn OpaqueThinVec_iter(this: &OpaqueThinVec) -> Box<OpaqueThinIter><'a>;
 
     fn OpaqueThinVec_len(this: &OpaqueThinVec) -> usize;
 
-    fn OpaqueThinVec_get(this: &OpaqueThinVec, idx : usize) -> Option<OpaqueThin>;
+    fn OpaqueThinVec_get(this: &OpaqueThinVec, idx : usize) -> &'a Option<OpaqueThin>;
 
-    fn OpaqueThinVec_first(this: &OpaqueThinVec) -> Option<OpaqueThin>;
+    fn OpaqueThinVec_first(this: &OpaqueThinVec) -> &'a Option<OpaqueThin>;
 
     fn OpaqueThinVec_destroy(this : *mut OpaqueThinVec);
 }

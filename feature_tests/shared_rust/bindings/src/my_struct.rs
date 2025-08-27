@@ -17,12 +17,12 @@ impl MyStruct {
         ret
     }
 
-    pub fn takes_mut(&mut self, o : MyStruct) {
+    pub fn takes_mut(&mut self, o : &'anon_1 mut MyStruct) {
         let ret = unsafe { MyStruct_takes_mut(self, o) };
         ret
     }
 
-    pub fn takes_const(&self, o : MyStruct) {
+    pub fn takes_const(&self, o : &'anon_1 mut MyStruct) {
         let ret = unsafe { MyStruct_takes_const(self, o) };
         ret
     }
@@ -49,9 +49,9 @@ impl MyStruct {
 unsafe extern "C" {
     fn MyStruct_new() -> MyStruct;
 
-    fn MyStruct_takes_mut(this: &mut MyStruct, o : MyStruct);
+    fn MyStruct_takes_mut(this: &mut MyStruct, o : &'anon_1 mut MyStruct);
 
-    fn MyStruct_takes_const(this: &MyStruct, o : MyStruct);
+    fn MyStruct_takes_const(this: &MyStruct, o : &'anon_1 mut MyStruct);
 
     fn MyStruct_into_a(this : MyStruct) -> u8;
 

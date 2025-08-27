@@ -11,27 +11,27 @@ impl Drop for Foo {
 }
 
 impl Foo {
-    pub fn new(x : [u8]) -> Box<Foo> {
+    pub fn new(x : &'a [u8]) -> Box<Foo><'a> {
         let ret = unsafe { Foo_new(x.into()) };
         ret
     }
 
-    pub fn get_bar(&self) -> Box<Bar> {
+    pub fn get_bar(&self) -> Box<Bar><'b, 'a> {
         let ret = unsafe { Foo_get_bar(self) };
         ret
     }
 
-    pub fn as_returning(&self) -> BorrowedFieldsReturning {
+    pub fn as_returning(&self) -> BorrowedFieldsReturning<'a> {
         let ret = unsafe { Foo_as_returning(self) };
         ret
     }
 
-    pub fn extract_from_fields(fields : BorrowedFields) -> Box<Foo> {
+    pub fn extract_from_fields(fields : BorrowedFields<'a>) -> Box<Foo><'a> {
         let ret = unsafe { Foo_extract_from_fields(fields) };
         ret
     }
 
-    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : [u8]) -> Box<Foo> {
+    pub fn extract_from_bounds(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a [u8]) -> Box<Foo><'a> {
         let ret = unsafe { Foo_extract_from_bounds(bounds, another_string.into()) };
         ret
     }
@@ -41,15 +41,15 @@ impl Foo {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Foo_new(x : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
+    fn Foo_new(x : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Foo><'a>;
 
-    fn Foo_get_bar(this: &Foo) -> Box<Bar>;
+    fn Foo_get_bar(this: &Foo) -> Box<Bar><'b, 'a>;
 
-    fn Foo_as_returning(this: &Foo) -> BorrowedFieldsReturning;
+    fn Foo_as_returning(this: &Foo) -> BorrowedFieldsReturning<'a>;
 
-    fn Foo_extract_from_fields(fields : BorrowedFields) -> Box<Foo>;
+    fn Foo_extract_from_fields(fields : BorrowedFields<'a>) -> Box<Foo><'a>;
 
-    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds, another_string : diplomat_runtime::DiplomatStrSlice) -> Box<Foo>;
+    fn Foo_extract_from_bounds(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Foo><'a>;
 
     fn Foo_destroy(this : *mut Foo);
 }

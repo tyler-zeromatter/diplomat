@@ -8,7 +8,7 @@ impl Drop for Bar {
 }
 
 impl Bar {
-    pub fn foo(&self) -> Foo {
+    pub fn foo(&self) -> &'b Foo<'a> {
         let ret = unsafe { Bar_foo(self) };
         ret
     }
@@ -18,7 +18,7 @@ impl Bar {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Bar_foo(this: &Bar) -> Foo;
+    fn Bar_foo(this: &Bar) -> &'b Foo<'a>;
 
     fn Bar_destroy(this : *mut Bar);
 }
