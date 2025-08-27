@@ -97,18 +97,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         struct FieldInfo<'a> {
             type_info : TypeInfo<'a>,
             name : Cow<'a, str>,
-            generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
-        }
-
-        impl<'a> FieldInfo<'a> {
-            fn generic_lifetimes(&self, env : &LifetimeEnv) -> Vec<String> {
-                self.generic_lifetimes.iter().map(|l| {
-                    match l {
-                        MaybeStatic::Static => "static".to_string(),
-                        MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns).to_string()
-                    }
-                }).collect()
-            }
         }
 
         #[derive(Template)]
@@ -132,12 +120,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         });
 
         let fields = ty.fields.iter().map(|f| {
-            let generic_lifetimes = f.ty.lifetimes();
-
             FieldInfo {
                 type_info: self.gen_type_info(&f.ty),
                 name: f.name.as_str().into(),
-                generic_lifetimes: generic_lifetimes.collect(),
             }
         }).collect();
 
