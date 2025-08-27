@@ -5,10 +5,16 @@ use diplomat_core::hir::{
     TypeContext,
 };
 
+pub enum TypeInfoWrapper {
+    Boxed,
+    None
+}
+
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
 pub(super) struct TypeInfo<'a> {
     pub(super) name: Cow<'a, str>,
     pub(super) generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
+    pub(super) wrapped : TypeInfoWrapper,
     pub(super) borrow: MaybeOwn,
 }
 
@@ -18,6 +24,7 @@ impl<'a> TypeInfo<'a> {
             name,
             generic_lifetimes: Vec::new(),
             borrow: MaybeOwn::Own,
+            wrapped: TypeInfoWrapper::None,
         }
     }
 
@@ -68,7 +75,13 @@ impl<'a> TypeInfo<'a> {
 
         let generic_lifetimes = Self::fmt_generic_lifetimes(self.generic_lifetimes.clone(), env);
 
-        format!("{borrow_stmt}{name}{generic_lifetimes}")
+        let name = format!("{name}{generic_lifetimes}");
+        let name_wrapped = match self.wrapped {
+            TypeInfoWrapper::None => name,
+            TypeInfoWrapper::Boxed => format!("Box<{name}>")
+        };
+
+        format!("{borrow_stmt}{name_wrapped}")
     }
 }
 

@@ -9,32 +9,32 @@ impl Drop for ResultOpaque {
 }
 
 impl ResultOpaque {
-    pub fn new(i : i32) -> Result<Box<ResultOpaque>, ErrorEnum> {
+    pub fn new(i : i32) -> Result<ResultOpaque, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new(i) };
         ret.into()
     }
 
-    pub fn new_failing_foo() -> Result<Box<ResultOpaque>, ErrorEnum> {
+    pub fn new_failing_foo() -> Result<ResultOpaque, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_foo() };
         ret.into()
     }
 
-    pub fn new_failing_bar() -> Result<Box<ResultOpaque>, ErrorEnum> {
+    pub fn new_failing_bar() -> Result<ResultOpaque, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_bar() };
         ret.into()
     }
 
-    pub fn new_failing_unit() -> Result<Box<ResultOpaque>, ()> {
+    pub fn new_failing_unit() -> Result<ResultOpaque, ()> {
         let ret = unsafe { ResultOpaque_new_failing_unit() };
         ret.into()
     }
 
-    pub fn new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct> {
+    pub fn new_failing_struct(i : i32) -> Result<ResultOpaque, ErrorStruct> {
         let ret = unsafe { ResultOpaque_new_failing_struct(i) };
         ret.into()
     }
 
-    pub fn new_in_err(i : i32) -> Result<(), Box<ResultOpaque>> {
+    pub fn new_in_err(i : i32) -> Result<(), ResultOpaque> {
         let ret = unsafe { ResultOpaque_new_in_err(i) };
         ret.into()
     }
@@ -44,7 +44,7 @@ impl ResultOpaque {
         ret.into()
     }
 
-    pub fn new_in_enum_err(i : i32) -> Result<ErrorEnum, Box<ResultOpaque>> {
+    pub fn new_in_enum_err(i : i32) -> Result<ErrorEnum, ResultOpaque> {
         let ret = unsafe { ResultOpaque_new_in_enum_err(i) };
         ret.into()
     }
@@ -64,21 +64,21 @@ impl ResultOpaque {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn ResultOpaque_new(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new(i : i32) -> crate::DiplomatResult<ResultOpaque, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_foo() -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_foo() -> crate::DiplomatResult<ResultOpaque, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_bar() -> crate::DiplomatResult<Box<ResultOpaque>, ErrorEnum>;
+    fn ResultOpaque_new_failing_bar() -> crate::DiplomatResult<ResultOpaque, ErrorEnum>;
 
-    fn ResultOpaque_new_failing_unit() -> crate::DiplomatResult<Box<ResultOpaque>, ()>;
+    fn ResultOpaque_new_failing_unit() -> crate::DiplomatResult<ResultOpaque, ()>;
 
-    fn ResultOpaque_new_failing_struct(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorStruct>;
+    fn ResultOpaque_new_failing_struct(i : i32) -> crate::DiplomatResult<ResultOpaque, ErrorStruct>;
 
-    fn ResultOpaque_new_in_err(i : i32) -> crate::DiplomatResult<(), Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_err(i : i32) -> crate::DiplomatResult<(), ResultOpaque>;
 
     fn ResultOpaque_new_int(i : i32) -> crate::DiplomatResult<i32, ()>;
 
-    fn ResultOpaque_new_in_enum_err(i : i32) -> crate::DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
+    fn ResultOpaque_new_in_enum_err(i : i32) -> crate::DiplomatResult<ErrorEnum, ResultOpaque>;
 
     fn ResultOpaque_takes_str<'a, 'anon_0>(this: &mut ResultOpaque, _v : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> &'a mut ResultOpaque;
 
