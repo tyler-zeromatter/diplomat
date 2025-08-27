@@ -1,5 +1,5 @@
 use super::OpaqueThin;
-pub struct OpaqueThinIter;
+pub struct OpaqueThinIter<'a>;
 
 impl Drop for OpaqueThinIter {
     fn drop(&mut self) {
@@ -7,7 +7,7 @@ impl Drop for OpaqueThinIter {
     }
 }
 
-impl OpaqueThinIter {
+impl<'a> OpaqueThinIter<'a> {
     pub fn next<'a>(&mut self) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinIter_next(self) };
         ret

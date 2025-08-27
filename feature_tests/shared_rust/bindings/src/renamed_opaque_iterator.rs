@@ -1,4 +1,4 @@
-pub struct RenamedOpaqueIterator;
+pub struct RenamedOpaqueIterator<'a>;
 
 impl Drop for RenamedOpaqueIterator {
     fn drop(&mut self) {
@@ -6,7 +6,7 @@ impl Drop for RenamedOpaqueIterator {
     }
 }
 
-impl RenamedOpaqueIterator {
+impl<'a> RenamedOpaqueIterator<'a> {
 }
 
 #[link(name = "somelib")]

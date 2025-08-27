@@ -2,7 +2,7 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
-pub struct Foo;
+pub struct Foo<'a>;
 
 impl Drop for Foo {
     fn drop(&mut self) {
@@ -10,7 +10,7 @@ impl Drop for Foo {
     }
 }
 
-impl Foo {
+impl<'a> Foo<'a> {
     pub fn new<'a>(x : &'a [u8]) -> Box<Foo><'a> {
         let ret = unsafe { Foo_new(x.into()) };
         ret

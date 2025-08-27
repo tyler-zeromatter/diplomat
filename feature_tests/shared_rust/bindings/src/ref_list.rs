@@ -1,5 +1,5 @@
 use super::RefListParameter;
-pub struct RefList;
+pub struct RefList<'a>;
 
 impl Drop for RefList {
     fn drop(&mut self) {
@@ -7,7 +7,7 @@ impl Drop for RefList {
     }
 }
 
-impl RefList {
+impl<'a> RefList<'a> {
     pub fn node<'b>(data : &'b RefListParameter) -> Box<RefList><'b> {
         let ret = unsafe { RefList_node(data) };
         ret
