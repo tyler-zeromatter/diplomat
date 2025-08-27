@@ -3,7 +3,7 @@
 {%- block type_def -%}
 pub struct {{type_name}}{{self.render_generic_lifetimes()}};
 
-impl Drop for {{type_name}} {
+impl{{self.render_generic_lifetimes()}} Drop for {{type_name}}{{self.render_generic_lifetimes()}} {
     fn drop(&mut self) {
         unsafe { {{dtor_abi}}(self) }
     }
