@@ -1,6 +1,6 @@
 pub struct Two<'a, 'b>;
 
-impl Drop for Two {
+impl<'a, 'b> Drop for Two<'a, 'b> {
     fn drop(&mut self) {
         unsafe { Two_destroy(self) }
     }

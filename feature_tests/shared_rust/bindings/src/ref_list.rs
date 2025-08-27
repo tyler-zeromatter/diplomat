@@ -1,7 +1,7 @@
 use super::RefListParameter;
 pub struct RefList<'a>;
 
-impl Drop for RefList {
+impl<'a> Drop for RefList<'a> {
     fn drop(&mut self) {
         unsafe { RefList_destroy(self) }
     }
