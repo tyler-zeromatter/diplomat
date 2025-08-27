@@ -1,8 +1,9 @@
-{% extends "base.rs.jinja" %}
+{%- extends "base.rs.jinja" -%}
 
 {%- block type_def -%}
 {%- let lifetimes = self.lifetime_env.all_lifetimes().collect::<Vec<_>>() -%}
-{%- if lifetimes.len() > 0 -%} use std::marker::PhantomData; {%- endif %}
+{%- if lifetimes.len() > 0 -%} use std::marker::PhantomData;
+{% endif -%}
 
 pub struct {{type_name}}{{self.render_generic_lifetimes()}} {%- if lifetimes.len() > 0 %} {
     {%- for lt in lifetimes %}
