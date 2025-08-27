@@ -9,7 +9,7 @@ use diplomat_core::hir::{
 
 use crate::{
     config::Config,
-    shared_rust::{formatter::TypeInfo, func::FunctionInfo, RustFormatter},
+    shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, func::FunctionInfo, RustFormatter},
 };
 
 pub(super) struct FileGenContext<'tcx> {
@@ -226,6 +226,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     borrow: st.owner(),
                     name: st_name,
                     generic_lifetimes: st.lifetimes().lifetimes().collect(),
+                    wrapped: TypeInfoWrapper::None,
                 }
             }
             Type::Enum(e) => {
@@ -240,12 +241,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 let op_name = self.formatter.fmt_symbol_name(type_id.into());
                 self.imports.insert(op_name.clone().into());
 
-                let op_name = if op.is_owned() {
-                    format!("Box<{op_name}>").into()
-                } else {
-                    format!("{op_name}").into()
-                };
-
                 TypeInfo {
                     name: if op.is_optional() {
                         format!("Option<{op_name}>").into()
@@ -254,6 +249,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     },
                     borrow: op.owner.get_borrow(),
                     generic_lifetimes: op.lifetimes.lifetimes().collect(),
+                    wrapped: if op.is_owned() {
+                        super::formatter::TypeInfoWrapper::Boxed
+                    } else {
+                        super::formatter::TypeInfoWrapper::None
+                    }
                 }
             }
             Type::DiplomatOption(op) => {
@@ -262,28 +262,23 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     name: format!("Option<{}>", info.name).into(),
                     generic_lifetimes: info.generic_lifetimes,
                     borrow: info.borrow,
+                    // TODO: I don't think this always needs to be wrapped the same way:
+                    wrapped: info.wrapped,
                 }
             }
             Type::Slice(sl) => {
                 let (borrow, type_name) = match sl {
                     Slice::Primitive(b, p) => {
-                        let name = if b.is_owned() {
-                            format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p))
-                        } else {
-                            format!("[{}]", self.formatter.fmt_primitive_name(*p))
-                        };
+                        let name = format!("[{}]", self.formatter.fmt_primitive_name(*p));
                         (b, name)
                     }
                     Slice::Struct(b, str) => {
                         let name = self.formatter.fmt_symbol_name(str.id().into());
-                        let name = if b.is_owned() {
-                            format!("Box<[{name}]>")
-                        } else {
-                            format!("[{name}]")
-                        };
+                        let name = format!("[{name}]");
                         (b, name)
                     }
                     Slice::Str(lt, enc) => {
+                        // TODO: I don't think this always needs to be wrapped the same way:
                         let name = match enc {
                             StringEncoding::Utf8 => "String",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
@@ -294,7 +289,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
                         match lt {
                             Some(lt) => (&MaybeOwn::from_immutable_lifetime(*lt), name),
-                            None => (&MaybeOwn::Own, format!("Box<{name}>")),
+                            None => (&MaybeOwn::Own, format!("{name}")),
                         }
                     }
                     Slice::Strs(enc) => {
@@ -308,6 +303,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     name: type_name.into(),
                     generic_lifetimes: Vec::new(),
                     borrow: *borrow,
+                    wrapped: if borrow.is_owned() {
+                        TypeInfoWrapper::Boxed
+                    } else {
+                        TypeInfoWrapper::None
+                    }
                 }
             }
             _ => TypeInfo::new("TODO()".into()),
