@@ -38,6 +38,7 @@ impl<'a> TypeInfo<'a> {
     }
 
     pub(super) fn fmt_generic_lifetimes(generic_lifetimes : Vec<MaybeStatic<Lifetime>>, env : &LifetimeEnv) -> String {
+        // TODO: I'm pretty sure bounds also need to be captured here?
         let generic_lifetimes : Vec<String> = generic_lifetimes.iter().map(|lt| {
             match lt {
                 MaybeStatic::Static => "'static".into(),
