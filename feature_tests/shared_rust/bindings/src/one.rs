@@ -1,5 +1,5 @@
 use super::Two;
-pub struct One;
+pub struct One<'a>;
 
 impl Drop for One {
     fn drop(&mut self) {
@@ -7,7 +7,7 @@ impl Drop for One {
     }
 }
 
-impl One {
+impl<'a> One<'a> {
     pub fn transitivity<'o, 'a, 'b, 'c, 'd, 'e, 'x, 'anon_0>(hold : &'x One<'e>, nohold : &'anon_0 One<'x>) -> Box<One><'a> {
         let ret = unsafe { One_transitivity(hold, nohold) };
         ret

@@ -1,4 +1,4 @@
-pub struct Two;
+pub struct Two<'a, 'b>;
 
 impl Drop for Two {
     fn drop(&mut self) {
@@ -6,7 +6,7 @@ impl Drop for Two {
     }
 }
 
-impl Two {
+impl<'a, 'b> Two<'a, 'b> {
 }
 
 #[link(name = "somelib")]
