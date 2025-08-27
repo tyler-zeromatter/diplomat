@@ -1,5 +1,3 @@
-
-
 pub struct RenamedOpaqueArithmetic;
 
 impl Drop for RenamedOpaqueArithmetic {

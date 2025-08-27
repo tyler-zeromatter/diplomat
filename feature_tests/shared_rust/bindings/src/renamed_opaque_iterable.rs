@@ -1,5 +1,3 @@
-
-
 pub struct RenamedOpaqueIterable;
 
 impl Drop for RenamedOpaqueIterable {

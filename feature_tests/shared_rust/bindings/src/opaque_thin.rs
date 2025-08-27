@@ -1,5 +1,3 @@
-
-
 pub struct OpaqueThin;
 
 impl Drop for OpaqueThin {

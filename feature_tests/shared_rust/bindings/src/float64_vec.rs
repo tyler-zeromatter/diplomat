@@ -1,5 +1,3 @@
-
-
 pub struct Float64Vec;
 
 impl Drop for Float64Vec {

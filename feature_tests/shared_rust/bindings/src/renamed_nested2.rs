@@ -1,5 +1,3 @@
-
-
 pub struct RenamedNested2;
 
 impl Drop for RenamedNested2 {

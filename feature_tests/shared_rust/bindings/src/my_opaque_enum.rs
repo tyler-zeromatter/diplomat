@@ -1,5 +1,3 @@
-
-
 pub struct MyOpaqueEnum;
 
 impl Drop for MyOpaqueEnum {

@@ -1,7 +1,5 @@
 use super::ImportedStruct;
 use super::MyStruct;
-
-
 pub struct Opaque;
 
 impl Drop for Opaque {

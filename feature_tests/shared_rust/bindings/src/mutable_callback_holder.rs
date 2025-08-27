@@ -1,5 +1,3 @@
-
-
 pub struct MutableCallbackHolder;
 
 impl Drop for MutableCallbackHolder {
