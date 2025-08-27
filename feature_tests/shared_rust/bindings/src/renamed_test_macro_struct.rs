@@ -4,7 +4,7 @@ pub struct RenamedTestMacroStruct {
 }
 
 impl RenamedTestMacroStruct {
-    pub fn test_func() -> usize {
+    pub fn test_func<'a>() -> usize {
         let ret = unsafe { namespace_TestMacroStruct_test_func() };
         ret
     }
@@ -19,7 +19,7 @@ impl RenamedTestMacroStruct {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn namespace_TestMacroStruct_test_func() -> usize;
+    fn namespace_TestMacroStruct_test_func<'a>() -> usize;
 
     fn namespace_TestMacroStruct_test_meta() -> RenamedTestMacroStruct;
 }

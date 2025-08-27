@@ -14,17 +14,17 @@ impl Opaque {
         ret
     }
 
-    pub fn try_from_utf8(input : &'anon_0 [u8]) -> Option<Box<Opaque>> {
+    pub fn try_from_utf8<'anon_0>(input : &'anon_0 [u8]) -> Option<Box<Opaque>> {
         let ret = unsafe { Opaque_try_from_utf8(input.into()) };
         ret
     }
 
-    pub fn from_str(input : &'anon_0 String) -> Box<Opaque> {
+    pub fn from_str<'anon_0>(input : &'anon_0 String) -> Box<Opaque> {
         let ret = unsafe { Opaque_from_str(input.into()) };
         ret
     }
 
-    pub fn get_debug_str(&self) -> String {
+    pub fn get_debug_str<'anon_0>(&self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { Opaque_get_debug_str(self, write_mut) };
@@ -32,7 +32,7 @@ impl Opaque {
         out_str
     }
 
-    pub fn assert_struct(&self, s : MyStruct) {
+    pub fn assert_struct<'anon_0>(&self, s : MyStruct) {
         let ret = unsafe { Opaque_assert_struct(self, s) };
         ret
     }
@@ -59,13 +59,13 @@ impl Opaque {
 unsafe extern "C" {
     fn Opaque_new() -> Box<Opaque>;
 
-    fn Opaque_try_from_utf8(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Option<Box<Opaque>>;
+    fn Opaque_try_from_utf8<'anon_0>(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Option<Box<Opaque>>;
 
-    fn Opaque_from_str(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<Opaque>;
+    fn Opaque_from_str<'anon_0>(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<Opaque>;
 
-    fn Opaque_get_debug_str(this: &Opaque, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn Opaque_get_debug_str<'anon_0>(this: &Opaque, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Opaque_assert_struct(this: &Opaque, s : MyStruct);
+    fn Opaque_assert_struct<'anon_0>(this: &Opaque, s : MyStruct);
 
     fn Opaque_returns_usize() -> usize;
 
