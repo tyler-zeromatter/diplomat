@@ -295,6 +295,8 @@ pub trait OpaqueOwner {
 
     /// Return the lifetime of the borrow, if any.
     fn lifetime(&self) -> Option<MaybeStatic<Lifetime>>;
+
+    fn get_borrow(&self) -> MaybeOwn;
 }
 
 impl OpaqueOwner for MaybeOwn {
@@ -318,6 +320,10 @@ impl OpaqueOwner for MaybeOwn {
             MaybeOwn::Borrow(b) => b.lifetime(),
         }
     }
+
+    fn get_borrow(&self) -> MaybeOwn {
+        *self
+    }
 }
 
 impl OpaqueOwner for Borrow {
@@ -331,5 +337,9 @@ impl OpaqueOwner for Borrow {
 
     fn lifetime(&self) -> Option<MaybeStatic<Lifetime>> {
         Some(self.lifetime)
+    }
+
+    fn get_borrow(&self) -> MaybeOwn {
+        MaybeOwn::Borrow(*self)
     }
 }
