@@ -1,6 +1,6 @@
 use super::ErrorEnum;
 use super::ErrorStruct;
-use std::marker::PhantomData;
+
 
 pub struct ResultOpaque;
 

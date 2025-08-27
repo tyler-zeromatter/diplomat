@@ -1,6 +1,6 @@
 use super::OpaqueThin;
 use super::OpaqueThinIter;
-use std::marker::PhantomData;
+
 
 pub struct OpaqueThinVec;
 
