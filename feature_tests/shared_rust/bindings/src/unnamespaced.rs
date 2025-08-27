@@ -1,6 +1,6 @@
 use super::AttrOpaque1Renamed;
 use super::RenamedAttrEnum;
-use std::marker::PhantomData;
+
 
 pub struct Unnamespaced;
 
