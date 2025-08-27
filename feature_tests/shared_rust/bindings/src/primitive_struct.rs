@@ -5,7 +5,7 @@ pub struct PrimitiveStruct {
     pub b: diplomat_runtime::DiplomatChar,
     pub c: i64,
     pub d: isize,
-    pub e: byte,
+    pub e: u8,
 }
 
 impl PrimitiveStruct {

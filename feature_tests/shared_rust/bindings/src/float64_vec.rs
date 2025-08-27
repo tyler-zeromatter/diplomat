@@ -32,7 +32,7 @@ impl Float64Vec {
         ret
     }
 
-    pub fn new_f64_be_bytes<'anon_0>(v : &'anon_0 [byte]) -> Box<Float64Vec> {
+    pub fn new_f64_be_bytes<'anon_0>(v : &'anon_0 [u8]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_f64_be_bytes(v) };
         ret
     }
@@ -90,7 +90,7 @@ unsafe extern "C" {
 
     fn Float64Vec_new_usize<'anon_0>(v : &'anon_0 [usize]) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_f64_be_bytes<'anon_0>(v : &'anon_0 [byte]) -> Box<Float64Vec>;
+    fn Float64Vec_new_f64_be_bytes<'anon_0>(v : &'anon_0 [u8]) -> Box<Float64Vec>;
 
     fn Float64Vec_new_from_owned(v : Box<[f64]>) -> Box<Float64Vec>;
 
