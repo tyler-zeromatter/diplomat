@@ -2,11 +2,10 @@ use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
 use diplomat_core::hir::{
-    Borrow, EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, OpaqueDef,
-    OpaqueOwner, OpaquePath, Slice, StringEncoding, StructDef, StructPathLike, SymbolId,
-    TyPosition, Type, TypeContext, TypeDef, TypeId,
+    EnumDef, LifetimeEnv, MaybeOwn, OpaqueDef,
+    OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId,
+    TyPosition, Type, TypeContext, TypeId,
 };
-use itertools::Itertools;
 
 use crate::{
     config::Config,
@@ -107,7 +106,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
 
         StructTemplate {
-            type_name: self.formatter.fmt_symbol_name(self.id.into()),
+            type_name: self.formatter.fmt_symbol_name(self.id),
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
@@ -139,7 +138,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
         }
 
-        let type_name = self.formatter.fmt_symbol_name(self.id.into());
+        let type_name = self.formatter.fmt_symbol_name(self.id);
 
         let dtor_abi = ty
             .attrs
@@ -208,7 +207,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
 
         EnumTemplate {
-            type_name: self.formatter.fmt_symbol_name(self.id.into()),
+            type_name: self.formatter.fmt_symbol_name(self.id),
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
@@ -269,18 +268,18 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 let (borrow, type_name) = match sl {
                     Slice::Primitive(b, p) => {
                         let name = if b.is_owned() {
-                            format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p)).into()
+                            format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p))
                         } else {
-                            format!("[{}]", self.formatter.fmt_primitive_name(*p)).into()
+                            format!("[{}]", self.formatter.fmt_primitive_name(*p))
                         };
                         (b, name)
                     }
                     Slice::Struct(b, str) => {
                         let name = self.formatter.fmt_symbol_name(str.id().into());
                         let name = if b.is_owned() {
-                            format!("Box<[{name}]>").into()
+                            format!("Box<[{name}]>")
                         } else {
-                            format!("[{name}]").into()
+                            format!("[{name}]")
                         };
                         (b, name)
                     }
@@ -294,7 +293,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         .into();
 
                         match lt {
-                            Some(lt) => (&MaybeOwn::from_immutable_lifetime(lt.clone()), name),
+                            Some(lt) => (&MaybeOwn::from_immutable_lifetime(*lt), name),
                             None => (&MaybeOwn::Own, format!("Box<{name}>")),
                         }
                     }
@@ -332,7 +331,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             Type::Slice(sl) => match sl {
                 // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
-                Slice::Str(..) => Some(format!("diplomat_runtime::DiplomatStrSlice").into()),
+                Slice::Str(..) => Some("diplomat_runtime::DiplomatStrSlice".to_string().into()),
                 _ => None,
             },
             _ => None,

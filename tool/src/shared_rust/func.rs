@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, Mutability, ReturnType, SelfType, Slice,
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, ReturnType, SelfType, Slice,
     SuccessType, TyPosition, Type, TypeId,
 };
 
