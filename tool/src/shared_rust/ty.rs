@@ -20,6 +20,7 @@ pub(super) trait TypeTemplate<'a> {
     fn crate_vis(&self) -> Option<String>;
 }
 
+/// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
 pub(super) struct TypeInfo<'a> {
     pub(super) name : Cow<'a, str>,
     pub(super) generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
