@@ -355,7 +355,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_abi_type_name(op).unwrap_or(regular_type)).into())
             }
             Type::Slice(sl) => match sl {
-                // TODO: Lifetimes.
+                // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
                 Slice::Str(..) => Some(format!("diplomat_runtime::DiplomatStrSlice").into()),
                 _ => None
             }
