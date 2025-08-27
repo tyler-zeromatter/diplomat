@@ -1,7 +1,15 @@
 {% extends "base.rs.jinja" %}
 
 {%- block type_def -%}
-pub struct {{type_name}}{{self.render_generic_lifetimes()}};
+{%- let lifetimes = self.lifetime_env.all_lifetimes().collect::<Vec<_>>() -%}
+use std::marker::PhantomData;
+
+pub struct {{type_name}}{{self.render_generic_lifetimes()}} {%- if lifetimes.len() > 0 %} {
+    {%- for lt in lifetimes %}
+    {{ lifetime_env.fmt_lifetime(*lt) }}_marker : PhantomData<&'{{lifetime_env.fmt_lifetime(*lt)}} ()>,
+    {%- endfor %}
+}
+{%- else -%} ; {%- endif %}
 
 impl{{self.render_generic_lifetimes()}} Drop for {{type_name}}{{self.render_generic_lifetimes()}} {
     fn drop(&mut self) {

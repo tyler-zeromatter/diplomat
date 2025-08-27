@@ -97,7 +97,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     }
 
     pub(super) fn generate_opaque(mut self, ty : &'tcx OpaqueDef) -> impl TypeTemplate<'tcx> {
-        // TODO: PhantomData for Opaques to avoid Rust complaining about lifetime usage?
         #[derive(Template)]
         #[template(path = "shared_rust/opaque.rs.jinja", escape = "none")]
         struct OpaqueTemplate<'a> {
