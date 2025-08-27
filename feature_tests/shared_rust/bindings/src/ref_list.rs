@@ -8,7 +8,7 @@ impl Drop for RefList {
 }
 
 impl RefList {
-    pub fn node(data : &RefListParameter) -> Box<RefList> {
+    pub fn node(data : RefListParameter) -> Box<RefList> {
         let ret = unsafe { RefList_node(data) };
         ret
     }
@@ -18,7 +18,7 @@ impl RefList {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn RefList_node(data : &RefListParameter) -> Box<RefList>;
+    fn RefList_node(data : RefListParameter) -> Box<RefList>;
 
     fn RefList_destroy(this : *mut RefList);
 }

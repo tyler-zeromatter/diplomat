@@ -14,7 +14,7 @@ impl Unnamespaced {
         ret
     }
 
-    pub fn use_namespaced(&self, _n : &AttrOpaque1Renamed) {
+    pub fn use_namespaced(&self, _n : AttrOpaque1Renamed) {
         let ret = unsafe { namespace_Unnamespaced_use_namespaced(self, _n) };
         ret
     }
@@ -26,7 +26,7 @@ impl Unnamespaced {
 unsafe extern "C" {
     fn namespace_Unnamespaced_make(_e : RenamedAttrEnum) -> Box<Unnamespaced>;
 
-    fn namespace_Unnamespaced_use_namespaced(this: &Unnamespaced, _n : &AttrOpaque1Renamed);
+    fn namespace_Unnamespaced_use_namespaced(this: &Unnamespaced, _n : AttrOpaque1Renamed);
 
     fn namespace_Unnamespaced_destroy(this : *mut Unnamespaced);
 }

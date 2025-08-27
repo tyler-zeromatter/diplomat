@@ -1,7 +1,7 @@
 #[repr(C)]
-pub struct StructWithSlices {
-    pub first: &[u8],
-    pub second: &[u16],
+pub struct StructWithSlices<'a> {
+    pub first: [u8]<'a>,
+    pub second: [u16]<'a>,
 }
 
 impl StructWithSlices {
