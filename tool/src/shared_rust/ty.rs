@@ -270,7 +270,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 let op_name = if op.is_owned() {
                     format!("Box<{op_name}>").into()
                 } else {
-                    // TODO: Lifetimes
                     format!("{op_name}").into()
                 };
 
