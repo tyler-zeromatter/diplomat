@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{EnumDef, Lifetime, LifetimeEnv, MaybeStatic, Mutability, OpaqueDef, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{EnumDef, Lifetime, LifetimeEnv, MaybeStatic, Mutability, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -20,6 +20,22 @@ pub(super) trait TypeTemplate<'a> {
     fn crate_vis(&self) -> Option<String>;
 }
 
+pub(super) struct TypeInfo<'a> {
+    pub(super) name : Cow<'a, str>,
+    pub(super) generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
+    pub(super) borrow : Option<MaybeStatic<Lifetime>>,
+}
+
+impl<'a> TypeInfo<'a> {
+    pub(super) fn new(name : Cow<'a, str>) -> Self {
+        Self {
+            name,
+            generic_lifetimes: Vec::new(),
+            borrow: None,
+        }
+    }
+}
+
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
     pub(super) fn from_type<'a>(config : &Config, id : TypeId, formatter : &'a RustFormatter, tcx : &'a TypeContext) -> FileGenContext<'a> {
         FileGenContext {
@@ -33,7 +49,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     pub(super) fn generate_struct<P: TyPosition>(mut self, ty : &'tcx StructDef<P>, is_out : bool) -> impl TypeTemplate<'tcx> {
         struct FieldInfo<'a> {
-            type_name : Cow<'a, str>,
+            type_info : TypeInfo<'a>,
             name : Cow<'a, str>,
             generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
         }
@@ -73,7 +89,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             let generic_lifetimes = f.ty.lifetimes();
 
             FieldInfo {
-                type_name: self.gen_type_name(&f.ty),
+                type_info: self.gen_type_info(&f.ty),
                 name: f.name.as_str().into(),
                 generic_lifetimes: generic_lifetimes.collect(),
             }
@@ -192,22 +208,23 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
-    /// Generate the type name of a given type. Does *NOT* handle lifetimes.
-    pub(super) fn gen_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Cow<'tcx, str> {
+    pub(super) fn gen_type_info<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> TypeInfo<'tcx> {
         match ty {
             Type::Primitive(p) => {
-                self.formatter.fmt_primitive_name(*p).into()
+                TypeInfo::new(self.formatter.fmt_primitive_name(*p).into())
             }
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
                 self.imports.insert(st_name.clone().into());
-                st_name
+                
+                TypeInfo::new(st_name)
             }
             Type::Enum(e) => {
                 let type_id : TypeId = e.tcx_id.into();
                 let enum_name = self.formatter.fmt_symbol_name(type_id.into());
                 self.imports.insert(enum_name.clone().into());
-                enum_name
+                
+                TypeInfo::new(enum_name)
             }
             Type::Opaque(op) => {
                 let type_id : TypeId = op.tcx_id.into();
@@ -221,14 +238,23 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     format!("{op_name}").into()
                 };
 
-                if op.is_optional() {
-                    format!("Option<{op_name}>").into()
-                } else {
-                    op_name
+                TypeInfo {
+                    name: if op.is_optional() {
+                        format!("Option<{op_name}>").into()
+                    } else {
+                        op_name
+                    },
+                    borrow: op.owner.lifetime(),
+                    generic_lifetimes: op.lifetimes.lifetimes().collect(),
                 }
             }
             Type::DiplomatOption(op) => {
-                format!("Option<{}>", self.gen_type_name(op)).into()
+                let info = self.gen_type_info(op);
+                TypeInfo {
+                    name: format!("Option<{}>", info.name).into(),
+                    generic_lifetimes: info.generic_lifetimes,
+                    borrow: info.borrow
+                }
             }
             Type::Slice(sl) => {
                 let type_name = match sl {
@@ -270,16 +296,16 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     _ => format!("TODO"),
                 };
 
-                type_name.into()
+                TypeInfo::new(type_name.into())
             }
-            _ => "TODO()".into()
+            _ => TypeInfo::new("TODO()".into())
         }
     } 
 
     pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
         match ty {
             Type::DiplomatOption(op) => {
-                let regular_type = self.gen_type_name(op);
+                let regular_type = self.gen_type_info(op).name;
                 Some(format!("diplomat_runtime::DiplomatOption<{}>", self.gen_abi_type_name(op).unwrap_or(regular_type)).into())
             }
             Type::Slice(sl) => match sl {

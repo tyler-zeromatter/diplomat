@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId};
 
-use crate::shared_rust::FileGenContext;
+use crate::shared_rust::{ty::TypeInfo, FileGenContext};
 
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
@@ -19,7 +19,7 @@ pub(super) struct FunctionInfo<'tcx> {
 
 struct ParamInfo<'a> {
     var_name : Cow<'a, str>,
-    type_name : Cow<'a, str>,
+    type_info : TypeInfo<'a>,
     abi_type_override : Option<Cow<'a, str>>,
     conversion : Option<Cow<'a, str>>,
 }
@@ -29,7 +29,7 @@ impl<'a> ParamInfo<'a> {
         if is_abi && self.abi_type_override.is_some() {
             self.abi_type_override.clone().unwrap()
         } else {
-            self.type_name.clone()
+            self.type_info.name.clone()
         }
     }
 
@@ -46,7 +46,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
-            params.push(ParamInfo { var_name: p.name.as_str().into(), type_name: ctx.gen_type_name(&p.ty), abi_type_override: ctx.gen_abi_type_name(&p.ty), conversion: Self::param_conversion(&p.ty) });
+            params.push(ParamInfo { var_name: p.name.as_str().into(), type_info: ctx.gen_type_info(&p.ty), abi_type_override: ctx.gen_abi_type_name(&p.ty), conversion: Self::param_conversion(&p.ty) });
         }
 
         let self_param_own = method.param_self.as_ref().map(|s| { 
@@ -89,7 +89,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 (format!("&{mutable}self"), format!("this: &{mutable}{type_name}"))
             };
 
-            ParamInfo { var_name: "".into(), type_name: type_name.into(), abi_type_override: Some(abi_type.into()), conversion: None }
+            ParamInfo { var_name: "".into(), type_info: TypeInfo::new(type_name.into()), abi_type_override: Some(abi_type.into()), conversion: None }
         });
 
         let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
@@ -115,16 +115,16 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
     
-    fn gen_ok_type_name(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> Cow<'tcx, str>  {
+    fn gen_ok_type_name(params : &mut Vec<ParamInfo>, ctx : &mut FileGenContext<'tcx>, ok : &'tcx SuccessType) -> TypeInfo<'tcx>  {
         match ok {
-            SuccessType::Unit => "()".into(),
+            SuccessType::Unit => TypeInfo::new("()".into()),
             SuccessType::OutType(o) => {
                 // TODO: Opaques.
-                ctx.gen_type_name(o)
+                ctx.gen_type_info(o)
             }
             SuccessType::Write => {
-                params.push(ParamInfo { var_name: "write_mut".into(), type_name: "&mut crate::DiplomatWrite".into(), abi_type_override: None, conversion: None, });
-                "String".into()
+                params.push(ParamInfo { var_name: "write_mut".into(), type_info: TypeInfo::new("&mut crate::DiplomatWrite".into()), abi_type_override: None, conversion: None, });
+                TypeInfo::new("String".into())
             }
             _ => panic!("HIR SuccessType {ok:?} unsupported")
         }
@@ -142,15 +142,16 @@ impl<'tcx> FunctionInfo<'tcx> {
          match ret {
             ReturnType::Fallible(ok, err) => {
                 let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
-                let err_ty = err.as_ref().map(|e| { ctx.gen_type_name(e) }).unwrap_or("()".into());
+                let err_ty = err.as_ref().map(|e| { ctx.gen_type_info(e) }).unwrap_or(TypeInfo::new("()".into()));
 
                 let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
                 let err_ty_abi = err.as_ref().map(|e| { ctx.gen_abi_type_name(e) }).unwrap_or(None);
 
-                let abi_override = format!("crate::DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.clone()), err_ty_abi.unwrap_or(err_ty.clone()));
+                // TODO: Generic lifetimes/borrow information from results (create a `render` function on TypeInfo, recursively use that).
+                let abi_override = format!("crate::DiplomatResult<{}, {}>", ok_ty_abi.unwrap_or(ok_ty.name.clone()), err_ty_abi.unwrap_or(err_ty.name.clone()));
                 let info = ParamInfo {
                     var_name: "".into(),
-                    type_name: format!("Result<{ok_ty}, {err_ty}>").into(),
+                    type_info: TypeInfo::new(format!("Result<{}, {}>", ok_ty.name, err_ty.name).into()),
                     abi_type_override: Some(abi_override.into()),
                     // TODO: More advanced conversions for inner types.
                     conversion: Some(".into()".into())
@@ -161,20 +162,20 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
 
                 let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
-                let abi_override = format!("diplomat_runtime::DiplomatOption<{}>", ok_ty_abi.unwrap_or(ok_ty.clone()));
+                let abi_override = format!("diplomat_runtime::DiplomatOption<{}>", ok_ty_abi.unwrap_or(ok_ty.name.clone()));
 
                 Some(ParamInfo {
                     var_name: "".into(),
-                    type_name: format!("Option<{ok_ty}>").into(),
+                    type_info: TypeInfo::new(format!("Option<{}>", ok_ty.name).into()),
                     abi_type_override: Some(abi_override.into()),
                     conversion: Some(".into_converted_option()".into()),
                 })
             }
             ReturnType::Infallible(ok) => {
-                let type_name = Self::gen_ok_type_name(params, ctx, ok);
+                let type_info = Self::gen_ok_type_name(params, ctx, ok);
                 let abi_name = Self::gen_ok_abi_name(ctx, ok);
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
-                    Some(ParamInfo { var_name: "".into(), type_name, abi_type_override: abi_name, conversion: None })
+                    Some(ParamInfo { var_name: "".into(), type_info, abi_type_override: abi_name, conversion: None })
                 } else {
                     None
                 }
