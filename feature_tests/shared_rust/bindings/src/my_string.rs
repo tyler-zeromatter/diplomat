@@ -67,7 +67,7 @@ unsafe extern "C" {
 
     fn MyString_new_unsafe<'anon_0>(v : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
 
-    fn MyString_new_owned(v : diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
+    fn MyString_new_owned(v : Box<diplomat_runtime::DiplomatStrSlice>) -> Box<MyString>;
 
     fn MyString_new_from_first(v : &[String]) -> Box<MyString>;
 

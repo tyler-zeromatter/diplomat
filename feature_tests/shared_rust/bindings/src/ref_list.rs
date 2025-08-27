@@ -12,7 +12,7 @@ impl<'a> Drop for RefList<'a> {
 }
 
 impl<'a> RefList<'a> {
-    pub fn node<'b>(data : &'b RefListParameter) -> Box<RefList><'b> {
+    pub fn node<'b>(data : &'b RefListParameter) -> Box<RefList<'b>> {
         let ret = unsafe { RefList_node(data) };
         ret
     }
@@ -22,7 +22,7 @@ impl<'a> RefList<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn RefList_node<'b>(data : &'b RefListParameter) -> Box<RefList><'b>;
+    fn RefList_node<'b>(data : &'b RefListParameter) -> Box<RefList<'b>>;
 
     fn RefList_destroy(this : *mut RefList);
 }

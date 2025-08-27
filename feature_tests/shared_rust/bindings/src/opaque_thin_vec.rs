@@ -14,7 +14,7 @@ impl OpaqueThinVec {
         ret
     }
 
-    pub fn iter<'a>(&self) -> Box<OpaqueThinIter><'a> {
+    pub fn iter<'a>(&self) -> Box<OpaqueThinIter<'a>> {
         let ret = unsafe { OpaqueThinVec_iter(self) };
         ret
     }
@@ -41,7 +41,7 @@ impl OpaqueThinVec {
 unsafe extern "C" {
     fn OpaqueThinVec_create<'anon_0, 'anon_1, 'anon_2>(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
 
-    fn OpaqueThinVec_iter<'a>(this: &OpaqueThinVec) -> Box<OpaqueThinIter><'a>;
+    fn OpaqueThinVec_iter<'a>(this: &OpaqueThinVec) -> Box<OpaqueThinIter<'a>>;
 
     fn OpaqueThinVec_len<'anon_0>(this: &OpaqueThinVec) -> usize;
 
