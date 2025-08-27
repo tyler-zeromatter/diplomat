@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::Template;
-use diplomat_core::hir::{MaybeOwn, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId, LifetimeEnv};
+use diplomat_core::hir::{Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, Mutability, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId};
 
 use crate::shared_rust::{ty::TypeInfo, FileGenContext};
 
@@ -16,6 +16,7 @@ pub(super) struct FunctionInfo<'tcx> {
     is_write : bool,
     return_info : ReturnType,
     lifetime_env : &'tcx LifetimeEnv,
+    generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
 }
 
 struct ParamInfo<'a> {
@@ -52,6 +53,10 @@ impl<'a> ParamInfo<'a> {
 }
 
 impl<'tcx> FunctionInfo<'tcx> {
+    fn render_generic_lifetimes(&self) -> String {
+        TypeInfo::fmt_generic_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
+    }
+    
     fn gen_function_info(ctx : &mut FileGenContext<'tcx>, method : &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
@@ -112,6 +117,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             is_write: method.output.is_write(),
             return_info: method.output.clone(),
             lifetime_env: &method.lifetime_env,
+            generic_lifetimes: method.method_lifetimes().lifetimes().collect(),
         }
     }
 
