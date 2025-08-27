@@ -7,7 +7,7 @@ pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
 }
 
 impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
-    pub fn from_foo_and_strings(foo : &'x Foo<'y>, dstr16_x : &'x [u16], utf8_str_z : &'z String) -> BorrowedFieldsWithBounds<'x, 'y, 'z> {
+    pub fn from_foo_and_strings<'x, 'y, 'z>(foo : &'x Foo<'y>, dstr16_x : &'x [u16], utf8_str_z : &'z String) -> BorrowedFieldsWithBounds<'x, 'y, 'z> {
         let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.into()) };
         ret
     }
@@ -17,5 +17,5 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFieldsWithBounds_from_foo_and_strings(foo : &'x Foo<'y>, dstr16_x : &'x diplomat_runtime::DiplomatStrSlice, utf8_str_z : &'z diplomat_runtime::DiplomatStrSlice) -> BorrowedFieldsWithBounds<'x, 'y, 'z>;
+    fn BorrowedFieldsWithBounds_from_foo_and_strings<'x, 'y, 'z>(foo : &'x Foo<'y>, dstr16_x : &'x diplomat_runtime::DiplomatStrSlice, utf8_str_z : &'z diplomat_runtime::DiplomatStrSlice) -> BorrowedFieldsWithBounds<'x, 'y, 'z>;
 }
