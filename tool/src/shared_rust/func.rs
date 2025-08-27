@@ -27,14 +27,6 @@ struct ParamInfo<'a> {
 }
 
 impl<'a> ParamInfo<'a> {
-    fn type_name(&self, is_abi : bool) -> Cow<'a, str> {
-        if is_abi && self.abi_type_override.is_some() {
-            self.abi_type_override.clone().unwrap()
-        } else {
-            self.type_info.name.clone()
-        }
-    }
-
     fn render(&self, env : &LifetimeEnv, is_abi : bool) -> String {
         if is_abi && self.abi_type_override.is_some() {
             self.type_info.render_with_override(env, Some(self.abi_type_override.clone().unwrap().into()))
@@ -117,6 +109,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             is_write: method.output.is_write(),
             return_info: method.output.clone(),
             lifetime_env: &method.lifetime_env,
+            // TODO: Need a separate set of lifetimes for the function definition, and one for the ABI.
             generic_lifetimes: method.method_lifetimes().lifetimes().collect(),
         }
     }
