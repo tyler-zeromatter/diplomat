@@ -1,7 +1,7 @@
 use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
-use diplomat_core::hir::{EnumDef, MaybeStatic, Mutability, OpaqueDef, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
+use diplomat_core::hir::{EnumDef, Lifetime, LifetimeEnv, MaybeStatic, Mutability, OpaqueDef, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeDef, TypeId};
 
 use crate::{config::Config, shared_rust::{func::FunctionInfo, RustFormatter}};
 
@@ -34,7 +34,19 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     pub(super) fn generate_struct<P: TyPosition>(mut self, ty : &'tcx StructDef<P>, is_out : bool) -> impl TypeTemplate<'tcx> {
         struct FieldInfo<'a> {
             type_name : Cow<'a, str>,
-            name : Cow<'a, str>
+            name : Cow<'a, str>,
+            generic_lifetimes : Vec<MaybeStatic<Lifetime>>,
+        }
+
+        impl<'a> FieldInfo<'a> {
+            fn generic_lifetimes(&self, env : &LifetimeEnv) -> Vec<String> {
+                self.generic_lifetimes.iter().map(|l| {
+                    match l {
+                        MaybeStatic::Static => "static".to_string(),
+                        MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns).to_string()
+                    }
+                }).collect()
+            }
         }
 
         #[derive(Template)]
@@ -46,14 +58,24 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             imports : BTreeSet<String>,
             is_out : bool,
             fields : Vec<FieldInfo<'a>>,
+            lifetime_env : &'a LifetimeEnv,
+            lifetimes : Vec<String>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
+        let lifetime_env = &ty.lifetimes;
+        let lifetimes = lifetime_env.all_lifetimes().map(|lt| {
+            lifetime_env.fmt_lifetime(lt).into()
+        });
+
         let fields = ty.fields.iter().map(|f| {
+            let generic_lifetimes = f.ty.lifetimes();
+
             FieldInfo {
                 type_name: self.gen_type_name(&f.ty),
-                name: f.name.as_str().into()
+                name: f.name.as_str().into(),
+                generic_lifetimes: generic_lifetimes.collect(),
             }
         }).collect();
 
@@ -82,7 +104,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             lib_name: self.lib_name,
             imports: self.imports,
             is_out,
-            fields
+            fields,
+            lifetime_env,
+            lifetimes: lifetimes.collect(),
         }
     }
 
@@ -168,6 +192,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
+    /// Generate the type name of a given type. Does *NOT* handle lifetimes.
     pub(super) fn gen_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Cow<'tcx, str> {
         match ty {
             Type::Primitive(p) => {
@@ -192,8 +217,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 let op_name = if op.is_owned() {
                     format!("Box<{op_name}>").into()
                 } else {
-                    // TODO: Lifetimes?
-                    format!("&{op_name}").into()
+                    // TODO: Lifetimes
+                    format!("{op_name}").into()
                 };
 
                 if op.is_optional() {
@@ -206,53 +231,50 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 format!("Option<{}>", self.gen_type_name(op)).into()
             }
             Type::Slice(sl) => {
-                let (mt, type_name) = match sl {
+                let type_name = match sl {
                     Slice::Primitive(b, p) => {
                         if b.is_owned() {
-                            return format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p)).into();
+                            format!("Box<[{}]>", self.formatter.fmt_primitive_name(*p)).into()
+                        } else {
+                            format!("[{}]", self.formatter.fmt_primitive_name(*p)).into()
                         }
-                        (b.mutability(), self.formatter.fmt_primitive_name(*p).to_string())
                     }
                     Slice::Struct(b, str) => {
                         let name = self.formatter.fmt_symbol_name(str.id().into());
                         if b.is_owned() {
-                            return format!("Box<[{name}]>").into();
+                            format!("Box<[{name}]>").into()
+                        } else {
+                            format!("[{name}]").into()
                         }
-                        (b.mutability(), name.into())
                     }
                     Slice::Str(lt, enc) => {
                         // TODO: Lifetimes
-                        let lifetimes = if let Some(lt) = lt {
-                            match lt {
-                                MaybeStatic::Static => "&'static".into(),
-                                MaybeStatic::NonStatic(ns) => {
-                                    format!("&")
-                                }
-                            }
-                        } else {
-                            "".into()
-                        };
+                        // let lifetimes = if let Some(lt) = lt {
+                        //     match lt {
+                        //         MaybeStatic::Static => "&'static".into(),
+                        //         MaybeStatic::NonStatic(ns) => {
+                        //             format!("&")
+                        //         }
+                        //     }
+                        // } else {
+                        //     "".into()
+                        // };
                         let encoding = match enc {
                             StringEncoding::Utf8 => "String",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
                             StringEncoding::UnvalidatedUtf16 => "[u16]",
                             _ => unreachable!("Unrecognized string encoding.")
                         };
-                        let name = format!("{lifetimes}{encoding}");
-                        return name.into();
+                        format!("{encoding}").into()
                     }
-                    _ => (diplomat_core::hir::Mutability::Immutable, format!("TODO")),
+                    _ => format!("TODO"),
                 };
 
-                format!("&{}[{type_name}]", if mt.is_mutable() {
-                    "mut "
-                } else {
-                    ""
-                }).into()
+                type_name.into()
             }
             _ => "TODO()".into()
         }
-    }
+    } 
 
     pub(super) fn gen_abi_type_name<P: TyPosition>(&'rcx mut self, ty : &Type<P>) -> Option<Cow<'tcx, str>> {
         match ty {
