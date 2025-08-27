@@ -1,7 +1,7 @@
 #[repr(C)]
 pub struct StructWithSlices<'a> {
-    pub first: [u8]<'a>,
-    pub second: [u16]<'a>,
+    pub first: &'a [u8],
+    pub second: &'a [u16],
 }
 
 impl<'a> StructWithSlices<'a> {

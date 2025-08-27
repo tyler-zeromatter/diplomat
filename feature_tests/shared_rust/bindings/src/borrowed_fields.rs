@@ -1,9 +1,9 @@
 use super::Bar;
 #[repr(C)]
 pub struct BorrowedFields<'a> {
-    pub a: [u16]<'a>,
-    pub b: [u8]<'a>,
-    pub c: String<'a>,
+    pub a: &'a [u16],
+    pub b: &'a [u8],
+    pub c: &'a String,
 }
 
 impl<'a> BorrowedFields<'a> {

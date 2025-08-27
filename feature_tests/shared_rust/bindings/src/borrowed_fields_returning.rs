@@ -1,6 +1,6 @@
 #[repr(C)]
 pub struct BorrowedFieldsReturning<'a> {
-    pub bytes: [u8]<'a>,
+    pub bytes: &'a [u8],
 }
 
 impl<'a> BorrowedFieldsReturning<'a> {
