@@ -2,8 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, ReturnType, SelfType, Slice,
-    SuccessType, TyPosition, Type, TypeId,
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId
 };
 
 use crate::shared_rust::{formatter::TypeInfo, FileGenContext};
@@ -74,20 +73,31 @@ impl<'tcx> FunctionInfo<'tcx> {
         // TODO: Param/Return type conversions (DiplomatResult and DiplomatOption, basically).
         // I think with `.into()` would be just fine
         let self_param = self_param_own.map(|(s, ty)| {
-            let type_name = match ty {
+            let (type_name, self_lifetime) = match ty {
                 SelfType::Enum(e) => {
                     let type_id: TypeId = e.tcx_id.into();
-                    ctx.formatter.fmt_symbol_name(type_id.into())
+                    (ctx.formatter.fmt_symbol_name(type_id.into()), None)
                 }
                 SelfType::Opaque(op) => {
                     let type_id: TypeId = op.tcx_id.into();
-                    ctx.formatter.fmt_symbol_name(type_id.into())
+                    (ctx.formatter.fmt_symbol_name(type_id.into()), Some(op.owner.lifetime))
                 }
                 SelfType::Struct(st) => {
                     let type_id: TypeId = st.tcx_id.into();
-                    ctx.formatter.fmt_symbol_name(type_id.into())
+                    (ctx.formatter.fmt_symbol_name(type_id.into()), st.owner.lifetime())
                 }
                 _ => unreachable!("Unknown SelfType {ty:?}"),
+            };
+
+            let lt = if let Some(lt) = self_lifetime {
+                match lt {
+                    MaybeStatic::NonStatic(ns) => { 
+                        format!("'{} ", method.lifetime_env.fmt_lifetime(ns))
+                    },
+                    MaybeStatic::Static => "'static ".into(),
+                }
+            } else {
+                "".into()
             };
 
             let (type_name, abi_type) = if s.is_owned() {
@@ -100,8 +110,8 @@ impl<'tcx> FunctionInfo<'tcx> {
                 };
 
                 (
-                    format!("&{mutable}self"),
-                    format!("this: &{mutable}{type_name}"),
+                    format!("&{lt}{mutable}self"),
+                    format!("this: &{lt}{mutable}{type_name}"),
                 )
             };
 
