@@ -9,11 +9,13 @@ pub struct MyStructContainingAnOption {
 impl MyStructContainingAnOption {
     pub fn new() -> MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_new() };
+        
         ret
     }
 
     pub fn filled() -> MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_filled() };
+        
         ret
     }
 

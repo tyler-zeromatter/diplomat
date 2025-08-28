@@ -14,31 +14,33 @@ pub struct MyStruct {
 impl MyStruct {
     pub fn new() -> MyStruct {
         let ret = unsafe { MyStruct_new() };
+        
         ret
     }
 
     pub fn takes_mut<'anon_0, 'anon_1>(&'anon_0 mut self, o : &'anon_1 mut MyStruct) {
         let ret = unsafe { MyStruct_takes_mut(self, o) };
-        ret
-    }
+        }
 
     pub fn takes_const<'anon_0, 'anon_1>(&'anon_0 self, o : &'anon_1 mut MyStruct) {
         let ret = unsafe { MyStruct_takes_const(self, o) };
-        ret
-    }
+        }
 
     pub fn into_a(self) -> u8 {
         let ret = unsafe { MyStruct_into_a(self) };
+        
         ret
     }
 
     pub fn returns_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_returns_zst_result() };
+        
         ret.into()
     }
 
     pub fn fails_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_fails_zst_result() };
+        
         ret.into()
     }
 

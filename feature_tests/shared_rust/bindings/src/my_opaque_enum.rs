@@ -9,6 +9,7 @@ impl Drop for MyOpaqueEnum {
 impl MyOpaqueEnum {
     pub fn new() -> Box<MyOpaqueEnum> {
         let ret = unsafe { MyOpaqueEnum_new() };
+        
         ret
     }
 
@@ -16,6 +17,7 @@ impl MyOpaqueEnum {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { MyOpaqueEnum_to_string(self, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }

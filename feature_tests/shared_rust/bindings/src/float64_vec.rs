@@ -9,69 +9,78 @@ impl Drop for Float64Vec {
 impl Float64Vec {
     pub fn new_bool<'anon_0>(v : &'anon_0 [bool]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_bool(v) };
+        
         ret
     }
 
     pub fn new_i16<'anon_0>(v : &'anon_0 [i16]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_i16(v) };
+        
         ret
     }
 
     pub fn new_u16<'anon_0>(v : &'anon_0 [u16]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_u16(v) };
+        
         ret
     }
 
     pub fn new_isize<'anon_0>(v : &'anon_0 [isize]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_isize(v) };
+        
         ret
     }
 
     pub fn new_usize<'anon_0>(v : &'anon_0 [usize]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_usize(v) };
+        
         ret
     }
 
     pub fn new_f64_be_bytes<'anon_0>(v : &'anon_0 [u8]) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_f64_be_bytes(v) };
+        
         ret
     }
 
     pub fn new_from_owned(v : Box<[f64]>) -> Box<Float64Vec> {
         let ret = unsafe { Float64Vec_new_from_owned(v) };
+        
         ret
     }
 
     pub fn as_slice<'a>(&'a self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_as_slice(self) };
+        
         ret
     }
 
     pub fn fill_slice<'anon_0, 'anon_1>(&'anon_0 self, v : &'anon_1 mut [f64]) {
         let ret = unsafe { Float64Vec_fill_slice(self, v) };
-        ret
-    }
+        }
 
     pub fn set_value<'anon_0, 'anon_1>(&'anon_0 mut self, new_slice : &'anon_1 [f64]) {
         let ret = unsafe { Float64Vec_set_value(self, new_slice) };
-        ret
-    }
+        }
 
     pub fn to_string<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { Float64Vec_to_string(self, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }
 
     pub fn borrow<'a>(&'a self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_borrow(self) };
+        
         ret
     }
 
     pub fn get<'anon_0>(&'anon_0 self, i : usize) -> Option<f64> {
         let ret = unsafe { Float64Vec_get(self, i) };
+        
         ret.into_converted_option()
     }
 

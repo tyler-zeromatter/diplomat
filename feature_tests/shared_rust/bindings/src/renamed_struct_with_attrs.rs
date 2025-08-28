@@ -7,11 +7,13 @@ pub struct RenamedStructWithAttrs {
 impl RenamedStructWithAttrs {
     pub fn new_fallible(a : bool, b : u32) -> Result<RenamedStructWithAttrs, ()> {
         let ret = unsafe { namespace_StructWithAttrs_new_fallible(a, b) };
+        
         ret.into()
     }
 
     pub fn c(self) -> u32 {
         let ret = unsafe { namespace_StructWithAttrs_c(self) };
+        
         ret
     }
 

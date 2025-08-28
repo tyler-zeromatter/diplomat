@@ -8,7 +8,8 @@ pub struct BorrowedFields<'a> {
 
 impl<'a> BorrowedFields<'a> {
     pub fn from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : &'x [u16], utf8_str : &'x String) -> BorrowedFields<'x> {
-        let ret = unsafe { BorrowedFields_from_bar_and_strings(bar, dstr16.into(), utf8_str.into()) };
+        let ret = unsafe { BorrowedFields_from_bar_and_strings(bar, &dstr16.into(), &utf8_str.into()) };
+        
         ret
     }
 

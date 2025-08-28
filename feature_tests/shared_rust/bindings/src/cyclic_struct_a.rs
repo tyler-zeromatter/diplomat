@@ -7,6 +7,7 @@ pub struct CyclicStructA {
 impl CyclicStructA {
     pub fn get_b() -> CyclicStructB {
         let ret = unsafe { CyclicStructA_get_b() };
+        
         ret
     }
 
@@ -14,6 +15,7 @@ impl CyclicStructA {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { CyclicStructA_cyclic_out(self, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }
@@ -22,6 +24,7 @@ impl CyclicStructA {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }
@@ -30,6 +33,7 @@ impl CyclicStructA {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { CyclicStructA_getter_out(self, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }

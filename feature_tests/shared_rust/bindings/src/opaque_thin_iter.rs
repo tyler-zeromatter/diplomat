@@ -14,6 +14,7 @@ impl<'a> Drop for OpaqueThinIter<'a> {
 impl<'a> OpaqueThinIter<'a> {
     pub fn next<'a>(&'a mut self) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinIter_next(self) };
+        
         ret
     }
 

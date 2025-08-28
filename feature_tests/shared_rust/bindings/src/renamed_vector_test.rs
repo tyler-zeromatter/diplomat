@@ -9,23 +9,25 @@ impl Drop for RenamedVectorTest {
 impl RenamedVectorTest {
     pub fn new() -> Box<RenamedVectorTest> {
         let ret = unsafe { namespace_VectorTest_new() };
+        
         ret
     }
 
     pub fn len<'anon_0>(&'anon_0 self) -> usize {
         let ret = unsafe { namespace_VectorTest_len(self) };
+        
         ret
     }
 
     pub fn get<'anon_0>(&'anon_0 self, idx : usize) -> Option<f64> {
         let ret = unsafe { namespace_VectorTest_get(self, idx) };
+        
         ret.into_converted_option()
     }
 
     pub fn push<'anon_0>(&'anon_0 mut self, value : f64) {
         let ret = unsafe { namespace_VectorTest_push(self, value) };
-        ret
-    }
+        }
 
 }
 

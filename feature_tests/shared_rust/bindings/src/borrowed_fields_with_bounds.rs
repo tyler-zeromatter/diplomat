@@ -8,7 +8,8 @@ pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
 
 impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
     pub fn from_foo_and_strings<'x, 'y, 'z>(foo : &'x Foo<'y>, dstr16_x : &'x [u16], utf8_str_z : &'z String) -> BorrowedFieldsWithBounds<'x, 'y, 'z> {
-        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.into()) };
+        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, &dstr16_x.into(), &utf8_str_z.into()) };
+        
         ret
     }
 

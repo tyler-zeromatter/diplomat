@@ -8,7 +8,8 @@ impl Drop for OptionString {
 
 impl OptionString {
     pub fn new<'a>(diplomat_str : &'a [u8]) -> Box<Option<OptionString>> {
-        let ret = unsafe { OptionString_new(diplomat_str.into()) };
+        let ret = unsafe { OptionString_new(&diplomat_str.into()) };
+        
         ret
     }
 
@@ -16,6 +17,7 @@ impl OptionString {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { OptionString_write(self, write_mut) };
+        
         let out_str = write.to_string();
         if ret.is_ok {
             Ok(out_str)
@@ -26,6 +28,7 @@ impl OptionString {
 
     pub fn borrow<'a>(&'a self) -> Option<[u8]> {
         let ret = unsafe { OptionString_borrow(self) };
+        
         ret.into_converted_option()
     }
 

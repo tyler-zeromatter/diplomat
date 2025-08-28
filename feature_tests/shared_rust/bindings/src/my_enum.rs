@@ -11,11 +11,13 @@ pub enum MyEnum {
 impl MyEnum {
     pub fn into_value(self) -> i8 {
         let ret = unsafe { MyEnum_into_value(self) };
+        
         ret
     }
 
     pub fn get_a() -> MyEnum {
         let ret = unsafe { MyEnum_get_a() };
+        
         ret
     }
 
