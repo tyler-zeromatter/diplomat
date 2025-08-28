@@ -7,9 +7,11 @@ use diplomat_core::hir::{
 
 use crate::shared_rust::func::ABITypeInfo;
 
+#[derive(Default)]
 pub enum TypeInfoWrapper {
-    Boxed,
-    None
+    #[default]
+    None,
+    Boxed
 }
 
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
@@ -81,7 +83,7 @@ impl<'a> TypeInfo<'a> {
         let generic_lifetimes = Self::fmt_generic_lifetimes(over.generic_lifetimes.as_ref().unwrap_or(self.generic_lifetimes.as_ref()).clone(), env);
 
         let name = format!("{name}{generic_lifetimes}");
-        let name_wrapped = match self.wrapped {
+        let name_wrapped = match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
             TypeInfoWrapper::None => name,
             TypeInfoWrapper::Boxed => format!("Box<{name}>")
         };
