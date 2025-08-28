@@ -13,7 +13,7 @@ impl<'b, 'a> Drop for Bar<'b, 'a> {
 }
 
 impl<'b, 'a> Bar<'b, 'a> {
-    pub fn foo<'b, 'a>(&'b self) -> &'b Foo<'a> {
+    pub fn foo<'b, 'a: 'b>(&'b self) -> &'b Foo<'a> {
         let ret = unsafe { Bar_foo(self) };
         
         ret
@@ -24,7 +24,7 @@ impl<'b, 'a> Bar<'b, 'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Bar_foo<'b, 'a>(this: &'b Bar) -> &'b Foo<'a>;
+    fn Bar_foo<'b, 'a: 'b>(this: &'b Bar) -> &'b Foo<'a>;
 
     fn Bar_destroy(this : *mut Bar);
 }
