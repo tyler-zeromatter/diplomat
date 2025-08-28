@@ -5,7 +5,7 @@ use diplomat_core::hir::{
     Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, SuccessType, TyPosition, Type, TypeId
 };
 
-use crate::shared_rust::{formatter::TypeInfo, FileGenContext};
+use crate::shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, FileGenContext};
 
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
@@ -26,6 +26,7 @@ pub(super) struct ABITypeInfo<'a> {
     pub(super) name : Option<Cow<'a, str>>,
     pub(super) borrow : Option<MaybeOwn>,
     pub(super) generic_lifetimes : Option<Vec<MaybeStatic<Lifetime>>>,
+    pub(super) wrapped : Option<TypeInfoWrapper>,
 }
 
 struct ParamInfo<'a> {
@@ -337,11 +338,22 @@ impl<'tcx> FunctionInfo<'tcx> {
                         _ => panic!("Unrecognized encoding type {enc:?}"),
                     };
 
+                    let name = if lt.is_none() {
+                        match enc {
+                            StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatOwnedStrSlice",
+                            StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatOwnedStr16Slice",
+                            _ => panic!("Unrecognized encoding type {enc:?}"),
+                        }
+                    } else {
+                        name
+                    };
+
                     ABITypeInfo {
                         name: Some(name.into()),
                         // We move the borrow to the generic lifetimes:
                         borrow: Some(MaybeOwn::Own),
                         generic_lifetimes: Some(lt.iter().cloned().collect()),
+                        wrapped: Some(TypeInfoWrapper::None),
                     }
                 },
                 _ => ABITypeInfo::default(),
