@@ -78,7 +78,7 @@ impl<'a> TypeInfo<'a> {
 
         let name = over.name.clone().unwrap_or(self.name.clone().into());
 
-        let generic_lifetimes = Self::fmt_generic_lifetimes(self.generic_lifetimes.clone(), env);
+        let generic_lifetimes = Self::fmt_generic_lifetimes(over.generic_lifetimes.as_ref().unwrap_or(self.generic_lifetimes.as_ref()).clone(), env);
 
         let name = format!("{name}{generic_lifetimes}");
         let name_wrapped = match self.wrapped {
