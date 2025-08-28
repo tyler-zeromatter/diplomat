@@ -11,7 +11,7 @@ pub struct NestedBorrowedFields<'x, 'y, 'z> {
 
 impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
     pub fn from_bar_and_foo_and_strings<'x, 'y, 'z>(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : &'x [u16], dstr16_z : &'z [u16], utf8_str_y : &'y String, utf8_str_z : &'z String) -> NestedBorrowedFields<'x, 'y, 'z> {
-        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, &dstr16_x.into(), &dstr16_z.into(), &utf8_str_y.into(), &utf8_str_z.into()) };
+        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x.into(), dstr16_z.into(), utf8_str_y.as_bytes().into(), utf8_str_z.as_bytes().into()) };
         
         ret
     }
@@ -21,5 +21,5 @@ impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn NestedBorrowedFields_from_bar_and_foo_and_strings<'x, 'y, 'z>(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : &'x diplomat_runtime::DiplomatStrSlice, dstr16_z : &'z diplomat_runtime::DiplomatStrSlice, utf8_str_y : &'y diplomat_runtime::DiplomatStrSlice, utf8_str_z : &'z diplomat_runtime::DiplomatStrSlice) -> NestedBorrowedFields<'x, 'y, 'z>;
+    fn NestedBorrowedFields_from_bar_and_foo_and_strings<'x, 'y, 'z>(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : diplomat_runtime::DiplomatStrSlice<'x>, dstr16_z : diplomat_runtime::DiplomatStrSlice<'z>, utf8_str_y : diplomat_runtime::DiplomatStrSlice<'y>, utf8_str_z : diplomat_runtime::DiplomatStrSlice<'z>) -> NestedBorrowedFields<'x, 'y, 'z>;
 }

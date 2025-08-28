@@ -16,7 +16,7 @@ impl<'a> Drop for Foo<'a> {
 
 impl<'a> Foo<'a> {
     pub fn new<'a>(x : &'a [u8]) -> Box<Foo<'a>> {
-        let ret = unsafe { Foo_new(&x.into()) };
+        let ret = unsafe { Foo_new(x.into()) };
         
         ret
     }
@@ -40,7 +40,7 @@ impl<'a> Foo<'a> {
     }
 
     pub fn extract_from_bounds<'a, 'x, 'y, 'z>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a [u8]) -> Box<Foo<'a>> {
-        let ret = unsafe { Foo_extract_from_bounds(bounds, &another_string.into()) };
+        let ret = unsafe { Foo_extract_from_bounds(bounds, another_string.into()) };
         
         ret
     }
@@ -50,7 +50,7 @@ impl<'a> Foo<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Foo_new<'a>(x : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Foo<'a>>;
+    fn Foo_new<'a>(x : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
 
     fn Foo_get_bar<'a, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
 
@@ -58,7 +58,7 @@ unsafe extern "C" {
 
     fn Foo_extract_from_fields<'a>(fields : BorrowedFields<'a>) -> Box<Foo<'a>>;
 
-    fn Foo_extract_from_bounds<'a, 'x, 'y, 'z>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Foo<'a>>;
+    fn Foo_extract_from_bounds<'a, 'x, 'y, 'z>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
 
     fn Foo_destroy(this : *mut Foo);
 }

@@ -16,13 +16,13 @@ impl Opaque {
     }
 
     pub fn try_from_utf8<'anon_0>(input : &'anon_0 [u8]) -> Box<Option<Opaque>> {
-        let ret = unsafe { Opaque_try_from_utf8(&input.into()) };
+        let ret = unsafe { Opaque_try_from_utf8(input.into()) };
         
         ret
     }
 
     pub fn from_str<'anon_0>(input : &'anon_0 String) -> Box<Opaque> {
-        let ret = unsafe { Opaque_from_str(&input.into()) };
+        let ret = unsafe { Opaque_from_str(input.as_bytes().into()) };
         
         ret
     }
@@ -65,9 +65,9 @@ impl Opaque {
 unsafe extern "C" {
     fn Opaque_new() -> Box<Opaque>;
 
-    fn Opaque_try_from_utf8<'anon_0>(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<Option<Opaque>>;
+    fn Opaque_try_from_utf8<'anon_0>(input : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<Option<Opaque>>;
 
-    fn Opaque_from_str<'anon_0>(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<Opaque>;
+    fn Opaque_from_str<'anon_0>(input : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<Opaque>;
 
     fn Opaque_get_debug_str<'anon_0>(this: &'anon_0 Opaque, write_mut : &mut crate::DiplomatWrite) -> ();
 
