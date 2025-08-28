@@ -35,13 +35,13 @@ impl MyStruct {
     pub fn returns_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_returns_zst_result() };
         
-        ret.into()
+        ret.to_result()
     }
 
     pub fn fails_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_fails_zst_result() };
         
-        ret.into()
+        ret.to_result()
     }
 
 }
