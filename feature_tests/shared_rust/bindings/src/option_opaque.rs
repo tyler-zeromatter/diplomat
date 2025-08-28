@@ -14,100 +14,117 @@ impl OptionOpaque {
         let ret = unsafe { OptionOpaque_new(i) };
         
         ret
+    
     }
 
     pub fn new_none() -> Option<Box<OptionOpaque>> {
         let ret = unsafe { OptionOpaque_new_none() };
         
         ret
+    
     }
 
     pub fn returns() -> Option<OptionStruct> {
         let ret = unsafe { OptionOpaque_returns() };
         
         ret.into_converted_option()
+    
     }
 
     pub fn option_isize<'anon_0>(&'anon_0 self) -> Option<isize> {
         let ret = unsafe { OptionOpaque_option_isize(self) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn option_usize<'anon_0>(&'anon_0 self) -> Option<usize> {
         let ret = unsafe { OptionOpaque_option_usize(self) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn option_i32<'anon_0>(&'anon_0 self) -> Option<i32> {
         let ret = unsafe { OptionOpaque_option_i32(self) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn option_u32<'anon_0>(&'anon_0 self) -> Option<u32> {
         let ret = unsafe { OptionOpaque_option_u32(self) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn new_struct() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct() };
         
         ret
+    
     }
 
     pub fn new_struct_nones() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct_nones() };
         
         ret
+    
     }
 
     pub fn returns_none_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_none_self(self) };
         
         ret
+    
     }
 
     pub fn returns_some_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_some_self(self) };
         
         ret
+    
     }
 
     pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
         let ret = unsafe { OptionOpaque_assert_integer(self, i) };
-        }
+        
+    }
 
     pub fn option_opaque_argument<'anon_0>(arg : &'anon_0 Option<OptionOpaque>) -> bool {
         let ret = unsafe { OptionOpaque_option_opaque_argument(arg) };
         
         ret
+    
     }
 
     pub fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
         let ret = unsafe { OptionOpaque_accepts_option_u8(arg.into(), sentinel) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
         let ret = unsafe { OptionOpaque_accepts_option_enum(arg.into(), sentinel) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
         let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.into(), sentinel) };
         
         ret.into_converted_option()
+    
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
         let ret = unsafe { OptionOpaque_returns_option_input_struct() };
         
         ret
+    
     }
 
 }

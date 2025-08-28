@@ -11,6 +11,7 @@ impl<'a> BorrowedFields<'a> {
         let ret = unsafe { BorrowedFields_from_bar_and_strings(bar, dstr16.into(), utf8_str.as_bytes().into()) };
         
         ret
+    
     }
 
 }

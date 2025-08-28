@@ -16,6 +16,7 @@ impl<'a> RefList<'a> {
         let ret = unsafe { RefList_node(data) };
         
         ret
+    
     }
 
 }

@@ -17,6 +17,7 @@ impl<'b, 'a> Bar<'b, 'a> {
         let ret = unsafe { Bar_foo(self) };
         
         ret
+    
     }
 
 }

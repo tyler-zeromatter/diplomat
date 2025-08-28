@@ -11,29 +11,34 @@ impl MyString {
         let ret = unsafe { MyString_new(v.into()) };
         
         ret
+    
     }
 
     pub fn new_unsafe<'anon_0>(v : &'anon_0 str) -> Box<MyString> {
         let ret = unsafe { MyString_new_unsafe(v.as_bytes().into()) };
         
         ret
+    
     }
 
     pub fn new_owned(v : Box<[u8]>) -> Box<MyString> {
         let ret = unsafe { MyString_new_owned(v.into()) };
         
         ret
+    
     }
 
     pub fn new_from_first(v : &[String]) -> Box<MyString> {
         let ret = unsafe { MyString_new_from_first(v) };
         
         ret
+    
     }
 
     pub fn set_str<'anon_0, 'anon_1>(&'anon_0 mut self, new_str : &'anon_1 [u8]) {
         let ret = unsafe { MyString_set_str(self, new_str.into()) };
-        }
+        
+    }
 
     pub fn get_str<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
@@ -42,12 +47,14 @@ impl MyString {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn get_static_str() -> &'static str {
         let ret = unsafe { MyString_get_static_str() };
         
         unsafe { str::from_utf8_unchecked(ret.into()).into()}
+    
     }
 
     pub fn string_transform<'anon_0>(foo : &'anon_0 str) -> String {
@@ -57,12 +64,14 @@ impl MyString {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn borrow<'a>(&'a self) -> &'a [u8] {
         let ret = unsafe { MyString_borrow(self) };
         
         ret.into()
+    
     }
 
 }

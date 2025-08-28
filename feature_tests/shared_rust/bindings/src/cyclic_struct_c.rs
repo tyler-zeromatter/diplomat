@@ -9,6 +9,7 @@ impl CyclicStructC {
         let ret = unsafe { CyclicStructC_takes_nested_parameters(c) };
         
         ret
+    
     }
 
     pub fn cyclic_out(self) -> String {
@@ -18,6 +19,7 @@ impl CyclicStructC {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
 }

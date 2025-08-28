@@ -9,6 +9,7 @@ impl CyclicStructA {
         let ret = unsafe { CyclicStructA_get_b() };
         
         ret
+    
     }
 
     pub fn cyclic_out(self) -> String {
@@ -18,6 +19,7 @@ impl CyclicStructA {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
@@ -27,6 +29,7 @@ impl CyclicStructA {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn getter_out(self) -> String {
@@ -36,6 +39,7 @@ impl CyclicStructA {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
 }

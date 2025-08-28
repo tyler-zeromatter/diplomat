@@ -11,12 +11,14 @@ impl MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_new() };
         
         ret
+    
     }
 
     pub fn filled() -> MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_filled() };
         
         ret
+    
     }
 
 }

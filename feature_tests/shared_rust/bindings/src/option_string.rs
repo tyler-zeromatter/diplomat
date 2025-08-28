@@ -11,6 +11,7 @@ impl OptionString {
         let ret = unsafe { OptionString_new(diplomat_str.into()) };
         
         ret
+    
     }
 
     pub fn write<'a>(&'a self) -> Result<String, ()> {
@@ -22,12 +23,14 @@ impl OptionString {
         ret.to_result().map(|_| {
             out_str
         })
+    
     }
 
     pub fn borrow<'a>(&'a self) -> Option<&'a [u8]> {
         let ret = unsafe { OptionString_borrow(self) };
         
         ret.into_converted_option().map(|ok : diplomat_runtime::DiplomatStrSlice| { ok.into() })
+    
     }
 
 }

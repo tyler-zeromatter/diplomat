@@ -9,12 +9,14 @@ impl RenamedStructWithAttrs {
         let ret = unsafe { namespace_StructWithAttrs_new_fallible(a, b) };
         
         ret.to_result()
+    
     }
 
     pub fn c(self) -> u32 {
         let ret = unsafe { namespace_StructWithAttrs_c(self) };
         
         ret
+    
     }
 
 }
