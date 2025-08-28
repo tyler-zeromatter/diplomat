@@ -157,6 +157,7 @@ impl<'tcx> RustFormatter<'tcx> {
         match primitive {
             PrimitiveType::Char => "diplomat_runtime::DiplomatChar",
             PrimitiveType::Byte => "u8",
+            PrimitiveType::Ordering => "std::cmp::Ordering",
             _ => primitive.as_str(),
         }
     }
