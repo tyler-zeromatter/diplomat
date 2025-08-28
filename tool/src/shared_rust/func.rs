@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, SuccessType, TyPosition, Type, TypeId
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, SuccessType, TyPosition, Type, TypeId
 };
 
 use crate::shared_rust::{formatter::TypeInfo, FileGenContext};
@@ -157,8 +157,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
-                Slice::Str(lt, enc) => {
+                Slice::Str(_, enc) => {
                     let maybe_enc = if let diplomat_core::hir::StringEncoding::Utf8 = enc {
+                        // From String or &str -> &[u8]:
                         ".as_bytes()"
                     } else {
                         ""
@@ -204,6 +205,20 @@ impl<'tcx> FunctionInfo<'tcx> {
             SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o),
             SuccessType::Write => ABITypeInfo { name: Some("()".into()), ..Default::default() },
             _ => ABITypeInfo::default(),
+        }
+    }
+
+    fn ok_type_conversion(ok: &'tcx SuccessType) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
+        match ok {
+            SuccessType::OutType(o) => match o {
+                Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
+                    // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
+                    StringEncoding::Utf8 => Some(("unsafe { str::from_utf8_unchecked(".into(), ".into()).into()}".into())),
+                    _ => None,
+                },
+                _ => None,
+            }
+            _ => None,
         }
     }
 
@@ -269,12 +284,13 @@ impl<'tcx> FunctionInfo<'tcx> {
             ReturnType::Infallible(ok) => {
                 let type_info = Self::gen_ok_type_name(params, ctx, ok);
                 let abi_name = Self::gen_ok_abi_info(ctx, ok);
+
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
                     Some(ParamInfo {
                         var_name: "ret".into(),
                         type_info,
                         abi_override: abi_name,
-                        conversion: None,
+                        conversion: Self::ok_type_conversion(ok),
                     })
                 } else {
                     None
