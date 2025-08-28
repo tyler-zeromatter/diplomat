@@ -46,7 +46,7 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
 {% if let Some(r) = return_type %}
     {{r.wrap_convert()}}
 {% endif -%}
-    {%- endif -%}
+    {%- endif %}
 }
 {%- endblock -%}
 
