@@ -62,7 +62,7 @@ impl MyString {
     pub fn borrow<'a>(&'a self) -> &'a [u8] {
         let ret = unsafe { MyString_borrow(self) };
         
-        ret
+        ret.into()
     }
 
 }

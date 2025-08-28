@@ -45,7 +45,7 @@ impl OpaqueMutexedString {
     pub fn dummy_str<'a>(&'a self) -> &'a [u8] {
         let ret = unsafe { OpaqueMutexedString_dummy_str(self) };
         
-        ret
+        ret.into()
     }
 
     pub fn wrapper<'a>(&'a self) -> Box<Utf16Wrap> {
