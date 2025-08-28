@@ -13,7 +13,7 @@ impl MyString {
         ret
     }
 
-    pub fn new_unsafe<'anon_0>(v : &'anon_0 String) -> Box<MyString> {
+    pub fn new_unsafe<'anon_0>(v : &'anon_0 str) -> Box<MyString> {
         let ret = unsafe { MyString_new_unsafe(v.as_bytes().into()) };
         
         ret
@@ -44,13 +44,13 @@ impl MyString {
         out_str
     }
 
-    pub fn get_static_str() -> &'static String {
+    pub fn get_static_str() -> &'static str {
         let ret = unsafe { MyString_get_static_str() };
         
-        ret
+        unsafe { str::from_utf8_unchecked(ret.into()).into()}
     }
 
-    pub fn string_transform<'anon_0>(foo : &'anon_0 String) -> String {
+    pub fn string_transform<'anon_0>(foo : &'anon_0 str) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { MyString_string_transform(foo.as_bytes().into(), write_mut) };

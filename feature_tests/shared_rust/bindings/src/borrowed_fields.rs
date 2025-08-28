@@ -3,11 +3,11 @@ use super::Bar;
 pub struct BorrowedFields<'a> {
     pub a: &'a [u16],
     pub b: &'a [u8],
-    pub c: &'a String,
+    pub c: &'a str,
 }
 
 impl<'a> BorrowedFields<'a> {
-    pub fn from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : &'x [u16], utf8_str : &'x String) -> BorrowedFields<'x> {
+    pub fn from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : &'x [u16], utf8_str : &'x str) -> BorrowedFields<'x> {
         let ret = unsafe { BorrowedFields_from_bar_and_strings(bar, dstr16.into(), utf8_str.as_bytes().into()) };
         
         ret

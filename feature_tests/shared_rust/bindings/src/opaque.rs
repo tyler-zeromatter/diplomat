@@ -21,7 +21,7 @@ impl Opaque {
         ret
     }
 
-    pub fn from_str<'anon_0>(input : &'anon_0 String) -> Box<Opaque> {
+    pub fn from_str<'anon_0>(input : &'anon_0 str) -> Box<Opaque> {
         let ret = unsafe { Opaque_from_str(input.as_bytes().into()) };
         
         ret
