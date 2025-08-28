@@ -21,18 +21,24 @@ pub(super) struct FunctionInfo<'tcx> {
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
 }
 
+#[derive(Default)]
+pub(super) struct ABITypeInfo<'a> {
+    pub(super) name : Option<Cow<'a, str>>,
+    pub(super) borrow : Option<MaybeOwn>,
+}
+
 struct ParamInfo<'a> {
     var_name: Cow<'a, str>,
     type_info: TypeInfo<'a>,
-    abi_type_override: Option<Cow<'a, str>>,
+    abi_override: ABITypeInfo<'a>,
     conversion : Option<(Cow<'a, str>, Cow<'a, str>)>,
 }
 
 impl<'a> ParamInfo<'a> {
     fn render(&self, env: &LifetimeEnv, is_abi: bool) -> String {
-        if is_abi && self.abi_type_override.is_some() {
+        if is_abi {
             self.type_info
-                .render_with_override(env, Some(self.abi_type_override.clone().unwrap().into()))
+                .render_with_override(env, &self.abi_override)
         } else {
             self.type_info.render(env)
         }
@@ -61,7 +67,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             params.push(ParamInfo {
                 var_name: p.name.as_str().into(),
                 type_info: ctx.gen_type_info(&p.ty),
-                abi_type_override: ctx.gen_abi_type_name(&p.ty),
+                abi_override: Self::gen_abi_type_info(ctx, &p.ty),
                 conversion: Self::param_conversion(&p.ty),
             });
         }
@@ -103,7 +109,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 "".into()
             };
 
-            let (type_name, abi_type) = if s.is_owned() {
+            let (type_name, abi_type_name) = if s.is_owned() {
                 ("self".into(), format!("this : {type_name}"))
             } else {
                 let mutable = if s.mutability().is_mutable() {
@@ -118,10 +124,15 @@ impl<'tcx> FunctionInfo<'tcx> {
                 )
             };
 
+            let abi_info = ABITypeInfo {
+                name: Some(abi_type_name.into()),
+                ..Default::default()
+            };
+
             ParamInfo {
                 var_name: "".into(),
                 type_info: TypeInfo::new(type_name.into()),
-                abi_type_override: Some(abi_type.into()),
+                abi_override: abi_info,
                 conversion: None,
             }
         });
@@ -152,13 +163,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                         ""
                     };
 
-                    let maybe_borrow = if lt.is_some() {
-                        "&"
-                    } else {
-                        ""
-                    };
-
-                    Some((maybe_borrow.into(), format!("{maybe_enc}.into()").into()))
+                    Some(("".into(), format!("{maybe_enc}.into()").into()))
                 },
                 _ => None,
             },
@@ -181,7 +186,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 params.push(ParamInfo {
                     var_name: "write_mut".into(),
                     type_info: TypeInfo::new("&mut crate::DiplomatWrite".into()),
-                    abi_type_override: None,
+                    abi_override: ABITypeInfo::default(),
                     conversion: None,
                 });
                 TypeInfo::new("String".into())
@@ -190,14 +195,14 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
-    fn gen_ok_abi_name(
+    fn gen_ok_abi_info(
         ctx: &mut FileGenContext<'tcx>,
         ok: &'tcx SuccessType,
-    ) -> Option<Cow<'tcx, str>> {
+    ) -> ABITypeInfo<'tcx> {
         match ok {
-            SuccessType::OutType(o) => ctx.gen_abi_type_name(o),
-            SuccessType::Write => Some("()".into()),
-            _ => None,
+            SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o),
+            SuccessType::Write => ABITypeInfo { name: Some("()".into()), ..Default::default() },
+            _ => ABITypeInfo::default(),
         }
     }
 
@@ -214,24 +219,28 @@ impl<'tcx> FunctionInfo<'tcx> {
                     .map(|e| ctx.gen_type_info(e))
                     .unwrap_or(TypeInfo::new("()".into()));
 
-                let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
+                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
                 let err_ty_abi = err
                     .as_ref()
-                    .map(|e| ctx.gen_abi_type_name(e))
-                    .unwrap_or(None);
+                    .map(|e| Self::gen_abi_type_info(ctx, e))
+                    .unwrap_or_default();
 
                 // TODO: Generic lifetimes/borrow information from results (create a `render` function on TypeInfo, recursively use that).
-                let abi_override = format!(
-                    "crate::DiplomatResult<{}, {}>",
-                    ok_ty_abi.unwrap_or(ok_ty.name.clone()),
-                    err_ty_abi.unwrap_or(err_ty.name.clone())
-                );
+                let abi_override = ABITypeInfo {
+                    name: Some(format!(
+                        "crate::DiplomatResult<{}, {}>",
+                        ok_ty_abi.name.unwrap_or(ok_ty.name.clone()),
+                        err_ty_abi.name.unwrap_or(err_ty.name.clone())
+                    ).into()),
+                    borrow: None,
+                };
+
                 let info = ParamInfo {
                     var_name: "ret".into(),
                     type_info: TypeInfo::new(
                         format!("Result<{}, {}>", ok_ty.name, err_ty.name).into(),
                     ),
-                    abi_type_override: Some(abi_override.into()),
+                    abi_override: abi_override,
                     // TODO: More advanced conversions for inner types.
                     conversion: Some(("".into(), ".into()".into())),
                 };
@@ -240,27 +249,30 @@ impl<'tcx> FunctionInfo<'tcx> {
             ReturnType::Nullable(ok) => {
                 let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
 
-                let ok_ty_abi = Self::gen_ok_abi_name(ctx, ok);
-                let abi_override = format!(
-                    "diplomat_runtime::DiplomatOption<{}>",
-                    ok_ty_abi.unwrap_or(ok_ty.name.clone())
-                );
+                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
+                let abi_override = ABITypeInfo {
+                    name: Some(format!(
+                        "diplomat_runtime::DiplomatOption<{}>",
+                        ok_ty_abi.name.unwrap_or(ok_ty.name.clone())
+                    ).into()),
+                    ..Default::default()
+                };
 
                 Some(ParamInfo {
                     var_name: "ret".into(),
                     type_info: TypeInfo::new(format!("Option<{}>", ok_ty.name).into()),
-                    abi_type_override: Some(abi_override.into()),
+                    abi_override,
                     conversion: Some(("".into(), ".into_converted_option()".into())),
                 })
             }
             ReturnType::Infallible(ok) => {
                 let type_info = Self::gen_ok_type_name(params, ctx, ok);
-                let abi_name = Self::gen_ok_abi_name(ctx, ok);
+                let abi_name = Self::gen_ok_abi_info(ctx, ok);
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
                     Some(ParamInfo {
                         var_name: "ret".into(),
                         type_info,
-                        abi_type_override: abi_name,
+                        abi_override: abi_name,
                         conversion: None,
                     })
                 } else {
@@ -279,5 +291,40 @@ impl<'tcx> FunctionInfo<'tcx> {
             funcs.push(FunctionInfo::gen_function_info(ctx, f));
         }
         funcs
+    }
+
+    fn gen_abi_type_info<P: TyPosition>(
+        ctx : &mut FileGenContext,
+        ty: &Type<P>,
+    ) -> ABITypeInfo<'tcx> {
+        match ty {
+            Type::DiplomatOption(op) => {
+                let regular_type = ctx.gen_type_info(op).name;
+                let inner = Self::gen_abi_type_info(ctx, op);
+                ABITypeInfo {
+                    name: Some(format!(
+                        "diplomat_runtime::DiplomatOption<{}>",
+                        inner.name.unwrap_or(regular_type)
+                    )
+                    .into()),
+                    borrow: None,
+                }
+            }
+            Type::Slice(sl) => match sl {
+                // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
+                Slice::Str(..) => {
+                    ABITypeInfo {
+                        name: Some("diplomat_runtime::DiplomatStrSlice".to_string().into()),
+                        borrow: Some(MaybeOwn::Own)
+                    }
+                },
+                // Diplomat always requires slices be owned:
+                _ => ABITypeInfo {
+                    borrow: Some(MaybeOwn::Own),
+                    ..Default::default()
+                },
+            },
+            _ => ABITypeInfo::default(),
+        }
     }
 }

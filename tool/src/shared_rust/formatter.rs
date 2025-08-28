@@ -5,6 +5,8 @@ use diplomat_core::hir::{
     TypeContext,
 };
 
+use crate::shared_rust::func::ABITypeInfo;
+
 pub enum TypeInfoWrapper {
     Boxed,
     None
@@ -52,18 +54,20 @@ impl<'a> TypeInfo<'a> {
     }
 
     pub(super) fn render(&self, env: &LifetimeEnv) -> String {
-        self.render_with_override(env, None)
+        self.render_with_override(env, &ABITypeInfo::default())
     }
 
-    pub(super) fn render_with_override(&self, env: &LifetimeEnv, over: Option<String>) -> String {
-        let maybe_borrow: Cow<'_, str> = match self.borrow {
+    pub(super) fn render_with_override(&self, env: &LifetimeEnv, over: &ABITypeInfo) -> String {
+        let borrow = over.borrow.unwrap_or(self.borrow);
+
+        let maybe_borrow: Cow<'_, str> = match borrow {
             MaybeOwn::Own => "".into(),
             MaybeOwn::Borrow(b) => match b.lifetime {
                 MaybeStatic::Static => "static".into(),
                 MaybeStatic::NonStatic(ns) => env.fmt_lifetime(ns),
             },
         };
-        let borrow_stmt = match self.borrow {
+        let borrow_stmt = match borrow {
             MaybeOwn::Own => "".into(),
             // TODO: Would be nice to have a LifetimeEnv helper to avoid formatting anonymous lifetimes.
             MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => {
@@ -72,7 +76,7 @@ impl<'a> TypeInfo<'a> {
             _ => format!("&'{maybe_borrow} "),
         };
 
-        let name = over.unwrap_or(self.name.clone().into());
+        let name = over.name.clone().unwrap_or(self.name.clone().into());
 
         let generic_lifetimes = Self::fmt_generic_lifetimes(self.generic_lifetimes.clone(), env);
 
