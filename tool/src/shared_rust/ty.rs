@@ -76,6 +76,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         let lifetimes = lifetime_env
             .all_lifetimes()
             .map(|lt| lifetime_env.fmt_lifetime(lt).into());
+        // TODO: Bounded lifetimes for the impl block.
 
         let fields = ty
             .fields
