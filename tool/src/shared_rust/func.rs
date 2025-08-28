@@ -209,17 +209,21 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
+    fn out_type_conversion<P: TyPosition>(out : &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
+        match out {
+            Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
+                // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
+                StringEncoding::Utf8 => Some(("unsafe { str::from_utf8_unchecked(".into(), ".into()).into()}".into())),
+                // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
+                _ => Some(("".into(), ".into()".into())),
+            },
+            _ => None,
+        }
+    }
+
     fn ok_type_conversion(ok: &'tcx SuccessType) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ok {
-            SuccessType::OutType(o) => match o {
-                Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
-                    // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
-                    StringEncoding::Utf8 => Some(("unsafe { str::from_utf8_unchecked(".into(), ".into()).into()}".into())),
-                    // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
-                    _ => Some(("".into(), ".into()".into())),
-                },
-                _ => None,
-            }
+            SuccessType::OutType(o) => Self::out_type_conversion(o),
             _ => None,
         }
     }
@@ -248,20 +252,34 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let abi_override = ABITypeInfo {
                     name: Some(format!(
                         "crate::DiplomatResult<{}, {}>",
-                        ok_ty_abi.name.unwrap_or(ok_ty.name.clone()),
-                        err_ty_abi.name.unwrap_or(err_ty.name.clone())
+                        ok_ty.render_with_override(env, &ok_ty_abi),
+                        err_ty.render_with_override(env, &err_ty_abi)
                     ).into()),
                     ..Default::default()
+                };
+                
+                let ok_convert = Self::ok_type_conversion(ok);
+                let err_convert = err.as_ref().and_then(|e| {
+                    Self::out_type_conversion(e)
+                });
+                let maybe_map_ok = if let Some((pre, post)) = ok_convert {
+                    format!(".map(|ok : {}| {{ {pre}ok{post} }})", ok_ty_abi.name.unwrap())
+                } else {
+                    "".into()
+                };
+                let maybe_map_err = if let Some((pre, post)) = err_convert {
+                    format!(".map_err(|err : {}| {{ {pre}err{post} }})", err_ty_abi.name.unwrap())
+                } else {
+                    "".into()
                 };
 
                 let info = ParamInfo {
                     var_name: "ret".into(),
                     type_info: TypeInfo::new(
-                        format!("Result<{}, {}>", ok_ty.name, err_ty.name).into(),
+                        format!("Result<{}, {}>", ok_ty.render(env), err_ty.render(env)).into(),
                     ),
                     abi_override: abi_override,
-                    // TODO: More advanced conversions for inner types.
-                    conversion: Some(("".into(), ".into()".into())),
+                    conversion: Some(("".into(), format!(".to_result(){maybe_map_ok}{maybe_map_err}").into())),
                 };
                 Some(info)
             }
