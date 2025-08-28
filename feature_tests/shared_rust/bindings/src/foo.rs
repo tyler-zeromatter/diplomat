@@ -21,7 +21,7 @@ impl<'a> Foo<'a> {
         ret
     }
 
-    pub fn get_bar<'a, 'b>(&'b self) -> Box<Bar<'b, 'a>> {
+    pub fn get_bar<'a: 'b, 'b>(&'b self) -> Box<Bar<'b, 'a>> {
         let ret = unsafe { Foo_get_bar(self) };
         
         ret
@@ -39,7 +39,7 @@ impl<'a> Foo<'a> {
         ret
     }
 
-    pub fn extract_from_bounds<'a, 'x, 'y, 'z>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a [u8]) -> Box<Foo<'a>> {
+    pub fn extract_from_bounds<'a, 'x, 'y: 'a + 'x, 'z: 'y + 'a + 'x>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a [u8]) -> Box<Foo<'a>> {
         let ret = unsafe { Foo_extract_from_bounds(bounds, another_string.into()) };
         
         ret
@@ -52,13 +52,13 @@ impl<'a> Foo<'a> {
 unsafe extern "C" {
     fn Foo_new<'a>(x : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
 
-    fn Foo_get_bar<'a, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
+    fn Foo_get_bar<'a: 'b, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
 
     fn Foo_as_returning<'a, 'anon_0>(this: &'anon_0 Foo) -> BorrowedFieldsReturning<'a>;
 
     fn Foo_extract_from_fields<'a>(fields : BorrowedFields<'a>) -> Box<Foo<'a>>;
 
-    fn Foo_extract_from_bounds<'a, 'x, 'y, 'z>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
+    fn Foo_extract_from_bounds<'a, 'x, 'y: 'a + 'x, 'z: 'y + 'a + 'x>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
 
     fn Foo_destroy(this : *mut Foo);
 }
