@@ -25,7 +25,7 @@ impl Utf16Wrap {
     pub fn borrow_cont<'a>(&'a self) -> &'a [u16] {
         let ret = unsafe { Utf16Wrap_borrow_cont(self) };
         
-        ret
+        ret.into()
     }
 
 }
