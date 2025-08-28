@@ -145,7 +145,21 @@ impl<'tcx> FunctionInfo<'tcx> {
     fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
-                Slice::Str(..) => Some(("&".into(), ".into()".into())),
+                Slice::Str(lt, enc) => {
+                    let maybe_enc = if let diplomat_core::hir::StringEncoding::Utf8 = enc {
+                        ".as_bytes()"
+                    } else {
+                        ""
+                    };
+
+                    let maybe_borrow = if lt.is_some() {
+                        "&"
+                    } else {
+                        ""
+                    };
+
+                    Some((maybe_borrow.into(), format!("{maybe_enc}.into()").into()))
+                },
                 _ => None,
             },
             _ => None,
