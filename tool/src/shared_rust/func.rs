@@ -81,8 +81,6 @@ impl<'tcx> FunctionInfo<'tcx> {
             _ => unreachable!("Unknown SelfType: {:?}", s.ty),
         });
 
-        // TODO: Param/Return type conversions (DiplomatResult and DiplomatOption, basically).
-        // I think with `.into()` would be just fine
         let self_param = self_param_own.map(|(s, ty)| {
             let (type_name, self_lifetime) = match ty {
                 SelfType::Enum(e) => {
@@ -151,6 +149,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             return_info: method.output.clone(),
             lifetime_env: &method.lifetime_env,
             // TODO: Need a separate set of lifetimes for the function definition, and one for the ABI.
+            // TODO: Bounded lifetimes.
             generic_lifetimes: method.method_lifetimes().lifetimes().collect(),
         }
     }
@@ -182,7 +181,6 @@ impl<'tcx> FunctionInfo<'tcx> {
         match ok {
             SuccessType::Unit => TypeInfo::new("()".into()),
             SuccessType::OutType(o) => {
-                // TODO: Opaques.
                 ctx.gen_type_info(o)
             }
             SuccessType::Write => {
@@ -248,7 +246,6 @@ impl<'tcx> FunctionInfo<'tcx> {
                     .map(|e| Self::gen_abi_type_info(ctx, e))
                     .unwrap_or_default();
 
-                // TODO: Generic lifetimes/borrow information from results (create a `render` function on TypeInfo, recursively use that).
                 let abi_override = ABITypeInfo {
                     name: Some(format!(
                         "crate::DiplomatResult<{}, {}>",
@@ -356,7 +353,6 @@ impl<'tcx> FunctionInfo<'tcx> {
                 }
             }
             Type::Slice(sl) => match sl {
-                // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
                 Slice::Str(lt, enc) => {
                     let name = match enc {
                         StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
