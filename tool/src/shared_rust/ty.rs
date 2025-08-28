@@ -308,7 +308,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     }
                 }
             }
-            _ => TypeInfo::new("TODO()".into()),
+            _ => todo!(),
         }
     }
 }
