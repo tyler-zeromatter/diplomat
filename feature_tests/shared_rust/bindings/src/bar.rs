@@ -15,6 +15,7 @@ impl<'b, 'a> Drop for Bar<'b, 'a> {
 impl<'b, 'a> Bar<'b, 'a> {
     pub fn foo<'b, 'a>(&'b self) -> &'b Foo<'a> {
         let ret = unsafe { Bar_foo(self) };
+        
         ret
     }
 

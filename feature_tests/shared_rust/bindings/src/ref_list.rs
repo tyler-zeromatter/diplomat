@@ -14,6 +14,7 @@ impl<'a> Drop for RefList<'a> {
 impl<'a> RefList<'a> {
     pub fn node<'b>(data : &'b RefListParameter) -> Box<RefList<'b>> {
         let ret = unsafe { RefList_node(data) };
+        
         ret
     }
 

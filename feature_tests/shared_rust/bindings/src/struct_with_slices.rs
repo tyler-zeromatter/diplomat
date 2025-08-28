@@ -9,6 +9,7 @@ impl<'a> StructWithSlices<'a> {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { StructWithSlices_return_last(self, write_mut) };
+        
         let out_str = write.to_string();
         out_str
     }

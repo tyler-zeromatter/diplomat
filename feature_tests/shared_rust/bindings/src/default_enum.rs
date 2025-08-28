@@ -7,6 +7,7 @@ pub enum DefaultEnum {
 impl DefaultEnum {
     pub fn new() -> DefaultEnum {
         let ret = unsafe { DefaultEnum_new() };
+        
         ret
     }
 
