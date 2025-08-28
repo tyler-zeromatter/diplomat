@@ -330,9 +330,15 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
             Type::Slice(sl) => match sl {
                 // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
-                Slice::Str(lt, _) => {
+                Slice::Str(lt, enc) => {
+                    let name = match enc {
+                        StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
+                        StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
+                        _ => panic!("Unrecognized encoding type {enc:?}"),
+                    };
+
                     ABITypeInfo {
-                        name: Some("diplomat_runtime::DiplomatStrSlice".to_string().into()),
+                        name: Some(name.into()),
                         // We move the borrow to the generic lifetimes:
                         borrow: Some(MaybeOwn::Own),
                         generic_lifetimes: Some(lt.iter().cloned().collect()),
