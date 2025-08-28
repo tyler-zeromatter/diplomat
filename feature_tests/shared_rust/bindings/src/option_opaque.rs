@@ -87,19 +87,19 @@ impl OptionOpaque {
     }
 
     pub fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
-        let ret = unsafe { OptionOpaque_accepts_option_u8(arg, sentinel) };
+        let ret = unsafe { OptionOpaque_accepts_option_u8(arg.into(), sentinel) };
         
         ret.into_converted_option()
     }
 
     pub fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
-        let ret = unsafe { OptionOpaque_accepts_option_enum(arg, sentinel) };
+        let ret = unsafe { OptionOpaque_accepts_option_enum(arg.into(), sentinel) };
         
         ret.into_converted_option()
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
-        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg, sentinel) };
+        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.into(), sentinel) };
         
         ret.into_converted_option()
     }
