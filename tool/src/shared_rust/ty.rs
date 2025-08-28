@@ -242,17 +242,14 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 self.imports.insert(op_name.clone().into());
 
                 TypeInfo {
-                    name: if op.is_optional() {
-                        format!("Option<{op_name}>").into()
-                    } else {
-                        op_name
-                    },
+                    name: op_name,
                     borrow: op.owner.get_borrow(),
                     generic_lifetimes: op.lifetimes.lifetimes().collect(),
-                    wrapped: if op.is_owned() {
-                        super::formatter::TypeInfoWrapper::Boxed
-                    } else {
-                        super::formatter::TypeInfoWrapper::None
+                    wrapped: match(op.is_owned(), op.is_optional()) {
+                        (true, true) => super::formatter::TypeInfoWrapper::BoxedOptional,
+                        (true, false) => super::formatter::TypeInfoWrapper::Boxed,
+                        (false, true) => super::formatter::TypeInfoWrapper::Optional,
+                        (false, false) => super::formatter::TypeInfoWrapper::None,
                     }
                 }
             }

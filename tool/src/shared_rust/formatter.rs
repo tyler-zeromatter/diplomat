@@ -11,7 +11,9 @@ use crate::shared_rust::func::ABITypeInfo;
 pub enum TypeInfoWrapper {
     #[default]
     None,
-    Boxed
+    Boxed,
+    BoxedOptional,
+    Optional,
 }
 
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
@@ -85,7 +87,9 @@ impl<'a> TypeInfo<'a> {
         let name = format!("{name}{generic_lifetimes}");
         let name_wrapped = match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
             TypeInfoWrapper::None => name,
-            TypeInfoWrapper::Boxed => format!("Box<{name}>")
+            TypeInfoWrapper::Boxed => format!("Box<{name}>"),
+            TypeInfoWrapper::BoxedOptional => format!("Option<Box<{name}>>"),
+            TypeInfoWrapper::Optional => format!("Option<{name}>"),
         };
 
         format!("{borrow_stmt}{name_wrapped}")
