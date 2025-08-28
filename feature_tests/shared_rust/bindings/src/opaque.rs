@@ -52,7 +52,7 @@ impl Opaque {
         ret
     }
 
-    pub fn cmp() -> ordering {
+    pub fn cmp() -> std::cmp::Ordering {
         let ret = unsafe { Opaque_cmp() };
         
         ret
@@ -77,7 +77,7 @@ unsafe extern "C" {
 
     fn Opaque_returns_imported() -> ImportedStruct;
 
-    fn Opaque_cmp() -> ordering;
+    fn Opaque_cmp() -> std::cmp::Ordering;
 
     fn Opaque_destroy(this : *mut Opaque);
 }
