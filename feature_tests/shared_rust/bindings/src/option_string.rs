@@ -12,7 +12,7 @@ impl OptionString {
         ret
     }
 
-    pub fn write<'a>(&self) -> Result<String, ()> {
+    pub fn write<'a>(&'a self) -> Result<String, ()> {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { OptionString_write(self, write_mut) };
@@ -24,7 +24,7 @@ impl OptionString {
         }
     }
 
-    pub fn borrow<'a>(&self) -> Option<[u8]> {
+    pub fn borrow<'a>(&'a self) -> Option<[u8]> {
         let ret = unsafe { OptionString_borrow(self) };
         ret.into_converted_option()
     }
@@ -36,9 +36,9 @@ impl OptionString {
 unsafe extern "C" {
     fn OptionString_new<'a>(diplomat_str : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Option<OptionString>>;
 
-    fn OptionString_write<'a>(this: &OptionString, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), ()>;
+    fn OptionString_write<'a>(this: &'a OptionString, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), ()>;
 
-    fn OptionString_borrow<'a>(this: &OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice>;
+    fn OptionString_borrow<'a>(this: &'a OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice>;
 
     fn OptionString_destroy(this : *mut OptionString);
 }

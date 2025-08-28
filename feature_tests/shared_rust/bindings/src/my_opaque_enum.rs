@@ -12,7 +12,7 @@ impl MyOpaqueEnum {
         ret
     }
 
-    pub fn to_string<'anon_0>(&self) -> String {
+    pub fn to_string<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { MyOpaqueEnum_to_string(self, write_mut) };
@@ -27,7 +27,7 @@ impl MyOpaqueEnum {
 unsafe extern "C" {
     fn MyOpaqueEnum_new() -> Box<MyOpaqueEnum>;
 
-    fn MyOpaqueEnum_to_string<'anon_0>(this: &MyOpaqueEnum, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn MyOpaqueEnum_to_string<'anon_0>(this: &'anon_0 MyOpaqueEnum, write_mut : &mut crate::DiplomatWrite) -> ();
 
     fn MyOpaqueEnum_destroy(this : *mut MyOpaqueEnum);
 }

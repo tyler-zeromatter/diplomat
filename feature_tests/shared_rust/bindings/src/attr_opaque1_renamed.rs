@@ -24,22 +24,22 @@ impl AttrOpaque1Renamed {
         ret
     }
 
-    pub fn method<'anon_0>(&self) -> u8 {
+    pub fn method<'anon_0>(&'anon_0 self) -> u8 {
         let ret = unsafe { namespace_AttrOpaque1_method(self) };
         ret
     }
 
-    pub fn abirenamed<'anon_0>(&self) -> u8 {
+    pub fn abirenamed<'anon_0>(&'anon_0 self) -> u8 {
         let ret = unsafe { renamed_on_abi_only(self) };
         ret
     }
 
-    pub fn use_unnamespaced<'anon_0, 'anon_1>(&self, _un : &'anon_1 Unnamespaced) {
+    pub fn use_unnamespaced<'anon_0, 'anon_1>(&'anon_0 self, _un : &'anon_1 Unnamespaced) {
         let ret = unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) };
         ret
     }
 
-    pub fn use_namespaced<'anon_0>(&self, _n : RenamedAttrEnum) {
+    pub fn use_namespaced<'anon_0>(&'anon_0 self, _n : RenamedAttrEnum) {
         let ret = unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) };
         ret
     }
@@ -55,13 +55,13 @@ unsafe extern "C" {
 
     fn namespace_AttrOpaque1_hello() -> i32;
 
-    fn namespace_AttrOpaque1_method<'anon_0>(this: &AttrOpaque1Renamed) -> u8;
+    fn namespace_AttrOpaque1_method<'anon_0>(this: &'anon_0 AttrOpaque1Renamed) -> u8;
 
-    fn renamed_on_abi_only<'anon_0>(this: &AttrOpaque1Renamed) -> u8;
+    fn renamed_on_abi_only<'anon_0>(this: &'anon_0 AttrOpaque1Renamed) -> u8;
 
-    fn namespace_AttrOpaque1_use_unnamespaced<'anon_0, 'anon_1>(this: &AttrOpaque1Renamed, _un : &'anon_1 Unnamespaced);
+    fn namespace_AttrOpaque1_use_unnamespaced<'anon_0, 'anon_1>(this: &'anon_0 AttrOpaque1Renamed, _un : &'anon_1 Unnamespaced);
 
-    fn namespace_AttrOpaque1_use_namespaced<'anon_0>(this: &AttrOpaque1Renamed, _n : RenamedAttrEnum);
+    fn namespace_AttrOpaque1_use_namespaced<'anon_0>(this: &'anon_0 AttrOpaque1Renamed, _n : RenamedAttrEnum);
 
     fn namespace_AttrOpaque1_destroy(this : *mut AttrOpaque1Renamed);
 }

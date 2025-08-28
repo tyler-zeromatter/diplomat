@@ -9,7 +9,7 @@ pub struct PrimitiveStruct {
 }
 
 impl PrimitiveStruct {
-    pub fn mutable_ref<'anon_0, 'anon_1>(&mut self, a : &'anon_1 mut PrimitiveStruct) {
+    pub fn mutable_ref<'anon_0, 'anon_1>(&'anon_0 mut self, a : &'anon_1 mut PrimitiveStruct) {
         let ret = unsafe { PrimitiveStruct_mutable_ref(self, a) };
         ret
     }
@@ -19,5 +19,5 @@ impl PrimitiveStruct {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn PrimitiveStruct_mutable_ref<'anon_0, 'anon_1>(this: &mut PrimitiveStruct, a : &'anon_1 mut PrimitiveStruct);
+    fn PrimitiveStruct_mutable_ref<'anon_0, 'anon_1>(this: &'anon_0 mut PrimitiveStruct, a : &'anon_1 mut PrimitiveStruct);
 }

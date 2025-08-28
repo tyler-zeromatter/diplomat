@@ -25,22 +25,22 @@ impl OptionOpaque {
         ret.into_converted_option()
     }
 
-    pub fn option_isize<'anon_0>(&self) -> Option<isize> {
+    pub fn option_isize<'anon_0>(&'anon_0 self) -> Option<isize> {
         let ret = unsafe { OptionOpaque_option_isize(self) };
         ret.into_converted_option()
     }
 
-    pub fn option_usize<'anon_0>(&self) -> Option<usize> {
+    pub fn option_usize<'anon_0>(&'anon_0 self) -> Option<usize> {
         let ret = unsafe { OptionOpaque_option_usize(self) };
         ret.into_converted_option()
     }
 
-    pub fn option_i32<'anon_0>(&self) -> Option<i32> {
+    pub fn option_i32<'anon_0>(&'anon_0 self) -> Option<i32> {
         let ret = unsafe { OptionOpaque_option_i32(self) };
         ret.into_converted_option()
     }
 
-    pub fn option_u32<'anon_0>(&self) -> Option<u32> {
+    pub fn option_u32<'anon_0>(&'anon_0 self) -> Option<u32> {
         let ret = unsafe { OptionOpaque_option_u32(self) };
         ret.into_converted_option()
     }
@@ -55,17 +55,17 @@ impl OptionOpaque {
         ret
     }
 
-    pub fn returns_none_self<'a>(&self) -> &'a Option<OptionOpaque> {
+    pub fn returns_none_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_none_self(self) };
         ret
     }
 
-    pub fn returns_some_self<'a>(&self) -> &'a Option<OptionOpaque> {
+    pub fn returns_some_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_some_self(self) };
         ret
     }
 
-    pub fn assert_integer<'anon_0>(&self, i : i32) {
+    pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
         let ret = unsafe { OptionOpaque_assert_integer(self, i) };
         ret
     }
@@ -106,23 +106,23 @@ unsafe extern "C" {
 
     fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStruct>;
 
-    fn OptionOpaque_option_isize<'anon_0>(this: &OptionOpaque) -> diplomat_runtime::DiplomatOption<isize>;
+    fn OptionOpaque_option_isize<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<isize>;
 
-    fn OptionOpaque_option_usize<'anon_0>(this: &OptionOpaque) -> diplomat_runtime::DiplomatOption<usize>;
+    fn OptionOpaque_option_usize<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<usize>;
 
-    fn OptionOpaque_option_i32<'anon_0>(this: &OptionOpaque) -> diplomat_runtime::DiplomatOption<i32>;
+    fn OptionOpaque_option_i32<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<i32>;
 
-    fn OptionOpaque_option_u32<'anon_0>(this: &OptionOpaque) -> diplomat_runtime::DiplomatOption<u32>;
+    fn OptionOpaque_option_u32<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<u32>;
 
     fn OptionOpaque_new_struct() -> OptionStruct;
 
     fn OptionOpaque_new_struct_nones() -> OptionStruct;
 
-    fn OptionOpaque_returns_none_self<'a>(this: &OptionOpaque) -> &'a Option<OptionOpaque>;
+    fn OptionOpaque_returns_none_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
 
-    fn OptionOpaque_returns_some_self<'a>(this: &OptionOpaque) -> &'a Option<OptionOpaque>;
+    fn OptionOpaque_returns_some_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
 
-    fn OptionOpaque_assert_integer<'anon_0>(this: &OptionOpaque, i : i32);
+    fn OptionOpaque_assert_integer<'anon_0>(this: &'anon_0 OptionOpaque, i : i32);
 
     fn OptionOpaque_option_opaque_argument<'anon_0>(arg : &'anon_0 Option<OptionOpaque>) -> bool;
 

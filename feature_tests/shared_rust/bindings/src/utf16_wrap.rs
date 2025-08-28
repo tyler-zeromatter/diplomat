@@ -12,7 +12,7 @@ impl Utf16Wrap {
         ret
     }
 
-    pub fn get_debug_str<'anon_0>(&self) -> String {
+    pub fn get_debug_str<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { Utf16Wrap_get_debug_str(self, write_mut) };
@@ -20,7 +20,7 @@ impl Utf16Wrap {
         out_str
     }
 
-    pub fn borrow_cont<'a>(&self) -> &'a [u16] {
+    pub fn borrow_cont<'a>(&'a self) -> &'a [u16] {
         let ret = unsafe { Utf16Wrap_borrow_cont(self) };
         ret
     }
@@ -32,9 +32,9 @@ impl Utf16Wrap {
 unsafe extern "C" {
     fn Utf16Wrap_from_utf16<'anon_0>(input : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<Utf16Wrap>;
 
-    fn Utf16Wrap_get_debug_str<'anon_0>(this: &Utf16Wrap, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn Utf16Wrap_get_debug_str<'anon_0>(this: &'anon_0 Utf16Wrap, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Utf16Wrap_borrow_cont<'a>(this: &Utf16Wrap) -> &'a diplomat_runtime::DiplomatStrSlice;
+    fn Utf16Wrap_borrow_cont<'a>(this: &'a Utf16Wrap) -> &'a diplomat_runtime::DiplomatStrSlice;
 
     fn Utf16Wrap_destroy(this : *mut Utf16Wrap);
 }
