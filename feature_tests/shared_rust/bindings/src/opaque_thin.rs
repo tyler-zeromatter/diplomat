@@ -11,12 +11,14 @@ impl OpaqueThin {
         let ret = unsafe { OpaqueThin_a(self) };
         
         ret
+    
     }
 
     pub fn b<'anon_0>(&'anon_0 self) -> f32 {
         let ret = unsafe { OpaqueThin_b(self) };
         
         ret
+    
     }
 
     pub fn c<'anon_0>(&'anon_0 self) -> String {
@@ -26,6 +28,7 @@ impl OpaqueThin {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
 }

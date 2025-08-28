@@ -12,6 +12,7 @@ impl<'a> StructWithSlices<'a> {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
 }

@@ -9,12 +9,14 @@ impl CyclicStructB {
         let ret = unsafe { CyclicStructB_get_a() };
         
         ret
+    
     }
 
     pub fn get_a_option() -> Option<CyclicStructA> {
         let ret = unsafe { CyclicStructB_get_a_option() };
         
         ret.into_converted_option()
+    
     }
 
 }

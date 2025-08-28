@@ -13,59 +13,69 @@ impl ResultOpaque {
         let ret = unsafe { ResultOpaque_new(i) };
         
         ret.to_result()
+    
     }
 
     pub fn new_failing_foo() -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_foo() };
         
         ret.to_result()
+    
     }
 
     pub fn new_failing_bar() -> Result<Box<ResultOpaque>, ErrorEnum> {
         let ret = unsafe { ResultOpaque_new_failing_bar() };
         
         ret.to_result()
+    
     }
 
     pub fn new_failing_unit() -> Result<Box<ResultOpaque>, ()> {
         let ret = unsafe { ResultOpaque_new_failing_unit() };
         
         ret.to_result()
+    
     }
 
     pub fn new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct> {
         let ret = unsafe { ResultOpaque_new_failing_struct(i) };
         
         ret.to_result()
+    
     }
 
     pub fn new_in_err(i : i32) -> Result<(), Box<ResultOpaque>> {
         let ret = unsafe { ResultOpaque_new_in_err(i) };
         
         ret.to_result()
+    
     }
 
     pub fn new_int(i : i32) -> Result<i32, ()> {
         let ret = unsafe { ResultOpaque_new_int(i) };
         
         ret.to_result()
+    
     }
 
     pub fn new_in_enum_err(i : i32) -> Result<ErrorEnum, Box<ResultOpaque>> {
         let ret = unsafe { ResultOpaque_new_in_enum_err(i) };
         
         ret.to_result()
+    
     }
 
     pub fn takes_str<'a, 'anon_0>(&'a mut self, _v : &'anon_0 str) -> &'a mut ResultOpaque {
         let ret = unsafe { ResultOpaque_takes_str(self, _v.as_bytes().into()) };
         
         ret
+    
     }
 
     pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
         let ret = unsafe { ResultOpaque_assert_integer(self, i) };
-        }
+        
+    }
 
 }
 

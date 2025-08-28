@@ -11,7 +11,8 @@ pub struct PrimitiveStruct {
 impl PrimitiveStruct {
     pub fn mutable_ref<'anon_0, 'anon_1>(&'anon_0 mut self, a : &'anon_1 mut PrimitiveStruct) {
         let ret = unsafe { PrimitiveStruct_mutable_ref(self, a) };
-        }
+        
+    }
 
 }
 

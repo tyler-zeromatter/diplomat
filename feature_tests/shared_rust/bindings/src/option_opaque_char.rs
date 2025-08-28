@@ -9,7 +9,8 @@ impl Drop for OptionOpaqueChar {
 impl OptionOpaqueChar {
     pub fn assert_char<'anon_0>(&'anon_0 self, ch : diplomat_runtime::DiplomatChar) {
         let ret = unsafe { OptionOpaqueChar_assert_char(self, ch) };
-        }
+        
+    }
 
 }
 

@@ -13,30 +13,35 @@ impl OpaqueThinVec {
         let ret = unsafe { OpaqueThinVec_create(a, b, c.into()) };
         
         ret
+    
     }
 
     pub fn iter<'a>(&'a self) -> Box<OpaqueThinIter<'a>> {
         let ret = unsafe { OpaqueThinVec_iter(self) };
         
         ret
+    
     }
 
     pub fn len<'anon_0>(&'anon_0 self) -> usize {
         let ret = unsafe { OpaqueThinVec_len(self) };
         
         ret
+    
     }
 
     pub fn get<'a>(&'a self, idx : usize) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_get(self, idx) };
         
         ret
+    
     }
 
     pub fn first<'a>(&'a self) -> &'a Option<OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_first(self) };
         
         ret
+    
     }
 
 }

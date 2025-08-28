@@ -11,6 +11,7 @@ impl Utf16Wrap {
         let ret = unsafe { Utf16Wrap_from_utf16(input.into()) };
         
         ret
+    
     }
 
     pub fn get_debug_str<'anon_0>(&'anon_0 self) -> String {
@@ -20,12 +21,14 @@ impl Utf16Wrap {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn borrow_cont<'a>(&'a self) -> &'a [u16] {
         let ret = unsafe { Utf16Wrap_borrow_cont(self) };
         
         ret.into()
+    
     }
 
 }

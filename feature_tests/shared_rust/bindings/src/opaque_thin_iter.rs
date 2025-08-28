@@ -16,6 +16,7 @@ impl<'a> OpaqueThinIter<'a> {
         let ret = unsafe { OpaqueThinIter_next(self) };
         
         ret
+    
     }
 
 }

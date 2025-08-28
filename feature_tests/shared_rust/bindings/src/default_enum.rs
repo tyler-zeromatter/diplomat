@@ -9,6 +9,7 @@ impl DefaultEnum {
         let ret = unsafe { DefaultEnum_new() };
         
         ret
+    
     }
 
 }

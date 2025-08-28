@@ -11,6 +11,7 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
         let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.as_bytes().into()) };
         
         ret
+    
     }
 
 }

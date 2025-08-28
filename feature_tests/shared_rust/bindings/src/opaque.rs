@@ -13,18 +13,21 @@ impl Opaque {
         let ret = unsafe { Opaque_new() };
         
         ret
+    
     }
 
     pub fn try_from_utf8<'anon_0>(input : &'anon_0 [u8]) -> Option<Box<Opaque>> {
         let ret = unsafe { Opaque_try_from_utf8(input.into()) };
         
         ret
+    
     }
 
     pub fn from_str<'anon_0>(input : &'anon_0 str) -> Box<Opaque> {
         let ret = unsafe { Opaque_from_str(input.as_bytes().into()) };
         
         ret
+    
     }
 
     pub fn get_debug_str<'anon_0>(&'anon_0 self) -> String {
@@ -34,28 +37,33 @@ impl Opaque {
         
         let out_str = write.to_string();
         out_str
+    
     }
 
     pub fn assert_struct<'anon_0>(&'anon_0 self, s : MyStruct) {
         let ret = unsafe { Opaque_assert_struct(self, s) };
-        }
+        
+    }
 
     pub fn returns_usize() -> usize {
         let ret = unsafe { Opaque_returns_usize() };
         
         ret
+    
     }
 
     pub fn returns_imported() -> ImportedStruct {
         let ret = unsafe { Opaque_returns_imported() };
         
         ret
+    
     }
 
     pub fn cmp() -> std::cmp::Ordering {
         let ret = unsafe { Opaque_cmp() };
         
         ret
+    
     }
 
 }
