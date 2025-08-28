@@ -139,7 +139,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         });
 
-        let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output);
+        let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output, &method.lifetime_env);
 
         FunctionInfo {
             name: method.name.as_str().into(),
@@ -228,6 +228,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         params: &mut Vec<ParamInfo>,
         ctx: &mut FileGenContext<'tcx>,
         ret: &'tcx ReturnType,
+        env : &LifetimeEnv,
     ) -> Option<ParamInfo<'tcx>> {
         match ret {
             ReturnType::Fallible(ok, err) => {
@@ -271,16 +272,23 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let abi_override = ABITypeInfo {
                     name: Some(format!(
                         "diplomat_runtime::DiplomatOption<{}>",
-                        ok_ty_abi.name.unwrap_or(ok_ty.name.clone())
+                        ok_ty.render_with_override(env, &ok_ty_abi)
                     ).into()),
                     ..Default::default()
                 };
 
+                let convert = Self::ok_type_conversion(ok);
+                let potential_map = if let Some((pre, post)) = convert {
+                    format!(".map(|ok : {}| {{ {pre}ok{post} }})", ok_ty_abi.name.unwrap())
+                } else {
+                    "".into()
+                };
+
                 Some(ParamInfo {
                     var_name: "ret".into(),
-                    type_info: TypeInfo::new(format!("Option<{}>", ok_ty.name).into()),
+                    type_info: TypeInfo::new(format!("Option<{}>", ok_ty.render(env)).into()),
                     abi_override,
-                    conversion: Some(("".into(), ".into_converted_option()".into())),
+                    conversion: Some(("".into(), format!(".into_converted_option(){potential_map}").into())),
                 })
             }
             ReturnType::Infallible(ok) => {

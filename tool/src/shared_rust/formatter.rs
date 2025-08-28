@@ -57,6 +57,8 @@ impl<'a> TypeInfo<'a> {
         }
     }
 
+    /// Format a given Rust type name with the the following layout:
+    /// WrapperBegin &'lifetime mut TypeName<GenericLifetimes> WrapperEnd
     pub(super) fn render(&self, env: &LifetimeEnv) -> String {
         self.render_with_override(env, &ABITypeInfo::default())
     }
