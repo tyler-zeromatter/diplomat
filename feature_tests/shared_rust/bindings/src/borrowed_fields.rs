@@ -18,5 +18,5 @@ impl<'a> BorrowedFields<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStrSlice<'x>, utf8_str : diplomat_runtime::DiplomatStrSlice<'x>) -> BorrowedFields<'x>;
+    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str : diplomat_runtime::DiplomatStrSlice<'x>) -> BorrowedFields<'x>;
 }

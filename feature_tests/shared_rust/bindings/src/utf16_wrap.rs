@@ -33,11 +33,11 @@ impl Utf16Wrap {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Utf16Wrap_from_utf16<'anon_0>(input : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<Utf16Wrap>;
+    fn Utf16Wrap_from_utf16<'anon_0>(input : diplomat_runtime::DiplomatStr16Slice<'anon_0>) -> Box<Utf16Wrap>;
 
     fn Utf16Wrap_get_debug_str<'anon_0>(this: &'anon_0 Utf16Wrap, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Utf16Wrap_borrow_cont<'a>(this: &'a Utf16Wrap) -> diplomat_runtime::DiplomatStrSlice<'a>;
+    fn Utf16Wrap_borrow_cont<'a>(this: &'a Utf16Wrap) -> diplomat_runtime::DiplomatStr16Slice<'a>;
 
     fn Utf16Wrap_destroy(this : *mut Utf16Wrap);
 }
