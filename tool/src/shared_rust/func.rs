@@ -169,6 +169,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 },
                 _ => None,
             },
+            Type::DiplomatOption(..) => Some(("".into(), ".into()".into())),
             _ => None,
         }
     }
