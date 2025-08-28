@@ -18,5 +18,5 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFieldsWithBounds_from_foo_and_strings<'x, 'y, 'z>(foo : &'x Foo<'y>, dstr16_x : diplomat_runtime::DiplomatStrSlice<'x>, utf8_str_z : diplomat_runtime::DiplomatStrSlice<'z>) -> BorrowedFieldsWithBounds<'x, 'y, 'z>;
+    fn BorrowedFieldsWithBounds_from_foo_and_strings<'x, 'y, 'z>(foo : &'x Foo<'y>, dstr16_x : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str_z : diplomat_runtime::DiplomatStrSlice<'z>) -> BorrowedFieldsWithBounds<'x, 'y, 'z>;
 }
