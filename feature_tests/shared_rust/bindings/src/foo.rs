@@ -20,12 +20,12 @@ impl<'a> Foo<'a> {
         ret
     }
 
-    pub fn get_bar<'a, 'b>(&self) -> Box<Bar<'b, 'a>> {
+    pub fn get_bar<'a, 'b>(&'b self) -> Box<Bar<'b, 'a>> {
         let ret = unsafe { Foo_get_bar(self) };
         ret
     }
 
-    pub fn as_returning<'a, 'anon_0>(&self) -> BorrowedFieldsReturning<'a> {
+    pub fn as_returning<'a, 'anon_0>(&'anon_0 self) -> BorrowedFieldsReturning<'a> {
         let ret = unsafe { Foo_as_returning(self) };
         ret
     }
@@ -47,9 +47,9 @@ impl<'a> Foo<'a> {
 unsafe extern "C" {
     fn Foo_new<'a>(x : &'a diplomat_runtime::DiplomatStrSlice) -> Box<Foo<'a>>;
 
-    fn Foo_get_bar<'a, 'b>(this: &Foo) -> Box<Bar<'b, 'a>>;
+    fn Foo_get_bar<'a, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
 
-    fn Foo_as_returning<'a, 'anon_0>(this: &Foo) -> BorrowedFieldsReturning<'a>;
+    fn Foo_as_returning<'a, 'anon_0>(this: &'anon_0 Foo) -> BorrowedFieldsReturning<'a>;
 
     fn Foo_extract_from_fields<'a>(fields : BorrowedFields<'a>) -> Box<Foo<'a>>;
 
