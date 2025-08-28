@@ -22,31 +22,33 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
         {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
         {%- for p in params -%} 
-        {{p.var_name}}{{p.convert()}}
+        {{p.wrap_convert()}}
         {%- if !loop.last %}, {% endif -%}
         {%- endfor -%}
-        ) };
-    {% if is_write -%}
+        ) }; {#- ~#}
+    {% if is_write %}
     let out_str = write.to_string();
-    {%- match return_info  -%}
-    {%- when ReturnType::Fallible(..) %}
+{%- match return_info -%}
+{%- when ReturnType::Fallible(..) %}
     if ret.is_ok {
         Ok(out_str)
     } else {
         Err(ret.unwrap_err())
     }
-    {%- when ReturnType::Nullable(..) %}
+{% when ReturnType::Nullable(..) %}
     if ret.is_ok {
         Some(out_str)
     } else {
         None
     }
-    {%- when _ %}
+{% when _ %}
     out_str
-    {%- endmatch -%}
+{% endmatch -%}
     {%- else -%}
-    ret{% if let Some(r) = return_type %}{{r.convert()}}{% endif %}
-    {%- endif %}
+{% if let Some(r) = return_type %}
+    {{r.wrap_convert()}}
+{% endif -%}
+    {%- endif -%}
 }
 {%- endblock -%}
 

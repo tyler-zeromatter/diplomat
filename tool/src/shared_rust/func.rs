@@ -25,7 +25,7 @@ struct ParamInfo<'a> {
     var_name: Cow<'a, str>,
     type_info: TypeInfo<'a>,
     abi_type_override: Option<Cow<'a, str>>,
-    conversion: Option<Cow<'a, str>>,
+    conversion : Option<(Cow<'a, str>, Cow<'a, str>)>,
 }
 
 impl<'a> ParamInfo<'a> {
@@ -38,12 +38,15 @@ impl<'a> ParamInfo<'a> {
         }
     }
 
-    fn convert(&self) -> Cow<'a, str> {
-        if let Some(c) = &self.conversion {
-            c.clone()
+    fn wrap_convert(&self) -> Cow<'a, str> {
+        let (pre_convert, post_convert) = 
+        if let Some((pre, post)) = &self.conversion {
+            (pre.clone(), post.clone())
         } else {
-            "".into()
-        }
+            ("".into(), "".into())
+        };
+
+        format!("{pre_convert}{}{post_convert}", self.var_name).into()
     }
 }
 
@@ -139,10 +142,10 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
-    fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<Cow<'tcx, str>> {
+    fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
-                Slice::Str(..) => Some(".into()".into()),
+                Slice::Str(..) => Some(("&".into(), ".into()".into())),
                 _ => None,
             },
             _ => None,
@@ -210,13 +213,13 @@ impl<'tcx> FunctionInfo<'tcx> {
                     err_ty_abi.unwrap_or(err_ty.name.clone())
                 );
                 let info = ParamInfo {
-                    var_name: "".into(),
+                    var_name: "ret".into(),
                     type_info: TypeInfo::new(
                         format!("Result<{}, {}>", ok_ty.name, err_ty.name).into(),
                     ),
                     abi_type_override: Some(abi_override.into()),
                     // TODO: More advanced conversions for inner types.
-                    conversion: Some(".into()".into()),
+                    conversion: Some(("".into(), ".into()".into())),
                 };
                 Some(info)
             }
@@ -230,10 +233,10 @@ impl<'tcx> FunctionInfo<'tcx> {
                 );
 
                 Some(ParamInfo {
-                    var_name: "".into(),
+                    var_name: "ret".into(),
                     type_info: TypeInfo::new(format!("Option<{}>", ok_ty.name).into()),
                     abi_type_override: Some(abi_override.into()),
-                    conversion: Some(".into_converted_option()".into()),
+                    conversion: Some(("".into(), ".into_converted_option()".into())),
                 })
             }
             ReturnType::Infallible(ok) => {
@@ -241,7 +244,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let abi_name = Self::gen_ok_abi_name(ctx, ok);
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
                     Some(ParamInfo {
-                        var_name: "".into(),
+                        var_name: "ret".into(),
                         type_info,
                         abi_type_override: abi_name,
                         conversion: None,
