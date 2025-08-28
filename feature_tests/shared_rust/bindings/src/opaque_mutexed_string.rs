@@ -77,7 +77,7 @@ unsafe extern "C" {
 
     fn OpaqueMutexedString_get_len_and_add<'anon_0>(this: &'anon_0 OpaqueMutexedString, other : usize) -> usize;
 
-    fn OpaqueMutexedString_dummy_str<'a>(this: &'a OpaqueMutexedString) -> &'a diplomat_runtime::DiplomatStrSlice;
+    fn OpaqueMutexedString_dummy_str<'a>(this: &'a OpaqueMutexedString) -> diplomat_runtime::DiplomatStrSlice<'a>;
 
     fn OpaqueMutexedString_wrapper<'a>(this: &'a OpaqueMutexedString) -> Box<Utf16Wrap>;
 

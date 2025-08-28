@@ -8,19 +8,19 @@ impl Drop for MyString {
 
 impl MyString {
     pub fn new<'anon_0>(v : &'anon_0 [u8]) -> Box<MyString> {
-        let ret = unsafe { MyString_new(&v.into()) };
+        let ret = unsafe { MyString_new(v.into()) };
         
         ret
     }
 
     pub fn new_unsafe<'anon_0>(v : &'anon_0 String) -> Box<MyString> {
-        let ret = unsafe { MyString_new_unsafe(&v.into()) };
+        let ret = unsafe { MyString_new_unsafe(v.as_bytes().into()) };
         
         ret
     }
 
     pub fn new_owned(v : Box<[u8]>) -> Box<MyString> {
-        let ret = unsafe { MyString_new_owned(&v.into()) };
+        let ret = unsafe { MyString_new_owned(v.into()) };
         
         ret
     }
@@ -32,7 +32,7 @@ impl MyString {
     }
 
     pub fn set_str<'anon_0, 'anon_1>(&'anon_0 mut self, new_str : &'anon_1 [u8]) {
-        let ret = unsafe { MyString_set_str(self, &new_str.into()) };
+        let ret = unsafe { MyString_set_str(self, new_str.into()) };
         }
 
     pub fn get_str<'anon_0>(&'anon_0 self) -> String {
@@ -53,7 +53,7 @@ impl MyString {
     pub fn string_transform<'anon_0>(foo : &'anon_0 String) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { MyString_string_transform(&foo.into(), write_mut) };
+        let ret = unsafe { MyString_string_transform(foo.as_bytes().into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -70,23 +70,23 @@ impl MyString {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn MyString_new<'anon_0>(v : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
+    fn MyString_new<'anon_0>(v : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<MyString>;
 
-    fn MyString_new_unsafe<'anon_0>(v : &'anon_0 diplomat_runtime::DiplomatStrSlice) -> Box<MyString>;
+    fn MyString_new_unsafe<'anon_0>(v : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<MyString>;
 
     fn MyString_new_owned(v : Box<diplomat_runtime::DiplomatStrSlice>) -> Box<MyString>;
 
     fn MyString_new_from_first(v : &[String]) -> Box<MyString>;
 
-    fn MyString_set_str<'anon_0, 'anon_1>(this: &'anon_0 mut MyString, new_str : &'anon_1 diplomat_runtime::DiplomatStrSlice);
+    fn MyString_set_str<'anon_0, 'anon_1>(this: &'anon_0 mut MyString, new_str : diplomat_runtime::DiplomatStrSlice<'anon_1>);
 
     fn MyString_get_str<'anon_0>(this: &'anon_0 MyString, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn MyString_get_static_str() -> &'static diplomat_runtime::DiplomatStrSlice;
+    fn MyString_get_static_str() -> diplomat_runtime::DiplomatStrSlice<'static>;
 
-    fn MyString_string_transform<'anon_0>(foo : &'anon_0 diplomat_runtime::DiplomatStrSlice, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn MyString_string_transform<'anon_0>(foo : diplomat_runtime::DiplomatStrSlice<'anon_0>, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn MyString_borrow<'a>(this: &'a MyString) -> &'a diplomat_runtime::DiplomatStrSlice;
+    fn MyString_borrow<'a>(this: &'a MyString) -> diplomat_runtime::DiplomatStrSlice<'a>;
 
     fn MyString_destroy(this : *mut MyString);
 }

@@ -10,7 +10,7 @@ impl Drop for OpaqueThinVec {
 
 impl OpaqueThinVec {
     pub fn create<'anon_0, 'anon_1, 'anon_2>(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 [u8]) -> Box<OpaqueThinVec> {
-        let ret = unsafe { OpaqueThinVec_create(a, b, &c.into()) };
+        let ret = unsafe { OpaqueThinVec_create(a, b, c.into()) };
         
         ret
     }
@@ -44,7 +44,7 @@ impl OpaqueThinVec {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OpaqueThinVec_create<'anon_0, 'anon_1, 'anon_2>(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 diplomat_runtime::DiplomatStrSlice) -> Box<OpaqueThinVec>;
+    fn OpaqueThinVec_create<'anon_0, 'anon_1, 'anon_2>(a : &'anon_0 [i32], b : &'anon_1 [f32], c : diplomat_runtime::DiplomatStrSlice<'anon_2>) -> Box<OpaqueThinVec>;
 
     fn OpaqueThinVec_iter<'a>(this: &'a OpaqueThinVec) -> Box<OpaqueThinIter<'a>>;
 
