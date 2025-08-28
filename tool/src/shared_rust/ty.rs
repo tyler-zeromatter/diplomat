@@ -280,7 +280,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     Slice::Str(lt, enc) => {
                         // TODO: I don't think this always needs to be wrapped the same way:
                         let name = match enc {
-                            StringEncoding::Utf8 => "String",
+                            StringEncoding::Utf8 if lt.is_none() => "String",
+                            StringEncoding::Utf8 => "str",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
                             StringEncoding::UnvalidatedUtf16 => "[u16]",
                             _ => panic!("Unknown encoding {enc:?}"),
