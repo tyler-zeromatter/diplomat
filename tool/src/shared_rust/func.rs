@@ -25,6 +25,7 @@ pub(super) struct FunctionInfo<'tcx> {
 pub(super) struct ABITypeInfo<'a> {
     pub(super) name : Option<Cow<'a, str>>,
     pub(super) borrow : Option<MaybeOwn>,
+    pub(super) generic_lifetimes : Option<Vec<MaybeStatic<Lifetime>>>,
 }
 
 struct ParamInfo<'a> {
@@ -232,7 +233,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                         ok_ty_abi.name.unwrap_or(ok_ty.name.clone()),
                         err_ty_abi.name.unwrap_or(err_ty.name.clone())
                     ).into()),
-                    borrow: None,
+                    ..Default::default()
                 };
 
                 let info = ParamInfo {
@@ -307,22 +308,20 @@ impl<'tcx> FunctionInfo<'tcx> {
                         inner.name.unwrap_or(regular_type)
                     )
                     .into()),
-                    borrow: None,
+                    ..Default::default()
                 }
             }
             Type::Slice(sl) => match sl {
                 // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
-                Slice::Str(..) => {
+                Slice::Str(lt, _) => {
                     ABITypeInfo {
                         name: Some("diplomat_runtime::DiplomatStrSlice".to_string().into()),
-                        borrow: Some(MaybeOwn::Own)
+                        // We move the borrow to the generic lifetimes:
+                        borrow: Some(MaybeOwn::Own),
+                        generic_lifetimes: Some(lt.iter().cloned().collect()),
                     }
                 },
-                // Diplomat always requires slices be owned:
-                _ => ABITypeInfo {
-                    borrow: Some(MaybeOwn::Own),
-                    ..Default::default()
-                },
+                _ => ABITypeInfo::default(),
             },
             _ => ABITypeInfo::default(),
         }
