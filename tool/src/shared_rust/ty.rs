@@ -313,28 +313,4 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             _ => TypeInfo::new("TODO()".into()),
         }
     }
-
-    pub(super) fn gen_abi_type_name<P: TyPosition>(
-        &'rcx mut self,
-        ty: &Type<P>,
-    ) -> Option<Cow<'tcx, str>> {
-        match ty {
-            Type::DiplomatOption(op) => {
-                let regular_type = self.gen_type_info(op).name;
-                Some(
-                    format!(
-                        "diplomat_runtime::DiplomatOption<{}>",
-                        self.gen_abi_type_name(op).unwrap_or(regular_type)
-                    )
-                    .into(),
-                )
-            }
-            Type::Slice(sl) => match sl {
-                // TODO: Lifetimes. The current TypeInfo struct borrows this, when it needs to become a generic:
-                Slice::Str(..) => Some("diplomat_runtime::DiplomatStrSlice".to_string().into()),
-                _ => None,
-            },
-            _ => None,
-        }
-    }
 }
