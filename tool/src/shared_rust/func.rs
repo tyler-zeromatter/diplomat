@@ -60,7 +60,7 @@ impl<'a> ParamInfo<'a> {
 
 impl<'tcx> FunctionInfo<'tcx> {
     fn render_generic_lifetimes(&self) -> String {
-        TypeInfo::fmt_generic_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
+        TypeInfo::fmt_generic_bounded_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
     }
 
     fn gen_function_info(ctx: &mut FileGenContext<'tcx>, method: &'tcx Method) -> Self {

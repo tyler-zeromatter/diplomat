@@ -4,6 +4,7 @@ use diplomat_core::hir::{
     EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, SymbolId,
     TypeContext,
 };
+use itertools::Itertools;
 
 use crate::shared_rust::func::ABITypeInfo;
 
@@ -39,12 +40,48 @@ impl<'a> TypeInfo<'a> {
         generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
         env: &LifetimeEnv,
     ) -> String {
-        // TODO: I'm pretty sure bounds also need to be captured here?
         let generic_lifetimes: Vec<String> = generic_lifetimes
             .iter()
             .map(|lt| match lt {
                 MaybeStatic::Static => "'static".into(),
-                MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns)),
+                MaybeStatic::NonStatic(ns) => {
+                    format!("'{}", env.fmt_lifetime(ns))
+                },
+            })
+            .collect();
+
+        let generic_lifetimes_string = generic_lifetimes.join(", ");
+
+        if !generic_lifetimes.is_empty() {
+            format!("<{generic_lifetimes_string}>")
+        } else {
+            "".into()
+        }
+    }
+
+    pub(super) fn fmt_generic_bounded_lifetimes(
+        generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
+        env: &LifetimeEnv,
+    ) -> String {
+        let generic_lifetimes: Vec<String> = generic_lifetimes
+            .iter()
+            .map(|lt| match lt {
+                MaybeStatic::Static => "'static".into(),
+                MaybeStatic::NonStatic(ns) => {
+                    // TODO: Does this work okay?
+                    let bounded_lts : Vec<Lifetime> = env.all_shorter_lifetimes(ns).filter(|l| {
+                        l != ns
+                    }).collect();
+                    let bounded_str = bounded_lts.iter().map(|l| {
+                        format!("'{}", env.fmt_lifetime(l))
+                    }).join(" + ");
+                    let bounded = if bounded_lts.len() > 0 {
+                        format!(": {bounded_str}")
+                    } else {
+                        "".into()
+                    };
+                    format!("'{}{bounded}", env.fmt_lifetime(ns))
+                },
             })
             .collect();
 
