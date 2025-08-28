@@ -297,10 +297,11 @@ struct DiplomatResult<T, E> {
 }
 
 impl<T, E> DiplomatResult<T, E> {
-    pub fn unwrap_err(mut self) -> E {
-        if !self.is_ok {
-            panic!("Tried to unwrap_err a non-error.");
+    pub fn to_result(mut self) -> Result<T, E> {
+        if self.is_ok {
+            Ok(unsafe { ManuallyDrop::take(&mut self.value.ok) })
+        } else {
+            Err(unsafe { ManuallyDrop::take(&mut self.value.err) })
         }
-        unsafe { ManuallyDrop::take(&mut self.value.err) }
     }
 }

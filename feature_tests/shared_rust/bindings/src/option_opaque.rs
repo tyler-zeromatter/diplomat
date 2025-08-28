@@ -10,13 +10,13 @@ impl Drop for OptionOpaque {
 }
 
 impl OptionOpaque {
-    pub fn new(i : i32) -> Box<Option<OptionOpaque>> {
+    pub fn new(i : i32) -> Option<Box<OptionOpaque>> {
         let ret = unsafe { OptionOpaque_new(i) };
         
         ret
     }
 
-    pub fn new_none() -> Box<Option<OptionOpaque>> {
+    pub fn new_none() -> Option<Box<OptionOpaque>> {
         let ret = unsafe { OptionOpaque_new_none() };
         
         ret
@@ -115,9 +115,9 @@ impl OptionOpaque {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OptionOpaque_new(i : i32) -> Box<Option<OptionOpaque>>;
+    fn OptionOpaque_new(i : i32) -> Option<Box<OptionOpaque>>;
 
-    fn OptionOpaque_new_none() -> Box<Option<OptionOpaque>>;
+    fn OptionOpaque_new_none() -> Option<Box<OptionOpaque>>;
 
     fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStruct>;
 
