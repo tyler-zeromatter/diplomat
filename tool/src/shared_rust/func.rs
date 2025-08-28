@@ -214,7 +214,8 @@ impl<'tcx> FunctionInfo<'tcx> {
                 Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
                     // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
                     StringEncoding::Utf8 => Some(("unsafe { str::from_utf8_unchecked(".into(), ".into()).into()}".into())),
-                    _ => None,
+                    // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
+                    _ => Some(("".into(), ".into()".into())),
                 },
                 _ => None,
             }
