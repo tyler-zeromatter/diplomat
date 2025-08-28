@@ -30,11 +30,9 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
     let out_str = write.to_string();
 {%- match return_info -%}
 {%- when ReturnType::Fallible(..) %}
-    if ret.is_ok {
-        Ok(out_str)
-    } else {
-        Err(ret.unwrap_err())
-    }
+    ret.to_result().map(|_| {
+        out_str
+    })
 {% when ReturnType::Nullable(..) %}
     if ret.is_ok {
         Some(out_str)
