@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, SuccessType, TyPosition, Type, TypeId
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
 };
 
 use crate::shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, FileGenContext};
@@ -138,6 +138,31 @@ impl<'tcx> FunctionInfo<'tcx> {
         });
 
         let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output, &method.lifetime_env);
+
+        // FIXME: This is supposed to be code removing overlapping lifetimes for a method.
+        // This doesn't work because a method is not guaranteed to use all of the lifetimes associated with `&self`.
+        // Not sure what a solution here could be other than removing `impl` generic lifetime declarations, which seems
+        // like a bad way to handle lifetimes for long-lived references.
+
+        // let ty_lifetimes = if let SymbolId::TypeId(ty) = ctx.id {
+        //     match ctx.tcx.resolve_type(ty) {
+        //         TypeDef::Opaque(op) => op.lifetimes.all_lifetimes().collect(),
+        //         TypeDef::Struct(st) => st.lifetimes.all_lifetimes().collect(),
+        //         TypeDef::OutStruct(st) => st.lifetimes.all_lifetimes().collect(),
+        //         _ => Vec::new(),
+        //     }
+        // } else {
+        //     Vec::new()
+        // };
+
+        // let method_lifetimes = method.method_lifetimes();
+
+        // let lifetimes = method_lifetimes.lifetimes().filter(|lt| {
+        //     match lt {
+        //         MaybeStatic::Static => false,
+        //         MaybeStatic::NonStatic(ns) => !ty_lifetimes.contains(ns)
+        //     }
+        // });
 
         FunctionInfo {
             name: method.name.as_str().into(),

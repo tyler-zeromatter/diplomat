@@ -14,8 +14,8 @@ use crate::{
 
 pub(super) struct FileGenContext<'tcx> {
     pub(super) formatter: &'tcx RustFormatter<'tcx>,
-    tcx: &'tcx TypeContext,
-    id: SymbolId,
+    pub(super) tcx: &'tcx TypeContext,
+    pub(super) id: SymbolId,
     lib_name: String,
     imports: BTreeSet<String>,
 }
