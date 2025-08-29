@@ -26,6 +26,7 @@ pub(super) struct FunctionInfo<'tcx> {
     return_info: ReturnType,
     lifetime_env: &'tcx LifetimeEnv,
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
+    abi_lifetimes : Vec<MaybeStatic<Lifetime>>,
 }
 
 #[derive(Default)]
@@ -71,6 +72,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     /// Jinja Helper
     fn render_generic_lifetimes(&self) -> String {
         TypeInfo::fmt_generic_bounded_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
+    }
+    fn render_abi_generic_lifetimes(&self) -> String {
+        TypeInfo::fmt_generic_bounded_lifetimes(self.abi_lifetimes.clone(), self.lifetime_env)
     }
 
     /// Main constructor for this type. Needs [`FileGenContext`] mostly to be able to update the header.
@@ -157,30 +161,31 @@ impl<'tcx> FunctionInfo<'tcx> {
         let return_type =
             Self::gen_return_type_info(&mut params, ctx, &method.output, &method.lifetime_env);
 
-        // FIXME: This is supposed to be code removing overlapping lifetimes for a method.
-        // This doesn't work because a method is not guaranteed to use all of the lifetimes associated with `&self`.
-        // Not sure what a solution here could be other than removing `impl` generic lifetime declarations, which seems
-        // like a bad way to handle lifetimes for long-lived references.
+        // FIXME: This is hacky and ugly, I think a real design discussion about how to avoid lifetimes already existing in the SelfType's impl block is needed.
+        let formatted_parent = if let SymbolId::TypeId(ty) = ctx.id {
+            match ctx.tcx.resolve_type(ty) {
+                TypeDef::Opaque(op) => op.lifetimes.all_lifetimes().map(|l| {
+                    op.lifetimes.fmt_lifetime(l)
+                }).collect(),
+                TypeDef::Struct(st) => st.lifetimes.all_lifetimes().map(|l| {
+                    st.lifetimes.fmt_lifetime(l)
+                }).collect(),
+                TypeDef::OutStruct(st) => st.lifetimes.all_lifetimes().map(|l| {
+                    st.lifetimes.fmt_lifetime(l)
+                }).collect(),
+                _ => Vec::new(),
+            }
+        } else {
+            Vec::new()
+        };
+        let method_lifetimes = method.method_lifetimes();
 
-        // let ty_lifetimes = if let SymbolId::TypeId(ty) = ctx.id {
-        //     match ctx.tcx.resolve_type(ty) {
-        //         TypeDef::Opaque(op) => op.lifetimes.all_lifetimes().collect(),
-        //         TypeDef::Struct(st) => st.lifetimes.all_lifetimes().collect(),
-        //         TypeDef::OutStruct(st) => st.lifetimes.all_lifetimes().collect(),
-        //         _ => Vec::new(),
-        //     }
-        // } else {
-        //     Vec::new()
-        // };
-
-        // let method_lifetimes = method.method_lifetimes();
-
-        // let lifetimes = method_lifetimes.lifetimes().filter(|lt| {
-        //     match lt {
-        //         MaybeStatic::Static => false,
-        //         MaybeStatic::NonStatic(ns) => !ty_lifetimes.contains(ns)
-        //     }
-        // });
+        let lifetimes = method_lifetimes.lifetimes().filter(|lt| {
+            match lt {
+                MaybeStatic::Static => true,
+                MaybeStatic::NonStatic(ns) => !formatted_parent.contains(&method.lifetime_env.fmt_lifetime(ns)),
+            }
+        });
 
         FunctionInfo {
             name: method.name.as_str().into(),
@@ -191,9 +196,9 @@ impl<'tcx> FunctionInfo<'tcx> {
             is_write: method.output.is_write(),
             return_info: method.output.clone(),
             lifetime_env: &method.lifetime_env,
-            // TODO: Need a separate set of lifetimes for the function definition, and one for the ABI.
             // TODO: Bounded lifetimes.
-            generic_lifetimes: method.method_lifetimes().lifetimes().collect(),
+            generic_lifetimes: lifetimes.collect(),
+            abi_lifetimes: method_lifetimes.lifetimes().collect(),
         }
     }
 

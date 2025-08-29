@@ -51,7 +51,7 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
 {%- endblock -%}
 
 {%- block function_def -%}
-    fn {{abi_name}}{{self.render_generic_lifetimes()}}(
+    fn {{abi_name}}{{self.render_abi_generic_lifetimes()}}(
         {%- call func_params(self_param, params, true) -%}
     ) 
         
