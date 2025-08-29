@@ -2,14 +2,17 @@ use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
 use diplomat_core::hir::{
-    EnumDef, LifetimeEnv, MaybeOwn, OpaqueDef,
-    OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId,
-    TyPosition, Type, TypeContext, TypeId,
+    EnumDef, LifetimeEnv, MaybeOwn, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef,
+    StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeId,
 };
 
 use crate::{
     config::Config,
-    shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, func::FunctionInfo, RustFormatter},
+    shared_rust::{
+        formatter::{TypeInfo, TypeInfoWrapper},
+        func::FunctionInfo,
+        RustFormatter,
+    },
 };
 
 /// Generation context of a single `.rs` file to be output.
@@ -261,12 +264,12 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     name: op_name,
                     borrow: op.owner.get_borrow(),
                     generic_lifetimes: op.lifetimes.lifetimes().collect(),
-                    wrapped: match(op.is_owned(), op.is_optional()) {
+                    wrapped: match (op.is_owned(), op.is_optional()) {
                         (true, true) => super::formatter::TypeInfoWrapper::BoxedOptional,
                         (true, false) => super::formatter::TypeInfoWrapper::Boxed,
                         (false, true) => super::formatter::TypeInfoWrapper::Optional,
                         (false, false) => super::formatter::TypeInfoWrapper::None,
-                    }
+                    },
                 }
             }
             Type::DiplomatOption(op) => {
@@ -321,7 +324,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         TypeInfoWrapper::Boxed
                     } else {
                         TypeInfoWrapper::None
-                    }
+                    },
                 }
             }
             _ => todo!(),
