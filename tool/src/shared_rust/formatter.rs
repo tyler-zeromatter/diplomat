@@ -9,11 +9,17 @@ use itertools::Itertools;
 use crate::shared_rust::func::ABITypeInfo;
 
 #[derive(Default)]
+/// A wrapper around any type information.
+/// Currently just a handler for the weirdness that is returning Option<Opaque>, Box<Option<Opaque>>, etc.
+/// Not meant to be used in conjunction with [`ABITypeInfo`], that will mess things up considerably.
 pub enum TypeInfoWrapper {
     #[default]
     None,
+    /// Box<Type>
     Boxed,
+    /// Option<Box<Type>>
     BoxedOptional,
+    /// Option<Type>
     Optional,
 }
 

@@ -7,21 +7,26 @@ use diplomat_core::hir::{
 
 use crate::shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, FileGenContext};
 
+/// Information need to generate a single function. Used for both the ABI version of the function (`extern "C"`) and the Rust version of the function (`pub fn`). 
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
     name: Cow<'tcx, str>,
     abi_name: Cow<'tcx, str>,
     self_param: Option<ParamInfo<'tcx>>,
-    return_type: Option<ParamInfo<'tcx>>,
     params: Vec<ParamInfo<'tcx>>,
     is_write: bool,
+    /// Used for displaying type info of the returned type.
+    return_type: Option<ParamInfo<'tcx>>,
+    /// Used for converting the returned type. Right now, this is only used for `SuccessType::Write` methods, since that gets tricky on the ABI side.
     return_info: ReturnType,
     lifetime_env: &'tcx LifetimeEnv,
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
 }
 
 #[derive(Default)]
+/// Like [`TypeInfo`], but is used specifically for the `extern "C"` version of a type.
+/// Every field will be `None` if there is nothing to override.
 pub(super) struct ABITypeInfo<'a> {
     pub(super) name : Option<Cow<'a, str>>,
     pub(super) borrow : Option<MaybeOwn>,
@@ -33,10 +38,12 @@ struct ParamInfo<'a> {
     var_name: Cow<'a, str>,
     type_info: TypeInfo<'a>,
     abi_override: ABITypeInfo<'a>,
+    /// (pre, post) conversion of a type. Can either be to or from the Rust C ABI.
     conversion : Option<(Cow<'a, str>, Cow<'a, str>)>,
 }
 
 impl<'a> ParamInfo<'a> {
+    // These are both helper functions used in the .jinja templates:
     fn render(&self, env: &LifetimeEnv, is_abi: bool) -> String {
         if is_abi {
             self.type_info
@@ -59,10 +66,12 @@ impl<'a> ParamInfo<'a> {
 }
 
 impl<'tcx> FunctionInfo<'tcx> {
+    /// Jinja Helper
     fn render_generic_lifetimes(&self) -> String {
         TypeInfo::fmt_generic_bounded_lifetimes(self.generic_lifetimes.clone(), self.lifetime_env)
     }
 
+    /// Main constructor for this type. Needs [`FileGenContext`] mostly to be able to update the header.
     fn gen_function_info(ctx: &mut FileGenContext<'tcx>, method: &'tcx Method) -> Self {
         let mut params = Vec::new();
         for p in &method.params {
@@ -179,6 +188,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
+    /// Get the (pre, post) conversion from Rust to the C ABI.
     fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
@@ -199,7 +209,8 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
-    fn gen_ok_type_name(
+    /// For a given [`SuccessType`], get the Rust type information.
+    fn gen_ok_type_info(
         params: &mut Vec<ParamInfo>,
         ctx: &mut FileGenContext<'tcx>,
         ok: &'tcx SuccessType,
@@ -222,6 +233,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
+    /// For a given [`SuccessType`], get the C ABI type information.
     fn gen_ok_abi_info(
         ctx: &mut FileGenContext<'tcx>,
         ok: &'tcx SuccessType,
@@ -233,6 +245,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
+    /// Get the C ABI -> Rust conversion for a return type.
     fn out_type_conversion<P: TyPosition>(out : &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match out {
             Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
@@ -260,7 +273,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     ) -> Option<ParamInfo<'tcx>> {
         match ret {
             ReturnType::Fallible(ok, err) => {
-                let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
+                let ok_ty = Self::gen_ok_type_info(params, ctx, ok);
                 let err_ty = err
                     .as_ref()
                     .map(|e| ctx.gen_type_info(e))
@@ -307,7 +320,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 Some(info)
             }
             ReturnType::Nullable(ok) => {
-                let ok_ty = Self::gen_ok_type_name(params, ctx, ok);
+                let ok_ty = Self::gen_ok_type_info(params, ctx, ok);
 
                 let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
                 let abi_override = ABITypeInfo {
@@ -333,7 +346,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 })
             }
             ReturnType::Infallible(ok) => {
-                let type_info = Self::gen_ok_type_name(params, ctx, ok);
+                let type_info = Self::gen_ok_type_info(params, ctx, ok);
                 let abi_name = Self::gen_ok_abi_info(ctx, ok);
 
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
@@ -361,6 +374,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         funcs
     }
 
+    /// Given any type, generate C ABI info. 
     fn gen_abi_type_info<P: TyPosition>(
         ctx : &mut FileGenContext,
         ty: &Type<P>,
