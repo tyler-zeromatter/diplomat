@@ -228,6 +228,10 @@ impl<'tcx> FunctionInfo<'tcx> {
                     // Maybe(&str ->) &[u8] -> DiplomatStrSlice
                     Some(("".into(), format!("{maybe_enc}.into()").into()))
                 }
+                // From &[String|&[u8]|&[u16]] -> DiplomatSlice<DiplomatStrSlice>
+                // Slice::Strs(enc) => {
+
+                // }
                 _ => None,
             },
             Type::DiplomatOption(ok) => {
@@ -462,16 +466,16 @@ impl<'tcx> FunctionInfo<'tcx> {
             Type::Slice(sl) => match sl {
                 Slice::Str(lt, enc) => {
                     let name = match enc {
-                        StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => {
-                            "diplomat_runtime::DiplomatStrSlice"
-                        }
+                        StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
+                        StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
                         StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
                         _ => panic!("Unrecognized encoding type {enc:?}"),
                     };
 
                     let name = if lt.is_none() {
                         match enc {
-                            StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => {
+                            StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8OwnedStrSlice",
+                            StringEncoding::UnvalidatedUtf8 => {
                                 "diplomat_runtime::DiplomatOwnedStrSlice"
                             }
                             StringEncoding::UnvalidatedUtf16 => {
@@ -489,6 +493,20 @@ impl<'tcx> FunctionInfo<'tcx> {
                         borrow: Some(MaybeOwn::Own),
                         generic_lifetimes: Some(lt.iter().cloned().collect()),
                         wrapped: Some(TypeInfoWrapper::None),
+                    }
+                }
+                Slice::Strs(enc) => {
+                    let name = match enc {
+                        StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
+                        StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
+                        StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
+                        _ => panic!("Unrecognized encoding type {enc:?}"),
+                    };
+
+                    let name = format!("diplomat_runtime::DiplomatSlice<{name}>");
+                    ABITypeInfo {
+                        name: Some(name.into()),
+                        ..Default::default()
                     }
                 }
                 _ => ABITypeInfo::default(),
