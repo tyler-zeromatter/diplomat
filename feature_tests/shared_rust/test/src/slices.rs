@@ -25,12 +25,11 @@ mod tests {
         assert_eq!(my_string_unchecked.get_str(), new_str);
     }
 
-    // TODO: Need to make sure &[String] works:
-    // #[test]
-    // fn test_string_list() {
-    //     let out = MyString::new_from_first(vec!["This", "is", "a", "test"]);
-    //     assert_eq!(out.get_str(), "This")
-    // }
+    #[test]
+    fn test_string_list() {
+        let out = MyString::new_from_first(&vec!["This".as_bytes(), "is".as_bytes(), "a".as_bytes(), "test".as_bytes()]);
+        assert_eq!(out.get_str(), "This")
+    }
 
     #[test]
     fn test_float64_vec() {
