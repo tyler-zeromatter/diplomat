@@ -18,7 +18,7 @@ pub(crate) struct PrimitiveStructAbi {
 }
 
 impl PrimitiveStructAbi {
-    pub(crate) fn from_ffi(self) -> PrimitiveStruct{
+    pub(crate) fn from_ffi(self) -> PrimitiveStruct {
         PrimitiveStruct {
             
             x: self.x,
@@ -36,7 +36,7 @@ impl PrimitiveStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : PrimitiveStruct) -> PrimitiveStructAbi{
+    pub(crate) fn to_ffi(this : PrimitiveStruct) -> PrimitiveStructAbi {
         PrimitiveStructAbi {
             
             x : this.x,

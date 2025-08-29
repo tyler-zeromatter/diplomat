@@ -118,8 +118,8 @@ pub use option_opaque_char::OptionOpaqueChar;
 pub mod option_string;
 pub use option_string::OptionString;
 
-pub(crate) mod option_struct;
-pub(crate) use option_struct::OptionStruct;
+pub mod option_struct;
+pub use option_struct::OptionStruct;
 
 pub mod primitive_struct;
 pub use primitive_struct::PrimitiveStruct;

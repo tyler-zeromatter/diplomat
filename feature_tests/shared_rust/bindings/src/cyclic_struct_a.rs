@@ -10,7 +10,7 @@ pub(crate) struct CyclicStructAAbi {
 }
 
 impl CyclicStructAAbi {
-    pub(crate) fn from_ffi(self) -> CyclicStructA{
+    pub(crate) fn from_ffi(self) -> CyclicStructA {
         CyclicStructA {
             
             a: self.a.from_ffi(),
@@ -18,7 +18,7 @@ impl CyclicStructAAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : CyclicStructA) -> CyclicStructAAbi{
+    pub(crate) fn to_ffi(this : CyclicStructA) -> CyclicStructAAbi {
         CyclicStructAAbi {
             
             a : this.a.into(),

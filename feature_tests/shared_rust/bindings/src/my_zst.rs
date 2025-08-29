@@ -4,13 +4,13 @@ pub struct MyZst;
 pub(crate) struct MyZstAbi;
 
 impl MyZstAbi {
-    pub(crate) fn from_ffi(self) -> MyZst{
+    pub(crate) fn from_ffi(self) -> MyZst {
         MyZst {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : MyZst) -> MyZstAbi{
+    pub(crate) fn to_ffi(_this : MyZst) -> MyZstAbi {
         MyZstAbi {
             
         }

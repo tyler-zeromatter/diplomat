@@ -8,7 +8,7 @@ pub(crate) struct BorrowedFieldsReturningAbi<'a> {
 }
 
 impl<'a> BorrowedFieldsReturningAbi<'a> {
-    pub(crate) fn from_ffi(self) -> BorrowedFieldsReturning<'a>{
+    pub(crate) fn from_ffi(self) -> BorrowedFieldsReturning<'a> {
         BorrowedFieldsReturning {
             
             bytes: self.bytes.into(),
@@ -16,7 +16,7 @@ impl<'a> BorrowedFieldsReturningAbi<'a> {
         }
     }
 
-    pub (crate) fn to_ffi(this : BorrowedFieldsReturning<'a>) -> BorrowedFieldsReturningAbi<'a>{
+    pub(crate) fn to_ffi(this : BorrowedFieldsReturning<'a>) -> BorrowedFieldsReturningAbi<'a> {
         BorrowedFieldsReturningAbi {
             
             bytes : this.bytes.into(),

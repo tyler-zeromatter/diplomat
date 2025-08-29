@@ -4,13 +4,13 @@ pub struct TraitTestingStruct;
 pub(crate) struct TraitTestingStructAbi;
 
 impl TraitTestingStructAbi {
-    pub(crate) fn from_ffi(self) -> TraitTestingStruct{
+    pub(crate) fn from_ffi(self) -> TraitTestingStruct {
         TraitTestingStruct {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : TraitTestingStruct) -> TraitTestingStructAbi{
+    pub(crate) fn to_ffi(_this : TraitTestingStruct) -> TraitTestingStructAbi {
         TraitTestingStructAbi {
             
         }

@@ -13,7 +13,7 @@ pub(crate) struct MyStructContainingAnOptionAbi {
 }
 
 impl MyStructContainingAnOptionAbi {
-    pub(crate) fn from_ffi(self) -> MyStructContainingAnOption{
+    pub(crate) fn from_ffi(self) -> MyStructContainingAnOption {
         MyStructContainingAnOption {
             
             a: self.a.into_converted_option(),
@@ -23,7 +23,7 @@ impl MyStructContainingAnOptionAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : MyStructContainingAnOption) -> MyStructContainingAnOptionAbi{
+    pub(crate) fn to_ffi(this : MyStructContainingAnOption) -> MyStructContainingAnOptionAbi {
         MyStructContainingAnOptionAbi {
             
             a : this.a.map(|ok| { ok.into() }).into(),

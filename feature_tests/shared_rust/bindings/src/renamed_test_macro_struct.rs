@@ -8,7 +8,7 @@ pub(crate) struct RenamedTestMacroStructAbi {
 }
 
 impl RenamedTestMacroStructAbi {
-    pub(crate) fn from_ffi(self) -> RenamedTestMacroStruct{
+    pub(crate) fn from_ffi(self) -> RenamedTestMacroStruct {
         RenamedTestMacroStruct {
             
             a: self.a,
@@ -16,7 +16,7 @@ impl RenamedTestMacroStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : RenamedTestMacroStruct) -> RenamedTestMacroStructAbi{
+    pub(crate) fn to_ffi(this : RenamedTestMacroStruct) -> RenamedTestMacroStructAbi {
         RenamedTestMacroStructAbi {
             
             a : this.a,

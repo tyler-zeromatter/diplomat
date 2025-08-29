@@ -13,7 +13,7 @@ pub(crate) struct OptionInputStructAbi {
 }
 
 impl OptionInputStructAbi {
-    pub(crate) fn from_ffi(self) -> OptionInputStruct{
+    pub(crate) fn from_ffi(self) -> OptionInputStruct {
         OptionInputStruct {
             
             a: self.a.into_converted_option(),
@@ -25,7 +25,7 @@ impl OptionInputStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : OptionInputStruct) -> OptionInputStructAbi{
+    pub(crate) fn to_ffi(this : OptionInputStruct) -> OptionInputStructAbi {
         OptionInputStructAbi {
             
             a : this.a.into(),

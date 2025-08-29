@@ -4,13 +4,13 @@ pub struct BigStructWithStuff;
 pub(crate) struct BigStructWithStuffAbi;
 
 impl BigStructWithStuffAbi {
-    pub(crate) fn from_ffi(self) -> BigStructWithStuff{
+    pub(crate) fn from_ffi(self) -> BigStructWithStuff {
         BigStructWithStuff {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : BigStructWithStuff) -> BigStructWithStuffAbi{
+    pub(crate) fn to_ffi(_this : BigStructWithStuff) -> BigStructWithStuffAbi {
         BigStructWithStuffAbi {
             
         }

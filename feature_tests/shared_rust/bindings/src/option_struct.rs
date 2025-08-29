@@ -1,10 +1,10 @@
 use super::OptionOpaque;
 use super::OptionOpaqueChar;
-pub(super) struct OptionStruct {
-    pub a: Option<Box<OptionOpaque>>,
-    pub b: Option<Box<OptionOpaqueChar>>,
-    pub c: u32,
-    pub d: Box<OptionOpaque>,
+pub struct OptionStruct {
+    a: Option<Box<OptionOpaque>>,
+    b: Option<Box<OptionOpaqueChar>>,
+    c: u32,
+    d: Box<OptionOpaque>,
 }
 
 #[repr(C)]
@@ -16,7 +16,7 @@ pub(crate) struct OptionStructAbi {
 }
 
 impl OptionStructAbi {
-    pub(crate) fn from_ffi(self) -> OptionStruct{
+    pub(crate) fn from_ffi(self) -> OptionStruct {
         OptionStruct {
             
             a: self.a,
@@ -30,7 +30,7 @@ impl OptionStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : OptionStruct) -> OptionStructAbi{
+    pub(crate) fn to_ffi(this : OptionStruct) -> OptionStructAbi {
         OptionStructAbi {
             
             a : this.a,

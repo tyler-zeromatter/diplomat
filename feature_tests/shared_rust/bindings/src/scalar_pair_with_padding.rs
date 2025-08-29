@@ -4,13 +4,13 @@ pub struct ScalarPairWithPadding;
 pub(crate) struct ScalarPairWithPaddingAbi;
 
 impl ScalarPairWithPaddingAbi {
-    pub(crate) fn from_ffi(self) -> ScalarPairWithPadding{
+    pub(crate) fn from_ffi(self) -> ScalarPairWithPadding {
         ScalarPairWithPadding {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : ScalarPairWithPadding) -> ScalarPairWithPaddingAbi{
+    pub(crate) fn to_ffi(_this : ScalarPairWithPadding) -> ScalarPairWithPaddingAbi {
         ScalarPairWithPaddingAbi {
             
         }

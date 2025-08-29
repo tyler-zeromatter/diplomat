@@ -4,13 +4,13 @@ pub struct TraitWrapper;
 pub(crate) struct TraitWrapperAbi;
 
 impl TraitWrapperAbi {
-    pub(crate) fn from_ffi(self) -> TraitWrapper{
+    pub(crate) fn from_ffi(self) -> TraitWrapper {
         TraitWrapper {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : TraitWrapper) -> TraitWrapperAbi{
+    pub(crate) fn to_ffi(_this : TraitWrapper) -> TraitWrapperAbi {
         TraitWrapperAbi {
             
         }

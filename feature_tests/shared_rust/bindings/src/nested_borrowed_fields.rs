@@ -18,7 +18,7 @@ pub(crate) struct NestedBorrowedFieldsAbi<'x, 'y, 'z> {
 }
 
 impl<'x, 'y, 'z> NestedBorrowedFieldsAbi<'x, 'y, 'z> {
-    pub(crate) fn from_ffi(self) -> NestedBorrowedFields<'x, 'y, 'z>{
+    pub(crate) fn from_ffi(self) -> NestedBorrowedFields<'x, 'y, 'z> {
         NestedBorrowedFields {
             
             fields: self.fields.from_ffi(),
@@ -30,7 +30,7 @@ impl<'x, 'y, 'z> NestedBorrowedFieldsAbi<'x, 'y, 'z> {
         }
     }
 
-    pub (crate) fn to_ffi(this : NestedBorrowedFields<'x, 'y, 'z>) -> NestedBorrowedFieldsAbi<'x, 'y, 'z>{
+    pub(crate) fn to_ffi(this : NestedBorrowedFields<'x, 'y, 'z>) -> NestedBorrowedFieldsAbi<'x, 'y, 'z> {
         NestedBorrowedFieldsAbi {
             
             fields : this.fields.into(),
