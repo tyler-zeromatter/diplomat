@@ -9,7 +9,7 @@ pub struct BorrowedFields<'a> {
 pub(crate) struct BorrowedFieldsAbi<'a> {
     a : diplomat_runtime::DiplomatStr16Slice<'a>,
     b : diplomat_runtime::DiplomatStrSlice<'a>,
-    c : diplomat_runtime::DiplomatStrSlice<'a>,
+    c : diplomat_runtime::DiplomatUtf8StrSlice<'a>,
 }
 
 impl<'a> BorrowedFieldsAbi<'a> {
@@ -62,5 +62,5 @@ impl<'a> BorrowedFields<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str : diplomat_runtime::DiplomatStrSlice<'x>) -> BorrowedFieldsAbi<'x>;
+    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str : diplomat_runtime::DiplomatUtf8StrSlice<'x>) -> BorrowedFieldsAbi<'x>;
 }

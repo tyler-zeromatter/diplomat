@@ -98,7 +98,7 @@ unsafe extern "C" {
 
     fn ResultOpaque_new_in_enum_err(i : i32) -> crate::DiplomatResult<ErrorEnum, Box<ResultOpaque>>;
 
-    fn ResultOpaque_takes_str<'a, 'anon_0>(this: &'a mut ResultOpaque, _v : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> &'a mut ResultOpaque;
+    fn ResultOpaque_takes_str<'a, 'anon_0>(this: &'a mut ResultOpaque, _v : diplomat_runtime::DiplomatUtf8StrSlice<'anon_0>) -> &'a mut ResultOpaque;
 
     fn ResultOpaque_assert_integer<'anon_0>(this: &'anon_0 ResultOpaque, i : i32);
 

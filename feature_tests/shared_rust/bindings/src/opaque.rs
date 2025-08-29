@@ -76,7 +76,7 @@ unsafe extern "C" {
 
     fn Opaque_try_from_utf8<'anon_0>(input : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Option<Box<Opaque>>;
 
-    fn Opaque_from_str<'anon_0>(input : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<Opaque>;
+    fn Opaque_from_str<'anon_0>(input : diplomat_runtime::DiplomatUtf8StrSlice<'anon_0>) -> Box<Opaque>;
 
     fn Opaque_get_debug_str<'anon_0>(this: &'anon_0 Opaque, write_mut : &mut crate::DiplomatWrite) -> ();
 
