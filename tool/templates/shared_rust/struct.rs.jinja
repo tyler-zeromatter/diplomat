@@ -6,6 +6,13 @@
 
 {%- endif -%}
 {%- endmacro -%}
+{%- macro draw_conversion(from, to, to_func) -%}
+impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{from}}{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{to}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
+    fn from(value: {{from}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
+        {{type_name}}Abi::{{to_func}}(value)
+    }
+}
+{%- endmacro -%}
 
 {%- block type_def -%}
 pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
@@ -44,17 +51,12 @@ impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call d
     }
 }
 
-impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%} {
-    fn from(value: {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
-        {{type_name}}Abi::to_ffi(value)
-    }
-}
+{%- let abi_name = format!("{}Abi", self.type_name) %}
 
-impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
-    fn from(value: {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
-        value.from_ffi()
-    }
-}
+{% call draw_conversion(type_name, abi_name, "to_ffi") %}
+
+{% call draw_conversion(abi_name, type_name, "from_ffi") %}
+
 {%- endblock -%}
 
 {%- block impl_generics -%}
