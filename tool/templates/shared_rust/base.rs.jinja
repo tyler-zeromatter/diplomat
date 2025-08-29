@@ -13,6 +13,10 @@ impl {{- self.generic_lifetimes() }} {{type_name}} {{- self.generic_lifetimes()}
 {%- endblock -%}
 }
 
+{%- for sm in special_methods %}
+{{sm}}
+{%- endfor %}
+
 #[link(name = "{{lib_name}}")]
 {#- Opaques generate warnings: #}
 #[allow(improper_ctypes)]
