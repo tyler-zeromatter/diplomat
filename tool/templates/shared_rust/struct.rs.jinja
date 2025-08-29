@@ -29,9 +29,29 @@ impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call d
     pub(crate) fn from_ffi(self) -> {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
         {{type_name}} {
             {% for f in fields %}
-                {{f.name}}: {{f.wrap_convert()}},
+            {{f.name}}: {{f.wrap_convert()}},
             {% endfor %}
         }
+    }
+
+    pub (crate) fn to_ffi(this : {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%} {
+        {{type_name}}Abi {
+            {% for f in fields %}
+            {{f.name}} : {{f.wrap_c_convert()}},
+            {% endfor %}
+        }
+    }
+}
+
+impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%} {
+    fn from(value: {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
+        {{type_name}}Abi::to_ffi(value)
+    }
+}
+
+impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
+    fn from(value: {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
+        value.from_ffi()
     }
 }
 {%- endblock -%}

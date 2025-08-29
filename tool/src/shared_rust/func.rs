@@ -202,7 +202,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// Get the (pre, post) conversion from Rust to the C ABI.
-    fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
+    pub(super) fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
                 Slice::Str(_, enc) => {
@@ -217,7 +217,17 @@ impl<'tcx> FunctionInfo<'tcx> {
                 }
                 _ => None,
             },
-            Type::DiplomatOption(..) => Some(("".into(), ".into()".into())),
+            Type::DiplomatOption(ok) => {
+                let maybe_map = if let Some((pre, post)) = Self::param_conversion(ok) {
+                    format!(".map(|ok| {{ {pre}ok{post} }})")
+                } else {
+                    "".into()
+                };
+                Some(("".into(), format!("{maybe_map}.into()").into()))
+            },
+            Type::Struct(..) => { 
+                Some(("".into(), ".into()".into()))
+            },
             _ => None,
         }
     }
@@ -271,6 +281,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 _ => Some(("".into(), ".into()".into())),
             },
             Type::Struct(..) => Some(("".into(), ".from_ffi()".into())),
+            Type::DiplomatOption(..) => Some(("".into(), ".into_converted_option()".into())),
             _ => None,
         }
     }
