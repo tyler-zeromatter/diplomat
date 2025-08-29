@@ -492,6 +492,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                         // We move the borrow to the generic lifetimes:
                         borrow: Some(MaybeOwn::Own),
                         generic_lifetimes: Some(lt.iter().cloned().collect()),
+                        // We want to avoid any Box<> issues for owned slices (since we already own this with DiplomatSlice):
                         wrapped: Some(TypeInfoWrapper::None),
                     }
                 }
