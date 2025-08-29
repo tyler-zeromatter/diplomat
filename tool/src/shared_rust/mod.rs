@@ -19,7 +19,7 @@ mod ty;
 pub(crate) fn attr_support() -> BackendAttrSupport {
     let mut support = BackendAttrSupport::default();
     support.option = true;
-    support.struct_refs = true;
+    // support.struct_refs = true;
     // Support can be added gradually. I think the main goal should be getting a robust test suite of what's already been generated so far.
 
     support
