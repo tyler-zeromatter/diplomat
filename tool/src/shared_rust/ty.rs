@@ -36,8 +36,6 @@ pub(super) trait TypeTemplate<'a> {
     fn render(&self) -> askama::Result<String>;
     fn imports(&mut self) -> &mut BTreeSet<String>;
     fn mod_name(&self) -> String;
-    /// TODO: Remove this, this is only used for OutStructs and is broken. Everything should be `pub`.
-    fn crate_vis(&self) -> Option<String>;
     /// Lifetimes on the impl block
     /// TODO: Add a bounded_generic_lifetime function as well.
     fn generic_lifetimes(&self) -> String;
@@ -144,13 +142,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
             }
-            fn crate_vis(&self) -> Option<String> {
-                if self.is_out {
-                    Some("(crate)".into())
-                } else {
-                    None
-                }
-            }
 
             fn generic_lifetimes(&self) -> String {
                 let new_lts = self.lifetimes.iter().map(|lt| {
@@ -208,9 +199,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
             }
-            fn crate_vis(&self) -> Option<String> {
-                None
-            }
             fn generic_lifetimes(&self) -> String {
                 TypeInfo::fmt_generic_lifetimes(
                     self.lifetime_env.lifetimes().lifetimes().collect(),
@@ -257,9 +245,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
-            }
-            fn crate_vis(&self) -> Option<String> {
-                None
             }
             fn generic_lifetimes(&self) -> String {
                 String::new()

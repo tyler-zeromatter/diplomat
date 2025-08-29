@@ -8,13 +8,13 @@ impl {{- self.generic_lifetimes() }} From<{{from}}{{- self.generic_lifetimes() -
 {%- endmacro -%}
 
 {%- block type_def -%}
-pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
+pub struct {{type_name -}}
 
 {{- self.generic_lifetimes() -}}
 
 {%- if fields.len() > 0 %} {
     {%- for f in fields %}
-    pub {{f.name}}: {{f.type_info.render(lifetime_env)}},
+    {% if !is_out -%} pub {% endif -%} {{f.name}}: {{f.type_info.render(lifetime_env)}},
     {%- endfor %}
 } {%- else -%};{%- endif %}
 

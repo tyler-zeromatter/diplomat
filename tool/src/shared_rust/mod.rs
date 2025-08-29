@@ -40,9 +40,6 @@ pub(crate) fn run<'tcx>(
     struct ModImport {
         mod_name: String,
         type_name: String,
-        /// TODO: This is only for OutStructs, should be removed since you can't access a pub(crate) struct.
-        /// Everything should just be `pub`, and we should add getters to the OutStructs.
-        vis: Option<String>,
     }
 
     #[derive(Template)]
@@ -75,7 +72,6 @@ pub(crate) fn run<'tcx>(
         lib.mods.insert(ModImport {
             mod_name: mod_name.clone(),
             type_name: template.mod_name(),
-            vis: template.crate_vis(),
         });
         files.add_file(format!("{}.rs", mod_name), template.render().unwrap())
     }
