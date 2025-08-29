@@ -4,13 +4,13 @@ pub struct CallbackTestingStruct;
 pub(crate) struct CallbackTestingStructAbi;
 
 impl CallbackTestingStructAbi {
-    pub(crate) fn from_ffi(self) -> CallbackTestingStruct{
+    pub(crate) fn from_ffi(self) -> CallbackTestingStruct {
         CallbackTestingStruct {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : CallbackTestingStruct) -> CallbackTestingStructAbi{
+    pub(crate) fn to_ffi(_this : CallbackTestingStruct) -> CallbackTestingStructAbi {
         CallbackTestingStructAbi {
             
         }

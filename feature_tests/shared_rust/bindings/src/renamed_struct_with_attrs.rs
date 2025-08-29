@@ -10,7 +10,7 @@ pub(crate) struct RenamedStructWithAttrsAbi {
 }
 
 impl RenamedStructWithAttrsAbi {
-    pub(crate) fn from_ffi(self) -> RenamedStructWithAttrs{
+    pub(crate) fn from_ffi(self) -> RenamedStructWithAttrs {
         RenamedStructWithAttrs {
             
             a: self.a,
@@ -20,7 +20,7 @@ impl RenamedStructWithAttrsAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : RenamedStructWithAttrs) -> RenamedStructWithAttrsAbi{
+    pub(crate) fn to_ffi(this : RenamedStructWithAttrs) -> RenamedStructWithAttrsAbi {
         RenamedStructWithAttrsAbi {
             
             a : this.a,

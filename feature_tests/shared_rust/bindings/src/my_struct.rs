@@ -23,7 +23,7 @@ pub(crate) struct MyStructAbi {
 }
 
 impl MyStructAbi {
-    pub(crate) fn from_ffi(self) -> MyStruct{
+    pub(crate) fn from_ffi(self) -> MyStruct {
         MyStruct {
             
             a: self.a,
@@ -43,7 +43,7 @@ impl MyStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : MyStruct) -> MyStructAbi{
+    pub(crate) fn to_ffi(this : MyStruct) -> MyStructAbi {
         MyStructAbi {
             
             a : this.a,

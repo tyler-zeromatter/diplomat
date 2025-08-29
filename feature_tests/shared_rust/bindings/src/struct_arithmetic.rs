@@ -4,13 +4,13 @@ pub struct StructArithmetic;
 pub(crate) struct StructArithmeticAbi;
 
 impl StructArithmeticAbi {
-    pub(crate) fn from_ffi(self) -> StructArithmetic{
+    pub(crate) fn from_ffi(self) -> StructArithmetic {
         StructArithmetic {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : StructArithmetic) -> StructArithmeticAbi{
+    pub(crate) fn to_ffi(_this : StructArithmetic) -> StructArithmeticAbi {
         StructArithmeticAbi {
             
         }

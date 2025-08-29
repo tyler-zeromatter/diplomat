@@ -4,13 +4,13 @@ pub struct CallbackWrapper;
 pub(crate) struct CallbackWrapperAbi;
 
 impl CallbackWrapperAbi {
-    pub(crate) fn from_ffi(self) -> CallbackWrapper{
+    pub(crate) fn from_ffi(self) -> CallbackWrapper {
         CallbackWrapper {
             
         }
     }
 
-    pub (crate) fn to_ffi(_this : CallbackWrapper) -> CallbackWrapperAbi{
+    pub(crate) fn to_ffi(_this : CallbackWrapper) -> CallbackWrapperAbi {
         CallbackWrapperAbi {
             
         }

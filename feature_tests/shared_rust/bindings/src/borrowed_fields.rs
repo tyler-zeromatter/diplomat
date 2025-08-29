@@ -13,7 +13,7 @@ pub(crate) struct BorrowedFieldsAbi<'a> {
 }
 
 impl<'a> BorrowedFieldsAbi<'a> {
-    pub(crate) fn from_ffi(self) -> BorrowedFields<'a>{
+    pub(crate) fn from_ffi(self) -> BorrowedFields<'a> {
         BorrowedFields {
             
             a: self.a.into(),
@@ -25,7 +25,7 @@ impl<'a> BorrowedFieldsAbi<'a> {
         }
     }
 
-    pub (crate) fn to_ffi(this : BorrowedFields<'a>) -> BorrowedFieldsAbi<'a>{
+    pub(crate) fn to_ffi(this : BorrowedFields<'a>) -> BorrowedFieldsAbi<'a> {
         BorrowedFieldsAbi {
             
             a : this.a.into(),

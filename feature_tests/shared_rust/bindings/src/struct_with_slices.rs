@@ -10,7 +10,7 @@ pub(crate) struct StructWithSlicesAbi<'a> {
 }
 
 impl<'a> StructWithSlicesAbi<'a> {
-    pub(crate) fn from_ffi(self) -> StructWithSlices<'a>{
+    pub(crate) fn from_ffi(self) -> StructWithSlices<'a> {
         StructWithSlices {
             
             first: self.first.into(),
@@ -20,7 +20,7 @@ impl<'a> StructWithSlicesAbi<'a> {
         }
     }
 
-    pub (crate) fn to_ffi(this : StructWithSlices<'a>) -> StructWithSlicesAbi<'a>{
+    pub(crate) fn to_ffi(this : StructWithSlices<'a>) -> StructWithSlicesAbi<'a> {
         StructWithSlicesAbi {
             
             first : this.first.into(),

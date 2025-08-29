@@ -10,7 +10,7 @@ pub(crate) struct ErrorStructAbi {
 }
 
 impl ErrorStructAbi {
-    pub(crate) fn from_ffi(self) -> ErrorStruct{
+    pub(crate) fn from_ffi(self) -> ErrorStruct {
         ErrorStruct {
             
             i: self.i,
@@ -20,7 +20,7 @@ impl ErrorStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : ErrorStruct) -> ErrorStructAbi{
+    pub(crate) fn to_ffi(this : ErrorStruct) -> ErrorStructAbi {
         ErrorStructAbi {
             
             i : this.i,

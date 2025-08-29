@@ -11,7 +11,7 @@ pub(crate) struct ImportedStructAbi {
 }
 
 impl ImportedStructAbi {
-    pub(crate) fn from_ffi(self) -> ImportedStruct{
+    pub(crate) fn from_ffi(self) -> ImportedStruct {
         ImportedStruct {
             
             foo: self.foo,
@@ -21,7 +21,7 @@ impl ImportedStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : ImportedStruct) -> ImportedStructAbi{
+    pub(crate) fn to_ffi(this : ImportedStruct) -> ImportedStructAbi {
         ImportedStructAbi {
             
             foo : this.foo,
