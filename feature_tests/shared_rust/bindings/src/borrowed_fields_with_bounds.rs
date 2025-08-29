@@ -9,7 +9,7 @@ pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
 pub(crate) struct BorrowedFieldsWithBoundsAbi<'a, 'b, 'c> {
     field_a : diplomat_runtime::DiplomatStr16Slice<'a>,
     field_b : diplomat_runtime::DiplomatStrSlice<'b>,
-    field_c : diplomat_runtime::DiplomatStrSlice<'c>,
+    field_c : diplomat_runtime::DiplomatUtf8StrSlice<'c>,
 }
 
 impl<'a, 'b, 'c> BorrowedFieldsWithBoundsAbi<'a, 'b, 'c> {
@@ -62,5 +62,5 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFieldsWithBounds_from_foo_and_strings<'x, 'y: 'x, 'z: 'y + 'x>(foo : &'x Foo<'y>, dstr16_x : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str_z : diplomat_runtime::DiplomatStrSlice<'z>) -> BorrowedFieldsWithBoundsAbi<'x, 'y, 'z>;
+    fn BorrowedFieldsWithBounds_from_foo_and_strings<'x, 'y: 'x, 'z: 'y + 'x>(foo : &'x Foo<'y>, dstr16_x : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str_z : diplomat_runtime::DiplomatUtf8StrSlice<'z>) -> BorrowedFieldsWithBoundsAbi<'x, 'y, 'z>;
 }

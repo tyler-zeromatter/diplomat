@@ -67,5 +67,5 @@ impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn NestedBorrowedFields_from_bar_and_foo_and_strings<'x, 'y: 'x, 'z>(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : diplomat_runtime::DiplomatStr16Slice<'x>, dstr16_z : diplomat_runtime::DiplomatStr16Slice<'z>, utf8_str_y : diplomat_runtime::DiplomatStrSlice<'y>, utf8_str_z : diplomat_runtime::DiplomatStrSlice<'z>) -> NestedBorrowedFieldsAbi<'x, 'y, 'z>;
+    fn NestedBorrowedFields_from_bar_and_foo_and_strings<'x, 'y: 'x, 'z>(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : diplomat_runtime::DiplomatStr16Slice<'x>, dstr16_z : diplomat_runtime::DiplomatStr16Slice<'z>, utf8_str_y : diplomat_runtime::DiplomatUtf8StrSlice<'y>, utf8_str_z : diplomat_runtime::DiplomatUtf8StrSlice<'z>) -> NestedBorrowedFieldsAbi<'x, 'y, 'z>;
 }
