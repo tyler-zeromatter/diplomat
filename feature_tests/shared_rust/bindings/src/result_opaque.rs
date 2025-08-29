@@ -67,7 +67,7 @@ impl ResultOpaque {
     }
 
     pub fn takes_str<'a, 'anon_0>(&'a mut self, _v : &'anon_0 str) -> &'a mut ResultOpaque {
-        let ret = unsafe { ResultOpaque_takes_str(self, _v.as_bytes().into()) };
+        let ret = unsafe { ResultOpaque_takes_str(self, _v.into()) };
         
         ret
     

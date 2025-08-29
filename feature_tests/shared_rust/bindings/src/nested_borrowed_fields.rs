@@ -57,7 +57,7 @@ impl<'x, 'y, 'z> From<NestedBorrowedFieldsAbi<'x, 'y, 'z>> for NestedBorrowedFie
 
 impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
     pub fn from_bar_and_foo_and_strings(bar : &'x Bar<'x, 'y>, foo : &'z Foo<'z>, dstr16_x : &'x [u16], dstr16_z : &'z [u16], utf8_str_y : &'y str, utf8_str_z : &'z str) -> NestedBorrowedFields<'x, 'y, 'z> {
-        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x.into(), dstr16_z.into(), utf8_str_y.as_bytes().into(), utf8_str_z.as_bytes().into()) };
+        let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x.into(), dstr16_z.into(), utf8_str_y.into(), utf8_str_z.into()) };
         
         ret.from_ffi()
     
