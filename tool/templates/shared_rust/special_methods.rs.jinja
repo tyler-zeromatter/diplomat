@@ -1,0 +1,10 @@
+{%- match inner.special_method -%}
+{% when Some(SpecialMethod::Indexer) %}
+impl{{inner.render_abi_generic_lifetimes()}} std::ops::Index<{{inner.params[0].render(*inner.lifetime_env, false)}}> for {{type_name}} {# TODO: Type Generics #} {
+    type Output = {{ inner.return_type.as_ref().unwrap().render_without_borrow(*inner.lifetime_env, false) }};
+    fn index(&self, idx : {{inner.params[0].render(*inner.lifetime_env, false)}}) -> &Self::Output {
+        self.{{inner.name}}(idx)
+    }
+} 
+{%- when _ -%}
+{%- endmatch -%}

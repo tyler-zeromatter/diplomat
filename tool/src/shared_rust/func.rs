@@ -2,8 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
-    StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId,
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, SpecialMethod, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
 };
 
 use crate::shared_rust::{
@@ -12,7 +11,7 @@ use crate::shared_rust::{
 };
 
 /// Information need to generate a single function. Used for both the ABI version of the function (`extern "C"`) and the Rust version of the function (`pub fn`).
-#[derive(Template)]
+#[derive(Template, Clone)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
     name: Cow<'tcx, str>,
@@ -27,9 +26,17 @@ pub(super) struct FunctionInfo<'tcx> {
     lifetime_env: &'tcx LifetimeEnv,
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
     abi_lifetimes: Vec<MaybeStatic<Lifetime>>,
+    special_method : Option<SpecialMethod>,
 }
 
-#[derive(Default)]
+#[derive(Template)]
+#[template(path = "shared_rust/special_methods.rs.jinja", escape = "none")]
+pub(super) struct SpecialMethodInfo<'tcx> {
+    inner : FunctionInfo<'tcx>,
+    type_name : Cow<'tcx, str>,
+}
+
+#[derive(Default, Clone)]
 /// Like [`TypeInfo`], but is used specifically for the `extern "C"` version of a type.
 /// Every field will be `None` if there is nothing to override.
 pub(super) struct ABITypeInfo<'a> {
@@ -39,6 +46,7 @@ pub(super) struct ABITypeInfo<'a> {
     pub(super) wrapped: Option<TypeInfoWrapper>,
 }
 
+#[derive(Clone)]
 struct ParamInfo<'a> {
     var_name: Cow<'a, str>,
     type_info: TypeInfo<'a>,
@@ -54,6 +62,14 @@ impl<'a> ParamInfo<'a> {
             self.type_info.render_with_override(env, &self.abi_override)
         } else {
             self.type_info.render(env)
+        }
+    }
+
+    fn render_without_borrow(&self, env : &LifetimeEnv, is_abi: bool) -> String {
+        if is_abi {
+            self.type_info.render_without_borrow(env, &self.abi_override)
+        } else {
+            self.type_info.render_without_borrow(env, &ABITypeInfo::default())
         }
     }
 
@@ -208,6 +224,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             // TODO: Bounded lifetimes.
             generic_lifetimes: lifetimes.collect(),
             abi_lifetimes: method_lifetimes.lifetimes().collect(),
+            special_method: method.attrs.special_method.clone(),
         }
     }
 
@@ -438,6 +455,25 @@ impl<'tcx> FunctionInfo<'tcx> {
             funcs.push(FunctionInfo::gen_function_info(ctx, f));
         }
         funcs
+    }
+
+    /// Generate an impl block for special Rust trait stuff.
+    /// Assumes that any special method can be generated as an `impl` trait block separately from the original method definition, and just call into that.
+    /// 
+    /// TODO: If you're interested in hiding the underlying conversion function, I'd add a `vis` modifier to [`FunctionInfo`] and make `functions` a mutable reference.
+    pub(super) fn get_special_methods(
+        ctx : &mut FileGenContext,
+        functions: Vec<FunctionInfo<'tcx>>,
+        self_type : Cow<'tcx, str>,
+    ) -> Vec<SpecialMethodInfo<'tcx>> {
+        let mut special_methods = Vec::new();
+        for f in functions {
+            if let Some(special_method) = &f.special_method {
+                // TODO: `impl Index` is not, unfortunately, super easy to implement.
+                // special_methods.push(SpecialMethodInfo { inner: f, type_name: self_type.clone() })
+            }
+        }
+        special_methods
     }
 
     /// Given any type, generate C ABI info.

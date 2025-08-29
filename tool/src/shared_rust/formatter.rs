@@ -7,7 +7,7 @@ use itertools::Itertools;
 
 use crate::shared_rust::func::ABITypeInfo;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 /// A wrapper around any type information.
 /// Currently just a handler for the weirdness that is returning Option<Opaque>, Box<Option<Opaque>>, etc.
 /// Not meant to be used in conjunction with [`ABITypeInfo`], that will mess things up considerably.
@@ -24,6 +24,7 @@ pub enum TypeInfoWrapper {
 
 /// All information relevant to displaying a type in any position in Rust. This just includes the type name and generic/borrow information.
 /// This is *NOT* meant to include conversion information or ABI-specific info. That should be handled mostly by the `func` module.
+#[derive(Clone)]
 pub(super) struct TypeInfo<'a> {
     pub(super) name: Cow<'a, str>,
     pub(super) generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
@@ -105,6 +106,27 @@ impl<'a> TypeInfo<'a> {
         self.render_with_override(env, &ABITypeInfo::default())
     }
 
+    pub(super) fn render_without_borrow(&self, env : &LifetimeEnv, over : &ABITypeInfo) -> String {
+        let name = over.name.clone().unwrap_or(self.name.clone().into());
+
+        let generic_lifetimes = Self::fmt_generic_lifetimes(
+            over.generic_lifetimes
+                .as_ref()
+                .unwrap_or(self.generic_lifetimes.as_ref())
+                .clone(),
+            env,
+        );
+
+        let name = format!("{name}{generic_lifetimes}");
+        
+        match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
+            TypeInfoWrapper::None => name,
+            TypeInfoWrapper::Boxed => format!("Box<{name}>"),
+            TypeInfoWrapper::BoxedOptional => format!("Option<Box<{name}>>"),
+            TypeInfoWrapper::Optional => format!("Option<{name}>"),
+        }
+    }
+
     pub(super) fn render_with_override(&self, env: &LifetimeEnv, over: &ABITypeInfo) -> String {
         let borrow = over.borrow.unwrap_or(self.borrow);
 
@@ -124,23 +146,7 @@ impl<'a> TypeInfo<'a> {
             _ => format!("&'{maybe_borrow} "),
         };
 
-        let name = over.name.clone().unwrap_or(self.name.clone().into());
-
-        let generic_lifetimes = Self::fmt_generic_lifetimes(
-            over.generic_lifetimes
-                .as_ref()
-                .unwrap_or(self.generic_lifetimes.as_ref())
-                .clone(),
-            env,
-        );
-
-        let name = format!("{name}{generic_lifetimes}");
-        let name_wrapped = match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
-            TypeInfoWrapper::None => name,
-            TypeInfoWrapper::Boxed => format!("Box<{name}>"),
-            TypeInfoWrapper::BoxedOptional => format!("Option<Box<{name}>>"),
-            TypeInfoWrapper::Optional => format!("Option<{name}>"),
-        };
+        let name_wrapped = self.render_without_borrow(env, over);
 
         format!("{borrow_stmt}{name_wrapped}")
     }

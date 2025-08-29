@@ -10,7 +10,7 @@ use crate::{
     config::Config,
     shared_rust::{
         formatter::{TypeInfo, TypeInfoWrapper},
-        func::{ABITypeInfo, FunctionInfo},
+        func::{ABITypeInfo, FunctionInfo, SpecialMethodInfo},
         RustFormatter,
     },
 };
@@ -112,6 +112,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fields: Vec<FieldInfo<'a>>,
             lifetime_env: &'a LifetimeEnv,
             lifetimes: Vec<Lifetime>,
+            special_methods : Vec<SpecialMethodInfo<'a>>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
@@ -158,6 +159,10 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         // FIXME: Hacky, needs to be able to take into account namespaces
         self.imports
             .remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
+        
+        
+        // TODO:
+        let special_methods = FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
 
         StructTemplate {
             type_name,
@@ -168,6 +173,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fields,
             lifetime_env,
             lifetimes,
+            special_methods,
         }
     }
 
@@ -181,6 +187,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             imports: BTreeSet<String>,
             dtor_abi: Cow<'a, str>,
             lifetime_env: &'a LifetimeEnv,
+            special_methods : Vec<SpecialMethodInfo<'a>>,
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id);
@@ -209,6 +216,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 )
             }
         }
+        let special_methods = FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
 
         OpaqueTemplate {
             type_name,
@@ -217,6 +225,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             imports: self.imports,
             dtor_abi,
             lifetime_env: &ty.lifetimes,
+            special_methods,
         }
     }
 
@@ -229,6 +238,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             lib_name: String,
             imports: BTreeSet<String>,
             variants: Vec<Cow<'a, str>>,
+            special_methods : Vec<SpecialMethodInfo<'a>>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
@@ -253,13 +263,17 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 String::new()
             }
         }
+        let type_name = self.formatter.fmt_symbol_name(self.id);
+
+        let special_methods = FunctionInfo::get_special_methods(&mut self, methods.clone(),  type_name.clone());
 
         EnumTemplate {
-            type_name: self.formatter.fmt_symbol_name(self.id),
+            type_name,
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
             variants,
+            special_methods,
         }
     }
 
