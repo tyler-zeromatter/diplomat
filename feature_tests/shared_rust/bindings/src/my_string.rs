@@ -29,7 +29,7 @@ impl MyString {
     }
 
     pub fn new_from_first(v : &[&[u8]]) -> Box<MyString> {
-        let ret = unsafe { MyString_new_from_first(v) };
+        let ret = unsafe { MyString_new_from_first(v.iter().map(|u| { diplomat_runtime::DiplomatStrSlice::from(*u) }).collect::<Vec<_>>().as_slice().into()) };
         
         ret
     
