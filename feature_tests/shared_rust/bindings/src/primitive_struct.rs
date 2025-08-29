@@ -1,4 +1,3 @@
-#[repr(C)]
 pub struct PrimitiveStruct {
     pub x: f32,
     pub a: bool,
@@ -6,6 +5,43 @@ pub struct PrimitiveStruct {
     pub c: i64,
     pub d: isize,
     pub e: u8,
+}
+
+#[repr(C)]
+pub(crate) struct PrimitiveStructAbi {
+    
+    x : f32,
+    
+    a : bool,
+    
+    b : diplomat_runtime::DiplomatChar,
+    
+    c : i64,
+    
+    d : isize,
+    
+    e : u8,
+    
+}
+
+impl PrimitiveStructAbi {
+    fn from_ffi(self) -> PrimitiveStruct{
+        PrimitiveStruct {
+            
+                x: self.x,
+            
+                a: self.a,
+            
+                b: self.b,
+            
+                c: self.c,
+            
+                d: self.d,
+            
+                e: self.e,
+            
+        }
+    }
 }
 
 impl PrimitiveStruct {
@@ -19,5 +55,5 @@ impl PrimitiveStruct {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn PrimitiveStruct_mutable_ref<'anon_0, 'anon_1>(this: &'anon_0 mut PrimitiveStruct, a : &'anon_1 mut PrimitiveStruct);
+    fn PrimitiveStruct_mutable_ref<'anon_0, 'anon_1>(this: &'anon_0 mut PrimitiveStruct, a : &'anon_1 mut PrimitiveStructAbi);
 }

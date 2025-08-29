@@ -1,14 +1,30 @@
 use super::CyclicStructB;
-#[repr(C)]
 pub struct CyclicStructA {
     pub a: CyclicStructB,
+}
+
+#[repr(C)]
+pub(crate) struct CyclicStructAAbi {
+    
+    a : CyclicStructBAbi,
+    
+}
+
+impl CyclicStructAAbi {
+    fn from_ffi(self) -> CyclicStructA{
+        CyclicStructA {
+            
+                a: self.a.from_ffi(),
+            
+        }
+    }
 }
 
 impl CyclicStructA {
     pub fn get_b() -> CyclicStructB {
         let ret = unsafe { CyclicStructA_get_b() };
         
-        ret
+        ret.from_ffi()
     
     }
 
@@ -47,11 +63,11 @@ impl CyclicStructA {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn CyclicStructA_get_b() -> CyclicStructB;
+    fn CyclicStructA_get_b() -> CyclicStructBAbi;
 
     fn CyclicStructA_cyclic_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructAAbi, write_mut : &mut crate::DiplomatWrite) -> ();
 
     fn CyclicStructA_getter_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
 }

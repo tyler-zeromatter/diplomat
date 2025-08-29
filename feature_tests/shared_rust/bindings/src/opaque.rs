@@ -55,7 +55,7 @@ impl Opaque {
     pub fn returns_imported() -> ImportedStruct {
         let ret = unsafe { Opaque_returns_imported() };
         
-        ret
+        ret.from_ffi()
     
     }
 
@@ -79,11 +79,11 @@ unsafe extern "C" {
 
     fn Opaque_get_debug_str<'anon_0>(this: &'anon_0 Opaque, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Opaque_assert_struct<'anon_0>(this: &'anon_0 Opaque, s : MyStruct);
+    fn Opaque_assert_struct<'anon_0>(this: &'anon_0 Opaque, s : MyStructAbi);
 
     fn Opaque_returns_usize() -> usize;
 
-    fn Opaque_returns_imported() -> ImportedStruct;
+    fn Opaque_returns_imported() -> ImportedStructAbi;
 
     fn Opaque_cmp() -> std::cmp::Ordering;
 

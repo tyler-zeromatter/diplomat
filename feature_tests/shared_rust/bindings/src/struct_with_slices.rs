@@ -1,7 +1,27 @@
-#[repr(C)]
 pub struct StructWithSlices<'a> {
     pub first: &'a [u8],
     pub second: &'a [u16],
+}
+
+#[repr(C)]
+pub(crate) struct StructWithSlicesAbi<'a> {
+    
+    first : diplomat_runtime::DiplomatStrSlice<'a>,
+    
+    second : &'a [u16],
+    
+}
+
+impl<'a> StructWithSlicesAbi<'a> {
+    fn from_ffi(self) -> StructWithSlices<'a>{
+        StructWithSlices {
+            
+                first: self.first.into(),
+            
+                second: self.second,
+            
+        }
+    }
 }
 
 impl<'a> StructWithSlices<'a> {

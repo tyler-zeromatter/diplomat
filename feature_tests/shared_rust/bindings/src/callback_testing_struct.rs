@@ -1,5 +1,15 @@
-#[repr(C)]
 pub struct CallbackTestingStruct;
+
+#[repr(C)]
+pub(crate) struct CallbackTestingStructAbi;
+
+impl CallbackTestingStructAbi {
+    fn from_ffi(self) -> CallbackTestingStruct{
+        CallbackTestingStruct {
+            
+        }
+    }
+}
 
 impl CallbackTestingStruct {
 }

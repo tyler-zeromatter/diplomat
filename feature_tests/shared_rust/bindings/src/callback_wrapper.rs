@@ -1,5 +1,15 @@
-#[repr(C)]
 pub struct CallbackWrapper;
+
+#[repr(C)]
+pub(crate) struct CallbackWrapperAbi;
+
+impl CallbackWrapperAbi {
+    fn from_ffi(self) -> CallbackWrapper{
+        CallbackWrapper {
+            
+        }
+    }
+}
 
 impl CallbackWrapper {
 }
