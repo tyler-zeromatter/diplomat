@@ -27,7 +27,7 @@ pub(crate) struct {{ type_name }}Abi {{- self.generic_lifetimes() -}} {%- if fie
 } {%- else -%};{%- endif %}
 
 impl {{- self.generic_lifetimes() }} {{type_name}}Abi {{- self.generic_lifetimes() }} {
-    pub(crate) fn from_ffi(self) -> {{type_name}}{{- self.generic_lifetimes() -}} {
+    pub(crate) fn from_ffi(self) -> {{type_name}}{{- self.generic_lifetimes() }} {
         {{type_name}} {
             {% for f in fields %}
             {{f.name}}: {{f.wrap_convert()}},
@@ -35,7 +35,7 @@ impl {{- self.generic_lifetimes() }} {{type_name}}Abi {{- self.generic_lifetimes
         }
     }
 
-    pub (crate) fn to_ffi({%- if fields.len() == 0 -%}_{%- endif -%} this : {{type_name}}{{- self.generic_lifetimes() -}}) -> {{type_name}}Abi{{- self.generic_lifetimes() -}} {
+    pub(crate) fn to_ffi({%- if fields.len() == 0 -%}_{%- endif -%} this : {{type_name}}{{- self.generic_lifetimes() -}}) -> {{type_name}}Abi{{- self.generic_lifetimes() }} {
         {{type_name}}Abi {
             {% for f in fields %}
             {{f.name}} : {{f.wrap_c_convert()}},
