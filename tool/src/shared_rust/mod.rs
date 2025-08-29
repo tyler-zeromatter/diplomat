@@ -20,6 +20,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     let mut support = BackendAttrSupport::default();
     support.option = true;
     support.struct_refs = true;
+    // Support can be added gradually. I think the main goal should be getting a robust test suite of what's already been generated so far.
 
     support
 }
@@ -34,9 +35,12 @@ pub(crate) fn run<'tcx>(
     let formatter = RustFormatter { tcx };
 
     #[derive(PartialEq, PartialOrd, Eq, Ord)]
+    /// A `mod type;` `pub use type;` statement.
     struct ModImport {
         mod_name: String,
         type_name: String,
+        /// TODO: This is only for OutStructs, should be removed since you can't access a pub(crate) struct.
+        /// Everything should just be `pub`, and we should add getters to the OutStructs.
         vis: Option<String>,
     }
 
@@ -75,7 +79,9 @@ pub(crate) fn run<'tcx>(
         files.add_file(format!("{}.rs", mod_name), template.render().unwrap())
     }
 
-    for (id, func) in tcx.all_free_functions() {}
+    for (id, func) in tcx.all_free_functions() {
+        // See [`FunctionInfo::gen_function_block`].
+    }
 
     files.add_file("lib.rs".into(), lib.render().unwrap());
 

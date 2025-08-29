@@ -12,22 +12,35 @@ use crate::{
     shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, func::FunctionInfo, RustFormatter},
 };
 
+/// Generation context of a single `.rs` file to be output.
+/// Currently implemented for files containing `struct` or `enum` information,
+/// although this should (and is designed to) be expanded to include free functions.
 pub(super) struct FileGenContext<'tcx> {
     pub(super) formatter: &'tcx RustFormatter<'tcx>,
     pub(super) tcx: &'tcx TypeContext,
     pub(super) id: SymbolId,
+    /// For the #[link(name=)] attribute.
     lib_name: String,
+    /// All the `use` statements at the start of the file.
+    /// TODO: For future namespacing support, this (and [`TypeInfo`]) will need to be updated,
+    /// especially to account for types of the same name but in different namespaces.
     imports: BTreeSet<String>,
 }
 
+/// Helper trait for file generation templates.
+/// Since not all generated file templates will be the same,
+/// this is a quick helper to access any important shared details after generating information.
 pub(super) trait TypeTemplate<'a> {
     fn render(&self) -> askama::Result<String>;
     fn imports(&mut self) -> &mut BTreeSet<String>;
     fn mod_name(&self) -> String;
+    /// TODO: Remove this, this is only used for OutStructs and is broken. Everything should be `pub`.
     fn crate_vis(&self) -> Option<String>;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
+    /// TODO: Create a version of this for free functions.
+    /// Constructor from a given [`TypeId`].
     pub(super) fn from_type<'a>(
         config: &Config,
         id: TypeId,
@@ -216,6 +229,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
     }
 
+    /// Generate [`TypeInfo`] for a given [`Type`]. See [`TypeInfo`] for more information.
+    /// Mutable since [`FileGenContext`] may need to update imports depending on the type.
     pub(super) fn gen_type_info<P: TyPosition>(&'rcx mut self, ty: &Type<P>) -> TypeInfo<'tcx> {
         match ty {
             Type::Primitive(p) => TypeInfo::new(self.formatter.fmt_primitive_name(*p).into()),
