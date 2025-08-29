@@ -28,7 +28,7 @@ pub enum TypeInfoWrapper {
 pub(super) struct TypeInfo<'a> {
     pub(super) name: Cow<'a, str>,
     pub(super) generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
-    pub(super) wrapped : TypeInfoWrapper,
+    pub(super) wrapped: TypeInfoWrapper,
     pub(super) borrow: MaybeOwn,
 }
 
@@ -52,7 +52,7 @@ impl<'a> TypeInfo<'a> {
                 MaybeStatic::Static => "'static".into(),
                 MaybeStatic::NonStatic(ns) => {
                     format!("'{}", env.fmt_lifetime(ns))
-                },
+                }
             })
             .collect();
 
@@ -75,19 +75,19 @@ impl<'a> TypeInfo<'a> {
                 MaybeStatic::Static => "'static".into(),
                 MaybeStatic::NonStatic(ns) => {
                     // TODO: Does this work okay?
-                    let bounded_lts : Vec<Lifetime> = env.all_shorter_lifetimes(ns).filter(|l| {
-                        l != ns
-                    }).collect();
-                    let bounded_str = bounded_lts.iter().map(|l| {
-                        format!("'{}", env.fmt_lifetime(l))
-                    }).join(" + ");
+                    let bounded_lts: Vec<Lifetime> =
+                        env.all_shorter_lifetimes(ns).filter(|l| l != ns).collect();
+                    let bounded_str = bounded_lts
+                        .iter()
+                        .map(|l| format!("'{}", env.fmt_lifetime(l)))
+                        .join(" + ");
                     let bounded = if bounded_lts.len() > 0 {
                         format!(": {bounded_str}")
                     } else {
                         "".into()
                     };
                     format!("'{}{bounded}", env.fmt_lifetime(ns))
-                },
+                }
             })
             .collect();
 
@@ -127,7 +127,13 @@ impl<'a> TypeInfo<'a> {
 
         let name = over.name.clone().unwrap_or(self.name.clone().into());
 
-        let generic_lifetimes = Self::fmt_generic_lifetimes(over.generic_lifetimes.as_ref().unwrap_or(self.generic_lifetimes.as_ref()).clone(), env);
+        let generic_lifetimes = Self::fmt_generic_lifetimes(
+            over.generic_lifetimes
+                .as_ref()
+                .unwrap_or(self.generic_lifetimes.as_ref())
+                .clone(),
+            env,
+        );
 
         let name = format!("{name}{generic_lifetimes}");
         let name_wrapped = match over.wrapped.as_ref().unwrap_or(&self.wrapped) {

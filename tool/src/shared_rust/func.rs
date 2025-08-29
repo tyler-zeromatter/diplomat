@@ -2,12 +2,16 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
+    StringEncoding, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId,
 };
 
-use crate::shared_rust::{formatter::{TypeInfo, TypeInfoWrapper}, FileGenContext};
+use crate::shared_rust::{
+    formatter::{TypeInfo, TypeInfoWrapper},
+    FileGenContext,
+};
 
-/// Information need to generate a single function. Used for both the ABI version of the function (`extern "C"`) and the Rust version of the function (`pub fn`). 
+/// Information need to generate a single function. Used for both the ABI version of the function (`extern "C"`) and the Rust version of the function (`pub fn`).
 #[derive(Template)]
 #[template(path = "shared_rust/function.rs.jinja", blocks = ["function_impl", "function_def"], escape = "none")]
 pub(super) struct FunctionInfo<'tcx> {
@@ -28,10 +32,10 @@ pub(super) struct FunctionInfo<'tcx> {
 /// Like [`TypeInfo`], but is used specifically for the `extern "C"` version of a type.
 /// Every field will be `None` if there is nothing to override.
 pub(super) struct ABITypeInfo<'a> {
-    pub(super) name : Option<Cow<'a, str>>,
-    pub(super) borrow : Option<MaybeOwn>,
-    pub(super) generic_lifetimes : Option<Vec<MaybeStatic<Lifetime>>>,
-    pub(super) wrapped : Option<TypeInfoWrapper>,
+    pub(super) name: Option<Cow<'a, str>>,
+    pub(super) borrow: Option<MaybeOwn>,
+    pub(super) generic_lifetimes: Option<Vec<MaybeStatic<Lifetime>>>,
+    pub(super) wrapped: Option<TypeInfoWrapper>,
 }
 
 struct ParamInfo<'a> {
@@ -39,23 +43,21 @@ struct ParamInfo<'a> {
     type_info: TypeInfo<'a>,
     abi_override: ABITypeInfo<'a>,
     /// (pre, post) conversion of a type. Can either be to or from the Rust C ABI.
-    conversion : Option<(Cow<'a, str>, Cow<'a, str>)>,
+    conversion: Option<(Cow<'a, str>, Cow<'a, str>)>,
 }
 
 impl<'a> ParamInfo<'a> {
     // These are both helper functions used in the .jinja templates:
     fn render(&self, env: &LifetimeEnv, is_abi: bool) -> String {
         if is_abi {
-            self.type_info
-                .render_with_override(env, &self.abi_override)
+            self.type_info.render_with_override(env, &self.abi_override)
         } else {
             self.type_info.render(env)
         }
     }
 
     fn wrap_convert(&self) -> Cow<'a, str> {
-        let (pre_convert, post_convert) = 
-        if let Some((pre, post)) = &self.conversion {
+        let (pre_convert, post_convert) = if let Some((pre, post)) = &self.conversion {
             (pre.clone(), post.clone())
         } else {
             ("".into(), "".into())
@@ -98,20 +100,26 @@ impl<'tcx> FunctionInfo<'tcx> {
                 }
                 SelfType::Opaque(op) => {
                     let type_id: TypeId = op.tcx_id.into();
-                    (ctx.formatter.fmt_symbol_name(type_id.into()), Some(op.owner.lifetime))
+                    (
+                        ctx.formatter.fmt_symbol_name(type_id.into()),
+                        Some(op.owner.lifetime),
+                    )
                 }
                 SelfType::Struct(st) => {
                     let type_id: TypeId = st.tcx_id.into();
-                    (ctx.formatter.fmt_symbol_name(type_id.into()), st.owner.lifetime())
+                    (
+                        ctx.formatter.fmt_symbol_name(type_id.into()),
+                        st.owner.lifetime(),
+                    )
                 }
                 _ => unreachable!("Unknown SelfType {ty:?}"),
             };
 
             let lt = if let Some(lt) = self_lifetime {
                 match lt {
-                    MaybeStatic::NonStatic(ns) => { 
+                    MaybeStatic::NonStatic(ns) => {
                         format!("'{} ", method.lifetime_env.fmt_lifetime(ns))
-                    },
+                    }
                     MaybeStatic::Static => "'static ".into(),
                 }
             } else {
@@ -146,7 +154,8 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         });
 
-        let return_type = Self::gen_return_type_info(&mut params, ctx, &method.output, &method.lifetime_env);
+        let return_type =
+            Self::gen_return_type_info(&mut params, ctx, &method.output, &method.lifetime_env);
 
         // FIXME: This is supposed to be code removing overlapping lifetimes for a method.
         // This doesn't work because a method is not guaranteed to use all of the lifetimes associated with `&self`.
@@ -201,7 +210,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                     };
 
                     Some(("".into(), format!("{maybe_enc}.into()").into()))
-                },
+                }
                 _ => None,
             },
             Type::DiplomatOption(..) => Some(("".into(), ".into()".into())),
@@ -217,9 +226,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     ) -> TypeInfo<'tcx> {
         match ok {
             SuccessType::Unit => TypeInfo::new("()".into()),
-            SuccessType::OutType(o) => {
-                ctx.gen_type_info(o)
-            }
+            SuccessType::OutType(o) => ctx.gen_type_info(o),
             SuccessType::Write => {
                 params.push(ParamInfo {
                     var_name: "write_mut".into(),
@@ -234,23 +241,28 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// For a given [`SuccessType`], get the C ABI type information.
-    fn gen_ok_abi_info(
-        ctx: &mut FileGenContext<'tcx>,
-        ok: &'tcx SuccessType,
-    ) -> ABITypeInfo<'tcx> {
+    fn gen_ok_abi_info(ctx: &mut FileGenContext<'tcx>, ok: &'tcx SuccessType) -> ABITypeInfo<'tcx> {
         match ok {
             SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o),
-            SuccessType::Write => ABITypeInfo { name: Some("()".into()), ..Default::default() },
+            SuccessType::Write => ABITypeInfo {
+                name: Some("()".into()),
+                ..Default::default()
+            },
             _ => ABITypeInfo::default(),
         }
     }
 
     /// Get the C ABI -> Rust conversion for a return type.
-    fn out_type_conversion<P: TyPosition>(out : &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
+    fn out_type_conversion<P: TyPosition>(
+        out: &Type<P>,
+    ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match out {
             Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
                 // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
-                StringEncoding::Utf8 => Some(("unsafe { str::from_utf8_unchecked(".into(), ".into()).into()}".into())),
+                StringEncoding::Utf8 => Some((
+                    "unsafe { str::from_utf8_unchecked(".into(),
+                    ".into()).into()}".into(),
+                )),
                 // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
                 _ => Some(("".into(), ".into()".into())),
             },
@@ -269,7 +281,7 @@ impl<'tcx> FunctionInfo<'tcx> {
         params: &mut Vec<ParamInfo>,
         ctx: &mut FileGenContext<'tcx>,
         ret: &'tcx ReturnType,
-        env : &LifetimeEnv,
+        env: &LifetimeEnv,
     ) -> Option<ParamInfo<'tcx>> {
         match ret {
             ReturnType::Fallible(ok, err) => {
@@ -286,25 +298,32 @@ impl<'tcx> FunctionInfo<'tcx> {
                     .unwrap_or_default();
 
                 let abi_override = ABITypeInfo {
-                    name: Some(format!(
-                        "crate::DiplomatResult<{}, {}>",
-                        ok_ty.render_with_override(env, &ok_ty_abi),
-                        err_ty.render_with_override(env, &err_ty_abi)
-                    ).into()),
+                    name: Some(
+                        format!(
+                            "crate::DiplomatResult<{}, {}>",
+                            ok_ty.render_with_override(env, &ok_ty_abi),
+                            err_ty.render_with_override(env, &err_ty_abi)
+                        )
+                        .into(),
+                    ),
                     ..Default::default()
                 };
-                
+
                 let ok_convert = Self::ok_type_conversion(ok);
-                let err_convert = err.as_ref().and_then(|e| {
-                    Self::out_type_conversion(e)
-                });
+                let err_convert = err.as_ref().and_then(|e| Self::out_type_conversion(e));
                 let maybe_map_ok = if let Some((pre, post)) = ok_convert {
-                    format!(".map(|ok : {}| {{ {pre}ok{post} }})", ok_ty_abi.name.unwrap())
+                    format!(
+                        ".map(|ok : {}| {{ {pre}ok{post} }})",
+                        ok_ty_abi.name.unwrap()
+                    )
                 } else {
                     "".into()
                 };
                 let maybe_map_err = if let Some((pre, post)) = err_convert {
-                    format!(".map_err(|err : {}| {{ {pre}err{post} }})", err_ty_abi.name.unwrap())
+                    format!(
+                        ".map_err(|err : {}| {{ {pre}err{post} }})",
+                        err_ty_abi.name.unwrap()
+                    )
                 } else {
                     "".into()
                 };
@@ -315,7 +334,10 @@ impl<'tcx> FunctionInfo<'tcx> {
                         format!("Result<{}, {}>", ok_ty.render(env), err_ty.render(env)).into(),
                     ),
                     abi_override: abi_override,
-                    conversion: Some(("".into(), format!(".to_result(){maybe_map_ok}{maybe_map_err}").into())),
+                    conversion: Some((
+                        "".into(),
+                        format!(".to_result(){maybe_map_ok}{maybe_map_err}").into(),
+                    )),
                 };
                 Some(info)
             }
@@ -324,16 +346,22 @@ impl<'tcx> FunctionInfo<'tcx> {
 
                 let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
                 let abi_override = ABITypeInfo {
-                    name: Some(format!(
-                        "diplomat_runtime::DiplomatOption<{}>",
-                        ok_ty.render_with_override(env, &ok_ty_abi)
-                    ).into()),
+                    name: Some(
+                        format!(
+                            "diplomat_runtime::DiplomatOption<{}>",
+                            ok_ty.render_with_override(env, &ok_ty_abi)
+                        )
+                        .into(),
+                    ),
                     ..Default::default()
                 };
 
                 let convert = Self::ok_type_conversion(ok);
                 let potential_map = if let Some((pre, post)) = convert {
-                    format!(".map(|ok : {}| {{ {pre}ok{post} }})", ok_ty_abi.name.unwrap())
+                    format!(
+                        ".map(|ok : {}| {{ {pre}ok{post} }})",
+                        ok_ty_abi.name.unwrap()
+                    )
                 } else {
                     "".into()
                 };
@@ -342,7 +370,10 @@ impl<'tcx> FunctionInfo<'tcx> {
                     var_name: "ret".into(),
                     type_info: TypeInfo::new(format!("Option<{}>", ok_ty.render(env)).into()),
                     abi_override,
-                    conversion: Some(("".into(), format!(".into_converted_option(){potential_map}").into())),
+                    conversion: Some((
+                        "".into(),
+                        format!(".into_converted_option(){potential_map}").into(),
+                    )),
                 })
             }
             ReturnType::Infallible(ok) => {
@@ -374,9 +405,9 @@ impl<'tcx> FunctionInfo<'tcx> {
         funcs
     }
 
-    /// Given any type, generate C ABI info. 
+    /// Given any type, generate C ABI info.
     fn gen_abi_type_info<P: TyPosition>(
-        ctx : &mut FileGenContext,
+        ctx: &mut FileGenContext,
         ty: &Type<P>,
     ) -> ABITypeInfo<'tcx> {
         match ty {
@@ -384,26 +415,34 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let regular_type = ctx.gen_type_info(op).name;
                 let inner = Self::gen_abi_type_info(ctx, op);
                 ABITypeInfo {
-                    name: Some(format!(
-                        "diplomat_runtime::DiplomatOption<{}>",
-                        inner.name.unwrap_or(regular_type)
-                    )
-                    .into()),
+                    name: Some(
+                        format!(
+                            "diplomat_runtime::DiplomatOption<{}>",
+                            inner.name.unwrap_or(regular_type)
+                        )
+                        .into(),
+                    ),
                     ..Default::default()
                 }
             }
             Type::Slice(sl) => match sl {
                 Slice::Str(lt, enc) => {
                     let name = match enc {
-                        StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
+                        StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => {
+                            "diplomat_runtime::DiplomatStrSlice"
+                        }
                         StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
                         _ => panic!("Unrecognized encoding type {enc:?}"),
                     };
 
                     let name = if lt.is_none() {
                         match enc {
-                            StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatOwnedStrSlice",
-                            StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatOwnedStr16Slice",
+                            StringEncoding::Utf8 | StringEncoding::UnvalidatedUtf8 => {
+                                "diplomat_runtime::DiplomatOwnedStrSlice"
+                            }
+                            StringEncoding::UnvalidatedUtf16 => {
+                                "diplomat_runtime::DiplomatOwnedStr16Slice"
+                            }
                             _ => panic!("Unrecognized encoding type {enc:?}"),
                         }
                     } else {
@@ -417,7 +456,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                         generic_lifetimes: Some(lt.iter().cloned().collect()),
                         wrapped: Some(TypeInfoWrapper::None),
                     }
-                },
+                }
                 _ => ABITypeInfo::default(),
             },
             _ => ABITypeInfo::default(),
