@@ -35,7 +35,7 @@ impl Opaque {
     pub fn get_debug_str<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { Opaque_get_debug_str(self, write_mut) };
+        unsafe { Opaque_get_debug_str(self, write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -43,7 +43,7 @@ impl Opaque {
     }
 
     pub fn assert_struct<'anon_0>(&'anon_0 self, s : MyStruct) {
-        let ret = unsafe { Opaque_assert_struct(self, s.into()) };
+        unsafe { Opaque_assert_struct(self, s.into()) };
         
     }
 

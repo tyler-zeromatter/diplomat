@@ -50,7 +50,7 @@ impl CyclicStructA {
     pub fn cyclic_out(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_cyclic_out(self.into(), write_mut) };
+        unsafe { CyclicStructA_cyclic_out(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -60,7 +60,7 @@ impl CyclicStructA {
     pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_double_cyclic_out(self.into(), cyclic_struct_a.into(), write_mut) };
+        unsafe { CyclicStructA_double_cyclic_out(self.into(), cyclic_struct_a.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -70,7 +70,7 @@ impl CyclicStructA {
     pub fn getter_out(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_getter_out(self.into(), write_mut) };
+        unsafe { CyclicStructA_getter_out(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str

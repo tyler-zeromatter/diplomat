@@ -64,19 +64,19 @@ impl Float64Vec {
     }
 
     pub fn fill_slice<'anon_0, 'anon_1>(&'anon_0 self, v : &'anon_1 mut [f64]) {
-        let ret = unsafe { Float64Vec_fill_slice(self, v) };
+        unsafe { Float64Vec_fill_slice(self, v) };
         
     }
 
     pub fn set_value<'anon_0, 'anon_1>(&'anon_0 mut self, new_slice : &'anon_1 [f64]) {
-        let ret = unsafe { Float64Vec_set_value(self, new_slice) };
+        unsafe { Float64Vec_set_value(self, new_slice) };
         
     }
 
     pub fn to_string<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { Float64Vec_to_string(self, write_mut) };
+        unsafe { Float64Vec_to_string(self, write_mut) };
         
         let out_str = write.to_string();
         out_str

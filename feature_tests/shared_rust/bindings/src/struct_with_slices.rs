@@ -47,7 +47,7 @@ impl<'a> StructWithSlices<'a> {
     pub fn return_last(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { StructWithSlices_return_last(self.into(), write_mut) };
+        unsafe { StructWithSlices_return_last(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str

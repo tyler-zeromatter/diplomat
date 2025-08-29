@@ -74,7 +74,7 @@ impl ResultOpaque {
     }
 
     pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
-        let ret = unsafe { ResultOpaque_assert_integer(self, i) };
+        unsafe { ResultOpaque_assert_integer(self, i) };
         
     }
 

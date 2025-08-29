@@ -16,7 +16,7 @@ impl OpaqueMutexedString {
     }
 
     pub fn change<'anon_0>(&'anon_0 self, number : usize) {
-        let ret = unsafe { OpaqueMutexedString_change(self, number) };
+        unsafe { OpaqueMutexedString_change(self, number) };
         
     }
 
