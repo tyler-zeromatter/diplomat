@@ -25,7 +25,7 @@ impl From<ScalarPairWithPadding> for ScalarPairWithPaddingAbi{
 
 impl From<ScalarPairWithPaddingAbi> for ScalarPairWithPadding{
     fn from(value: ScalarPairWithPaddingAbi) -> Self {
-        value.from_ffi()
+        ScalarPairWithPaddingAbi::from_ffi(value)
     }
 }
 

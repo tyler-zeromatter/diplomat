@@ -25,7 +25,7 @@ impl From<CallbackWrapper> for CallbackWrapperAbi{
 
 impl From<CallbackWrapperAbi> for CallbackWrapper{
     fn from(value: CallbackWrapperAbi) -> Self {
-        value.from_ffi()
+        CallbackWrapperAbi::from_ffi(value)
     }
 }
 

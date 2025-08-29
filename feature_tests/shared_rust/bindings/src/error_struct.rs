@@ -39,7 +39,7 @@ impl From<ErrorStruct> for ErrorStructAbi{
 
 impl From<ErrorStructAbi> for ErrorStruct{
     fn from(value: ErrorStructAbi) -> Self {
-        value.from_ffi()
+        ErrorStructAbi::from_ffi(value)
     }
 }
 

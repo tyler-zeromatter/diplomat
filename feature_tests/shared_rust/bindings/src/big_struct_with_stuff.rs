@@ -25,7 +25,7 @@ impl From<BigStructWithStuff> for BigStructWithStuffAbi{
 
 impl From<BigStructWithStuffAbi> for BigStructWithStuff{
     fn from(value: BigStructWithStuffAbi) -> Self {
-        value.from_ffi()
+        BigStructWithStuffAbi::from_ffi(value)
     }
 }
 

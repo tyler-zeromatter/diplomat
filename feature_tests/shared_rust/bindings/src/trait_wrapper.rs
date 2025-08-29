@@ -25,7 +25,7 @@ impl From<TraitWrapper> for TraitWrapperAbi{
 
 impl From<TraitWrapperAbi> for TraitWrapper{
     fn from(value: TraitWrapperAbi) -> Self {
-        value.from_ffi()
+        TraitWrapperAbi::from_ffi(value)
     }
 }
 

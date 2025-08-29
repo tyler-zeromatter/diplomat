@@ -25,7 +25,7 @@ impl From<MyZst> for MyZstAbi{
 
 impl From<MyZstAbi> for MyZst{
     fn from(value: MyZstAbi) -> Self {
-        value.from_ffi()
+        MyZstAbi::from_ffi(value)
     }
 }
 

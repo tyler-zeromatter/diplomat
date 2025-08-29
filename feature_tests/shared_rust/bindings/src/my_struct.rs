@@ -72,7 +72,7 @@ impl From<MyStruct> for MyStructAbi{
 
 impl From<MyStructAbi> for MyStruct{
     fn from(value: MyStructAbi) -> Self {
-        value.from_ffi()
+        MyStructAbi::from_ffi(value)
     }
 }
 

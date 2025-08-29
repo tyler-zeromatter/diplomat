@@ -25,7 +25,7 @@ impl From<StructArithmetic> for StructArithmeticAbi{
 
 impl From<StructArithmeticAbi> for StructArithmetic{
     fn from(value: StructArithmeticAbi) -> Self {
-        value.from_ffi()
+        StructArithmeticAbi::from_ffi(value)
     }
 }
 

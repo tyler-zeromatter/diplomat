@@ -25,7 +25,7 @@ impl From<CallbackTestingStruct> for CallbackTestingStructAbi{
 
 impl From<CallbackTestingStructAbi> for CallbackTestingStruct{
     fn from(value: CallbackTestingStructAbi) -> Self {
-        value.from_ffi()
+        CallbackTestingStructAbi::from_ffi(value)
     }
 }
 

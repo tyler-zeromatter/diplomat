@@ -33,7 +33,7 @@ impl From<RenamedTestMacroStruct> for RenamedTestMacroStructAbi{
 
 impl From<RenamedTestMacroStructAbi> for RenamedTestMacroStruct{
     fn from(value: RenamedTestMacroStructAbi) -> Self {
-        value.from_ffi()
+        RenamedTestMacroStructAbi::from_ffi(value)
     }
 }
 

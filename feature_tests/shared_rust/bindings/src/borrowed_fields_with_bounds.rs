@@ -46,7 +46,7 @@ impl<'a, 'b, 'c> From<BorrowedFieldsWithBounds<'a, 'b, 'c>> for BorrowedFieldsWi
 
 impl<'a, 'b, 'c> From<BorrowedFieldsWithBoundsAbi<'a, 'b, 'c>> for BorrowedFieldsWithBounds<'a, 'b, 'c>{
     fn from(value: BorrowedFieldsWithBoundsAbi<'a, 'b, 'c>) -> Self {
-        value.from_ffi()
+        BorrowedFieldsWithBoundsAbi::from_ffi(value)
     }
 }
 
