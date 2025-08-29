@@ -2,7 +2,8 @@ use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
 use diplomat_core::hir::{
-    EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeId
+    EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, OpaqueDef, OpaqueOwner, Slice,
+    StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeId,
 };
 
 use crate::{
@@ -72,10 +73,10 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         /// except it needs to be able to convert to and from C/Rust.
         struct FieldInfo<'a> {
             type_info: TypeInfo<'a>,
-            abi_info : ABITypeInfo<'a>,
+            abi_info: ABITypeInfo<'a>,
             name: Cow<'a, str>,
             to_rust: Option<(Cow<'a, str>, Cow<'a, str>)>,
-            to_c_abi : Option<(Cow<'a, str>, Cow<'a, str>)>,
+            to_c_abi: Option<(Cow<'a, str>, Cow<'a, str>)>,
         }
 
         impl<'a> FieldInfo<'a> {
@@ -116,8 +117,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
         let lifetime_env = &ty.lifetimes;
-        let lifetimes = lifetime_env
-            .all_lifetimes().collect();
+        let lifetimes = lifetime_env.all_lifetimes().collect();
         // TODO: Bounded lifetimes for the impl block.
 
         let fields = ty
@@ -144,9 +144,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
 
             fn generic_lifetimes(&self) -> String {
-                let new_lts = self.lifetimes.iter().map(|lt| {
-                    MaybeStatic::NonStatic(*lt)
-                }).collect();
+                let new_lts = self
+                    .lifetimes
+                    .iter()
+                    .map(|lt| MaybeStatic::NonStatic(*lt))
+                    .collect();
                 TypeInfo::fmt_generic_lifetimes(new_lts, self.lifetime_env)
             }
         }
@@ -154,7 +156,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         let type_name = self.formatter.fmt_symbol_name(self.id);
         let name = self.formatter.fmt_struct_abi_name(type_name.clone());
         // FIXME: Hacky, needs to be able to take into account namespaces
-        self.imports.remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
+        self.imports
+            .remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
 
         StructTemplate {
             type_name,
@@ -360,7 +363,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     }
 
     /// TODO: Add namespacing params.
-    pub(super) fn add_import(&mut self, import : String) {
+    pub(super) fn add_import(&mut self, import: String) {
         self.imports.insert(import.into());
     }
 }

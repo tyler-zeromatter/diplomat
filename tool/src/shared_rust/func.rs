@@ -2,7 +2,8 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
+    StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId,
 };
 
 use crate::shared_rust::{
@@ -25,7 +26,7 @@ pub(super) struct FunctionInfo<'tcx> {
     return_info: ReturnType,
     lifetime_env: &'tcx LifetimeEnv,
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
-    abi_lifetimes : Vec<MaybeStatic<Lifetime>>,
+    abi_lifetimes: Vec<MaybeStatic<Lifetime>>,
 }
 
 #[derive(Default)]
@@ -166,15 +167,21 @@ impl<'tcx> FunctionInfo<'tcx> {
         // FIXME: This is hacky and ugly, I think a real design discussion about how to avoid lifetimes already existing in the SelfType's impl block is needed.
         let formatted_parent = if let SymbolId::TypeId(ty) = ctx.id {
             match ctx.tcx.resolve_type(ty) {
-                TypeDef::Opaque(op) => op.lifetimes.all_lifetimes().map(|l| {
-                    op.lifetimes.fmt_lifetime(l)
-                }).collect(),
-                TypeDef::Struct(st) => st.lifetimes.all_lifetimes().map(|l| {
-                    st.lifetimes.fmt_lifetime(l)
-                }).collect(),
-                TypeDef::OutStruct(st) => st.lifetimes.all_lifetimes().map(|l| {
-                    st.lifetimes.fmt_lifetime(l)
-                }).collect(),
+                TypeDef::Opaque(op) => op
+                    .lifetimes
+                    .all_lifetimes()
+                    .map(|l| op.lifetimes.fmt_lifetime(l))
+                    .collect(),
+                TypeDef::Struct(st) => st
+                    .lifetimes
+                    .all_lifetimes()
+                    .map(|l| st.lifetimes.fmt_lifetime(l))
+                    .collect(),
+                TypeDef::OutStruct(st) => st
+                    .lifetimes
+                    .all_lifetimes()
+                    .map(|l| st.lifetimes.fmt_lifetime(l))
+                    .collect(),
                 _ => Vec::new(),
             }
         } else {
@@ -182,10 +189,10 @@ impl<'tcx> FunctionInfo<'tcx> {
         };
         let method_lifetimes = method.method_lifetimes();
 
-        let lifetimes = method_lifetimes.lifetimes().filter(|lt| {
-            match lt {
-                MaybeStatic::Static => true,
-                MaybeStatic::NonStatic(ns) => !formatted_parent.contains(&method.lifetime_env.fmt_lifetime(ns)),
+        let lifetimes = method_lifetimes.lifetimes().filter(|lt| match lt {
+            MaybeStatic::Static => true,
+            MaybeStatic::NonStatic(ns) => {
+                !formatted_parent.contains(&method.lifetime_env.fmt_lifetime(ns))
             }
         });
 
@@ -205,7 +212,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// Get the (pre, post) conversion from Rust to the C ABI.
-    pub(super) fn param_conversion<P: TyPosition>(ty: &Type<P>) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
+    pub(super) fn param_conversion<P: TyPosition>(
+        ty: &Type<P>,
+    ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
                 Slice::Str(_, enc) => {
@@ -229,11 +238,11 @@ impl<'tcx> FunctionInfo<'tcx> {
                     "".into()
                 };
                 Some(("".into(), format!("{maybe_map}.into()").into()))
-            },
-            Type::Struct(..) => { 
+            }
+            Type::Struct(..) => {
                 // Struct -> StructAbi
                 Some(("".into(), ".into()".into()))
-            },
+            }
             _ => None,
         }
     }
@@ -486,8 +495,11 @@ impl<'tcx> FunctionInfo<'tcx> {
             },
             Type::Struct(st) => {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
-                let name = ctx.formatter.fmt_struct_abi_name(struct_name.clone()).into_owned();
-                // FIXME: Hacky, needs to be able to take into account namespaces 
+                let name = ctx
+                    .formatter
+                    .fmt_struct_abi_name(struct_name.clone())
+                    .into_owned();
+                // FIXME: Hacky, needs to be able to take into account namespaces
                 ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(struct_name)));
                 ABITypeInfo {
                     name: Some(name.into()),
