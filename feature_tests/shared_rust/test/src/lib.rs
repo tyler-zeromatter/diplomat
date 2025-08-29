@@ -1,2 +1,3 @@
 mod slices;
 mod opaque;
+mod enums;
