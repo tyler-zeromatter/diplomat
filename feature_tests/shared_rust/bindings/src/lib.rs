@@ -4,20 +4,20 @@ use std::ffi::c_void;
 pub mod attr_opaque1_renamed;
 pub use attr_opaque1_renamed::AttrOpaque1Renamed;
 
-// pub mod bar;
-// pub use bar::Bar;
+pub mod bar;
+pub use bar::Bar;
 
 pub mod big_struct_with_stuff;
 pub use big_struct_with_stuff::BigStructWithStuff;
 
-// pub mod borrowed_fields;
-// pub use borrowed_fields::BorrowedFields;
+pub mod borrowed_fields;
+pub use borrowed_fields::BorrowedFields;
 
 pub mod borrowed_fields_returning;
 pub use borrowed_fields_returning::BorrowedFieldsReturning;
 
-// pub mod borrowed_fields_with_bounds;
-// pub use borrowed_fields_with_bounds::BorrowedFieldsWithBounds;
+pub mod borrowed_fields_with_bounds;
+pub use borrowed_fields_with_bounds::BorrowedFieldsWithBounds;
 
 pub mod callback_holder;
 pub use callback_holder::CallbackHolder;
@@ -55,8 +55,8 @@ pub use float64_vec::Float64Vec;
 pub mod float64_vec_error;
 pub use float64_vec_error::Float64VecError;
 
-// pub mod foo;
-// pub use foo::Foo;
+pub mod foo;
+pub use foo::Foo;
 
 pub mod imported_struct;
 pub use imported_struct::ImportedStruct;
@@ -82,11 +82,11 @@ pub use my_struct_containing_an_option::MyStructContainingAnOption;
 pub mod my_zst;
 pub use my_zst::MyZst;
 
-// pub mod nested_borrowed_fields;
-// pub use nested_borrowed_fields::NestedBorrowedFields;
+pub mod nested_borrowed_fields;
+pub use nested_borrowed_fields::NestedBorrowedFields;
 
-// pub mod one;
-// pub use one::One;
+pub mod one;
+pub use one::One;
 
 pub mod opaque;
 pub use opaque::Opaque;
@@ -97,11 +97,11 @@ pub use opaque_mutexed_string::OpaqueMutexedString;
 pub mod opaque_thin;
 pub use opaque_thin::OpaqueThin;
 
-// pub mod opaque_thin_iter;
-// pub use opaque_thin_iter::OpaqueThinIter;
+pub mod opaque_thin_iter;
+pub use opaque_thin_iter::OpaqueThinIter;
 
-// pub mod opaque_thin_vec;
-// pub use opaque_thin_vec::OpaqueThinVec;
+pub mod opaque_thin_vec;
+pub use opaque_thin_vec::OpaqueThinVec;
 
 pub mod option_enum;
 pub use option_enum::OptionEnum;
@@ -187,8 +187,8 @@ pub use scalar_pair_with_padding::ScalarPairWithPadding;
 pub mod struct_arithmetic;
 pub use struct_arithmetic::StructArithmetic;
 
-// pub mod struct_with_slices;
-// pub use struct_with_slices::StructWithSlices;
+pub mod struct_with_slices;
+pub use struct_with_slices::StructWithSlices;
 
 pub mod trait_testing_struct;
 pub use trait_testing_struct::TraitTestingStruct;

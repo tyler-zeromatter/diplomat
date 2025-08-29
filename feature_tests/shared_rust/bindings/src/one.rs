@@ -12,21 +12,21 @@ impl<'a> Drop for One<'a> {
 }
 
 impl<'a> One<'a> {
-    pub fn transitivity<'o, 'a, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'e: 'x + 'd + 'c + 'b + 'a, 'x, 'anon_0>(hold : &'x One<'e>, nohold : &'anon_0 One<'x>) -> Box<One<'a>> {
+    pub fn transitivity<'o, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'e: 'x + 'd + 'c + 'b + 'a, 'x, 'anon_0>(hold : &'x One<'e>, nohold : &'anon_0 One<'x>) -> Box<One<'a>> {
         let ret = unsafe { One_transitivity(hold, nohold) };
         
         ret
     
     }
 
-    pub fn cycle<'o, 'a: 'b + 'c, 'b: 'c + 'a, 'c: 'a + 'b, 'x, 'anon_0>(hold : &'anon_0 Two<'x, 'b>, nohold : &'x One<'x>) -> Box<One<'a>> {
+    pub fn cycle<'o, 'b: 'c + 'a, 'c: 'a + 'b, 'x, 'anon_0>(hold : &'anon_0 Two<'x, 'b>, nohold : &'x One<'x>) -> Box<One<'a>> {
         let ret = unsafe { One_cycle(hold, nohold) };
         
         ret
     
     }
 
-    pub fn many_dependents<'o, 'a: 'b + 'x, 'b: 'a + 'x, 'c: 'a + 'b + 'x, 'd: 'x + 'b + 'a, 'x, 'y: 'x, 'anon_0>(a : &'x One<'a>, b : &'b One<'a>, c : &'anon_0 Two<'x, 'c>, d : &'x Two<'d, 'y>, nohold : &'x Two<'x, 'y>) -> Box<One<'a>> {
+    pub fn many_dependents<'o, 'b: 'a + 'x, 'c: 'a + 'b + 'x, 'd: 'x + 'b + 'a, 'x, 'y: 'x, 'anon_0>(a : &'x One<'a>, b : &'b One<'a>, c : &'anon_0 Two<'x, 'c>, d : &'x Two<'d, 'y>, nohold : &'x Two<'x, 'y>) -> Box<One<'a>> {
         let ret = unsafe { One_many_dependents(a, b, c, d, nohold) };
         
         ret
@@ -68,21 +68,21 @@ impl<'a> One<'a> {
     
     }
 
-    pub fn diamond_and_nested_types<'o, 'a, 'b: 'y + 'a, 'c: 'b + 'y + 'a, 'd: 'c + 'b + 'y + 'a, 'x, 'y, 'anon_0, 'anon_1, 'anon_2, 'anon_3>(a : &'anon_0 One<'a>, b : &'y One<'b>, c : &'anon_1 One<'c>, d : &'anon_2 One<'d>, nohold : &'anon_3 One<'x>) -> Box<One<'a>> {
+    pub fn diamond_and_nested_types<'o, 'b: 'y + 'a, 'c: 'b + 'y + 'a, 'd: 'c + 'b + 'y + 'a, 'x, 'y, 'anon_0, 'anon_1, 'anon_2, 'anon_3>(a : &'anon_0 One<'a>, b : &'y One<'b>, c : &'anon_1 One<'c>, d : &'anon_2 One<'d>, nohold : &'anon_3 One<'x>) -> Box<One<'a>> {
         let ret = unsafe { One_diamond_and_nested_types(a, b, c, d, nohold) };
         
         ret
     
     }
 
-    pub fn implicit_bounds<'o, 'a, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'x: 'd + 'c + 'b + 'a, 'y, 'anon_0, 'anon_1>(explicit_hold : &'d One<'x>, implicit_hold : &'anon_0 One<'x>, nohold : &'anon_1 One<'y>) -> Box<One<'a>> {
+    pub fn implicit_bounds<'o, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'x: 'd + 'c + 'b + 'a, 'y, 'anon_0, 'anon_1>(explicit_hold : &'d One<'x>, implicit_hold : &'anon_0 One<'x>, nohold : &'anon_1 One<'y>) -> Box<One<'a>> {
         let ret = unsafe { One_implicit_bounds(explicit_hold, implicit_hold, nohold) };
         
         ret
     
     }
 
-    pub fn implicit_bounds_deep<'o, 'a, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'x>(explicit_ : &'a One<'b>, implicit_1 : &'b One<'c>, implicit_2 : &'c One<'d>, nohold : &'x One<'x>) -> Box<One<'a>> {
+    pub fn implicit_bounds_deep<'o, 'b: 'a, 'c: 'b + 'a, 'd: 'c + 'b + 'a, 'x>(explicit_ : &'a One<'b>, implicit_1 : &'b One<'c>, implicit_2 : &'c One<'d>, nohold : &'x One<'x>) -> Box<One<'a>> {
         let ret = unsafe { One_implicit_bounds_deep(explicit_, implicit_1, implicit_2, nohold) };
         
         ret
