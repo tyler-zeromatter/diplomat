@@ -9,30 +9,51 @@ pub(super) struct OptionStruct {
 
 #[repr(C)]
 pub(crate) struct OptionStructAbi {
-    
     a : Option<Box<OptionOpaque>>,
-    
     b : Option<Box<OptionOpaqueChar>>,
-    
     c : u32,
-    
     d : Box<OptionOpaque>,
-    
 }
 
 impl OptionStructAbi {
-    fn from_ffi(self) -> OptionStruct{
+    pub(crate) fn from_ffi(self) -> OptionStruct{
         OptionStruct {
             
-                a: self.a,
+            a: self.a,
             
-                b: self.b,
+            b: self.b,
             
-                c: self.c,
+            c: self.c,
             
-                d: self.d,
+            d: self.d,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : OptionStruct) -> OptionStructAbi{
+        OptionStructAbi {
+            
+            a : this.a,
+            
+            b : this.b,
+            
+            c : this.c,
+            
+            d : this.d,
+            
+        }
+    }
+}
+
+impl From<OptionStruct> for OptionStructAbi{
+    fn from(value: OptionStruct) -> Self {
+        OptionStructAbi::to_ffi(value)
+    }
+}
+
+impl From<OptionStructAbi> for OptionStruct{
+    fn from(value: OptionStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 

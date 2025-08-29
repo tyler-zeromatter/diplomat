@@ -4,10 +4,28 @@ pub struct TraitTestingStruct;
 pub(crate) struct TraitTestingStructAbi;
 
 impl TraitTestingStructAbi {
-    fn from_ffi(self) -> TraitTestingStruct{
+    pub(crate) fn from_ffi(self) -> TraitTestingStruct{
         TraitTestingStruct {
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : TraitTestingStruct) -> TraitTestingStructAbi{
+        TraitTestingStructAbi {
+            
+        }
+    }
+}
+
+impl From<TraitTestingStruct> for TraitTestingStructAbi{
+    fn from(value: TraitTestingStruct) -> Self {
+        TraitTestingStructAbi::to_ffi(value)
+    }
+}
+
+impl From<TraitTestingStructAbi> for TraitTestingStruct{
+    fn from(value: TraitTestingStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 

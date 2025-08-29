@@ -1,5 +1,7 @@
 use super::ImportedStruct;
 use super::MyStruct;
+use super::imported_struct::ImportedStructAbi;
+use super::my_struct::MyStructAbi;
 pub struct Opaque;
 
 impl Drop for Opaque {
@@ -41,7 +43,7 @@ impl Opaque {
     }
 
     pub fn assert_struct<'anon_0>(&'anon_0 self, s : MyStruct) {
-        let ret = unsafe { Opaque_assert_struct(self, s) };
+        let ret = unsafe { Opaque_assert_struct(self, s.into()) };
         
     }
 

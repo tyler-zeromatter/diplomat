@@ -7,26 +7,46 @@ pub struct BorrowedFields<'a> {
 
 #[repr(C)]
 pub(crate) struct BorrowedFieldsAbi<'a> {
-    
     a : diplomat_runtime::DiplomatStr16Slice<'a>,
-    
     b : diplomat_runtime::DiplomatStrSlice<'a>,
-    
     c : diplomat_runtime::DiplomatStrSlice<'a>,
-    
 }
 
 impl<'a> BorrowedFieldsAbi<'a> {
-    fn from_ffi(self) -> BorrowedFields<'a>{
+    pub(crate) fn from_ffi(self) -> BorrowedFields<'a>{
         BorrowedFields {
             
-                a: self.a.into(),
+            a: self.a.into(),
             
-                b: self.b.into(),
+            b: self.b.into(),
             
-                c: unsafe { str::from_utf8_unchecked(self.c.into()).into()},
+            c: unsafe { str::from_utf8_unchecked(self.c.into()).into()},
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : BorrowedFields<'a>) -> BorrowedFieldsAbi<'a>{
+        BorrowedFieldsAbi {
+            
+            a : this.a.into(),
+            
+            b : this.b.into(),
+            
+            c : this.c.as_bytes().into(),
+            
+        }
+    }
+}
+
+impl<'a> From<BorrowedFields<'a>> for BorrowedFieldsAbi<'a>{
+    fn from(value: BorrowedFields<'a>) -> Self {
+        BorrowedFieldsAbi::to_ffi(value)
+    }
+}
+
+impl<'a> From<BorrowedFieldsAbi<'a>> for BorrowedFields<'a>{
+    fn from(value: BorrowedFieldsAbi<'a>) -> Self {
+        value.from_ffi()
     }
 }
 

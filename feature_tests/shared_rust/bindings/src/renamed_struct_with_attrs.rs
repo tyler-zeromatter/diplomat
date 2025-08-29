@@ -5,22 +5,41 @@ pub struct RenamedStructWithAttrs {
 
 #[repr(C)]
 pub(crate) struct RenamedStructWithAttrsAbi {
-    
     a : bool,
-    
     b : u32,
-    
 }
 
 impl RenamedStructWithAttrsAbi {
-    fn from_ffi(self) -> RenamedStructWithAttrs{
+    pub(crate) fn from_ffi(self) -> RenamedStructWithAttrs{
         RenamedStructWithAttrs {
             
-                a: self.a,
+            a: self.a,
             
-                b: self.b,
+            b: self.b,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : RenamedStructWithAttrs) -> RenamedStructWithAttrsAbi{
+        RenamedStructWithAttrsAbi {
+            
+            a : this.a,
+            
+            b : this.b,
+            
+        }
+    }
+}
+
+impl From<RenamedStructWithAttrs> for RenamedStructWithAttrsAbi{
+    fn from(value: RenamedStructWithAttrs) -> Self {
+        RenamedStructWithAttrsAbi::to_ffi(value)
+    }
+}
+
+impl From<RenamedStructWithAttrsAbi> for RenamedStructWithAttrs{
+    fn from(value: RenamedStructWithAttrsAbi) -> Self {
+        value.from_ffi()
     }
 }
 

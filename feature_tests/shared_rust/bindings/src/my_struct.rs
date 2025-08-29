@@ -1,5 +1,6 @@
 use super::MyEnum;
 use super::MyZst;
+use super::my_zst::MyZstAbi;
 pub struct MyStruct {
     pub a: u8,
     pub b: bool,
@@ -12,42 +13,66 @@ pub struct MyStruct {
 
 #[repr(C)]
 pub(crate) struct MyStructAbi {
-    
     a : u8,
-    
     b : bool,
-    
     c : u8,
-    
     d : u64,
-    
     e : i32,
-    
     f : diplomat_runtime::DiplomatChar,
-    
     g : MyEnum,
-    
 }
 
 impl MyStructAbi {
-    fn from_ffi(self) -> MyStruct{
+    pub(crate) fn from_ffi(self) -> MyStruct{
         MyStruct {
             
-                a: self.a,
+            a: self.a,
             
-                b: self.b,
+            b: self.b,
             
-                c: self.c,
+            c: self.c,
             
-                d: self.d,
+            d: self.d,
             
-                e: self.e,
+            e: self.e,
             
-                f: self.f,
+            f: self.f,
             
-                g: self.g,
+            g: self.g,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : MyStruct) -> MyStructAbi{
+        MyStructAbi {
+            
+            a : this.a,
+            
+            b : this.b,
+            
+            c : this.c,
+            
+            d : this.d,
+            
+            e : this.e,
+            
+            f : this.f,
+            
+            g : this.g,
+            
+        }
+    }
+}
+
+impl From<MyStruct> for MyStructAbi{
+    fn from(value: MyStruct) -> Self {
+        MyStructAbi::to_ffi(value)
+    }
+}
+
+impl From<MyStructAbi> for MyStruct{
+    fn from(value: MyStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 
@@ -57,16 +82,6 @@ impl MyStruct {
         
         ret.from_ffi()
     
-    }
-
-    pub fn takes_mut<'anon_0, 'anon_1>(&'anon_0 mut self, o : &'anon_1 mut MyStruct) {
-        let ret = unsafe { MyStruct_takes_mut(self, o) };
-        
-    }
-
-    pub fn takes_const<'anon_0, 'anon_1>(&'anon_0 self, o : &'anon_1 mut MyStruct) {
-        let ret = unsafe { MyStruct_takes_const(self, o) };
-        
     }
 
     pub fn into_a(self) -> u8 {
@@ -96,10 +111,6 @@ impl MyStruct {
 #[allow(improper_ctypes)]
 unsafe extern "C" {
     fn MyStruct_new() -> MyStructAbi;
-
-    fn MyStruct_takes_mut<'anon_0, 'anon_1>(this: &'anon_0 mut MyStruct, o : &'anon_1 mut MyStructAbi);
-
-    fn MyStruct_takes_const<'anon_0, 'anon_1>(this: &'anon_0 MyStruct, o : &'anon_1 mut MyStructAbi);
 
     fn MyStruct_into_a(this : MyStruct) -> u8;
 

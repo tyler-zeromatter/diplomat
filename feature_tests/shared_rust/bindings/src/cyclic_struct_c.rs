@@ -1,28 +1,47 @@
 use super::CyclicStructA;
+use super::cyclic_struct_a::CyclicStructAAbi;
 pub struct CyclicStructC {
     pub a: CyclicStructA,
 }
 
 #[repr(C)]
 pub(crate) struct CyclicStructCAbi {
-    
     a : CyclicStructAAbi,
-    
 }
 
 impl CyclicStructCAbi {
-    fn from_ffi(self) -> CyclicStructC{
+    pub(crate) fn from_ffi(self) -> CyclicStructC{
         CyclicStructC {
             
-                a: self.a.from_ffi(),
+            a: self.a.from_ffi(),
+            
+        }
+    }
+
+    pub (crate) fn to_ffi(this : CyclicStructC) -> CyclicStructCAbi{
+        CyclicStructCAbi {
+            
+            a : this.a.into(),
             
         }
     }
 }
 
+impl From<CyclicStructC> for CyclicStructCAbi{
+    fn from(value: CyclicStructC) -> Self {
+        CyclicStructCAbi::to_ffi(value)
+    }
+}
+
+impl From<CyclicStructCAbi> for CyclicStructC{
+    fn from(value: CyclicStructCAbi) -> Self {
+        value.from_ffi()
+    }
+}
+
 impl CyclicStructC {
     pub fn takes_nested_parameters(c : CyclicStructC) -> CyclicStructC {
-        let ret = unsafe { CyclicStructC_takes_nested_parameters(c) };
+        let ret = unsafe { CyclicStructC_takes_nested_parameters(c.into()) };
         
         ret.from_ffi()
     

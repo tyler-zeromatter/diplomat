@@ -1,22 +1,41 @@
 use super::CyclicStructB;
+use super::cyclic_struct_b::CyclicStructBAbi;
 pub struct CyclicStructA {
     pub a: CyclicStructB,
 }
 
 #[repr(C)]
 pub(crate) struct CyclicStructAAbi {
-    
     a : CyclicStructBAbi,
-    
 }
 
 impl CyclicStructAAbi {
-    fn from_ffi(self) -> CyclicStructA{
+    pub(crate) fn from_ffi(self) -> CyclicStructA{
         CyclicStructA {
             
-                a: self.a.from_ffi(),
+            a: self.a.from_ffi(),
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : CyclicStructA) -> CyclicStructAAbi{
+        CyclicStructAAbi {
+            
+            a : this.a.into(),
+            
+        }
+    }
+}
+
+impl From<CyclicStructA> for CyclicStructAAbi{
+    fn from(value: CyclicStructA) -> Self {
+        CyclicStructAAbi::to_ffi(value)
+    }
+}
+
+impl From<CyclicStructAAbi> for CyclicStructA{
+    fn from(value: CyclicStructAAbi) -> Self {
+        value.from_ffi()
     }
 }
 
@@ -41,7 +60,7 @@ impl CyclicStructA {
     pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a, write_mut) };
+        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str

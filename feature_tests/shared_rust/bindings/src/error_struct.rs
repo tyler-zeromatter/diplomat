@@ -5,22 +5,41 @@ pub struct ErrorStruct {
 
 #[repr(C)]
 pub(crate) struct ErrorStructAbi {
-    
     i : i32,
-    
     j : i32,
-    
 }
 
 impl ErrorStructAbi {
-    fn from_ffi(self) -> ErrorStruct{
+    pub(crate) fn from_ffi(self) -> ErrorStruct{
         ErrorStruct {
             
-                i: self.i,
+            i: self.i,
             
-                j: self.j,
+            j: self.j,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : ErrorStruct) -> ErrorStructAbi{
+        ErrorStructAbi {
+            
+            i : this.i,
+            
+            j : this.j,
+            
+        }
+    }
+}
+
+impl From<ErrorStruct> for ErrorStructAbi{
+    fn from(value: ErrorStruct) -> Self {
+        ErrorStructAbi::to_ffi(value)
+    }
+}
+
+impl From<ErrorStructAbi> for ErrorStruct{
+    fn from(value: ErrorStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 
