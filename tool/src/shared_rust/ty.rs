@@ -2,8 +2,7 @@ use std::{borrow::Cow, collections::BTreeSet};
 
 use askama::Template;
 use diplomat_core::hir::{
-    EnumDef, LifetimeEnv, MaybeOwn, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef,
-    StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeId,
+    EnumDef, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, OpaqueDef, OpaqueOwner, Slice, StringEncoding, StructDef, StructPathLike, SymbolId, TyPosition, Type, TypeContext, TypeId
 };
 
 use crate::{
@@ -39,6 +38,7 @@ pub(super) trait TypeTemplate<'a> {
     fn mod_name(&self) -> String;
     /// TODO: Remove this, this is only used for OutStructs and is broken. Everything should be `pub`.
     fn crate_vis(&self) -> Option<String>;
+    fn generic_lifetimes(&self) -> String;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
@@ -110,15 +110,14 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             is_out: bool,
             fields: Vec<FieldInfo<'a>>,
             lifetime_env: &'a LifetimeEnv,
-            lifetimes: Vec<String>,
+            lifetimes: Vec<Lifetime>,
         }
 
         let methods = FunctionInfo::gen_function_block(&mut self, ty.methods.iter());
 
         let lifetime_env = &ty.lifetimes;
         let lifetimes = lifetime_env
-            .all_lifetimes()
-            .map(|lt| lifetime_env.fmt_lifetime(lt).into());
+            .all_lifetimes().collect();
         // TODO: Bounded lifetimes for the impl block.
 
         let fields = ty
@@ -150,6 +149,13 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     None
                 }
             }
+
+            fn generic_lifetimes(&self) -> String {
+                let new_lts = self.lifetimes.iter().map(|lt| {
+                    MaybeStatic::NonStatic(*lt)
+                }).collect();
+                TypeInfo::fmt_generic_lifetimes(new_lts, self.lifetime_env)
+            }
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id);
@@ -165,7 +171,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             is_out,
             fields,
             lifetime_env,
-            lifetimes: lifetimes.collect(),
+            lifetimes,
         }
     }
 
@@ -212,6 +218,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn crate_vis(&self) -> Option<String> {
                 None
             }
+            fn generic_lifetimes(&self) -> String {
+                self.render_generic_lifetimes()
+            }
         }
 
         OpaqueTemplate {
@@ -255,6 +264,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             fn crate_vis(&self) -> Option<String> {
                 None
+            }
+            fn generic_lifetimes(&self) -> String {
+                String::new()
             }
         }
 
