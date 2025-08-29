@@ -10,12 +10,16 @@ mod tests {
         let opaque = OptionOpaque::new_none();
         assert!(opaque.is_none());
 
-        // TODO: Out structs are not done yet.
-        // I think crate_vis will need to be removed from `TypeTemplate`, and instead the fields will have to be made private to anything outside of the crate.
-        // Then we'll just need to make getter functions for all of the fields.
         let str = OptionOpaque::new_struct();
+        str.get_a().as_ref().unwrap().assert_integer(101);
+        str.get_b().as_ref().unwrap().assert_char('餐');
+        assert_eq!(*str.get_c(), 904);
+        str.get_d().assert_integer(926535);
         
-        // let sn = OptionOpaque::new_struct_nones();
+        let sn = OptionOpaque::new_struct_nones();
+        assert!(sn.get_a().is_none());
+        assert!(sn.get_b().is_none());
+        assert_eq!(*sn.get_c(), 908);
     }
 
     #[test]
