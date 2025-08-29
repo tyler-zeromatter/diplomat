@@ -23,7 +23,3 @@ impl{{self.render_generic_lifetimes()}} Drop for {{type_name}}{{self.render_gene
 {%- block abi_methods %}
     fn {{dtor_abi}}(this : *mut {{type_name}});
 {% endblock -%}
-
-{%- block impl_generics -%}
-{{self.render_generic_lifetimes()}}
-{%- endblock -%}

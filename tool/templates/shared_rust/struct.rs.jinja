@@ -1,14 +1,7 @@
 {% extends "base.rs.jinja" %}
-{%- macro draw_formatted_lifetimes(lifetimes) -%}
-
-{%- if lifetimes.len() > 0 -%}
-<{%- for lt in lifetimes -%} '{{lt}} {%- if !loop.last -%}, {% endif -%} {%- endfor -%}>
-
-{%- endif -%}
-{%- endmacro -%}
 {%- macro draw_conversion(from, to, to_func) -%}
-impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{from}}{%- call draw_formatted_lifetimes(lifetimes) -%}> for {{to}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
-    fn from(value: {{from}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> Self {
+impl {{- self.generic_lifetimes() }} From<{{from}}{{- self.generic_lifetimes() -}}> for {{to}}{{- self.generic_lifetimes() -}} {
+    fn from(value: {{from}}{{- self.generic_lifetimes() -}}) -> Self {
         {{type_name}}Abi::{{to_func}}(value)
     }
 }
@@ -17,7 +10,7 @@ impl {%- call draw_formatted_lifetimes(lifetimes) %} From<{{from}}{%- call draw_
 {%- block type_def -%}
 pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
 
-{%- call draw_formatted_lifetimes(lifetimes) -%}
+{{- self.generic_lifetimes() -}}
 
 {%- if fields.len() > 0 %} {
     {%- for f in fields %}
@@ -27,14 +20,14 @@ pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
 
 #[repr(C)]
 {# Option<> and DiplomatStrSlice are two types that we don't want to expose to the user, so we create an ABI type for conversion: -#}
-pub(crate) struct {{ type_name }}Abi {%- call draw_formatted_lifetimes(lifetimes) -%} {%- if fields.len() > 0 %} {
+pub(crate) struct {{ type_name }}Abi {{- self.generic_lifetimes() -}} {%- if fields.len() > 0 %} {
     {%- for f in fields %}
     {{f.name}} : {{f.type_info.render_with_override(lifetime_env, f.abi_info)}},
     {%- endfor %}
 } {%- else -%};{%- endif %}
 
-impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call draw_formatted_lifetimes(lifetimes) %} {
-    pub(crate) fn from_ffi(self) -> {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
+impl {{- self.generic_lifetimes() }} {{type_name}}Abi {{- self.generic_lifetimes() }} {
+    pub(crate) fn from_ffi(self) -> {{type_name}}{{- self.generic_lifetimes() -}} {
         {{type_name}} {
             {% for f in fields %}
             {{f.name}}: {{f.wrap_convert()}},
@@ -42,7 +35,7 @@ impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call d
         }
     }
 
-    pub (crate) fn to_ffi(this : {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%}) -> {{type_name}}Abi{%- call draw_formatted_lifetimes(lifetimes) -%} {
+    pub (crate) fn to_ffi(this : {{type_name}}{{- self.generic_lifetimes() -}}) -> {{type_name}}Abi{{- self.generic_lifetimes() -}} {
         {{type_name}}Abi {
             {% for f in fields %}
             {{f.name}} : {{f.wrap_c_convert()}},
@@ -57,8 +50,4 @@ impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call d
 
 {% call draw_conversion(abi_name, type_name, "from_ffi") %}
 
-{%- endblock -%}
-
-{%- block impl_generics -%}
-{%- call draw_formatted_lifetimes(lifetimes) -%}
 {%- endblock -%}

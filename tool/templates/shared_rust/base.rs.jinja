@@ -5,7 +5,7 @@ use super::{{i}};
 {%- block type_def -%}
 {%- endblock %}
 
-impl {%- block impl_generics -%}{%- endblock %} {{type_name}} {%- block impl_generics -%}{%- endblock %} {
+impl {{- self.generic_lifetimes() }} {{type_name}} {{- self.generic_lifetimes()}} {
 {%- for m in methods %}
     {{ m.as_function_impl()|indent(4) }}
 {% endfor %}
