@@ -18,7 +18,7 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
     let mut write = crate::DiplomatWrite::new();
     let write_mut = &mut write;
     {% endif -%}
-    let ret = unsafe { {{abi_name}}(
+    {%- if !matches!(self.return_info, ReturnType::Infallible(SuccessType::Unit | SuccessType::Write)) -%} let ret = {% endif -%} unsafe { {{abi_name}}(
         {%- if let Some(s) = self_param -%} {{s.wrap_convert()}} {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
         {%- for p in params -%} 
