@@ -5,7 +5,7 @@ pub struct StructWithSlices<'a> {
 }
 
 impl<'a> StructWithSlices<'a> {
-    pub fn return_last<'a>(self) -> String {
+    pub fn return_last(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
         let ret = unsafe { StructWithSlices_return_last(self, write_mut) };
