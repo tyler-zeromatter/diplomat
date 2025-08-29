@@ -217,16 +217,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match ty {
             Type::Slice(sl) => match sl {
-                Slice::Str(_, enc) => {
-                    let maybe_enc = if let diplomat_core::hir::StringEncoding::Utf8 = enc {
-                        // From String or &str -> &[u8]:
-                        ".as_bytes()"
-                    } else {
-                        ""
-                    };
-
-                    // Maybe(&str ->) &[u8] -> DiplomatStrSlice
-                    Some(("".into(), format!("{maybe_enc}.into()").into()))
+                Slice::Str(..) => {
+                    //  &str|&[u8] -> DiplomatStrSlice
+                    Some(("".into(), format!(".into()").into()))
                 }
                 // From &[String|&[u8]|&[u16]] -> DiplomatSlice<DiplomatStrSlice>
                 // Slice::Strs(enc) => {
@@ -291,10 +284,10 @@ impl<'tcx> FunctionInfo<'tcx> {
     ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match out {
             Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
-                // ABI returns DiplomatSliceStr, we want -> &[u8] -> &str
+                // From DiplomatUtf8SliceStr -> &str
                 StringEncoding::Utf8 => Some((
-                    "unsafe { str::from_utf8_unchecked(".into(),
-                    ".into()).into()}".into(),
+                    "".into(),
+                    ".into()".into(),
                 )),
                 // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
                 _ => Some(("".into(), ".into()".into())),

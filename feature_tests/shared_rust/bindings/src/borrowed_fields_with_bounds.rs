@@ -20,7 +20,7 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBoundsAbi<'a, 'b, 'c> {
             
             field_b: self.field_b.into(),
             
-            field_c: unsafe { str::from_utf8_unchecked(self.field_c.into()).into()},
+            field_c: self.field_c.into(),
             
         }
     }
@@ -32,7 +32,7 @@ impl<'a, 'b, 'c> BorrowedFieldsWithBoundsAbi<'a, 'b, 'c> {
             
             field_b : this.field_b.into(),
             
-            field_c : this.field_c.as_bytes().into(),
+            field_c : this.field_c.into(),
             
         }
     }
@@ -52,7 +52,7 @@ impl<'a, 'b, 'c> From<BorrowedFieldsWithBoundsAbi<'a, 'b, 'c>> for BorrowedField
 
 impl<'a, 'b, 'c> BorrowedFieldsWithBounds<'a, 'b, 'c> {
     pub fn from_foo_and_strings<'x, 'y: 'x, 'z: 'y + 'x>(foo : &'x Foo<'y>, dstr16_x : &'x [u16], utf8_str_z : &'z str) -> BorrowedFieldsWithBounds<'x, 'y, 'z> {
-        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.as_bytes().into()) };
+        let ret = unsafe { BorrowedFieldsWithBounds_from_foo_and_strings(foo, dstr16_x.into(), utf8_str_z.into()) };
         
         ret.from_ffi()
     
