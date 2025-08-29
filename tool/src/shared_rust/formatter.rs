@@ -1,8 +1,7 @@
 use std::borrow::Cow;
 
 use diplomat_core::hir::{
-    EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, SymbolId,
-    TypeContext,
+    EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, StringEncoding, SymbolId, TypeContext
 };
 use itertools::Itertools;
 
@@ -188,5 +187,23 @@ impl<'tcx> RustFormatter<'tcx> {
 
     pub(super) fn fmt_struct_abi_name(&self, st: Cow<'tcx, str>) -> Cow<'tcx, str> {
         format!("{st}Abi").into()
+    }
+
+    pub(super) fn fmt_slice_abi_name(enc : &StringEncoding) -> &'static str {
+        match enc {
+            StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
+            StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
+            StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
+            _ => panic!("Unrecognized encoding type {enc:?}"),
+        }
+    }
+    
+    pub(super) fn fmt_owned_slice_abi_name(enc : &StringEncoding) -> &'static str {
+        match enc {
+            StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8OwnedStrSlice",
+            StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatOwnedStrSlice",
+            StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatOwnedStr16Slice",
+            _ => panic!("Unrecognized encoding type {enc:?}"),
+        }
     }
 }

@@ -8,7 +8,7 @@ use diplomat_core::hir::{
 
 use crate::shared_rust::{
     formatter::{TypeInfo, TypeInfoWrapper},
-    FileGenContext,
+    FileGenContext, RustFormatter,
 };
 
 /// Information need to generate a single function. Used for both the ABI version of the function (`extern "C"`) and the Rust version of the function (`pub fn`).
@@ -222,9 +222,14 @@ impl<'tcx> FunctionInfo<'tcx> {
                     Some(("".into(), format!(".into()").into()))
                 }
                 // From &[String|&[u8]|&[u16]] -> DiplomatSlice<DiplomatStrSlice>
-                // Slice::Strs(enc) => {
+                Slice::Strs(enc) => {
+                    let name = RustFormatter::fmt_slice_abi_name(enc);
 
-                // }
+                    // FIXME: Incredibly hacky.
+                    let convert = format!(".iter().map(|u| {{ {name}::from(*u) }}).collect::<Vec<_>>().as_slice().into()");
+
+                    Some(("".into(), convert.into()))
+                }
                 _ => None,
             },
             Type::DiplomatOption(ok) => {
@@ -458,26 +463,10 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
             Type::Slice(sl) => match sl {
                 Slice::Str(lt, enc) => {
-                    let name = match enc {
-                        StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
-                        StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
-                        StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
-                        _ => panic!("Unrecognized encoding type {enc:?}"),
-                    };
-
                     let name = if lt.is_none() {
-                        match enc {
-                            StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8OwnedStrSlice",
-                            StringEncoding::UnvalidatedUtf8 => {
-                                "diplomat_runtime::DiplomatOwnedStrSlice"
-                            }
-                            StringEncoding::UnvalidatedUtf16 => {
-                                "diplomat_runtime::DiplomatOwnedStr16Slice"
-                            }
-                            _ => panic!("Unrecognized encoding type {enc:?}"),
-                        }
+                        RustFormatter::fmt_owned_slice_abi_name(enc)
                     } else {
-                        name
+                        RustFormatter::fmt_slice_abi_name(enc)
                     };
 
                     ABITypeInfo {
@@ -490,12 +479,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                     }
                 }
                 Slice::Strs(enc) => {
-                    let name = match enc {
-                        StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
-                        StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
-                        StringEncoding::UnvalidatedUtf16 => "diplomat_runtime::DiplomatStr16Slice",
-                        _ => panic!("Unrecognized encoding type {enc:?}"),
-                    };
+                    let name = RustFormatter::fmt_slice_abi_name(enc);
 
                     let name = format!("diplomat_runtime::DiplomatSlice<{name}>");
                     ABITypeInfo {
