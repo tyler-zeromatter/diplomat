@@ -7,7 +7,7 @@ impl Drop for OptionOpaqueChar {
 }
 
 impl OptionOpaqueChar {
-    pub fn assert_char<'anon_0>(&'anon_0 self, ch : diplomat_runtime::DiplomatChar) {
+    pub fn assert_char<'anon_0>(&'anon_0 self, ch : char) {
         let ret = unsafe { OptionOpaqueChar_assert_char(self, ch) };
         
     }
@@ -17,7 +17,7 @@ impl OptionOpaqueChar {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OptionOpaqueChar_assert_char<'anon_0>(this: &'anon_0 OptionOpaqueChar, ch : diplomat_runtime::DiplomatChar);
+    fn OptionOpaqueChar_assert_char<'anon_0>(this: &'anon_0 OptionOpaqueChar, ch : char);
 
     fn OptionOpaqueChar_destroy(this : *mut OptionOpaqueChar);
 }
