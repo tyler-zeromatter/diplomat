@@ -10,7 +10,7 @@ impl ScalarPairWithPaddingAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : ScalarPairWithPadding) -> ScalarPairWithPaddingAbi{
+    pub (crate) fn to_ffi(_this : ScalarPairWithPadding) -> ScalarPairWithPaddingAbi{
         ScalarPairWithPaddingAbi {
             
         }

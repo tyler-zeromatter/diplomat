@@ -10,7 +10,7 @@ impl StructArithmeticAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : StructArithmetic) -> StructArithmeticAbi{
+    pub (crate) fn to_ffi(_this : StructArithmetic) -> StructArithmeticAbi{
         StructArithmeticAbi {
             
         }

@@ -10,7 +10,7 @@ impl TraitTestingStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : TraitTestingStruct) -> TraitTestingStructAbi{
+    pub (crate) fn to_ffi(_this : TraitTestingStruct) -> TraitTestingStructAbi{
         TraitTestingStructAbi {
             
         }

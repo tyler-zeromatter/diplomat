@@ -10,7 +10,7 @@ impl CallbackTestingStructAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : CallbackTestingStruct) -> CallbackTestingStructAbi{
+    pub (crate) fn to_ffi(_this : CallbackTestingStruct) -> CallbackTestingStructAbi{
         CallbackTestingStructAbi {
             
         }

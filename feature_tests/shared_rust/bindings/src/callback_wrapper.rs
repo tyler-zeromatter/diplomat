@@ -10,7 +10,7 @@ impl CallbackWrapperAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : CallbackWrapper) -> CallbackWrapperAbi{
+    pub (crate) fn to_ffi(_this : CallbackWrapper) -> CallbackWrapperAbi{
         CallbackWrapperAbi {
             
         }

@@ -10,7 +10,7 @@ impl MyZstAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : MyZst) -> MyZstAbi{
+    pub (crate) fn to_ffi(_this : MyZst) -> MyZstAbi{
         MyZstAbi {
             
         }
