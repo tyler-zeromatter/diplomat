@@ -10,7 +10,7 @@ use crate::{
     config::Config,
     shared_rust::{
         formatter::{TypeInfo, TypeInfoWrapper},
-        func::FunctionInfo,
+        func::{ABITypeInfo, FunctionInfo},
         RustFormatter,
     },
 };
@@ -68,9 +68,24 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         ty: &'tcx StructDef<P>,
         is_out: bool,
     ) -> impl TypeTemplate<'tcx> {
+        /// Like [`super::func::ParamInfo`], and re-uses a lot of the same methods that `ParamInfo` does for generation.
         struct FieldInfo<'a> {
             type_info: TypeInfo<'a>,
+            abi_info : ABITypeInfo<'a>,
             name: Cow<'a, str>,
+            conversion: Option<(Cow<'a, str>, Cow<'a, str>)>,
+        }
+
+        impl<'a> FieldInfo<'a> {
+            fn wrap_convert(&self) -> Cow<'a, str> {
+                let (pre_convert, post_convert) = if let Some((pre, post)) = &self.conversion {
+                    (pre.clone(), post.clone())
+                } else {
+                    ("".into(), "".into())
+                };
+
+                format!("{pre_convert}self.{}{post_convert}", self.name).into()
+            }
         }
 
         #[derive(Template)]
@@ -99,6 +114,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             .iter()
             .map(|f| FieldInfo {
                 type_info: self.gen_type_info(&f.ty),
+                abi_info: FunctionInfo::gen_abi_type_info(&mut self, &f.ty),
+                conversion: FunctionInfo::out_type_conversion(&f.ty),
                 name: f.name.as_str().into(),
             })
             .collect();
