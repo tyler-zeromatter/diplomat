@@ -38,6 +38,8 @@ pub(super) trait TypeTemplate<'a> {
     fn mod_name(&self) -> String;
     /// TODO: Remove this, this is only used for OutStructs and is broken. Everything should be `pub`.
     fn crate_vis(&self) -> Option<String>;
+    /// Lifetimes on the impl block
+    /// TODO: Add a bounded_generic_lifetime function as well.
     fn generic_lifetimes(&self) -> String;
 }
 
