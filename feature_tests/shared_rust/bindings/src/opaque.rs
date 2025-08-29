@@ -67,7 +67,6 @@ impl Opaque {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

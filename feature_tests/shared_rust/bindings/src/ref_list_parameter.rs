@@ -6,8 +6,7 @@ impl Drop for RefListParameter {
     }
 }
 
-impl RefListParameter {
-}
+impl RefListParameter {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

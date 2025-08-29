@@ -6,8 +6,7 @@ impl Drop for RenamedComparable {
     }
 }
 
-impl RenamedComparable {
-}
+impl RenamedComparable {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

@@ -6,8 +6,7 @@ impl Drop for RenamedNested {
     }
 }
 
-impl RenamedNested {
-}
+impl RenamedNested {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

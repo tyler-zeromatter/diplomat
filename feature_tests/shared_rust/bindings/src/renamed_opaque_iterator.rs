@@ -10,8 +10,7 @@ impl<'a> Drop for RenamedOpaqueIterator<'a> {
     }
 }
 
-impl<'a> RenamedOpaqueIterator<'a> {
-}
+impl<'a> RenamedOpaqueIterator<'a> {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

@@ -6,8 +6,7 @@ impl Drop for RenamedOpaqueIterable {
     }
 }
 
-impl RenamedOpaqueIterable {
-}
+impl RenamedOpaqueIterable {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

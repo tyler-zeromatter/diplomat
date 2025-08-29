@@ -62,7 +62,6 @@ impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
         ret.from_ffi()
     
     }
-
 }
 
 #[link(name = "somelib")]

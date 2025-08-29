@@ -59,7 +59,6 @@ impl<'a> Foo<'a> {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

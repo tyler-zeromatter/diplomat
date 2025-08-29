@@ -53,7 +53,6 @@ impl<'a> StructWithSlices<'a> {
         out_str
     
     }
-
 }
 
 #[link(name = "somelib")]

@@ -29,8 +29,7 @@ impl From<MyZstAbi> for MyZst{
     }
 }
 
-impl MyZst {
-}
+impl MyZst {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

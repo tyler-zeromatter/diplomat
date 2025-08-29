@@ -29,8 +29,7 @@ impl From<TraitTestingStructAbi> for TraitTestingStruct{
     }
 }
 
-impl TraitTestingStruct {
-}
+impl TraitTestingStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

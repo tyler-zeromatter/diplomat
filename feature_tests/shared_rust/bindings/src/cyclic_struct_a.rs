@@ -76,7 +76,6 @@ impl CyclicStructA {
         out_str
     
     }
-
 }
 
 #[link(name = "somelib")]

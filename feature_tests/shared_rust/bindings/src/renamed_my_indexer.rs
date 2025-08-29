@@ -6,8 +6,7 @@ impl Drop for RenamedMyIndexer {
     }
 }
 
-impl RenamedMyIndexer {
-}
+impl RenamedMyIndexer {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

@@ -6,8 +6,7 @@ impl Drop for RenamedOpaqueArithmetic {
     }
 }
 
-impl RenamedOpaqueArithmetic {
-}
+impl RenamedOpaqueArithmetic {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

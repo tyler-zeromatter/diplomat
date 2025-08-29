@@ -57,7 +57,6 @@ impl RenamedStructWithAttrs {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

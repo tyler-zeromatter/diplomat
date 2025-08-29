@@ -6,8 +6,7 @@ impl Drop for Float64VecError {
     }
 }
 
-impl Float64VecError {
-}
+impl Float64VecError {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

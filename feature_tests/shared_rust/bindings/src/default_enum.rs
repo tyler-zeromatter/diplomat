@@ -11,7 +11,6 @@ impl DefaultEnum {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

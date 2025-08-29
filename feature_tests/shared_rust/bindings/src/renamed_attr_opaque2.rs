@@ -6,8 +6,7 @@ impl Drop for RenamedAttrOpaque2 {
     }
 }
 
-impl RenamedAttrOpaque2 {
-}
+impl RenamedAttrOpaque2 {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

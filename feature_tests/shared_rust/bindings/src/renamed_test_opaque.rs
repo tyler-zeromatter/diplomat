@@ -6,8 +6,7 @@ impl Drop for RenamedTestOpaque {
     }
 }
 
-impl RenamedTestOpaque {
-}
+impl RenamedTestOpaque {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

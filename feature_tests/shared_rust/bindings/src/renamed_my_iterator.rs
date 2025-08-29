@@ -10,8 +10,7 @@ impl<'a> Drop for RenamedMyIterator<'a> {
     }
 }
 
-impl<'a> RenamedMyIterator<'a> {
-}
+impl<'a> RenamedMyIterator<'a> {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

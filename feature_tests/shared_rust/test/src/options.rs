@@ -13,7 +13,7 @@ mod tests {
         // TODO: Out structs are not done yet.
         // I think crate_vis will need to be removed from `TypeTemplate`, and instead the fields will have to be made private to anything outside of the crate.
         // Then we'll just need to make getter functions for all of the fields.
-        // let str = OptionOpaque::new_struct();
+        let str = OptionOpaque::new_struct();
         
         // let sn = OptionOpaque::new_struct_nones();
     }

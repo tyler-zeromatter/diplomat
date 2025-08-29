@@ -22,7 +22,6 @@ impl MyEnum {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

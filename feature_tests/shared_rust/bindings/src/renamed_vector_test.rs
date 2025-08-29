@@ -32,7 +32,6 @@ impl RenamedVectorTest {
         unsafe { namespace_VectorTest_push(self, value) };
         
     }
-
 }
 
 #[link(name = "somelib")]

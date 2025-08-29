@@ -60,7 +60,6 @@ impl MyStructContainingAnOption {
         ret.from_ffi()
     
     }
-
 }
 
 #[link(name = "somelib")]

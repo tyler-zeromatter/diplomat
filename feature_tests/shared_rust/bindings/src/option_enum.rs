@@ -4,8 +4,7 @@ pub enum OptionEnum {
     Bar = 1
 }
 
-impl OptionEnum {
-}
+impl OptionEnum {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

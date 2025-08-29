@@ -30,7 +30,6 @@ impl OpaqueThin {
         out_str
     
     }
-
 }
 
 #[link(name = "somelib")]

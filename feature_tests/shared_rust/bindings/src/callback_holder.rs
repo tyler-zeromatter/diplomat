@@ -6,8 +6,7 @@ impl Drop for CallbackHolder {
     }
 }
 
-impl CallbackHolder {
-}
+impl CallbackHolder {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

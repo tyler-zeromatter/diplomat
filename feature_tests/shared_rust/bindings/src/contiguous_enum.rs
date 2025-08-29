@@ -6,8 +6,7 @@ pub enum ContiguousEnum {
     F = 3
 }
 
-impl ContiguousEnum {
-}
+impl ContiguousEnum {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
