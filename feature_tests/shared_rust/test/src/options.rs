@@ -47,7 +47,6 @@ mod tests {
         assert!(strct.b.is_none());
         assert!(matches!(strct.c, Some(OptionEnum::Bar)));
 
-        // TODO: This is failing because structs need a `FromFFI` function (mostly to convert `DiplomatOption` to `Option` and for any other types that need a conversion).
         let strct = OptionOpaque::returns_option_input_struct();
         assert_eq!(strct.a, Some(6));
         assert!(strct.b.is_none());
