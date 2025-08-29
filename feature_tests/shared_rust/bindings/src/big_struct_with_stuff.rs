@@ -10,7 +10,7 @@ impl BigStructWithStuffAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : BigStructWithStuff) -> BigStructWithStuffAbi{
+    pub (crate) fn to_ffi(_this : BigStructWithStuff) -> BigStructWithStuffAbi{
         BigStructWithStuffAbi {
             
         }

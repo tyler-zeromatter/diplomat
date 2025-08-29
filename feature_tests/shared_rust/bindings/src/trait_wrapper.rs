@@ -10,7 +10,7 @@ impl TraitWrapperAbi {
         }
     }
 
-    pub (crate) fn to_ffi(this : TraitWrapper) -> TraitWrapperAbi{
+    pub (crate) fn to_ffi(_this : TraitWrapper) -> TraitWrapperAbi{
         TraitWrapperAbi {
             
         }
