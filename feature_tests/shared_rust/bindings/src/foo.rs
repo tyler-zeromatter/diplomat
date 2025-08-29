@@ -32,6 +32,13 @@ impl<'a> Foo<'a> {
     
     }
 
+    pub fn new_static(x : &'static [u8]) -> Box<Foo<'a>> {
+        let ret = unsafe { Foo_new_static(x.into()) };
+        
+        ret
+    
+    }
+
     pub fn as_returning<'anon_0>(&'anon_0 self) -> BorrowedFieldsReturning<'a> {
         let ret = unsafe { Foo_as_returning(self) };
         
@@ -61,6 +68,8 @@ unsafe extern "C" {
     fn Foo_new<'a>(x : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
 
     fn Foo_get_bar<'a: 'b, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
+
+    fn Foo_new_static<'a>(x : diplomat_runtime::DiplomatStrSlice<'static>) -> Box<Foo<'a>>;
 
     fn Foo_as_returning<'a, 'anon_0>(this: &'anon_0 Foo) -> BorrowedFieldsReturningAbi<'a>;
 
