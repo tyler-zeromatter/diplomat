@@ -1,22 +1,41 @@
 use super::CyclicStructA;
+use super::cyclic_struct_a::CyclicStructAAbi;
 pub struct CyclicStructB {
     pub field: u8,
 }
 
 #[repr(C)]
 pub(crate) struct CyclicStructBAbi {
-    
     field : u8,
-    
 }
 
 impl CyclicStructBAbi {
-    fn from_ffi(self) -> CyclicStructB{
+    pub(crate) fn from_ffi(self) -> CyclicStructB{
         CyclicStructB {
             
-                field: self.field,
+            field: self.field,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : CyclicStructB) -> CyclicStructBAbi{
+        CyclicStructBAbi {
+            
+            field : this.field,
+            
+        }
+    }
+}
+
+impl From<CyclicStructB> for CyclicStructBAbi{
+    fn from(value: CyclicStructB) -> Self {
+        CyclicStructBAbi::to_ffi(value)
+    }
+}
+
+impl From<CyclicStructBAbi> for CyclicStructB{
+    fn from(value: CyclicStructBAbi) -> Self {
+        value.from_ffi()
     }
 }
 

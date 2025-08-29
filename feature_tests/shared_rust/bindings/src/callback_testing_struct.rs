@@ -4,10 +4,28 @@ pub struct CallbackTestingStruct;
 pub(crate) struct CallbackTestingStructAbi;
 
 impl CallbackTestingStructAbi {
-    fn from_ffi(self) -> CallbackTestingStruct{
+    pub(crate) fn from_ffi(self) -> CallbackTestingStruct{
         CallbackTestingStruct {
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : CallbackTestingStruct) -> CallbackTestingStructAbi{
+        CallbackTestingStructAbi {
+            
+        }
+    }
+}
+
+impl From<CallbackTestingStruct> for CallbackTestingStructAbi{
+    fn from(value: CallbackTestingStruct) -> Self {
+        CallbackTestingStructAbi::to_ffi(value)
+    }
+}
+
+impl From<CallbackTestingStructAbi> for CallbackTestingStruct{
+    fn from(value: CallbackTestingStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 

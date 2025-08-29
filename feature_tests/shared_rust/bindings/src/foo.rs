@@ -2,6 +2,9 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
+use super::borrowed_fields::BorrowedFieldsAbi;
+use super::borrowed_fields_returning::BorrowedFieldsReturningAbi;
+use super::borrowed_fields_with_bounds::BorrowedFieldsWithBoundsAbi;
 use std::marker::PhantomData;
 
 pub struct Foo<'a> {
@@ -37,14 +40,14 @@ impl<'a> Foo<'a> {
     }
 
     pub fn extract_from_fields(fields : BorrowedFields<'a>) -> Box<Foo<'a>> {
-        let ret = unsafe { Foo_extract_from_fields(fields) };
+        let ret = unsafe { Foo_extract_from_fields(fields.into()) };
         
         ret
     
     }
 
     pub fn extract_from_bounds<'x, 'y: 'a + 'x, 'z: 'y + 'a + 'x>(bounds : BorrowedFieldsWithBounds<'x, 'y, 'z>, another_string : &'a [u8]) -> Box<Foo<'a>> {
-        let ret = unsafe { Foo_extract_from_bounds(bounds, another_string.into()) };
+        let ret = unsafe { Foo_extract_from_bounds(bounds.into(), another_string.into()) };
         
         ret
     

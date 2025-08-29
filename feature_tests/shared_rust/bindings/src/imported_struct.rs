@@ -6,22 +6,41 @@ pub struct ImportedStruct {
 
 #[repr(C)]
 pub(crate) struct ImportedStructAbi {
-    
     foo : UnimportedEnum,
-    
     count : u8,
-    
 }
 
 impl ImportedStructAbi {
-    fn from_ffi(self) -> ImportedStruct{
+    pub(crate) fn from_ffi(self) -> ImportedStruct{
         ImportedStruct {
             
-                foo: self.foo,
+            foo: self.foo,
             
-                count: self.count,
+            count: self.count,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : ImportedStruct) -> ImportedStructAbi{
+        ImportedStructAbi {
+            
+            foo : this.foo,
+            
+            count : this.count,
+            
+        }
+    }
+}
+
+impl From<ImportedStruct> for ImportedStructAbi{
+    fn from(value: ImportedStruct) -> Self {
+        ImportedStructAbi::to_ffi(value)
+    }
+}
+
+impl From<ImportedStructAbi> for ImportedStruct{
+    fn from(value: ImportedStructAbi) -> Self {
+        value.from_ffi()
     }
 }
 

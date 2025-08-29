@@ -1,6 +1,8 @@
 use super::OptionEnum;
 use super::OptionInputStruct;
 use super::OptionStruct;
+use super::option_input_struct::OptionInputStructAbi;
+use super::option_struct::OptionStructAbi;
 pub struct OptionOpaque;
 
 impl Drop for OptionOpaque {
@@ -114,7 +116,7 @@ impl OptionOpaque {
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
-        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.into(), sentinel) };
+        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.map(|ok| { ok.into() }).into(), sentinel) };
         
         ret.into_converted_option().map(|ok : OptionInputStructAbi| { ok.from_ffi() })
     

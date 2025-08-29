@@ -5,22 +5,41 @@ pub struct StructWithSlices<'a> {
 
 #[repr(C)]
 pub(crate) struct StructWithSlicesAbi<'a> {
-    
     first : diplomat_runtime::DiplomatStrSlice<'a>,
-    
     second : &'a [u16],
-    
 }
 
 impl<'a> StructWithSlicesAbi<'a> {
-    fn from_ffi(self) -> StructWithSlices<'a>{
+    pub(crate) fn from_ffi(self) -> StructWithSlices<'a>{
         StructWithSlices {
             
-                first: self.first.into(),
+            first: self.first.into(),
             
-                second: self.second,
+            second: self.second,
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : StructWithSlices<'a>) -> StructWithSlicesAbi<'a>{
+        StructWithSlicesAbi {
+            
+            first : this.first.into(),
+            
+            second : this.second,
+            
+        }
+    }
+}
+
+impl<'a> From<StructWithSlices<'a>> for StructWithSlicesAbi<'a>{
+    fn from(value: StructWithSlices<'a>) -> Self {
+        StructWithSlicesAbi::to_ffi(value)
+    }
+}
+
+impl<'a> From<StructWithSlicesAbi<'a>> for StructWithSlices<'a>{
+    fn from(value: StructWithSlicesAbi<'a>) -> Self {
+        value.from_ffi()
     }
 }
 

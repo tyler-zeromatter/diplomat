@@ -2,6 +2,8 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsWithBounds;
 use super::Foo;
+use super::borrowed_fields::BorrowedFieldsAbi;
+use super::borrowed_fields_with_bounds::BorrowedFieldsWithBoundsAbi;
 pub struct NestedBorrowedFields<'x, 'y, 'z> {
     pub fields: BorrowedFields<'x>,
     pub bounds: BorrowedFieldsWithBounds<'x, 'y, 'y>,
@@ -10,26 +12,46 @@ pub struct NestedBorrowedFields<'x, 'y, 'z> {
 
 #[repr(C)]
 pub(crate) struct NestedBorrowedFieldsAbi<'x, 'y, 'z> {
-    
     fields : BorrowedFieldsAbi<'x>,
-    
     bounds : BorrowedFieldsWithBoundsAbi<'x, 'y, 'y>,
-    
     bounds2 : BorrowedFieldsWithBoundsAbi<'z, 'z, 'z>,
-    
 }
 
 impl<'x, 'y, 'z> NestedBorrowedFieldsAbi<'x, 'y, 'z> {
-    fn from_ffi(self) -> NestedBorrowedFields<'x, 'y, 'z>{
+    pub(crate) fn from_ffi(self) -> NestedBorrowedFields<'x, 'y, 'z>{
         NestedBorrowedFields {
             
-                fields: self.fields.from_ffi(),
+            fields: self.fields.from_ffi(),
             
-                bounds: self.bounds.from_ffi(),
+            bounds: self.bounds.from_ffi(),
             
-                bounds2: self.bounds2.from_ffi(),
+            bounds2: self.bounds2.from_ffi(),
             
         }
+    }
+
+    pub (crate) fn to_ffi(this : NestedBorrowedFields<'x, 'y, 'z>) -> NestedBorrowedFieldsAbi<'x, 'y, 'z>{
+        NestedBorrowedFieldsAbi {
+            
+            fields : this.fields.into(),
+            
+            bounds : this.bounds.into(),
+            
+            bounds2 : this.bounds2.into(),
+            
+        }
+    }
+}
+
+impl<'x, 'y, 'z> From<NestedBorrowedFields<'x, 'y, 'z>> for NestedBorrowedFieldsAbi<'x, 'y, 'z>{
+    fn from(value: NestedBorrowedFields<'x, 'y, 'z>) -> Self {
+        NestedBorrowedFieldsAbi::to_ffi(value)
+    }
+}
+
+impl<'x, 'y, 'z> From<NestedBorrowedFieldsAbi<'x, 'y, 'z>> for NestedBorrowedFields<'x, 'y, 'z>{
+    fn from(value: NestedBorrowedFieldsAbi<'x, 'y, 'z>) -> Self {
+        value.from_ffi()
     }
 }
 
