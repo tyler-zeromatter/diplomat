@@ -216,11 +216,13 @@ impl<'tcx> FunctionInfo<'tcx> {
                         ""
                     };
 
+                    // Maybe(&str ->) &[u8] -> DiplomatStrSlice
                     Some(("".into(), format!("{maybe_enc}.into()").into()))
                 }
                 _ => None,
             },
             Type::DiplomatOption(ok) => {
+                // Option<T> -> DiplomatOption<U>
                 let maybe_map = if let Some((pre, post)) = Self::param_conversion(ok) {
                     format!(".map(|ok| {{ {pre}ok{post} }})")
                 } else {
@@ -229,6 +231,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 Some(("".into(), format!("{maybe_map}.into()").into()))
             },
             Type::Struct(..) => { 
+                // Struct -> StructAbi
                 Some(("".into(), ".into()".into()))
             },
             _ => None,
@@ -283,7 +286,9 @@ impl<'tcx> FunctionInfo<'tcx> {
                 // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
                 _ => Some(("".into(), ".into()".into())),
             },
+            // StructAbi -> Struct
             Type::Struct(..) => Some(("".into(), ".from_ffi()".into())),
+            // DiplomatOption<T> -> Option<U>
             Type::DiplomatOption(..) => Some(("".into(), ".into_converted_option()".into())),
             _ => None,
         }
