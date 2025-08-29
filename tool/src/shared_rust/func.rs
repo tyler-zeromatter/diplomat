@@ -2,8 +2,7 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
-    StringEncoding, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId,
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
 };
 
 use crate::shared_rust::{
@@ -257,8 +256,8 @@ impl<'tcx> FunctionInfo<'tcx> {
         }
     }
 
-    /// Get the C ABI -> Rust conversion for a return type.
-    fn out_type_conversion<P: TyPosition>(
+    /// Get the C ABI -> Rust conversion for either a return type or a struct's fields.
+    pub(super) fn out_type_conversion<P: TyPosition>(
         out: &Type<P>,
     ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match out {
@@ -271,6 +270,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
                 _ => Some(("".into(), ".into()".into())),
             },
+            Type::Struct(..) => Some(("".into(), ".from_ffi()".into())),
             _ => None,
         }
     }
@@ -411,7 +411,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// Given any type, generate C ABI info.
-    fn gen_abi_type_info<P: TyPosition>(
+    pub(super) fn gen_abi_type_info<P: TyPosition>(
         ctx: &mut FileGenContext,
         ty: &Type<P>,
     ) -> ABITypeInfo<'tcx> {
@@ -464,6 +464,13 @@ impl<'tcx> FunctionInfo<'tcx> {
                 }
                 _ => ABITypeInfo::default(),
             },
+            Type::Struct(st) => {
+                let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
+                ABITypeInfo {
+                    name: Some(format!("{struct_name}Abi").into()),
+                    ..Default::default()
+                }
+            }
             _ => ABITypeInfo::default(),
         }
     }
