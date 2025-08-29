@@ -341,8 +341,14 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                         }
                     }
                     Slice::Strs(enc) => {
-                        // TODO: Need to read encoding properly.
-                        return TypeInfo::new("&[String]".into());
+                        // We perform borrows (without updating TypeInfo to reflect them), because we don't have borrow information, so we assume that this `is all elided:
+                        let inner = match enc {
+                            StringEncoding::Utf8 => "String",
+                            StringEncoding::UnvalidatedUtf8 => "&[u8]",
+                            StringEncoding::UnvalidatedUtf16 => "&[u16]",
+                            _ => panic!("Unknown encoding {enc:?}"),
+                        };
+                        return TypeInfo::new(format!("&[{inner}]").into());
                     }
                     _ => unreachable!("Unknown slice type {sl:?}"),
                 };
