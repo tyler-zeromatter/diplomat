@@ -167,8 +167,7 @@ impl<'tcx> RustFormatter<'tcx> {
 
     pub(super) fn fmt_primitive_name(&self, primitive: PrimitiveType) -> &'static str {
         match primitive {
-            // TODO: I feel like there's a better way to handle `char` than to use the diplomat runtime (which should be used for conversion only):
-            PrimitiveType::Char => "diplomat_runtime::DiplomatChar",
+            PrimitiveType::Char => "char",
             PrimitiveType::Byte => "u8",
             PrimitiveType::Ordering => "std::cmp::Ordering",
             _ => primitive.as_str(),

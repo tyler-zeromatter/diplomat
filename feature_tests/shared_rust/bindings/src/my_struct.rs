@@ -7,7 +7,7 @@ pub struct MyStruct {
     pub c: u8,
     pub d: u64,
     pub e: i32,
-    pub f: diplomat_runtime::DiplomatChar,
+    pub f: char,
     pub g: MyEnum,
 }
 
@@ -18,7 +18,7 @@ pub(crate) struct MyStructAbi {
     c : u8,
     d : u64,
     e : i32,
-    f : diplomat_runtime::DiplomatChar,
+    f : char,
     g : MyEnum,
 }
 

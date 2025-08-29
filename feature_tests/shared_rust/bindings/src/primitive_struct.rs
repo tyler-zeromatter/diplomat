@@ -1,7 +1,7 @@
 pub struct PrimitiveStruct {
     pub x: f32,
     pub a: bool,
-    pub b: diplomat_runtime::DiplomatChar,
+    pub b: char,
     pub c: i64,
     pub d: isize,
     pub e: u8,
@@ -11,7 +11,7 @@ pub struct PrimitiveStruct {
 pub(crate) struct PrimitiveStructAbi {
     x : f32,
     a : bool,
-    b : diplomat_runtime::DiplomatChar,
+    b : char,
     c : i64,
     d : isize,
     e : u8,
