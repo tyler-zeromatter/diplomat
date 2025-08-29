@@ -90,7 +90,7 @@ impl OptionOpaque {
     }
 
     pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
-        let ret = unsafe { OptionOpaque_assert_integer(self, i) };
+        unsafe { OptionOpaque_assert_integer(self, i) };
         
     }
 

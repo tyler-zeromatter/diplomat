@@ -17,7 +17,7 @@ impl Utf16Wrap {
     pub fn get_debug_str<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { Utf16Wrap_get_debug_str(self, write_mut) };
+        unsafe { Utf16Wrap_get_debug_str(self, write_mut) };
         
         let out_str = write.to_string();
         out_str

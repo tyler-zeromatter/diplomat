@@ -45,12 +45,12 @@ impl AttrOpaque1Renamed {
     }
 
     pub fn use_unnamespaced<'anon_0, 'anon_1>(&'anon_0 self, _un : &'anon_1 Unnamespaced) {
-        let ret = unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) };
+        unsafe { namespace_AttrOpaque1_use_unnamespaced(self, _un) };
         
     }
 
     pub fn use_namespaced<'anon_0>(&'anon_0 self, _n : RenamedAttrEnum) {
-        let ret = unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) };
+        unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) };
         
     }
 

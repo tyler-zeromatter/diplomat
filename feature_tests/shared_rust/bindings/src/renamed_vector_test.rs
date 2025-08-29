@@ -29,7 +29,7 @@ impl RenamedVectorTest {
     }
 
     pub fn push<'anon_0>(&'anon_0 mut self, value : f64) {
-        let ret = unsafe { namespace_VectorTest_push(self, value) };
+        unsafe { namespace_VectorTest_push(self, value) };
         
     }
 

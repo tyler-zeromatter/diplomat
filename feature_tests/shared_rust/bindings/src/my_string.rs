@@ -36,14 +36,14 @@ impl MyString {
     }
 
     pub fn set_str<'anon_0, 'anon_1>(&'anon_0 mut self, new_str : &'anon_1 [u8]) {
-        let ret = unsafe { MyString_set_str(self, new_str.into()) };
+        unsafe { MyString_set_str(self, new_str.into()) };
         
     }
 
     pub fn get_str<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { MyString_get_str(self, write_mut) };
+        unsafe { MyString_get_str(self, write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -60,7 +60,7 @@ impl MyString {
     pub fn string_transform<'anon_0>(foo : &'anon_0 str) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { MyString_string_transform(foo.as_bytes().into(), write_mut) };
+        unsafe { MyString_string_transform(foo.as_bytes().into(), write_mut) };
         
         let out_str = write.to_string();
         out_str

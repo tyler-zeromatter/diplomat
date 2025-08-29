@@ -17,7 +17,7 @@ impl MyOpaqueEnum {
     pub fn to_string<'anon_0>(&'anon_0 self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { MyOpaqueEnum_to_string(self, write_mut) };
+        unsafe { MyOpaqueEnum_to_string(self, write_mut) };
         
         let out_str = write.to_string();
         out_str
