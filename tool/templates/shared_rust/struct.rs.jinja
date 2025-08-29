@@ -51,3 +51,13 @@ impl {{- self.generic_lifetimes() }} {{type_name}}Abi {{- self.generic_lifetimes
 {% call draw_conversion(abi_name, type_name, "from_ffi") %}
 
 {%- endblock -%}
+
+{%- block extra_impl -%}
+{%- if is_out %}
+{% for f in fields %}
+    pub fn get_{{f.name}}(&self) -> &{{f.type_info.render(lifetime_env)}} {
+        &self.{{f.name}}
+    }
+{% endfor %}
+{% endif -%}
+{%- endblock -%}
