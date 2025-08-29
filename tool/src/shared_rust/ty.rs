@@ -139,8 +139,13 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
         }
 
+        let type_name = self.formatter.fmt_symbol_name(self.id);
+        // FIXME: Hacky, needs to be able to take into account namespaces (should also be in the formatter I think?)
+        let name = format!("{type_name}Abi");
+        self.imports.remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
+
         StructTemplate {
-            type_name: self.formatter.fmt_symbol_name(self.id),
+            type_name,
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
@@ -256,7 +261,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             Type::Primitive(p) => TypeInfo::new(self.formatter.fmt_primitive_name(*p).into()),
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
-                self.imports.insert(st_name.clone().into());
+                self.add_import(st_name.clone().into());
 
                 TypeInfo {
                     borrow: st.owner(),
@@ -275,7 +280,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             Type::Opaque(op) => {
                 let type_id: TypeId = op.tcx_id.into();
                 let op_name = self.formatter.fmt_symbol_name(type_id.into());
-                self.imports.insert(op_name.clone().into());
+                self.add_import(op_name.clone().into());
 
                 TypeInfo {
                     name: op_name,
@@ -346,5 +351,10 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             }
             _ => todo!(),
         }
+    }
+
+    /// TODO: Add namespacing params.
+    pub(super) fn add_import(&mut self, import : String) {
+        self.imports.insert(import.into());
     }
 }

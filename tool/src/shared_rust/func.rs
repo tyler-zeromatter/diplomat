@@ -411,6 +411,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// Given any type, generate C ABI info.
+    /// TODO: Should this be moved to [`FileGenContext`], since it's used both by [`ParamInfo`] and `FieldInfo`?
     pub(super) fn gen_abi_type_info<P: TyPosition>(
         ctx: &mut FileGenContext,
         ty: &Type<P>,
@@ -466,8 +467,11 @@ impl<'tcx> FunctionInfo<'tcx> {
             },
             Type::Struct(st) => {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
+                // FIXME: Hacky, needs to be able to take into account namespaces (should also be in the formatter I think?)
+                let name = format!("{struct_name}Abi");
+                ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(struct_name)));
                 ABITypeInfo {
-                    name: Some(format!("{struct_name}Abi").into()),
+                    name: Some(name.into()),
                     ..Default::default()
                 }
             }
