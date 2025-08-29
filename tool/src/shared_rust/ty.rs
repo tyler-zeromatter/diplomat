@@ -153,8 +153,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id);
-        // FIXME: Hacky, needs to be able to take into account namespaces (should also be in the formatter I think?)
-        let name = format!("{type_name}Abi");
+        let name = self.formatter.fmt_struct_abi_name(type_name.clone());
+        // FIXME: Hacky, needs to be able to take into account namespaces
         self.imports.remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
 
         StructTemplate {
