@@ -19,6 +19,7 @@ pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
 } {%- else -%};{%- endif %}
 
 #[repr(C)]
+{# Option<> and DiplomatStrSlice are two types that we don't want to expose to the user, so we create an ABI type for conversion: -#}
 pub(crate) struct {{ type_name }}Abi {%- call draw_formatted_lifetimes(lifetimes) -%} {%- if fields.len() > 0 %} {
     {%- for f in fields %}
     {{f.name}} : {{f.type_info.render_with_override(lifetime_env, f.abi_info)}},
