@@ -478,8 +478,8 @@ impl<'tcx> FunctionInfo<'tcx> {
             },
             Type::Struct(st) => {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
-                // FIXME: Hacky, needs to be able to take into account namespaces (should also be in the formatter I think?)
-                let name = format!("{struct_name}Abi");
+                let name = ctx.formatter.fmt_struct_abi_name(struct_name.clone()).into_owned();
+                // FIXME: Hacky, needs to be able to take into account namespaces 
                 ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(struct_name)));
                 ABITypeInfo {
                     name: Some(name.into()),
