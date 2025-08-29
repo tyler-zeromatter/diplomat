@@ -85,7 +85,7 @@ impl MyStruct {
     }
 
     pub fn into_a(self) -> u8 {
-        let ret = unsafe { MyStruct_into_a(self) };
+        let ret = unsafe { MyStruct_into_a(self.into()) };
         
         ret
     
@@ -112,7 +112,7 @@ impl MyStruct {
 unsafe extern "C" {
     fn MyStruct_new() -> MyStructAbi;
 
-    fn MyStruct_into_a(this : MyStruct) -> u8;
+    fn MyStruct_into_a(this : MyStructAbi) -> u8;
 
     fn MyStruct_returns_zst_result() -> crate::DiplomatResult<(), MyZstAbi>;
 

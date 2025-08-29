@@ -52,7 +52,7 @@ impl RenamedStructWithAttrs {
     }
 
     pub fn c(self) -> u32 {
-        let ret = unsafe { namespace_StructWithAttrs_c(self) };
+        let ret = unsafe { namespace_StructWithAttrs_c(self.into()) };
         
         ret
     
@@ -65,5 +65,5 @@ impl RenamedStructWithAttrs {
 unsafe extern "C" {
     fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> crate::DiplomatResult<RenamedStructWithAttrsAbi, ()>;
 
-    fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrs) -> u32;
+    fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrsAbi) -> u32;
 }

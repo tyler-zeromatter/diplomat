@@ -50,7 +50,7 @@ impl CyclicStructA {
     pub fn cyclic_out(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_cyclic_out(self, write_mut) };
+        let ret = unsafe { CyclicStructA_cyclic_out(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -60,7 +60,7 @@ impl CyclicStructA {
     pub fn double_cyclic_out(self, cyclic_struct_a : CyclicStructA) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_double_cyclic_out(self, cyclic_struct_a.into(), write_mut) };
+        let ret = unsafe { CyclicStructA_double_cyclic_out(self.into(), cyclic_struct_a.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -70,7 +70,7 @@ impl CyclicStructA {
     pub fn getter_out(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructA_getter_out(self, write_mut) };
+        let ret = unsafe { CyclicStructA_getter_out(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -84,9 +84,9 @@ impl CyclicStructA {
 unsafe extern "C" {
     fn CyclicStructA_get_b() -> CyclicStructBAbi;
 
-    fn CyclicStructA_cyclic_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn CyclicStructA_cyclic_out(this : CyclicStructAAbi, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn CyclicStructA_double_cyclic_out(this : CyclicStructA, cyclic_struct_a : CyclicStructAAbi, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn CyclicStructA_double_cyclic_out(this : CyclicStructAAbi, cyclic_struct_a : CyclicStructAAbi, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn CyclicStructA_getter_out(this : CyclicStructA, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn CyclicStructA_getter_out(this : CyclicStructAAbi, write_mut : &mut crate::DiplomatWrite) -> ();
 }

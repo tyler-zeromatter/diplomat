@@ -50,7 +50,7 @@ impl CyclicStructC {
     pub fn cyclic_out(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        let ret = unsafe { CyclicStructC_cyclic_out(self, write_mut) };
+        let ret = unsafe { CyclicStructC_cyclic_out(self.into(), write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -64,5 +64,5 @@ impl CyclicStructC {
 unsafe extern "C" {
     fn CyclicStructC_takes_nested_parameters(c : CyclicStructCAbi) -> CyclicStructCAbi;
 
-    fn CyclicStructC_cyclic_out(this : CyclicStructC, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn CyclicStructC_cyclic_out(this : CyclicStructCAbi, write_mut : &mut crate::DiplomatWrite) -> ();
 }
