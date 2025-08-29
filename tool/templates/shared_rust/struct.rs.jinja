@@ -20,13 +20,13 @@ pub {%- if is_out -%}(super){%- endif %} struct {{type_name -}}
 
 #[repr(C)]
 pub(crate) struct {{ type_name }}Abi {%- call draw_formatted_lifetimes(lifetimes) -%} {%- if fields.len() > 0 %} {
-    {% for f in fields %}
+    {%- for f in fields %}
     {{f.name}} : {{f.type_info.render_with_override(lifetime_env, f.abi_info)}},
-    {% endfor %}
+    {%- endfor %}
 } {%- else -%};{%- endif %}
 
 impl {%- call draw_formatted_lifetimes(lifetimes) %} {{type_name}}Abi {%- call draw_formatted_lifetimes(lifetimes) %} {
-    fn from_ffi(self) -> {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
+    pub(crate) fn from_ffi(self) -> {{type_name}}{%- call draw_formatted_lifetimes(lifetimes) -%} {
         {{type_name}} {
             {% for f in fields %}
                 {{f.name}}: {{f.wrap_convert()}},
