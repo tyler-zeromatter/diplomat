@@ -189,15 +189,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             lifetime_env: &'a LifetimeEnv,
         }
 
-        impl<'a> OpaqueTemplate<'a> {
-            fn render_generic_lifetimes(&self) -> String {
-                TypeInfo::fmt_generic_lifetimes(
-                    self.lifetime_env.lifetimes().lifetimes().collect(),
-                    self.lifetime_env,
-                )
-            }
-        }
-
         let type_name = self.formatter.fmt_symbol_name(self.id);
 
         let dtor_abi = ty
@@ -221,7 +212,10 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 None
             }
             fn generic_lifetimes(&self) -> String {
-                self.render_generic_lifetimes()
+                TypeInfo::fmt_generic_lifetimes(
+                    self.lifetime_env.lifetimes().lifetimes().collect(),
+                    self.lifetime_env,
+                )
             }
         }
 
