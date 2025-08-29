@@ -59,6 +59,10 @@ dependencies = ["test-kotlin-example", "test-kotlin-feature"]
 category = "Tests"
 dependencies = ["test-nanobind-feature"]
 
+[tasks.test-shared-rust]
+category = "Tests"
+dependencies = ["test-rust-feature"]
+
 [tasks.test-example]
 category = "Tests"
 dependencies = [
@@ -79,6 +83,7 @@ dependencies = [
     "test-dart-feature",
     "test-kotlin-feature",
     "test-nanobind-feature",
+    "test-rust-feature",
 ]
 
 [tasks.test-cpp-example]
@@ -373,6 +378,7 @@ dependencies = [
     "gen-dart-feature",
     "gen-kotlin-feature",
     "gen-nanobind-feature",
+    "gen-rust-feature",
 ]
 
 [tasks.gen-example]
@@ -404,6 +410,10 @@ dependencies = ["gen-kotlin-feature", "gen-kotlin-example"]
 [tasks.gen-js]
 category = "Code generation"
 dependencies = ["gen-js-feature", "gen-js-example"]
+
+[tasks.gen-shared-rust]
+category = "Code generation"
+dependencies = ["gen-rust-feature"]
 
 [tasks.gen-c-feature]
 category = "Code generation"
