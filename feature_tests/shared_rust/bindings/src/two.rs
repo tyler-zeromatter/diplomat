@@ -11,8 +11,7 @@ impl<'a, 'b> Drop for Two<'a, 'b> {
     }
 }
 
-impl<'a, 'b> Two<'a, 'b> {
-}
+impl<'a, 'b> Two<'a, 'b> {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

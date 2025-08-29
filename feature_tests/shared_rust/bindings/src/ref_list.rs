@@ -18,7 +18,6 @@ impl<'a> RefList<'a> {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

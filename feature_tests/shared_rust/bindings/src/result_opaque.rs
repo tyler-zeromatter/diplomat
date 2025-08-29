@@ -77,7 +77,6 @@ impl ResultOpaque {
         unsafe { ResultOpaque_assert_integer(self, i) };
         
     }
-
 }
 
 #[link(name = "somelib")]

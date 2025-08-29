@@ -68,7 +68,6 @@ impl OpaqueMutexedString {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

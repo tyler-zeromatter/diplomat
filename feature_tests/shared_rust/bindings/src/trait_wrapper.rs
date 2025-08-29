@@ -29,8 +29,7 @@ impl From<TraitWrapperAbi> for TraitWrapper{
     }
 }
 
-impl TraitWrapper {
-}
+impl TraitWrapper {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

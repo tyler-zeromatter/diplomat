@@ -11,7 +11,6 @@ impl OptionOpaqueChar {
         unsafe { OptionOpaqueChar_assert_char(self, ch) };
         
     }
-
 }
 
 #[link(name = "somelib")]

@@ -128,7 +128,6 @@ impl OptionOpaque {
         ret.from_ffi()
     
     }
-
 }
 
 #[link(name = "somelib")]

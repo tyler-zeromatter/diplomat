@@ -18,7 +18,6 @@ impl<'a> OpaqueThinIter<'a> {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

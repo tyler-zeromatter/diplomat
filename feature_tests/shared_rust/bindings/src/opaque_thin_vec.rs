@@ -43,7 +43,6 @@ impl OpaqueThinVec {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

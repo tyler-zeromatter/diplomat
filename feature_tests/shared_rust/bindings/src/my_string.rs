@@ -73,7 +73,6 @@ impl MyString {
         ret.into()
     
     }
-
 }
 
 #[link(name = "somelib")]

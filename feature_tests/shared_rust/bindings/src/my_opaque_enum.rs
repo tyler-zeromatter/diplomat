@@ -23,7 +23,6 @@ impl MyOpaqueEnum {
         out_str
     
     }
-
 }
 
 #[link(name = "somelib")]

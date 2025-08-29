@@ -96,7 +96,6 @@ impl Float64Vec {
         ret.into_converted_option()
     
     }
-
 }
 
 #[link(name = "somelib")]

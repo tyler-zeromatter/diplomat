@@ -53,7 +53,6 @@ impl AttrOpaque1Renamed {
         unsafe { namespace_AttrOpaque1_use_namespaced(self, _n) };
         
     }
-
 }
 
 #[link(name = "somelib")]

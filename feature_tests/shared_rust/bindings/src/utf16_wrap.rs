@@ -30,7 +30,6 @@ impl Utf16Wrap {
         ret.into()
     
     }
-
 }
 
 #[link(name = "somelib")]

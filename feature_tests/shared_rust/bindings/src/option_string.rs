@@ -32,7 +32,6 @@ impl OptionString {
         ret.into_converted_option().map(|ok : diplomat_runtime::DiplomatStrSlice| { ok.into() })
     
     }
-
 }
 
 #[link(name = "somelib")]

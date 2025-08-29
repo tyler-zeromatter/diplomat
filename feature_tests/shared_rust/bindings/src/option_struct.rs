@@ -58,6 +58,23 @@ impl From<OptionStructAbi> for OptionStruct{
 }
 
 impl OptionStruct {
+
+    pub fn get_a(&self) -> &Option<Box<OptionOpaque>> {
+        &self.a
+    }
+
+    pub fn get_b(&self) -> &Option<Box<OptionOpaqueChar>> {
+        &self.b
+    }
+
+    pub fn get_c(&self) -> &u32 {
+        &self.c
+    }
+
+    pub fn get_d(&self) -> &Box<OptionOpaque> {
+        &self.d
+    }
+
 }
 
 #[link(name = "somelib")]

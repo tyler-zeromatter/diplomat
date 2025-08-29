@@ -29,8 +29,7 @@ impl From<CallbackWrapperAbi> for CallbackWrapper{
     }
 }
 
-impl CallbackWrapper {
-}
+impl CallbackWrapper {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

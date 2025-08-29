@@ -19,7 +19,6 @@ impl<'b, 'a> Bar<'b, 'a> {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

@@ -6,8 +6,7 @@ impl Drop for MutableCallbackHolder {
     }
 }
 
-impl MutableCallbackHolder {
-}
+impl MutableCallbackHolder {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

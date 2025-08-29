@@ -57,7 +57,6 @@ impl<'a> BorrowedFields<'a> {
         ret.from_ffi()
     
     }
-
 }
 
 #[link(name = "somelib")]

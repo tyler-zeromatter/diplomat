@@ -6,8 +6,7 @@ impl Drop for PrimitiveStructVec {
     }
 }
 
-impl PrimitiveStructVec {
-}
+impl PrimitiveStructVec {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

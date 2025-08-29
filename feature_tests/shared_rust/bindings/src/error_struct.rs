@@ -43,8 +43,7 @@ impl From<ErrorStructAbi> for ErrorStruct{
     }
 }
 
-impl ErrorStruct {
-}
+impl ErrorStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

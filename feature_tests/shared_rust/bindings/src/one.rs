@@ -88,7 +88,6 @@ impl<'a> One<'a> {
         ret
     
     }
-
 }
 
 #[link(name = "somelib")]

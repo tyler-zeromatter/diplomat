@@ -50,8 +50,7 @@ impl From<OptionInputStructAbi> for OptionInputStruct{
     }
 }
 
-impl OptionInputStruct {
-}
+impl OptionInputStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

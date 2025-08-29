@@ -6,8 +6,7 @@ impl Drop for RenamedMyIterable {
     }
 }
 
-impl RenamedMyIterable {
-}
+impl RenamedMyIterable {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

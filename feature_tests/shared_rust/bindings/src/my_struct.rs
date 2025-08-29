@@ -104,7 +104,6 @@ impl MyStruct {
         ret.to_result().map_err(|err : MyZstAbi| { err.from_ffi() })
     
     }
-
 }
 
 #[link(name = "somelib")]

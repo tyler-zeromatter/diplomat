@@ -53,7 +53,6 @@ impl CyclicStructB {
         ret.into_converted_option().map(|ok : CyclicStructAAbi| { ok.from_ffi() })
     
     }
-
 }
 
 #[link(name = "somelib")]

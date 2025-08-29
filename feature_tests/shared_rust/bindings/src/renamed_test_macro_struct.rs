@@ -51,7 +51,6 @@ impl RenamedTestMacroStruct {
         ret.from_ffi()
     
     }
-
 }
 
 #[link(name = "somelib")]

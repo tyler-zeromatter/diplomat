@@ -29,8 +29,7 @@ impl From<ScalarPairWithPaddingAbi> for ScalarPairWithPadding{
     }
 }
 
-impl ScalarPairWithPadding {
-}
+impl ScalarPairWithPadding {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

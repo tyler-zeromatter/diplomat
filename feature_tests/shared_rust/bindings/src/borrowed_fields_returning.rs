@@ -37,8 +37,7 @@ impl<'a> From<BorrowedFieldsReturningAbi<'a>> for BorrowedFieldsReturning<'a>{
     }
 }
 
-impl<'a> BorrowedFieldsReturning<'a> {
-}
+impl<'a> BorrowedFieldsReturning<'a> {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

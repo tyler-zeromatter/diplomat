@@ -67,8 +67,7 @@ impl From<PrimitiveStructAbi> for PrimitiveStruct{
     }
 }
 
-impl PrimitiveStruct {
-}
+impl PrimitiveStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

@@ -20,7 +20,6 @@ impl Unnamespaced {
         unsafe { namespace_Unnamespaced_use_namespaced(self, _n) };
         
     }
-
 }
 
 #[link(name = "somelib")]

@@ -5,8 +5,7 @@ pub enum RenamedAttrEnum {
     Renamed = 2
 }
 
-impl RenamedAttrEnum {
-}
+impl RenamedAttrEnum {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

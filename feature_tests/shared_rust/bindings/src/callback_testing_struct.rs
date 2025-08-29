@@ -29,8 +29,7 @@ impl From<CallbackTestingStructAbi> for CallbackTestingStruct{
     }
 }
 
-impl CallbackTestingStruct {
-}
+impl CallbackTestingStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

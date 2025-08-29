@@ -29,8 +29,7 @@ impl From<StructArithmeticAbi> for StructArithmetic{
     }
 }
 
-impl StructArithmetic {
-}
+impl StructArithmetic {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

@@ -29,8 +29,7 @@ impl From<BigStructWithStuffAbi> for BigStructWithStuff{
     }
 }
 
-impl BigStructWithStuff {
-}
+impl BigStructWithStuff {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

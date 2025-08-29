@@ -44,8 +44,7 @@ impl From<ImportedStructAbi> for ImportedStruct{
     }
 }
 
-impl ImportedStruct {
-}
+impl ImportedStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

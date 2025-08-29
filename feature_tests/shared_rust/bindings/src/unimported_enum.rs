@@ -5,8 +5,7 @@ pub enum UnimportedEnum {
     C = 2
 }
 
-impl UnimportedEnum {
-}
+impl UnimportedEnum {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
