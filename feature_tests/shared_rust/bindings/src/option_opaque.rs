@@ -27,7 +27,7 @@ impl OptionOpaque {
     pub fn returns() -> Option<OptionStruct> {
         let ret = unsafe { OptionOpaque_returns() };
         
-        ret.into_converted_option()
+        ret.into_converted_option().map(|ok : OptionStructAbi| { ok.from_ffi() })
     
     }
 
@@ -62,14 +62,14 @@ impl OptionOpaque {
     pub fn new_struct() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct() };
         
-        ret
+        ret.from_ffi()
     
     }
 
     pub fn new_struct_nones() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct_nones() };
         
-        ret
+        ret.from_ffi()
     
     }
 
@@ -116,14 +116,14 @@ impl OptionOpaque {
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
         let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.into(), sentinel) };
         
-        ret.into_converted_option()
+        ret.into_converted_option().map(|ok : OptionInputStructAbi| { ok.from_ffi() })
     
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
         let ret = unsafe { OptionOpaque_returns_option_input_struct() };
         
-        ret
+        ret.from_ffi()
     
     }
 
@@ -136,7 +136,7 @@ unsafe extern "C" {
 
     fn OptionOpaque_new_none() -> Option<Box<OptionOpaque>>;
 
-    fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStruct>;
+    fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStructAbi>;
 
     fn OptionOpaque_option_isize<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<isize>;
 
@@ -146,9 +146,9 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_u32<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<u32>;
 
-    fn OptionOpaque_new_struct() -> OptionStruct;
+    fn OptionOpaque_new_struct() -> OptionStructAbi;
 
-    fn OptionOpaque_new_struct_nones() -> OptionStruct;
+    fn OptionOpaque_new_struct_nones() -> OptionStructAbi;
 
     fn OptionOpaque_returns_none_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
 
@@ -162,9 +162,9 @@ unsafe extern "C" {
 
     fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStruct>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStruct>;
+    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStructAbi>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStructAbi>;
 
-    fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
+    fn OptionOpaque_returns_option_input_struct() -> OptionInputStructAbi;
 
     fn OptionOpaque_destroy(this : *mut OptionOpaque);
 }

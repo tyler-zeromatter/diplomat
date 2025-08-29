@@ -1,5 +1,15 @@
-#[repr(C)]
 pub struct BigStructWithStuff;
+
+#[repr(C)]
+pub(crate) struct BigStructWithStuffAbi;
+
+impl BigStructWithStuffAbi {
+    fn from_ffi(self) -> BigStructWithStuff{
+        BigStructWithStuff {
+            
+        }
+    }
+}
 
 impl BigStructWithStuff {
 }

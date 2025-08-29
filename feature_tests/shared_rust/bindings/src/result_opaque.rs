@@ -40,7 +40,7 @@ impl ResultOpaque {
     pub fn new_failing_struct(i : i32) -> Result<Box<ResultOpaque>, ErrorStruct> {
         let ret = unsafe { ResultOpaque_new_failing_struct(i) };
         
-        ret.to_result()
+        ret.to_result().map_err(|err : ErrorStructAbi| { err.from_ffi() })
     
     }
 
@@ -90,7 +90,7 @@ unsafe extern "C" {
 
     fn ResultOpaque_new_failing_unit() -> crate::DiplomatResult<Box<ResultOpaque>, ()>;
 
-    fn ResultOpaque_new_failing_struct(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorStruct>;
+    fn ResultOpaque_new_failing_struct(i : i32) -> crate::DiplomatResult<Box<ResultOpaque>, ErrorStructAbi>;
 
     fn ResultOpaque_new_in_err(i : i32) -> crate::DiplomatResult<(), Box<ResultOpaque>>;
 

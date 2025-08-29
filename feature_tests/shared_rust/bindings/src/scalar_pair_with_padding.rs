@@ -1,5 +1,15 @@
-#[repr(C)]
 pub struct ScalarPairWithPadding;
+
+#[repr(C)]
+pub(crate) struct ScalarPairWithPaddingAbi;
+
+impl ScalarPairWithPaddingAbi {
+    fn from_ffi(self) -> ScalarPairWithPadding{
+        ScalarPairWithPadding {
+            
+        }
+    }
+}
 
 impl ScalarPairWithPadding {
 }

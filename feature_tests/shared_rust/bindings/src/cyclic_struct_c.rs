@@ -1,14 +1,30 @@
 use super::CyclicStructA;
-#[repr(C)]
 pub struct CyclicStructC {
     pub a: CyclicStructA,
+}
+
+#[repr(C)]
+pub(crate) struct CyclicStructCAbi {
+    
+    a : CyclicStructAAbi,
+    
+}
+
+impl CyclicStructCAbi {
+    fn from_ffi(self) -> CyclicStructC{
+        CyclicStructC {
+            
+                a: self.a.from_ffi(),
+            
+        }
+    }
 }
 
 impl CyclicStructC {
     pub fn takes_nested_parameters(c : CyclicStructC) -> CyclicStructC {
         let ret = unsafe { CyclicStructC_takes_nested_parameters(c) };
         
-        ret
+        ret.from_ffi()
     
     }
 
@@ -27,7 +43,7 @@ impl CyclicStructC {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn CyclicStructC_takes_nested_parameters(c : CyclicStructC) -> CyclicStructC;
+    fn CyclicStructC_takes_nested_parameters(c : CyclicStructCAbi) -> CyclicStructCAbi;
 
     fn CyclicStructC_cyclic_out(this : CyclicStructC, write_mut : &mut crate::DiplomatWrite) -> ();
 }

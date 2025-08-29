@@ -1,5 +1,15 @@
-#[repr(C)]
 pub struct TraitWrapper;
+
+#[repr(C)]
+pub(crate) struct TraitWrapperAbi;
+
+impl TraitWrapperAbi {
+    fn from_ffi(self) -> TraitWrapper{
+        TraitWrapper {
+            
+        }
+    }
+}
 
 impl TraitWrapper {
 }
