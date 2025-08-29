@@ -46,7 +46,7 @@ impl From<OptionInputStruct> for OptionInputStructAbi{
 
 impl From<OptionInputStructAbi> for OptionInputStruct{
     fn from(value: OptionInputStructAbi) -> Self {
-        value.from_ffi()
+        OptionInputStructAbi::from_ffi(value)
     }
 }
 

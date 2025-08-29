@@ -25,7 +25,7 @@ impl From<TraitTestingStruct> for TraitTestingStructAbi{
 
 impl From<TraitTestingStructAbi> for TraitTestingStruct{
     fn from(value: TraitTestingStructAbi) -> Self {
-        value.from_ffi()
+        TraitTestingStructAbi::from_ffi(value)
     }
 }
 

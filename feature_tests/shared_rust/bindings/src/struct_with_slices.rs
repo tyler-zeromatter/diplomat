@@ -39,7 +39,7 @@ impl<'a> From<StructWithSlices<'a>> for StructWithSlicesAbi<'a>{
 
 impl<'a> From<StructWithSlicesAbi<'a>> for StructWithSlices<'a>{
     fn from(value: StructWithSlicesAbi<'a>) -> Self {
-        value.from_ffi()
+        StructWithSlicesAbi::from_ffi(value)
     }
 }
 

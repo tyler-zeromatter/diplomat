@@ -51,7 +51,7 @@ impl<'x, 'y, 'z> From<NestedBorrowedFields<'x, 'y, 'z>> for NestedBorrowedFields
 
 impl<'x, 'y, 'z> From<NestedBorrowedFieldsAbi<'x, 'y, 'z>> for NestedBorrowedFields<'x, 'y, 'z>{
     fn from(value: NestedBorrowedFieldsAbi<'x, 'y, 'z>) -> Self {
-        value.from_ffi()
+        NestedBorrowedFieldsAbi::from_ffi(value)
     }
 }
 

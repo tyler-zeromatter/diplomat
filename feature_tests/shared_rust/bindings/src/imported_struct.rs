@@ -40,7 +40,7 @@ impl From<ImportedStruct> for ImportedStructAbi{
 
 impl From<ImportedStructAbi> for ImportedStruct{
     fn from(value: ImportedStructAbi) -> Self {
-        value.from_ffi()
+        ImportedStructAbi::from_ffi(value)
     }
 }
 

@@ -33,7 +33,7 @@ impl<'a> From<BorrowedFieldsReturning<'a>> for BorrowedFieldsReturningAbi<'a>{
 
 impl<'a> From<BorrowedFieldsReturningAbi<'a>> for BorrowedFieldsReturning<'a>{
     fn from(value: BorrowedFieldsReturningAbi<'a>) -> Self {
-        value.from_ffi()
+        BorrowedFieldsReturningAbi::from_ffi(value)
     }
 }
 

@@ -42,7 +42,7 @@ impl From<MyStructContainingAnOption> for MyStructContainingAnOptionAbi{
 
 impl From<MyStructContainingAnOptionAbi> for MyStructContainingAnOption{
     fn from(value: MyStructContainingAnOptionAbi) -> Self {
-        value.from_ffi()
+        MyStructContainingAnOptionAbi::from_ffi(value)
     }
 }
 

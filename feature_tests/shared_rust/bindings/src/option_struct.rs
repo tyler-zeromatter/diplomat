@@ -53,7 +53,7 @@ impl From<OptionStruct> for OptionStructAbi{
 
 impl From<OptionStructAbi> for OptionStruct{
     fn from(value: OptionStructAbi) -> Self {
-        value.from_ffi()
+        OptionStructAbi::from_ffi(value)
     }
 }
 

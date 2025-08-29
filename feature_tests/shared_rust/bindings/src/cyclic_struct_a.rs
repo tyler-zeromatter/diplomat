@@ -35,7 +35,7 @@ impl From<CyclicStructA> for CyclicStructAAbi{
 
 impl From<CyclicStructAAbi> for CyclicStructA{
     fn from(value: CyclicStructAAbi) -> Self {
-        value.from_ffi()
+        CyclicStructAAbi::from_ffi(value)
     }
 }
 

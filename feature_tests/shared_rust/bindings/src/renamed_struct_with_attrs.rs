@@ -39,7 +39,7 @@ impl From<RenamedStructWithAttrs> for RenamedStructWithAttrsAbi{
 
 impl From<RenamedStructWithAttrsAbi> for RenamedStructWithAttrs{
     fn from(value: RenamedStructWithAttrsAbi) -> Self {
-        value.from_ffi()
+        RenamedStructWithAttrsAbi::from_ffi(value)
     }
 }
 

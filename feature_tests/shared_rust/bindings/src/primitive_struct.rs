@@ -63,7 +63,7 @@ impl From<PrimitiveStruct> for PrimitiveStructAbi{
 
 impl From<PrimitiveStructAbi> for PrimitiveStruct{
     fn from(value: PrimitiveStructAbi) -> Self {
-        value.from_ffi()
+        PrimitiveStructAbi::from_ffi(value)
     }
 }
 
