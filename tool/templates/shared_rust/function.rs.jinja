@@ -19,7 +19,7 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
     let write_mut = &mut write;
     {% endif -%}
     let ret = unsafe { {{abi_name}}(
-        {%- if let Some(s) = self_param -%} self {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
+        {%- if let Some(s) = self_param -%} {{s.wrap_convert()}} {%- if params.len() > 0 -%}, {% endif -%} {%- endif -%}
 
         {%- for p in params -%} 
         {{p.wrap_convert()}}

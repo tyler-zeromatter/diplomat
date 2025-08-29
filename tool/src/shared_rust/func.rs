@@ -96,22 +96,25 @@ impl<'tcx> FunctionInfo<'tcx> {
         });
 
         let self_param = self_param_own.map(|(s, ty)| {
-            let (type_name, self_lifetime) = match ty {
+            let (abi_type_name, conversion, self_lifetime) = match ty {
                 SelfType::Enum(e) => {
                     let type_id: TypeId = e.tcx_id.into();
-                    (ctx.formatter.fmt_symbol_name(type_id.into()), None)
+                    (ctx.formatter.fmt_symbol_name(type_id.into()), None, None)
                 }
                 SelfType::Opaque(op) => {
                     let type_id: TypeId = op.tcx_id.into();
                     (
                         ctx.formatter.fmt_symbol_name(type_id.into()),
+                        None,
                         Some(op.owner.lifetime),
                     )
                 }
                 SelfType::Struct(st) => {
                     let type_id: TypeId = st.tcx_id.into();
+                    let name = ctx.formatter.fmt_symbol_name(type_id.into());
                     (
-                        ctx.formatter.fmt_symbol_name(type_id.into()),
+                        ctx.formatter.fmt_struct_abi_name(name),
+                        Some(("".into(), ".into()".into())),
                         st.owner.lifetime(),
                     )
                 }
@@ -130,7 +133,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             };
 
             let (type_name, abi_type_name) = if s.is_owned() {
-                ("self".into(), format!("this : {type_name}"))
+                ("self".into(), format!("this : {abi_type_name}"))
             } else {
                 let mutable = if s.mutability().is_mutable() {
                     "mut "
@@ -140,7 +143,7 @@ impl<'tcx> FunctionInfo<'tcx> {
 
                 (
                     format!("&{lt}{mutable}self"),
-                    format!("this: &{lt}{mutable}{type_name}"),
+                    format!("this: &{lt}{mutable}{abi_type_name}"),
                 )
             };
 
@@ -150,10 +153,10 @@ impl<'tcx> FunctionInfo<'tcx> {
             };
 
             ParamInfo {
-                var_name: "".into(),
+                var_name: "self".into(),
                 type_info: TypeInfo::new(type_name.into()),
                 abi_override: abi_info,
-                conversion: None,
+                conversion,
             }
         });
 
