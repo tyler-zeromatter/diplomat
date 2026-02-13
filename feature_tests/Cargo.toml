@@ -11,6 +11,9 @@ repository.workspace = true
 keywords.workspace = true
 readme = "../README.md"
 
+[features]
+allocator_trait = []
+
 
 [lib]
 crate-type = ["staticlib", "rlib", "cdylib"]
