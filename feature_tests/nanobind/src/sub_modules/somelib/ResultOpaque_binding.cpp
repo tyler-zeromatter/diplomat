@@ -13,6 +13,7 @@ void add_ResultOpaque_binding(nb::module_ mod) {
     nb::class_<somelib::ResultOpaque> opaque(mod, "ResultOpaque", nb::type_slots(somelib_ResultOpaque_slots));
     opaque
         .def("assert_integer", &somelib::ResultOpaque::assert_integer, "i"_a)
+        .def("give_self", &somelib::ResultOpaque::give_self)
         .def(nb::new_(&somelib::ResultOpaque::new_), "i"_a)
         .def_static("new_failing_bar", &somelib::ResultOpaque::new_failing_bar)
         .def_static("new_failing_foo", &somelib::ResultOpaque::new_failing_foo)
