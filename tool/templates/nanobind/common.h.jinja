@@ -122,12 +122,12 @@ namespace nanobind::detail
             auto errorPyV = nb::cast(std::move(std::move(value).err().value()));
             if (errorPyV.is_valid())
             {
-                PyErr_SetString(PyExc_Exception, nb::str(errorPyV).c_str());
+                PyErr_SetObject(PyExc_Exception, errorPyV.ptr());
             }
             else
             {
                 char error_msg[512];
-                snprintf(error_msg, sizeof(error_msg), "Cannot convert unknown type %s to string for python error.", typeid(E).name());
+                snprintf(error_msg, sizeof(error_msg), "Cannot convert unknown type %s to python exception.", typeid(E).name());
                 PyErr_SetString(PyExc_Exception, error_msg);
             }
 
