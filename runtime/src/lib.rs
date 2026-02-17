@@ -42,6 +42,9 @@ pub use result::{DiplomatOption, DiplomatResult};
 
 pub mod rust_interop;
 
+pub mod opaque;
+pub use opaque::DiplomatOpaque;
+
 /// Like [`char`], but unvalidated.
 ///
 /// This type will usually map to some character type in the target language, and
