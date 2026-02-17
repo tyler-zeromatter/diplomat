@@ -7,8 +7,8 @@
 //! when using the `#[diplomat::bridge]` macro.
 
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens};
-use syn::*;
+use quote::{ToTokens, quote};
+use syn::{parse::Parse, spanned::Spanned, *};
 
 use diplomat_core::ast::{self, StdlibOrDiplomat};
 
@@ -416,9 +416,95 @@ fn gen_custom_function(func_info: FuncGen) -> Item {
     }
 }
 
+struct OpaqueWrapperAttr {
+    path : Vec<String>,
+    /// Where `T` is located in the generic args:
+    generic_idx : usize,
+    generic_args : PathArguments,
+}
+
+impl Parse for OpaqueWrapperAttr {
+    fn parse(input: parse::ParseStream) -> Result<Self> {
+        let path = input.parse::<Path>()?;
+        if path.is_ident("wrapper") {
+            let _eq = input.parse::<Token![=]>()?;
+            let path = input.parse::<Path>()?;
+
+            let mut generic_idx_found : bool = false;
+            let mut generic_idx : usize = 0;
+
+            let generic_args : PathArguments;
+
+            if let Some(last) = path.segments.last() {
+                generic_args = last.arguments.clone();
+                match &last.arguments {
+                    PathArguments::AngleBracketed(a) if !a.args.is_empty() => {
+                        for (idx, arg) in a.args.iter().enumerate() {
+                            match arg {
+                                GenericArgument::Type(Type::Path(p)) => {
+                                    if let Some(i) = p.path.get_ident() {
+                                        if i == "T" {
+                                            generic_idx = idx;
+                                            generic_idx_found = true;
+                                        }
+                                    }
+                                }
+                                _ => {},
+                            }
+                        }
+                    },
+                    PathArguments::None => {
+                        generic_idx_found = true;
+                    }
+                    _ => {
+                        return Err(syn::Error::new(last.span(), format!("Unsupported path arguments {}", last.arguments.to_token_stream().to_string())));
+                    }
+                }
+                
+                if !generic_idx_found {
+                    return Err(syn::Error::new(last.span(), "Expected `T` specifier for opaque type".to_string()));
+                }
+            } else {
+                return Err(syn::Error::new(path.span(), "Expected ident.".to_string()));
+            }
+            
+            Ok(Self {
+                path: path.segments.iter().map(|i| {
+                    i.ident.to_string()
+                }).collect(),
+                generic_idx,
+                generic_args,
+            })
+        } else {
+            return Err(syn::Error::new(path.span(), "Expected `wrapper=`.".to_string()));
+        }
+    }
+}
+
+impl OpaqueWrapperAttr {
+    fn from_syn(meta : &Meta) -> Result<Self> {
+        match meta {
+            Meta::List(l) => {
+                l.parse_args::<Self>()
+            }
+            // Default is boxed:
+            _ => Ok(OpaqueWrapperAttr {
+                path: vec!["Box".into()],
+                generic_idx: 0,
+                generic_args: PathArguments::None,
+            }),
+        }
+    }
+}
+
+struct OpaqueWrapper {
+    attr: OpaqueWrapperAttr,
+    wrapped_ty : String,
+}
+
 struct AttributeInfo {
     repr: bool,
-    opaque: bool,
+    opaque: Option<OpaqueWrapperAttr>,
     #[allow(unused)]
     is_out: bool,
 }
@@ -426,7 +512,7 @@ struct AttributeInfo {
 impl AttributeInfo {
     fn extract(attrs: &mut Vec<Attribute>) -> Self {
         let mut repr = false;
-        let mut opaque = false;
+        let mut opaque = None;
         let mut is_out = false;
         attrs.retain(|attr| {
             let ident = &attr.path().segments.iter().next().unwrap().ident;
@@ -438,7 +524,12 @@ impl AttributeInfo {
                 if attr.path().segments.len() == 2 {
                     let seg = &attr.path().segments.iter().nth(1).unwrap().ident;
                     if seg == "opaque" {
-                        opaque = true;
+                        let op = OpaqueWrapperAttr::from_syn(&attr.meta);
+                        if let Ok(o) = op {
+                            opaque = Some(o);
+                        } else {
+                            panic!("Could not read opaque wrapper: {}", op.err().unwrap());
+                        }
                         return false;
                     } else if seg == "out" {
                         is_out = true;
@@ -478,6 +569,42 @@ impl AttributeInfo {
     }
 }
 
+fn gen_opaque_tests(opaques : Vec<OpaqueWrapper>) -> ItemConst {
+    let mut type_assertions : Vec<syn::Stmt> = Vec::new();
+    for o in opaques {
+        let joined_paths = Ident::new(&o.attr.path.join("::"), Span::call_site());
+
+        let ident = Ident::new(&o.wrapped_ty, Span::call_site());
+
+        let mut args = o.attr.generic_args.clone();
+        match &mut args {
+            PathArguments::AngleBracketed(bracketed) => {
+                let g = bracketed.args.get_mut(o.attr.generic_idx).unwrap();
+                *g = GenericArgument::Type(syn::Type::Path(syn::parse_quote!(#ident)));
+            }
+            PathArguments::None => {
+                args = PathArguments::AngleBracketed(syn::parse_quote!(<#ident>));
+            }
+            _ => unreachable!("Unsupported path args: {:?}", o.attr.generic_args),
+        };
+
+        let full_path : syn::Path = syn::parse_quote!(#joined_paths #args);
+        type_assertions.push(syn::parse_quote!(assert_trait::<#ident, #full_path>();));
+    }
+
+    let block = syn::Block {
+        brace_token: syn::token::Brace(Span::call_site()),
+        stmts: type_assertions,
+    };
+    syn::parse_quote! {
+        const DIPLOMAT_OPAQUE_TESTS : () = {
+            fn assert_trait<U, T : DiplomatOpaque<U>>() {}
+
+            fn assert_type() #block
+        };
+    }
+}
+
 fn gen_bridge(mut input: ItemMod) -> ItemMod {
     let module = ast::Module::from_syn(&input, true);
     // Clean out any diplomat attributes so Rust doesn't get mad
@@ -487,11 +614,13 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
     new_contents.push(parse2(quote! { use diplomat_runtime::*; }).unwrap());
     new_contents.push(parse2(quote! { use core::ffi::c_void; }).unwrap());
 
+    let mut opaques : Vec<OpaqueWrapper> = Vec::new();
+
     new_contents.iter_mut().for_each(|c| match c {
         Item::Struct(s) => {
             let info = AttributeInfo::extract(&mut s.attrs);
 
-            if !info.opaque {
+            if info.opaque.is_none() {
                 // This is validated by HIR, but it's also nice to validate it in the macro so that there
                 // are early error messages
                 for field in s.fields.iter_mut() {
@@ -507,7 +636,7 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
             // Normal opaque types don't need repr(transparent) because the inner type is
             // never referenced. #[diplomat::transparent_convert] handles adding repr(transparent)
             // on its own
-            if !info.opaque {
+            if info.opaque.is_none() {
                 let repr = if !info.repr {
                     quote!(#[repr(C)])
                 } else {
@@ -519,6 +648,9 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
                     #s
                 }
             }
+            if let Some(op) = info.opaque {
+                opaques.push(OpaqueWrapper { attr: op, wrapped_ty: s.ident.to_string() });
+            }
         }
 
         Item::Enum(e) => {
@@ -526,19 +658,23 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
 
             for v in &mut e.variants {
                 let info = AttributeInfo::extract(&mut v.attrs);
-                if info.opaque {
+                if info.opaque.is_some() {
                     panic!("#[diplomat::opaque] not allowed on enum variants");
                 }
             }
 
             // Normal opaque types don't need repr(transparent) because the inner type is
             // never referenced.
-            if !info.opaque {
+            if info.opaque.is_none() {
                 *e = syn::parse_quote! {
                     #[repr(C)]
                     #[derive(Clone, Copy)]
                     #e
                 };
+            }
+
+            if let Some(o) = info.opaque {
+                opaques.push(OpaqueWrapper { attr: o, wrapped_ty: e.ident.to_string() });
             }
         }
 
@@ -546,7 +682,7 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
             for item in &mut i.items {
                 if let syn::ImplItem::Fn(ref mut m) = *item {
                     let info = AttributeInfo::extract(&mut m.attrs);
-                    if info.opaque {
+                    if info.opaque.is_some() {
                         panic!("#[diplomat::opaque] not allowed on methods")
                     }
                     for i in m.sig.inputs.iter_mut() {
@@ -568,6 +704,8 @@ fn gen_bridge(mut input: ItemMod) -> ItemMod {
         }
         _ => (),
     });
+
+    new_contents.push(syn::Item::Const(gen_opaque_tests(opaques)));
 
     for custom_type in module.declared_types.values() {
         custom_type.methods().iter().for_each(|m| {
