@@ -6,7 +6,7 @@ mod mixins;
 #[diplomat::attr(auto, namespace = "ns")]
 #[diplomat::include("attrs/mixins.rs")]
 pub mod ffi {
-    // mixin_macro!{}
+    crate::mixin_macro!{}
 
     #[diplomat::macro_rules]
     macro_rules! impl_mac {
