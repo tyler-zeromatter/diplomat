@@ -480,7 +480,12 @@ impl AttributeInfo {
 }
 
 fn gen_bridge(mut input: ItemMod) -> ItemMod {
-    let module = ast::Module::from_syn(&input, true);
+    // TODO: 
+    // Required macro MSRV >= 1.88 and proc_macro2's span-locations feature
+    // let file = spanned::Spanned::span(&input).local_file().expect("Could not get local_file.")
+    // .parent().expect("Could not get source file parent.");
+    // ast::parse_module_with_includes(&mut input, &file, true).expect("Could not read module.");
+    let module = ast::Module::from_syn(&input, true, true);
     // Clean out any diplomat attributes so Rust doesn't get mad
     let _attrs = AttributeInfo::extract(&mut input.attrs);
     let (brace, mut new_contents) = input.content.unwrap();

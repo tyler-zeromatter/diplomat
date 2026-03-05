@@ -1,4 +1,7 @@
-mod mixins;
+mod mixins; 
+
+// For mixins macro imports:
+use super::*;
 
 #[diplomat::bridge]
 #[diplomat::abi_rename = "namespace_{0}"]
@@ -6,7 +9,8 @@ mod mixins;
 #[diplomat::attr(auto, namespace = "ns")]
 #[diplomat::include("attrs/mixins.rs")]
 pub mod ffi {
-    crate::mixin_macro!{}
+    use super::mixin_macro;
+    mixin_macro!{}
 
     #[diplomat::macro_rules]
     macro_rules! impl_mac {
