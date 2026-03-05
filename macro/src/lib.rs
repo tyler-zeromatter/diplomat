@@ -450,6 +450,7 @@ impl AttributeInfo {
                         || seg == "abi_rename"
                         || seg == "demo"
                         || seg == "docs"
+                        || seg == "include"
                     {
                         // diplomat-tool reads these, not diplomat::bridge.
                         // throw them away so rustc doesn't complain about unknown attributes
@@ -771,7 +772,7 @@ macro_rules! expose_attrs {
     }
 }
 
-expose_attrs! {opaque, opaque_mut, attr, demo, docs, config}
+expose_attrs! {opaque, opaque_mut, attr, demo, docs, config, include}
 
 #[cfg(test)]
 mod tests {
