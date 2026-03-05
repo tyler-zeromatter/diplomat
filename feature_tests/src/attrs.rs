@@ -1,8 +1,13 @@
+mod mixins;
+
 #[diplomat::bridge]
 #[diplomat::abi_rename = "namespace_{0}"]
 #[diplomat::attr(not(any(c, kotlin)), rename = "Renamed{0}")]
 #[diplomat::attr(auto, namespace = "ns")]
+#[diplomat::include("attrs/mixins.rs")]
 pub mod ffi {
+    // mixin_macro!{}
+
     #[diplomat::macro_rules]
     macro_rules! impl_mac {
         ($arg1:ident, $arg2:ident, $arg3:block) => {
