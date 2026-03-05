@@ -16,12 +16,18 @@ use syn::{
 #[derive(Default)]
 pub struct Macros {
     defs: BTreeMap<Ident, MacroDef>,
+    /// Because of #[diplomat::import], we cannot be sure in the proc_macro that any 
+    /// import exists or not.
+    /// 
+    /// This can be fixed when Diplomat has MSRV >= 1.88. See [`diplomat::gen_bridge`] for more.
+    ignore_undefined : bool,
 }
 
 impl Macros {
-    pub fn new() -> Macros {
+    pub fn new(ignore_undefined : bool) -> Macros {
         Macros {
             defs: BTreeMap::new(),
+            ignore_undefined
         }
     }
 
@@ -47,7 +53,11 @@ impl Macros {
             if let Some(def) = self.defs.get(&ident) {
                 def.evaluate(mac)
             } else {
-                panic!("Could not find definition for {ident}. Have you tried creating a #[diplomat::macro_rules] macro_rules! {ident} definition?");
+                if self.ignore_undefined {
+                    vec![]
+                } else {
+                    panic!("Could not find definition for {ident}. Have you tried creating a #[diplomat::macro_rules] macro_rules! {ident} definition?");
+                }
             }
         } else {
             // We handle errors automatically in `diplomat/macro`
@@ -64,7 +74,11 @@ impl Macros {
             if let Some(def) = self.defs.get(&path_ident) {
                 def.evaluate(matched)
             } else {
-                panic!("Could not find definition for {path_ident}. Have you tried creating a #[diplomat::macro_rules] macro_rules! {path_ident} definition?");
+                if self.ignore_undefined {
+                    vec![]
+                } else {
+                    panic!("Could not find definition for {path_ident}. Have you tried creating a #[diplomat::macro_rules] macro_rules! {path_ident} definition?");
+                }
             }
         } else {
             // We handle errors automatically in `diplomat/macro`

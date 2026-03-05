@@ -121,6 +121,7 @@ struct ModuleBuilder {
     ///
     /// Otherwise, we traverse through modules until we find a module marked by #[diplomat::bridge]
     analyze_types: bool,
+    ignore_undefined_macros : bool,
     type_parent_attrs: Attrs,
     impl_parent_attrs: Attrs,
     mod_macros: Macros,
@@ -261,7 +262,7 @@ impl ModuleBuilder {
                 }
             }
             Item::Mod(item_mod) => {
-                self.sub_modules.push(Module::from_syn(item_mod, false));
+                self.sub_modules.push(Module::from_syn(item_mod, false, self.ignore_undefined_macros));
             }
             Item::Trait(trt) => {
                 if self.analyze_types {
@@ -377,7 +378,7 @@ impl Module {
     ///
     /// `force_analyze` is for forcibly parsing the module in the case where we know the `#[diplomat::bridge]` attribute should be present,
     /// but proc_macro (or some other analyzer) has removed the attribute in advance.
-    pub fn from_syn(input: &ItemMod, force_analyze: bool) -> Module {
+    pub fn from_syn(input: &ItemMod, force_analyze: bool, ignore_undefined_macros : bool) -> Module {
         let mod_attrs: Attrs = (&*input.attrs).into();
 
         let mut mst = ModuleBuilder {
@@ -394,7 +395,8 @@ impl Module {
             impl_parent_attrs: mod_attrs
                 .attrs_for_inheritance(AttrInheritContext::MethodOrImplFromModule),
             type_parent_attrs: mod_attrs.attrs_for_inheritance(AttrInheritContext::Type),
-            mod_macros: Macros::new(),
+            mod_macros: Macros::new(ignore_undefined_macros),
+            ignore_undefined_macros,
         };
 
         input
@@ -473,8 +475,7 @@ impl File {
 }
 
 // TODO: Caching
-fn parse_module_with_includes(module : &mut syn::ItemMod, base_path : &std::path::Path) -> Result<(), std::io::Error> {
-
+pub fn parse_module_with_includes(module : &mut syn::ItemMod, base_path : &std::path::Path) -> Result<(), std::io::Error> {
     let contains_bridge = module
         .attrs
         .iter()
@@ -525,7 +526,7 @@ impl From<&syn::File> for File {
             if let Item::Mod(item_mod) = i {
                 out.insert(
                     item_mod.ident.to_string(),
-                    Module::from_syn(item_mod, false),
+                    Module::from_syn(item_mod, false, false),
                 );
             }
         });
@@ -587,7 +588,8 @@ mod tests {
                         }
                     }
                 },
-                true
+                true,
+                false
             ));
         });
     }
@@ -620,7 +622,8 @@ mod tests {
                         }
                     }
                 },
-                true
+                true,
+                false
             ));
         });
     }
