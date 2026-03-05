@@ -9,8 +9,7 @@ use super::*;
 #[diplomat::attr(auto, namespace = "ns")]
 #[diplomat::include("attrs/mixins.rs")]
 pub mod ffi {
-    use super::mixin_macro;
-    mixin_macro!{}
+    super::mixin_macro!{}
 
     #[diplomat::macro_rules]
     macro_rules! impl_mac {
