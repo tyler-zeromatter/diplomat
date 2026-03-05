@@ -81,7 +81,8 @@ pub fn gen(
         o => panic!("Unknown target: {}", o),
     };
 
-    let module = syn_inline_mod::parse_and_inline_modules(entry);
+    let syn_module = syn_inline_mod::parse_and_inline_modules(entry);
+    let module = diplomat_core::ast::parse_file_with_includes(syn_module, entry.parent().expect("Could not get parent for entry file.")).expect("Could not append includes.");
 
     // Config:
     // Just search the top-level lib.rs for the Config attributes for now. We can re-configure this to use AST to search ALL modules if need be.
