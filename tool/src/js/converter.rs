@@ -94,6 +94,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                 self.formatter.fmt_primitive_list_type(p).into()
             }
             Type::Slice(hir::Slice::Strs(..)) => "Array<string>".into(),
+            Type::Slice(hir::Slice::Opaque(_, ref pth)) => format!("Array<{}>", self.formatter.fmt_type_name(pth.id())).into(),
             Type::DiplomatOption(ref inner) => {
                 let inner = self.gen_js_type_str(inner);
                 // This is suboptimal for struct fields; we should instead be using optional fields,
@@ -244,6 +245,10 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                         )
                         .into()
                     }
+                    hir::Slice::Opaque(_, op) => {
+                        let op_convert = self.gen_c_to_js_for_type::<hir::Everywhere>(&Type::Opaque(op.clone()), "i".into(), lifetime_environment);
+                        format!(r#"Array.from(new diplomatRuntime.DiplomatSlicePrimitive(wasm, {variable_name}, "u32", {edges}).getValue()).map((i) => {op_convert})"#).into()
+                    },
                     _ => unreachable!("Unknown slice {slice:?} found"),
                 }
             }
@@ -677,13 +682,13 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                 if let Some(hir::MaybeStatic::Static) = slice.lifetime() {
                     panic!("'static not supported for JS backend.")
                 } else {
-                    let alloc = if slice.lifetime().is_none() {
+                    let sl_alloc = if slice.lifetime().is_none() {
                         "diplomatRuntime.OwnedSliceLeaker"
                     } else {
                         alloc.expect("Must provide some allocation anchor for slice conversion generation!")
                     };
 
-                    let mut alloc_stmnt = format!("{alloc}.alloc(");
+                    let mut alloc_stmnt = format!("{sl_alloc}.alloc(");
                     let mut alloc_end = ")";
 
                     // If we're wrapping our slices for the List context (or preallocation context), we want to wrap the allocate statement around it:
@@ -695,7 +700,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                     let (spread_pre, spread_post) = match gen_context {
                         // SlicePreAlloc just wants the DiplomatBufe
                         JsToCConversionContext::SlicePrealloc =>
-                            (format!("{alloc}.alloc(diplomatRuntime.DiplomatBuf.sliceWrapper(wasm, "), Cow::Borrowed("))")),
+                            (format!("{sl_alloc}.alloc(diplomatRuntime.DiplomatBuf.sliceWrapper(wasm, "), Cow::Borrowed("))")),
                         // List mode wants a list of (ptr, len)
                         // NOTE: This is only possible in the old WASM ABI, as _intoFFI requires this splatting:
                         JsToCConversionContext::List => ("...".into(), ".splat()".into()),
@@ -730,6 +735,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                             r#"{spread_pre}{alloc_stmnt}diplomatRuntime.DiplomatBuf.slice(wasm, {js_name}, "{}"){alloc_end}{spread_post}"#,
                             self.formatter.fmt_primitive_list_view(*p)
                         ),
+                        hir::Slice::Opaque(_, op) => format!(r#"{spread_pre}{alloc_stmnt}diplomatRuntime.DiplomatBuf.slice(wasm, {js_name}.map((op) => {}), "u32"){alloc_end}{spread_post}"#, self.gen_js_to_c_for_type::<hir::Everywhere>(&Type::Opaque(op.clone()), "op".into(), struct_borrow_info, alloc, JsToCConversionContext::List)),
                         _ => unreachable!("Unknown Slice variant {ty:?}"),
                     }
                     .into()
