@@ -222,6 +222,7 @@ impl RenderTerminusContext<'_, '_> {
             Type::Slice(hir::Slice::Primitive(.., p)) => {
                 self.formatter.fmt_primitive_list_type(*p).to_string()
             }
+            Type::Slice(hir::Slice::Opaque(..)) => { self.errors.push_error("Slices of opaques unsupported by demo_gen.".into()); "".into() }
             Type::Slice(hir::Slice::Strs(..)) => "Array<string>".to_string(),
             _ => {
                 if let Some(i) = type_info.id() {
