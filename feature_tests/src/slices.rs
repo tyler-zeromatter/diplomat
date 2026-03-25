@@ -48,6 +48,15 @@ pub mod ffi {
         pub fn borrow<'a>(&'a self) -> DiplomatStrSlice<'a> {
             AsRef::<[u8]>::as_ref(&self.0).into()
         }
+
+        pub fn slice_of_opaques(sl : &[&MyString], w : &mut DiplomatWrite) {
+            let st : String = sl.iter().map(|o| o.0.clone()).collect();
+            write!(w, "{}", st).expect("Could not write string.");
+        }
+
+        pub fn return_slice_of_opaques<'a>(i : &'a [&'a MyString]) -> &'a [&'a MyString] {
+            i
+        }
     }
 
     #[diplomat::opaque_mut]

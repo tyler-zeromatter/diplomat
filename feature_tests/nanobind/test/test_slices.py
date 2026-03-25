@@ -21,3 +21,10 @@ def test_slices():
     with pytest.raises(IndexError):
         c[4]
         d[4]
+    
+    l = [somelib.MyString("A"), somelib.MyString(" B "), somelib.MyString("C")]
+    assert somelib.MyString.slice_of_opaques(l) == "A B C"
+
+    out = somelib.MyString.return_slice_of_opaques(l)
+    assert out[0].str == l[0].str
+    assert out[1].str == l[1].str
