@@ -1143,25 +1143,6 @@ impl<'ast> LoweringContext<'ast> {
                 )))
             }
             ast::TypeName::CustomTypeSlice(lm, type_name) => {
-                match type_name.as_ref() {
-                    ast::TypeName::Named(path) => match path.resolve(in_path, self.env) {
-                        ast::CustomType::Struct(..) => {
-                            if !self.attr_validator.attrs_supported().abi_compatibles {
-                                self.errors.push(LoweringError::Other(
-                                    "Primitive struct slices are not supported by this backend"
-                                        .into(),
-                                ));
-                            }
-                        }
-                        _ => self.errors.push(LoweringError::Other(format!(
-                            "{type_name} slices are not supported."
-                        ))),
-                    },
-                    _ => self.errors.push(LoweringError::Other(format!(
-                        "{type_name} slices are not supported."
-                    ))),
-                }
-
                 let new_lifetime = lm
                     .as_ref()
                     .map(|(lt, m)| Borrow::new(ltl.lower_lifetime(lt), *m));
@@ -1176,28 +1157,19 @@ impl<'ast> LoweringContext<'ast> {
                     }
                 }
 
-                match type_name.as_ref() {
-                    ast::TypeName::Named(path) => match path.resolve(in_path, self.env) {
-                        ast::CustomType::Struct(..) => {
-                            let inner = self.lower_type::<P>(type_name, ltl, context, in_path)?;
-                            match inner {
-                                Type::Struct(st) => {
-                                    Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
-                                }
-                                _ => unreachable!(),
-                            }
-                        }
-                        _ => {
-                            self.errors.push(LoweringError::Other(
-                                    format!("Cannot have custom type {type_name} in a slice. Custom slices can only contain primitive-only structs.")
-                                ));
-                            Err(())
-                        }
-                    },
+                let inner = self.lower_type::<P>(type_name, ltl, context, in_path)?;
+                match inner {
+                    Type::Struct(st) => {
+                        Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
+                    }
+                    Type::Opaque(op) => {
+                        Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), op)))
+                    }
                     _ => {
-                        self.errors.push(LoweringError::Other(format!(
-                            "Cannot make a slice from type {type_name}"
-                        )));
+                        self.errors.push(LoweringError::Other(
+                            format!("Cannot have custom type {type_name} in a slice. Only abi_compatible structs or borrowed opaques are allowed."
+                        )
+                        ));
                         Err(())
                     }
                 }
@@ -1535,33 +1507,23 @@ impl<'ast> LoweringContext<'ast> {
                     }
                 }
 
-                match &type_name.as_ref() {
-                    ast::TypeName::Named(path) => match path.resolve(in_path, self.env) {
-                        ast::CustomType::Struct(..) => {
-                            let inner = self.lower_out_type(
-                                type_name,
-                                ltl,
-                                in_path,
-                                context,
-                                in_result_option,
-                            )?;
-                            match inner {
-                                Type::Struct(st) => {
-                                    Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
-                                }
-                                _ => unreachable!(),
-                            }
+                let inner = self.lower_out_type(type_name, ltl, in_path, context, in_result_option)?;
+                match inner {
+                    Type::Struct(st) => {
+                        Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
+                    }
+                    Type::Opaque(op) => {
+                        // Might be feasible to support at some point?
+                        if op.is_owned() {
+                            self.errors.push(LoweringError::Other(format!("Slices of opaque types (Box<{type_name}>) cannot be owned.")));
+                            return Err(());
                         }
-                        _ => {
-                            self.errors.push(LoweringError::Other(
-                                    format!("Cannot have custom type {type_name} in a slice. Custom slices can only contain primitive-only structs.")
-                                ));
-                            Err(())
-                        }
-                    },
+                        let borrow = op.owner.as_borrowed().unwrap().clone();
+                        Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), OpaquePath { lifetimes: op.lifetimes, optional: op.optional, owner: borrow, tcx_id: op.tcx_id })))
+                    }
                     _ => {
                         self.errors.push(LoweringError::Other(format!(
-                            "Cannot make a slice from type {type_name}"
+                            "Cannot make a slice from type {type_name}. Only abi_compatible structs and borrowed opaques are allowed."
                         )));
                         Err(())
                     }

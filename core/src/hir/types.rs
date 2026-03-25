@@ -47,7 +47,7 @@ pub enum SelfType {
     Enum(EnumPath),
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Slice<P: TyPosition> {
     /// A string slice, e.g. `&DiplomatStr` or `Box<DiplomatStr>`.
@@ -79,6 +79,11 @@ pub enum Slice<P: TyPosition> {
     /// Currently assumes that `&[Struct]` is provided as an input only for function parameters.
     /// Validated in [`super::type_context::TypeContext::validate_primitive_slice_struct`]
     Struct(MaybeOwn, P::StructPath),
+
+    /// A `&[&Opaque]` or `Box<[&Opaque]>`.
+    /// 
+    /// The opaque can also be wrapped in an option (i.e. `&[Option<&Opaque>]`)
+    Opaque(MaybeOwn, OpaquePath<Optional, Borrow>),
 }
 
 // For now, the lifetime in not optional. This is because when you have references
@@ -214,8 +219,8 @@ impl<P: TyPosition> Slice<P> {
         match self {
             Slice::Str(lifetime, ..) => lifetime.as_ref(),
             Slice::Primitive(MaybeOwn::Borrow(reference), ..)
-            | Slice::Struct(MaybeOwn::Borrow(reference), ..) => Some(&reference.lifetime),
-            Slice::Primitive(..) | Slice::Struct(..) => None,
+            | Slice::Struct(MaybeOwn::Borrow(reference), ..) | Slice::Opaque(MaybeOwn::Borrow(reference), ..) => Some(&reference.lifetime),
+            Slice::Primitive(..) | Slice::Struct(..) | Slice::Opaque(..) => None,
             Slice::Strs(..) => Some({
                 const X: MaybeStatic<Lifetime> = MaybeStatic::NonStatic(Lifetime::new(usize::MAX));
                 &X
