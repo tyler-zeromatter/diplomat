@@ -289,6 +289,8 @@ impl<'tcx> DartFormatter<'tcx> {
             hir::Slice::Primitive(_, p) => self.fmt_prim_slice_type(*p),
             hir::Slice::Str(_, encoding) => self.fmt_str_slice_type(*encoding),
             hir::Slice::Strs(encoding) => self.fmt_str_slice_slice_type(*encoding),
+            // Errors should pop up in the generator:
+            hir::Slice::Opaque(_, ref op) => panic!("Opaque slice &[&{}] is unsupported.", self.fmt_type_name(op.id())),
             _ => unreachable!("unknown AST/HIR variant"),
         }
     }

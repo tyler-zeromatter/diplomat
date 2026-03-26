@@ -738,6 +738,9 @@ impl<'cx> ItemGenContext<'_, 'cx> {
                 self.formatter.fmt_primitive_list_type(p).into()
             }
             Type::Slice(hir::Slice::Strs(..)) => "core.List<core.String>".into(),
+            Type::Slice(hir::Slice::Opaque(_, ref op)) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id()))
+            },
             Type::DiplomatOption(ref inner) => {
                 let inner = self.gen_type_name(inner);
                 self.formatter.fmt_nullable(&inner).into()
@@ -894,6 +897,9 @@ impl<'cx> ItemGenContext<'_, 'cx> {
                     hir::Slice::Primitive(_, p) => self.formatter.fmt_primitive_alloc_in(*p),
                     hir::Slice::Str(_, encoding) => self.formatter.fmt_str_alloc_in(*encoding),
                     hir::Slice::Strs(encoding) => self.formatter.fmt_str_slice_alloc_in(*encoding),
+                    hir::Slice::Opaque(_, ref op) => {
+                        panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id()))
+                    }
                     _ => unreachable!("unknown AST/HIR variant"),
                 };
                 let alloc = if s.lifetime().is_none() {
@@ -1125,6 +1131,9 @@ impl<'cx> ItemGenContext<'_, 'cx> {
                 &Type::<OutputOnly>::Slice(hir::Slice::Str(None, *encoding)),
                 false,
             ),
+            hir::Slice::Opaque(_, ref op) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id()))
+            },
             _ => unreachable!("unknown AST/HIR variant"),
         }
     }
@@ -1156,6 +1165,9 @@ impl<'cx> ItemGenContext<'_, 'cx> {
             hir::Slice::Primitive(_, p) => self.formatter.fmt_primitive_list_type(*p),
             hir::Slice::Str(.., encoding) => self.formatter.fmt_string_type(*encoding),
             hir::Slice::Strs(.., encoding) => self.formatter.fmt_string_list_type(*encoding),
+            hir::Slice::Opaque(_, ref op) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id()))
+            },
             _ => unreachable!("unknown AST/HIR variant"),
         };
 
@@ -1169,6 +1181,7 @@ impl<'cx> ItemGenContext<'_, 'cx> {
             hir::Slice::Primitive(_, hir::PrimitiveType::IntSize(_) | hir::PrimitiveType::Bool) => "core.Iterable.generate(_length, (i) => _data[i]).toList(growable: false)",
             hir::Slice::Primitive(..) => "_data.asTypedList(_length)",
             hir::Slice::Strs(..) => "core.Iterable.generate(_length, (i) => _data[i]._toDart(lifetimeEdges)).toList(growable: false)",
+            hir::Slice::Opaque(..) => panic!("Opaque slices are unsupported in Dart."),
             _ => unreachable!("unknown AST/HIR variant"),
         };
 
@@ -1176,6 +1189,7 @@ impl<'cx> ItemGenContext<'_, 'cx> {
             hir::Slice::Primitive(_, p) => self.formatter.fmt_primitive_alloc_in(*p),
             hir::Slice::Str(_, e) => self.formatter.fmt_str_alloc_in(*e),
             hir::Slice::Strs(e) => self.formatter.fmt_str_slice_alloc_in(*e),
+            hir::Slice::Opaque(..) => panic!("Opaque slices are unsupported in Dart."),
             _ => unreachable!("unknown AST/HIR variant"),
         };
 
@@ -1243,6 +1257,7 @@ impl<'cx> ItemGenContext<'_, 'cx> {
             format!("_rustFree.attach(r, (pointer: _data.cast(), bytes: _length{size}, align: {align}));").into()
         }
         hir::Slice::Strs(..) => "// unsupported".into(),
+        hir::Slice::Opaque(..) => panic!("Opaque slices are unsupported in Dart."),
         _ => unreachable!("unknown AST/HIR variant"),
         };
 
