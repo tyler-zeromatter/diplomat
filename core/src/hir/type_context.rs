@@ -1382,4 +1382,36 @@ mod tests {
         };
         insta::with_settings!({}, { insta::assert_snapshot!(output) });
     }
+
+    #[test]
+    fn test_opaque_slice() {
+        uitest_lowering! {
+            #[diplomat::bridge]
+            mod ffi {
+                #[diplomat::opaque]
+                pub struct Foo {
+                    pub x: u32,
+                    pub y: u32
+                }
+
+                impl Foo {
+                    pub fn takes_mut_slice(f : &mut [&Foo], a : &[&mut Foo], b : &mut [&mut Foo]) {
+                        todo!()
+                    }
+
+                    pub fn returns_mut_slice<'a>() -> &'a mut [&'a mut Foo] {
+                        todo!()
+                    }
+
+                    pub fn takes_owned_slice(f : &[Box<Foo>]) {
+                        todo!()
+                    }
+                    
+                    pub fn returns_owned_slice<'b>() -> &'b [Box<Foo>] {
+                        todo!()
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1163,6 +1163,12 @@ impl<'ast> LoweringContext<'ast> {
                         Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
                     }
                     Type::Opaque(op) => {
+                        if matches!(lm, Some((_, Mutability::Mutable))) {
+                            self.errors.push(LoweringError::Other(format!("Mutable slices of opaques (&mut [{type_name}]) are currently unsupported in Diplomat.")));
+                        }
+                        if matches!(op.borrowed().mutability, Mutability::Mutable) {
+                            self.errors.push(LoweringError::Other(format!("Slices of mutable opaques (&[{type_name}]) are currently unsupported in Diplomat.")));
+                        }
                         Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), op)))
                     }
                     _ => {
@@ -1515,9 +1521,17 @@ impl<'ast> LoweringContext<'ast> {
                     Type::Opaque(op) => {
                         // Might be feasible to support at some point?
                         if op.is_owned() {
-                            self.errors.push(LoweringError::Other(format!("Slices of opaque types (Box<{type_name}>) cannot be owned.")));
+                            self.errors.push(LoweringError::Other(format!("Slices of opaque types (&[{type_name}]) cannot be owned.")));
                             return Err(());
                         }
+                        
+                        if matches!(ltmt, Some((_, Mutability::Mutable))) {
+                            self.errors.push(LoweringError::Other(format!("Mutable slices of opaques (&mut [{type_name}]) are currently unsupported in Diplomat.")));
+                        }
+                        if matches!(op.as_borrowed().map(|b| b.mutability), Some(Mutability::Mutable)) {
+                            self.errors.push(LoweringError::Other(format!("Slices of mutable opaques (&[{type_name}]) are currently unsupported in Diplomat.")));
+                        }
+
                         let borrow = op.owner.as_borrowed().unwrap().clone();
                         Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), OpaquePath { lifetimes: op.lifetimes, optional: op.optional, owner: borrow, tcx_id: op.tcx_id })))
                     }

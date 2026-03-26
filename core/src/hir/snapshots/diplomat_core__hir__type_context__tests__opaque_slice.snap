@@ -1,0 +1,14 @@
+---
+source: core/src/hir/type_context.rs
+expression: output
+---
+Lowering error in Foo::takes_mut_slice: Mutable slices of opaques (&mut [&Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::takes_mut_slice: found opaque type Foo being passed around as &mut without #[diplomat::opaque_mut] annotation
+Lowering error in Foo::takes_mut_slice: Slices of mutable opaques (&[&mut Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::takes_mut_slice: found opaque type Foo being passed around as &mut without #[diplomat::opaque_mut] annotation
+Lowering error in Foo::takes_mut_slice: Mutable slices of opaques (&mut [&mut Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::takes_mut_slice: Slices of mutable opaques (&[&mut Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::returns_mut_slice: Mutable slices of opaques (&mut [&'a mut Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::returns_mut_slice: Slices of mutable opaques (&[&'a mut Foo]) are currently unsupported in Diplomat.
+Lowering error in Foo::takes_owned_slice: found Box<T> in input where T is an opaque, but owned opaques aren't allowed in inputs. try &T instead? T = Foo
+Lowering error in Foo::returns_owned_slice: Slices of opaque types (&[Box<Foo>]) cannot be owned.
