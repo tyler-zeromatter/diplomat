@@ -419,6 +419,9 @@ impl<'tcx> KotlinFormatter<'tcx> {
             Type::Slice(Slice::Strs(_)) => {
                 format!("PrimitiveArrayTools.getUt16s({field_val})").into()
             }
+            Type::Slice(Slice::Opaque(_, ref op)) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.fmt_type_name(op.id()))
+            }
             Type::DiplomatOption(ref inner) => {
                 // Kotlin allows you to .map() an Option via `val?.let { it.foo() }` where `it` is an implicit lambda argument
                 format!(
@@ -455,6 +458,9 @@ impl<'tcx> KotlinFormatter<'tcx> {
             }
             Type::Slice(Slice::Str(_, _)) => "String".into(),
             Type::Slice(Slice::Strs(_)) => "List<String>".into(),
+            Type::Slice(Slice::Opaque(_, op)) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.fmt_type_name(op.id()))
+            }
             Type::DiplomatOption(t) => format!("{}?", self.fmt_struct_field_type_kt(t)).into(),
             _ => todo!(),
         }

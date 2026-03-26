@@ -714,6 +714,9 @@ return string{return_type_modifier}"#
                 let prim_ty_array = format!("{prim_ty}Array");
                 Self::boxed_slice_return(prim_ty_array.as_str(), val_name, return_type_modifier)
             }
+            Slice::Opaque(_, ref op) => {
+                panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id()))
+            }
 
             _ => todo!(),
         }
@@ -2096,6 +2099,7 @@ returnVal.option() ?: return null
                 format!("{}?", self.gen_type_name(inner, None)).into()
             }
             Type::Slice(hir::Slice::Strs(_)) => self.formatter.fmt_str_slices().into(),
+            Type::Slice(hir::Slice::Opaque(_, ref op)) => panic!("Opaque slice &[&{}] is unsupported.", self.formatter.fmt_type_name(op.id())),
             _ => unreachable!("unknown AST/HIR variant"),
         }
     }
