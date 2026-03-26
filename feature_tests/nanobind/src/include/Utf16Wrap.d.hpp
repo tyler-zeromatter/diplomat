@@ -20,6 +20,17 @@ class Utf16Wrap;
 namespace somelib {
 namespace capi {
     struct Utf16Wrap;
+
+
+    typedef struct DiplomatUtf16WrapView {
+      const Utf16Wrap** data;
+      size_t len;
+    } DiplomatUtf16WrapView;
+
+    typedef struct DiplomatUtf16WrapViewMut {
+      Utf16Wrap** data;
+      size_t len;
+    } DiplomatUtf16WrapViewMut;
 } // namespace capi
 } // namespace
 

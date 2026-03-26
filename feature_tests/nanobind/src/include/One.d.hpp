@@ -22,6 +22,17 @@ class Two;
 namespace somelib {
 namespace capi {
     struct One;
+
+
+    typedef struct DiplomatOneView {
+      const One** data;
+      size_t len;
+    } DiplomatOneView;
+
+    typedef struct DiplomatOneViewMut {
+      One** data;
+      size_t len;
+    } DiplomatOneViewMut;
 } // namespace capi
 } // namespace
 

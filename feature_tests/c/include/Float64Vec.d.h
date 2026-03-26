@@ -14,6 +14,16 @@
 typedef struct Float64Vec Float64Vec;
 
 
+typedef struct DiplomatFloat64VecView {
+  const Float64Vec** data;
+  size_t len;
+} DiplomatFloat64VecView;
+
+typedef struct DiplomatFloat64VecViewMut {
+  Float64Vec** data;
+  size_t len;
+} DiplomatFloat64VecViewMut;
+
 
 
 #endif // Float64Vec_D_H

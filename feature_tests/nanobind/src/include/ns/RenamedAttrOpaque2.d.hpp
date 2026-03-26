@@ -15,6 +15,17 @@
 namespace somelib::ns {
 namespace capi {
     struct RenamedAttrOpaque2;
+
+
+    typedef struct DiplomatRenamedAttrOpaque2View {
+      const RenamedAttrOpaque2** data;
+      size_t len;
+    } DiplomatRenamedAttrOpaque2View;
+
+    typedef struct DiplomatRenamedAttrOpaque2ViewMut {
+      RenamedAttrOpaque2** data;
+      size_t len;
+    } DiplomatRenamedAttrOpaque2ViewMut;
 } // namespace capi
 } // namespace
 

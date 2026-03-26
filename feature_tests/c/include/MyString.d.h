@@ -14,6 +14,16 @@
 typedef struct MyString MyString;
 
 
+typedef struct DiplomatMyStringView {
+  const MyString** data;
+  size_t len;
+} DiplomatMyStringView;
+
+typedef struct DiplomatMyStringViewMut {
+  MyString** data;
+  size_t len;
+} DiplomatMyStringViewMut;
+
 
 
 #endif // MyString_D_H

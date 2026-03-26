@@ -14,6 +14,16 @@
 typedef struct Bar Bar;
 
 
+typedef struct DiplomatBarView {
+  const Bar** data;
+  size_t len;
+} DiplomatBarView;
+
+typedef struct DiplomatBarViewMut {
+  Bar** data;
+  size_t len;
+} DiplomatBarViewMut;
+
 
 
 #endif // Bar_D_H

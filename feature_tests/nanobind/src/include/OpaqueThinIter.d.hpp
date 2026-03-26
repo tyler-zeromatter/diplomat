@@ -20,6 +20,17 @@ class OpaqueThin;
 namespace somelib {
 namespace capi {
     struct OpaqueThinIter;
+
+
+    typedef struct DiplomatOpaqueThinIterView {
+      const OpaqueThinIter** data;
+      size_t len;
+    } DiplomatOpaqueThinIterView;
+
+    typedef struct DiplomatOpaqueThinIterViewMut {
+      OpaqueThinIter** data;
+      size_t len;
+    } DiplomatOpaqueThinIterViewMut;
 } // namespace capi
 } // namespace
 

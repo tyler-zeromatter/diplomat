@@ -14,6 +14,16 @@
 typedef struct ResultOpaque ResultOpaque;
 
 
+typedef struct DiplomatResultOpaqueView {
+  const ResultOpaque** data;
+  size_t len;
+} DiplomatResultOpaqueView;
+
+typedef struct DiplomatResultOpaqueViewMut {
+  ResultOpaque** data;
+  size_t len;
+} DiplomatResultOpaqueViewMut;
+
 
 
 #endif // ResultOpaque_D_H

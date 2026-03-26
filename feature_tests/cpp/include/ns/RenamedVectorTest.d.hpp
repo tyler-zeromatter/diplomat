@@ -22,6 +22,17 @@ class RenamedVectorTest;
 namespace somelib::ns {
 namespace capi {
     struct RenamedVectorTest;
+
+
+    typedef struct DiplomatRenamedVectorTestView {
+      const RenamedVectorTest** data;
+      size_t len;
+    } DiplomatRenamedVectorTestView;
+
+    typedef struct DiplomatRenamedVectorTestViewMut {
+      RenamedVectorTest** data;
+      size_t len;
+    } DiplomatRenamedVectorTestViewMut;
 } // namespace capi
 } // namespace
 

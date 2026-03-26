@@ -20,6 +20,17 @@ class MutableCallbackHolder;
 namespace somelib {
 namespace capi {
     struct MutableCallbackHolder;
+
+
+    typedef struct DiplomatMutableCallbackHolderView {
+      const MutableCallbackHolder** data;
+      size_t len;
+    } DiplomatMutableCallbackHolderView;
+
+    typedef struct DiplomatMutableCallbackHolderViewMut {
+      MutableCallbackHolder** data;
+      size_t len;
+    } DiplomatMutableCallbackHolderViewMut;
 } // namespace capi
 } // namespace
 

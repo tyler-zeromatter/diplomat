@@ -24,6 +24,17 @@ class RenamedOpaqueZSTIterator;
 namespace somelib::ns {
 namespace capi {
     struct RenamedOpaqueZSTIterator;
+
+
+    typedef struct DiplomatRenamedOpaqueZSTIteratorView {
+      const RenamedOpaqueZSTIterator** data;
+      size_t len;
+    } DiplomatRenamedOpaqueZSTIteratorView;
+
+    typedef struct DiplomatRenamedOpaqueZSTIteratorViewMut {
+      RenamedOpaqueZSTIterator** data;
+      size_t len;
+    } DiplomatRenamedOpaqueZSTIteratorViewMut;
 } // namespace capi
 } // namespace
 

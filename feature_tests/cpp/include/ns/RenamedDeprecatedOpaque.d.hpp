@@ -15,6 +15,17 @@
 namespace somelib::ns {
 namespace capi {
     struct RenamedDeprecatedOpaque;
+
+
+    typedef struct DiplomatRenamedDeprecatedOpaqueView {
+      const RenamedDeprecatedOpaque** data;
+      size_t len;
+    } DiplomatRenamedDeprecatedOpaqueView;
+
+    typedef struct DiplomatRenamedDeprecatedOpaqueViewMut {
+      RenamedDeprecatedOpaque** data;
+      size_t len;
+    } DiplomatRenamedDeprecatedOpaqueViewMut;
 } // namespace capi
 } // namespace
 

@@ -22,6 +22,17 @@ class RenamedOpaqueArithmetic;
 namespace somelib::ns {
 namespace capi {
     struct RenamedOpaqueArithmetic;
+
+
+    typedef struct DiplomatRenamedOpaqueArithmeticView {
+      const RenamedOpaqueArithmetic** data;
+      size_t len;
+    } DiplomatRenamedOpaqueArithmeticView;
+
+    typedef struct DiplomatRenamedOpaqueArithmeticViewMut {
+      RenamedOpaqueArithmetic** data;
+      size_t len;
+    } DiplomatRenamedOpaqueArithmeticViewMut;
 } // namespace capi
 } // namespace
 

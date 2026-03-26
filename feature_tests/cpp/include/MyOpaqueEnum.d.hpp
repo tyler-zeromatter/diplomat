@@ -20,6 +20,17 @@ class MyOpaqueEnum;
 namespace somelib {
 namespace capi {
     struct MyOpaqueEnum;
+
+
+    typedef struct DiplomatMyOpaqueEnumView {
+      const MyOpaqueEnum** data;
+      size_t len;
+    } DiplomatMyOpaqueEnumView;
+
+    typedef struct DiplomatMyOpaqueEnumViewMut {
+      MyOpaqueEnum** data;
+      size_t len;
+    } DiplomatMyOpaqueEnumViewMut;
 } // namespace capi
 } // namespace
 

@@ -14,6 +14,16 @@
 typedef struct Unnamespaced Unnamespaced;
 
 
+typedef struct DiplomatUnnamespacedView {
+  const Unnamespaced** data;
+  size_t len;
+} DiplomatUnnamespacedView;
+
+typedef struct DiplomatUnnamespacedViewMut {
+  Unnamespaced** data;
+  size_t len;
+} DiplomatUnnamespacedViewMut;
+
 
 
 #endif // Unnamespaced_D_H

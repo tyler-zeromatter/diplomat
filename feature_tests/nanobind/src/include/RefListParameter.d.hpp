@@ -15,6 +15,17 @@
 namespace somelib {
 namespace capi {
     struct RefListParameter;
+
+
+    typedef struct DiplomatRefListParameterView {
+      const RefListParameter** data;
+      size_t len;
+    } DiplomatRefListParameterView;
+
+    typedef struct DiplomatRefListParameterViewMut {
+      RefListParameter** data;
+      size_t len;
+    } DiplomatRefListParameterViewMut;
 } // namespace capi
 } // namespace
 

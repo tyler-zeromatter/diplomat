@@ -24,5 +24,9 @@ export class MyString {
 
     borrow(): string;
 
+    static sliceOfOpaques(sl: Array<MyString>): string;
+
+    static returnSliceOfOpaques(i: Array<MyString>): Array<MyString>;
+
     constructor(v: string);
 }

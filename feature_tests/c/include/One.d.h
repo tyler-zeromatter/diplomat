@@ -14,6 +14,16 @@
 typedef struct One One;
 
 
+typedef struct DiplomatOneView {
+  const One** data;
+  size_t len;
+} DiplomatOneView;
+
+typedef struct DiplomatOneViewMut {
+  One** data;
+  size_t len;
+} DiplomatOneViewMut;
+
 
 
 #endif // One_D_H

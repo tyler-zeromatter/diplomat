@@ -20,6 +20,17 @@ class Locale;
 namespace icu4x {
 namespace capi {
     struct Locale;
+
+
+    typedef struct DiplomatLocaleView {
+      const Locale** data;
+      size_t len;
+    } DiplomatLocaleView;
+
+    typedef struct DiplomatLocaleViewMut {
+      Locale** data;
+      size_t len;
+    } DiplomatLocaleViewMut;
 } // namespace capi
 } // namespace
 

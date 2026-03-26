@@ -15,6 +15,17 @@
 namespace somelib {
 namespace capi {
     struct Two;
+
+
+    typedef struct DiplomatTwoView {
+      const Two** data;
+      size_t len;
+    } DiplomatTwoView;
+
+    typedef struct DiplomatTwoViewMut {
+      Two** data;
+      size_t len;
+    } DiplomatTwoViewMut;
 } // namespace capi
 } // namespace
 

@@ -14,6 +14,16 @@
 typedef struct OpaqueThinIter OpaqueThinIter;
 
 
+typedef struct DiplomatOpaqueThinIterView {
+  const OpaqueThinIter** data;
+  size_t len;
+} DiplomatOpaqueThinIterView;
+
+typedef struct DiplomatOpaqueThinIterViewMut {
+  OpaqueThinIter** data;
+  size_t len;
+} DiplomatOpaqueThinIterViewMut;
+
 
 
 #endif // OpaqueThinIter_D_H

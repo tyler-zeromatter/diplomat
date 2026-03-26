@@ -20,6 +20,17 @@ class MyString;
 namespace somelib {
 namespace capi {
     struct MyString;
+
+
+    typedef struct DiplomatMyStringView {
+      const MyString** data;
+      size_t len;
+    } DiplomatMyStringView;
+
+    typedef struct DiplomatMyStringViewMut {
+      MyString** data;
+      size_t len;
+    } DiplomatMyStringViewMut;
 } // namespace capi
 } // namespace
 
@@ -46,6 +57,12 @@ public:
   inline static somelib::diplomat::result<std::monostate, somelib::diplomat::Utf8Error> string_transform_write(std::string_view foo, W& writeable_output);
 
   inline std::string_view borrow() const;
+
+  inline static std::string slice_of_opaques(somelib::diplomat::span<const somelib::MyString*> sl);
+  template<typename W>
+  inline static void slice_of_opaques_write(somelib::diplomat::span<const somelib::MyString*> sl, W& writeable_output);
+
+  inline static somelib::diplomat::span<const somelib::MyString*> return_slice_of_opaques(somelib::diplomat::span<const somelib::MyString*> i);
 
     inline const somelib::capi::MyString* AsFFI() const;
     inline somelib::capi::MyString* AsFFI();

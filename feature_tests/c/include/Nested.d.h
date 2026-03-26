@@ -14,6 +14,16 @@
 typedef struct Nested Nested;
 
 
+typedef struct DiplomatNestedView {
+  const Nested** data;
+  size_t len;
+} DiplomatNestedView;
+
+typedef struct DiplomatNestedViewMut {
+  Nested** data;
+  size_t len;
+} DiplomatNestedViewMut;
+
 
 
 #endif // Nested_D_H

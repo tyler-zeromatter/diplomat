@@ -14,6 +14,16 @@
 typedef struct TestOpaque TestOpaque;
 
 
+typedef struct DiplomatTestOpaqueView {
+  const TestOpaque** data;
+  size_t len;
+} DiplomatTestOpaqueView;
+
+typedef struct DiplomatTestOpaqueViewMut {
+  TestOpaque** data;
+  size_t len;
+} DiplomatTestOpaqueViewMut;
+
 
 
 #endif // TestOpaque_D_H

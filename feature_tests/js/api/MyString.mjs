@@ -192,6 +192,49 @@ export class MyString {
         }
     }
 
+    static sliceOfOpaques(sl) {
+        let functionCleanupArena = new diplomatRuntime.CleanupArena();
+
+        const slSlice = functionCleanupArena.alloc(diplomatRuntime.DiplomatBuf.sliceWrapper(wasm, diplomatRuntime.DiplomatBuf.slice(wasm, sl.map((op) => op.ffiValue), "u32")));
+        const write = new diplomatRuntime.DiplomatWriteBuf(wasm);
+
+    wasm.MyString_slice_of_opaques(slSlice.ptr, write.buffer);
+
+        try {
+            return write.readString8();
+        }
+
+        finally {
+            diplomatRuntime.FUNCTION_PARAM_ALLOC.clean();
+            functionCleanupArena.free();
+
+            write.free();
+        }
+    }
+
+    static returnSliceOfOpaques(i) {
+        let functionGarbageCollectorGrip = new diplomatRuntime.GarbageCollectorGrip();
+        const iSlice = functionGarbageCollectorGrip.alloc(diplomatRuntime.DiplomatBuf.sliceWrapper(wasm, diplomatRuntime.DiplomatBuf.slice(wasm, i.map((op) => op.ffiValue), "u32")));
+        const diplomatReceive = new diplomatRuntime.DiplomatReceiveBuf(wasm, 8, 4, false);
+
+        // This lifetime edge depends on lifetimes 'a
+        let aEdges = [iSlice];
+
+
+        const result = wasm.MyString_return_slice_of_opaques(diplomatReceive.buffer, iSlice.ptr);
+
+        try {
+            return Array.from(new diplomatRuntime.DiplomatSlicePrimitive(wasm, diplomatReceive.buffer, "u32", aEdges).getValue()).map((i) => new MyString(diplomatRuntime.internalConstructor, i, aEdges));
+        }
+
+        finally {
+            diplomatRuntime.FUNCTION_PARAM_ALLOC.clean();
+            functionGarbageCollectorGrip.releaseToGarbageCollector();
+
+            diplomatReceive.free();
+        }
+    }
+
     constructor(v) {
         if (arguments[0] === diplomatRuntime.exposeConstructor) {
             return this.#internalConstructor(...Array.prototype.slice.call(arguments, 1));

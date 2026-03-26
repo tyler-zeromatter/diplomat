@@ -14,6 +14,16 @@
 typedef struct DeprecatedOpaque DeprecatedOpaque;
 
 
+typedef struct DiplomatDeprecatedOpaqueView {
+  const DeprecatedOpaque** data;
+  size_t len;
+} DiplomatDeprecatedOpaqueView;
+
+typedef struct DiplomatDeprecatedOpaqueViewMut {
+  DeprecatedOpaque** data;
+  size_t len;
+} DiplomatDeprecatedOpaqueViewMut;
+
 
 
 #endif // DeprecatedOpaque_D_H

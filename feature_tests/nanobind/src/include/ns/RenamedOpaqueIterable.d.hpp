@@ -24,6 +24,17 @@ class RenamedOpaqueIterator;
 namespace somelib::ns {
 namespace capi {
     struct RenamedOpaqueIterable;
+
+
+    typedef struct DiplomatRenamedOpaqueIterableView {
+      const RenamedOpaqueIterable** data;
+      size_t len;
+    } DiplomatRenamedOpaqueIterableView;
+
+    typedef struct DiplomatRenamedOpaqueIterableViewMut {
+      RenamedOpaqueIterable** data;
+      size_t len;
+    } DiplomatRenamedOpaqueIterableViewMut;
 } // namespace capi
 } // namespace
 

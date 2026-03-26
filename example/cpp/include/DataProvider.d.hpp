@@ -20,6 +20,17 @@ class DataProvider;
 namespace icu4x {
 namespace capi {
     struct DataProvider;
+
+
+    typedef struct DiplomatDataProviderView {
+      const DataProvider** data;
+      size_t len;
+    } DiplomatDataProviderView;
+
+    typedef struct DiplomatDataProviderViewMut {
+      DataProvider** data;
+      size_t len;
+    } DiplomatDataProviderViewMut;
 } // namespace capi
 } // namespace
 

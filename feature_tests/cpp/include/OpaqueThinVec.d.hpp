@@ -24,6 +24,17 @@ class OpaqueThinVec;
 namespace somelib {
 namespace capi {
     struct OpaqueThinVec;
+
+
+    typedef struct DiplomatOpaqueThinVecView {
+      const OpaqueThinVec** data;
+      size_t len;
+    } DiplomatOpaqueThinVecView;
+
+    typedef struct DiplomatOpaqueThinVecViewMut {
+      OpaqueThinVec** data;
+      size_t len;
+    } DiplomatOpaqueThinVecViewMut;
 } // namespace capi
 } // namespace
 

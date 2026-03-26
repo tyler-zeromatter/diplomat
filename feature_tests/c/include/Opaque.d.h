@@ -14,6 +14,16 @@
 typedef struct Opaque Opaque;
 
 
+typedef struct DiplomatOpaqueView {
+  const Opaque** data;
+  size_t len;
+} DiplomatOpaqueView;
+
+typedef struct DiplomatOpaqueViewMut {
+  Opaque** data;
+  size_t len;
+} DiplomatOpaqueViewMut;
+
 
 
 #endif // Opaque_D_H

@@ -14,6 +14,16 @@
 typedef struct OptionString OptionString;
 
 
+typedef struct DiplomatOptionStringView {
+  const OptionString** data;
+  size_t len;
+} DiplomatOptionStringView;
+
+typedef struct DiplomatOptionStringViewMut {
+  OptionString** data;
+  size_t len;
+} DiplomatOptionStringViewMut;
+
 
 
 #endif // OptionString_D_H

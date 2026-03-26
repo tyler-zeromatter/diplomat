@@ -14,6 +14,16 @@
 typedef struct Two Two;
 
 
+typedef struct DiplomatTwoView {
+  const Two** data;
+  size_t len;
+} DiplomatTwoView;
+
+typedef struct DiplomatTwoViewMut {
+  Two** data;
+  size_t len;
+} DiplomatTwoViewMut;
+
 
 
 #endif // Two_D_H

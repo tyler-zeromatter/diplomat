@@ -25,6 +25,17 @@ struct BorrowedFieldsWithBounds;
 namespace somelib {
 namespace capi {
     struct Foo;
+
+
+    typedef struct DiplomatFooView {
+      const Foo** data;
+      size_t len;
+    } DiplomatFooView;
+
+    typedef struct DiplomatFooViewMut {
+      Foo** data;
+      size_t len;
+    } DiplomatFooViewMut;
 } // namespace capi
 } // namespace
 

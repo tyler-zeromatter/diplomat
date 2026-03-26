@@ -14,6 +14,16 @@
 typedef struct VectorTest VectorTest;
 
 
+typedef struct DiplomatVectorTestView {
+  const VectorTest** data;
+  size_t len;
+} DiplomatVectorTestView;
+
+typedef struct DiplomatVectorTestViewMut {
+  VectorTest** data;
+  size_t len;
+} DiplomatVectorTestViewMut;
+
 
 
 #endif // VectorTest_D_H

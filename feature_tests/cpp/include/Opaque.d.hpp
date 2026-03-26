@@ -22,6 +22,17 @@ struct MyStruct;
 namespace somelib {
 namespace capi {
     struct Opaque;
+
+
+    typedef struct DiplomatOpaqueView {
+      const Opaque** data;
+      size_t len;
+    } DiplomatOpaqueView;
+
+    typedef struct DiplomatOpaqueViewMut {
+      Opaque** data;
+      size_t len;
+    } DiplomatOpaqueViewMut;
 } // namespace capi
 } // namespace
 
