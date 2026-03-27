@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/MyString.hpp"
 #include "../include/SliceableOpaque.hpp"
+#include "../include/SliceableOpaqueHolder.hpp"
 #include "assert.hpp"
 
 using namespace somelib;
@@ -22,4 +23,16 @@ int main(int argc, char* argv[]) {
 
     auto static_out = SliceableOpaque::static_ret();
     SliceableOpaque::static_in(static_out, 20);
+
+    auto op_a = SliceableOpaque::new_(0);
+    auto op_b = SliceableOpaque::new_(5);
+    auto op_c = SliceableOpaque::new_(10);
+    const SliceableOpaque* sliceable_arr[] = {
+        op_a.get(), op_b.get(), op_c.get()
+    };
+    diplomat::span<const SliceableOpaque*> sl_in(sliceable_arr, 3);
+    SliceableOpaque::non_static_mismatch_in(sl_in, 0);
+
+    auto static_holder = SliceableOpaque::make_static_holder();
+    SliceableOpaque::non_static_mismatch_in(static_holder->mismatch_lt_ret(), 20);
 }
