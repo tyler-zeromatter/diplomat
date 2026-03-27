@@ -94,7 +94,16 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
                 self.formatter.fmt_primitive_list_type(p).into()
             }
             Type::Slice(hir::Slice::Strs(..)) => "Array<string>".into(),
-            Type::Slice(hir::Slice::Opaque(_, ref pth)) => format!("Array<{}>", self.formatter.fmt_type_name(pth.id())).into(),
+            Type::Slice(hir::Slice::Opaque(_, ref pth)) => {
+                let type_name = self.formatter.fmt_type_name(pth.id());
+                format!("Array<{}>", 
+                    if pth.is_optional() {
+                        self.formatter.fmt_nullable(&type_name)
+                    } else {
+                        type_name.into()
+                    }
+                ).into()
+            }
             Type::DiplomatOption(ref inner) => {
                 let inner = self.gen_js_type_str(inner);
                 // This is suboptimal for struct fields; we should instead be using optional fields,
