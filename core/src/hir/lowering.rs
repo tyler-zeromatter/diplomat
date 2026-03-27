@@ -1163,13 +1163,8 @@ impl<'ast> LoweringContext<'ast> {
                         Ok(Type::Slice(Slice::Struct(new_lifetime.into(), st)))
                     }
                     Type::Opaque(op) => {
-                        if matches!(lm, Some((_, Mutability::Mutable))) {
-                            self.errors.push(LoweringError::Other(format!("Mutable slices of opaques (&mut [{type_name}]) are currently unsupported in Diplomat.")));
-                        }
-                        if matches!(op.borrowed().mutability, Mutability::Mutable) {
-                            self.errors.push(LoweringError::Other(format!("Slices of mutable opaques (&[{type_name}]) are currently unsupported in Diplomat.")));
-                        }
-                        Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), op)))
+                        let sl = self.lower_opaque_slice(op, new_lifetime, type_name);
+                        Ok(Type::Slice(sl))
                     }
                     _ => {
                         self.errors.push(LoweringError::Other(
@@ -1533,7 +1528,8 @@ impl<'ast> LoweringContext<'ast> {
                         }
 
                         let borrow = op.owner.as_borrowed().unwrap().clone();
-                        Ok(Type::Slice(Slice::Opaque(new_lifetime.into(), OpaquePath { lifetimes: op.lifetimes, optional: op.optional, owner: borrow, tcx_id: op.tcx_id })))
+                        let sl = self.lower_opaque_slice( OpaquePath { lifetimes: op.lifetimes, optional: op.optional, owner: borrow, tcx_id: op.tcx_id }, new_lifetime, type_name);
+                        Ok(Type::Slice(sl))
                     }
                     _ => {
                         self.errors.push(LoweringError::Other(format!(
@@ -2019,5 +2015,19 @@ impl<'ast> LoweringContext<'ast> {
             .collect::<Result<_, ()>>()?;
 
         Ok(LifetimeEnv::new(nodes, ast.nodes.len()))
+    }
+
+    fn lower_opaque_slice<P: TyPosition>(&mut self, op : OpaquePath<Optional, Borrow>, slice_lifetime : Option<Borrow>, type_name : &ast::TypeName) -> Slice<P> {
+        if let Some(lt) = slice_lifetime {
+            if lt.mutability.is_mutable() {
+                self.errors.push(LoweringError::Other(format!("Mutable slices of opaques (&mut [{type_name}]) are currently unsupported in Diplomat.")));
+            }
+        }
+
+        if matches!(op.borrowed().mutability, Mutability::Mutable) {
+            self.errors.push(LoweringError::Other(format!("Slices of mutable opaques (&[{type_name}]) are currently unsupported in Diplomat.")));
+        }
+
+        Slice::Opaque(slice_lifetime.into(), op)
     }
 }
