@@ -194,6 +194,10 @@ pub mod ffi {
         pub fn make_static_holder() -> Box<SliceableOpaqueHolder<'static>> {
             SliceableOpaqueHolder::new(&SLICEABLE_OPAQUE_REF)
         }
+
+        pub fn optional_opaque_inout<'a>(sl : &'a [Option<&'a SliceableOpaque>]) -> &'a [Option<&'a SliceableOpaque>] {
+            sl
+        }
     }
     
     #[diplomat::opaque]
