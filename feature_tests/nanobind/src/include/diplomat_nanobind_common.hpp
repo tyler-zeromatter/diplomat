@@ -263,7 +263,15 @@ namespace nanobind::detail
 
                 return o.release();
             } else {
-                return ListCaster::from_cpp(src, policy, cleanup);
+                // If this is a span of pointers, then (as of currently writing)
+                // the only type this could be is a slice of opaques.
+                // Because we currently ONLY allow borrowed slices of borrowed opaques (no owned slices, no owned opaques)
+                // then we set everything to be a reference (Rust will handle cleanup).
+                if constexpr(std::is_pointer_v<T>) {
+                    return ListCaster::from_cpp(src, rv_policy::reference, cleanup);
+                } else {
+                    return ListCaster::from_cpp(src, policy, cleanup);
+                }
             }
         }
     };

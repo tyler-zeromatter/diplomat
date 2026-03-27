@@ -106,6 +106,10 @@ export { Float64Vec } from "./Float64Vec"
 
 export { MyString } from "./MyString"
 
+export { SliceableOpaque } from "./SliceableOpaque"
+
+export { SliceableOpaqueHolder } from "./SliceableOpaqueHolder"
+
 export { MyOpaqueEnum } from "./MyOpaqueEnum"
 
 export { Opaque } from "./Opaque"

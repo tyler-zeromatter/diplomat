@@ -104,6 +104,10 @@ export { Float64Vec } from "./Float64Vec.mjs"
 
 export { MyString } from "./MyString.mjs"
 
+export { SliceableOpaque } from "./SliceableOpaque.mjs"
+
+export { SliceableOpaqueHolder } from "./SliceableOpaqueHolder.mjs"
+
 export { MyOpaqueEnum } from "./MyOpaqueEnum.mjs"
 
 export { Opaque } from "./Opaque.mjs"

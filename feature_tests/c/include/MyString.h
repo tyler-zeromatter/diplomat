@@ -33,6 +33,8 @@ DiplomatStringView MyString_borrow(const MyString* self);
 
 void MyString_slice_of_opaques(DiplomatMyStringView sl, DiplomatWrite* write);
 
+DiplomatMyStringView MyString_return_slice_of_opaques(DiplomatMyStringView i);
+
 void MyString_destroy(MyString* self);
 
 

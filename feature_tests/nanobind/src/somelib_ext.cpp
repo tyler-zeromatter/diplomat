@@ -45,6 +45,8 @@ void add_RefListParameter_binding(nb::module_);
 void add_Float64Vec_binding(nb::module_);
 void add_Float64VecError_binding(nb::module_);
 void add_MyString_binding(nb::module_);
+void add_SliceableOpaque_binding(nb::module_);
+void add_SliceableOpaqueHolder_binding(nb::module_);
 void add_MyOpaqueEnum_binding(nb::module_);
 void add_Opaque_binding(nb::module_);
 void add_OpaqueMutexedString_binding(nb::module_);
@@ -190,6 +192,8 @@ NB_MODULE(somelib, mod)
     add_Float64Vec_binding(mod);
     add_Float64VecError_binding(mod);
     add_MyString_binding(mod);
+    add_SliceableOpaque_binding(mod);
+    add_SliceableOpaqueHolder_binding(mod);
     add_MyOpaqueEnum_binding(mod);
     add_Opaque_binding(mod);
     add_OpaqueMutexedString_binding(mod);
