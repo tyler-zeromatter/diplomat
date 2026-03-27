@@ -157,4 +157,51 @@ pub mod ffi {
             }
         }
     }
+
+    #[diplomat::opaque]
+    pub struct SliceableOpaque(i32);
+    
+    static SLICEABLE_OPAQUE_REF : SliceableOpaque = SliceableOpaque(20);
+    static SLICEABLE_OP_STATIC : &'static [&'static SliceableOpaque] = &[&SLICEABLE_OPAQUE_REF];
+
+    impl SliceableOpaque {
+        #[diplomat::attr(auto, constructor)]
+        pub fn new(i : i32) -> Box<Self> {
+            Box::new(Self(i))
+        }
+
+        #[diplomat::attr(auto, getter)]
+        pub fn num(&self) -> i32 {
+            self.0
+        }
+
+        pub fn static_in(i : &'static [&'static SliceableOpaque], n : i32) {
+            assert_eq!(i[0].0, n);
+        }
+
+        pub fn non_static_mismatch_in<'a>(i : &'a [&'static SliceableOpaque], n : i32) {
+            assert_eq!(i[0].0, n);
+        }
+
+        pub fn static_ret() -> &'static [&'static SliceableOpaque] {
+            SLICEABLE_OP_STATIC
+        }
+
+        pub fn make_static_holder() -> Box<SliceableOpaqueHolder<'static>> {
+            SliceableOpaqueHolder::new(&SLICEABLE_OPAQUE_REF)
+        }
+    }
+    
+    #[diplomat::opaque]
+    pub struct SliceableOpaqueHolder<'a>(Vec<&'a SliceableOpaque>);
+    impl<'a> SliceableOpaqueHolder<'a> {
+        #[diplomat::attr(auto, constructor)]
+        pub fn new(sl : &'a SliceableOpaque) -> Box<Self> {
+            Box::new(Self(vec![sl]))
+        }
+        
+        pub fn mismatch_lt_ret<'b>(&'b self) -> &'b [&'a SliceableOpaque] {
+            self.0.as_ref()
+        }
+    }
 }
