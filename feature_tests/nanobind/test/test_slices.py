@@ -28,3 +28,12 @@ def test_slices():
     out = somelib.MyString.return_slice_of_opaques(l)
     assert out[0].str == l[0].str
     assert out[1].str == l[1].str
+
+    static_out = somelib.SliceableOpaque.static_ret()
+    somelib.SliceableOpaque.static_in(static_out, 20)
+
+    sliceable_arr = [somelib.SliceableOpaque(0), somelib.SliceableOpaque(5), somelib.SliceableOpaque(10)]
+    somelib.SliceableOpaque.non_static_mismatch_in(sliceable_arr, 0)
+    
+    static_holder = somelib.SliceableOpaque.make_static_holder()
+    somelib.SliceableOpaque.non_static_mismatch_in(static_holder, 20)
