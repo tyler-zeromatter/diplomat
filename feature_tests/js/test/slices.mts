@@ -1,5 +1,5 @@
 import test from "ava";
-import { MyString, Float64Vec } from "diplomat-wasm-js-feature-tests";
+import { MyString, Float64Vec, SliceableOpaque } from "diplomat-wasm-js-feature-tests";
 
 test("MyString functionality", (t) => {
   let str = new MyString("This is a test value.");
@@ -37,4 +37,10 @@ test("MyString Opaque Slice Return", (t) => {
   let out = MyString.returnSliceOfOpaques(arr);
   t.is(out[0].str, "A");
   t.is(out[1].str, " B ");
+});
+
+test("Sliceable Opaque Optional", (t) => {
+  let out = SliceableOpaque.optionalOpaqueInout([new SliceableOpaque(0), null, new SliceableOpaque(5)]);
+  t.is(out[1], null);
+  t.is(out[0].num, 0);
 });
