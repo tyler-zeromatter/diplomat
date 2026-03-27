@@ -35,4 +35,7 @@ int main(int argc, char* argv[]) {
 
     auto static_holder = SliceableOpaque::make_static_holder();
     SliceableOpaque::non_static_mismatch_in(static_holder->mismatch_lt_ret(), 20);
+
+    auto optional_opaque_inout = SliceableOpaque::optional_opaque_inout(sliceable_arr);
+    simple_assert_eq("Optional Opaque Slice", optional_opaque_inout.data()[1]->num(), 5);
 }
