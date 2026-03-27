@@ -61,6 +61,29 @@ export class SliceableOpaque {
         }
     }
 
+    static optionalOpaqueInout(sl) {
+        let functionGarbageCollectorGrip = new diplomatRuntime.GarbageCollectorGrip();
+        const slSlice = functionGarbageCollectorGrip.alloc(diplomatRuntime.DiplomatBuf.sliceWrapper(wasm, diplomatRuntime.DiplomatBuf.slice(wasm, sl.map((op) => op?.ffiValue ?? 0), "u32")));
+        const diplomatReceive = new diplomatRuntime.DiplomatReceiveBuf(wasm, 8, 4, false);
+
+        // This lifetime edge depends on lifetimes 'a
+        let aEdges = [slSlice];
+
+
+        const result = wasm.SliceableOpaque_optional_opaque_inout(diplomatReceive.buffer, slSlice.ptr);
+
+        try {
+            return Array.from(new diplomatRuntime.DiplomatSlicePrimitive(wasm, diplomatReceive.buffer, "u32", aEdges).getValue()).map((i) => i === 0 ? null : new SliceableOpaque(diplomatRuntime.internalConstructor, i, aEdges));
+        }
+
+        finally {
+            diplomatRuntime.FUNCTION_PARAM_ALLOC.clean();
+            functionGarbageCollectorGrip.releaseToGarbageCollector();
+
+            diplomatReceive.free();
+        }
+    }
+
     constructor(i) {
         if (arguments[0] === diplomatRuntime.exposeConstructor) {
             return this.#internalConstructor(...Array.prototype.slice.call(arguments, 1));

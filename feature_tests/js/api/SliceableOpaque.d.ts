@@ -10,5 +10,7 @@ export class SliceableOpaque {
 
     get num(): number;
 
+    static optionalOpaqueInout(sl: Array<SliceableOpaque | null>): Array<SliceableOpaque | null>;
+
     constructor(i: number);
 }

@@ -28,6 +28,8 @@ DiplomatSliceableOpaqueView SliceableOpaque_static_ret(void);
 
 SliceableOpaqueHolder* SliceableOpaque_make_static_holder(void);
 
+void SliceableOpaque_optional_opaque_in(DiplomatSliceableOpaqueView sl, int32_t n);
+
 void SliceableOpaque_destroy(SliceableOpaque* self);
 
 

@@ -52,6 +52,8 @@ public:
 
   inline static std::unique_ptr<somelib::SliceableOpaqueHolder> make_static_holder();
 
+  inline static somelib::diplomat::span<const somelib::SliceableOpaque*> optional_opaque_inout(somelib::diplomat::span<const somelib::SliceableOpaque*> sl);
+
     inline const somelib::capi::SliceableOpaque* AsFFI() const;
     inline somelib::capi::SliceableOpaque* AsFFI();
     inline static const somelib::SliceableOpaque* FromFFI(const somelib::capi::SliceableOpaque* ptr);

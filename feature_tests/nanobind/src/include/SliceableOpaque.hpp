@@ -31,6 +31,8 @@ namespace capi {
 
     somelib::capi::SliceableOpaqueHolder* SliceableOpaque_make_static_holder(void);
 
+    somelib::capi::DiplomatSliceableOpaqueView SliceableOpaque_optional_opaque_inout(somelib::capi::DiplomatSliceableOpaqueView sl);
+
     void SliceableOpaque_destroy(SliceableOpaque* self);
 
     } // extern "C"
@@ -65,6 +67,11 @@ inline somelib::diplomat::span<const somelib::SliceableOpaque*> somelib::Sliceab
 inline std::unique_ptr<somelib::SliceableOpaqueHolder> somelib::SliceableOpaque::make_static_holder() {
     auto result = somelib::capi::SliceableOpaque_make_static_holder();
     return std::unique_ptr<somelib::SliceableOpaqueHolder>(somelib::SliceableOpaqueHolder::FromFFI(result));
+}
+
+inline somelib::diplomat::span<const somelib::SliceableOpaque*> somelib::SliceableOpaque::optional_opaque_inout(somelib::diplomat::span<const somelib::SliceableOpaque*> sl) {
+    auto result = somelib::capi::SliceableOpaque_optional_opaque_inout({reinterpret_cast<const somelib::capi::SliceableOpaque**>(sl.data()), sl.size()});
+    return somelib::diplomat::span<const somelib::SliceableOpaque*>(reinterpret_cast<const somelib::SliceableOpaque**>(result.data), result.len);
 }
 
 inline const somelib::capi::SliceableOpaque* somelib::SliceableOpaque::AsFFI() const {
