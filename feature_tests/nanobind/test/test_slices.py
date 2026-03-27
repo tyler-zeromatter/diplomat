@@ -37,3 +37,7 @@ def test_slices():
     
     static_holder = somelib.SliceableOpaque.make_static_holder()
     somelib.SliceableOpaque.non_static_mismatch_in(static_holder.mismatch_lt_ret(), 20)
+    
+    optional_outoptional_opaque_inout = somelib.SliceableOpaque.optional_opaque_inout([somelib.SliceableOpaque(0), None, somelib.SliceableOpaque(5)]);
+    assert optional_outoptional_opaque_inout[1] == None
+    assert optional_outoptional_opaque_inout[0].num == 0
