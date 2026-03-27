@@ -630,7 +630,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
         match *ty {
             Type::Primitive(p) => self.maybe_wrap_in_write(js_name, gen_context, p),
             Type::Opaque(ref op) if op.is_optional() => self.maybe_wrap_in_write(
-                format!("{js_name}.ffiValue ?? 0").into(),
+                format!("{js_name}?.ffiValue ?? 0").into(),
                 gen_context,
                 PrimitiveType::Int(IntType::U32),
             ),
