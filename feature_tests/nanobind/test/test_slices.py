@@ -29,7 +29,6 @@ def test_slices():
     assert out[0].str == l[0].str
     assert out[1].str == l[1].str
 
-    # FIXME: This errors the GC.
     static_out = somelib.SliceableOpaque.static_ret()
     somelib.SliceableOpaque.static_in(static_out, 20)
 
@@ -37,4 +36,4 @@ def test_slices():
     somelib.SliceableOpaque.non_static_mismatch_in(sliceable_arr, 0)
     
     static_holder = somelib.SliceableOpaque.make_static_holder()
-    somelib.SliceableOpaque.non_static_mismatch_in(static_holder, 20)
+    somelib.SliceableOpaque.non_static_mismatch_in(static_holder.mismatch_lt_ret(), 20)
