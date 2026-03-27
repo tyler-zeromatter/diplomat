@@ -175,18 +175,22 @@ pub mod ffi {
             self.0
         }
 
+        #[diplomat::cfg(supports=static_slices)]
         pub fn static_in(i : &'static [&'static SliceableOpaque], n : i32) {
             assert_eq!(i[0].0, n);
         }
 
+        #[diplomat::cfg(supports=static_slices)]
         pub fn non_static_mismatch_in<'a>(i : &'a [&'static SliceableOpaque], n : i32) {
             assert_eq!(i[0].0, n);
         }
 
+        #[diplomat::cfg(supports=static_slices)]
         pub fn static_ret() -> &'static [&'static SliceableOpaque] {
             SLICEABLE_OP_STATIC
         }
 
+        #[diplomat::cfg(supports=static_slices)]
         pub fn make_static_holder() -> Box<SliceableOpaqueHolder<'static>> {
             SliceableOpaqueHolder::new(&SLICEABLE_OPAQUE_REF)
         }
