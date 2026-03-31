@@ -1467,7 +1467,7 @@ mod tests {
             }
         }
     }
-        
+
     #[test]
     fn test_opaque_slice() {
         uitest_lowering! {
@@ -1495,7 +1495,7 @@ mod tests {
                     pub fn takes_owned_slice(f : &[Box<Foo>]) {
                         todo!()
                     }
-                    
+
                     pub fn returns_owned_slice<'b>() -> &'b [Box<Foo>] {
                         todo!()
                     }
@@ -1506,7 +1506,7 @@ mod tests {
 
     #[test]
     fn test_opaque_slice_borrows() {
-        let parsed : syn::File = syn::parse_quote! {
+        let parsed: syn::File = syn::parse_quote! {
             #[diplomat::bridge]
             mod ffi {
                 #[diplomat::opaque]
@@ -1515,7 +1515,7 @@ mod tests {
                     pub fn opaque_slice_lt_same<'a>(&'a self, op : &'a [&'a Foo]) {
                         todo!()
                     }
-                    
+
                     pub fn borrows_opaque_slice<'a>(&'a self, op : &'a [&'a Foo]) -> &'a Self {
                         todo!()
                     }
@@ -1525,9 +1525,7 @@ mod tests {
         let mut output = String::new();
 
         let mut attr_validator = hir::BasicAttributeValidator::new("tests");
-        attr_validator.support.abi_compatibles = true;
-        attr_validator.support.struct_refs = true;
-        attr_validator.support.callbacks = true;
+        attr_validator.support.opaque_slices = true;
         let config = super::LoweringConfig {
             unsafe_references_in_callbacks: true,
         };

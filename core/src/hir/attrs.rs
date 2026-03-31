@@ -1322,6 +1322,8 @@ pub struct BackendAttrSupport {
     pub default_args: bool,
     /// Whether the language supports mutable slices.
     pub mutable_slices: bool,
+    /// Whether the language supports taking in slices of opaque types.
+    pub opaque_slices: bool,
 }
 
 impl BackendAttrSupport {
@@ -1364,6 +1366,7 @@ impl BackendAttrSupport {
             owned_slices: true,
             default_args: true,
             mutable_slices: true,
+            opaque_slices: true,
         }
     }
 
@@ -1552,6 +1555,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 owned_slices,
                 default_args,
                 mutable_slices,
+                opaque_slices,
             } = self.support;
             match value {
                 "namespacing" => namespacing,
@@ -1590,6 +1594,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 "owned_slices" => owned_slices,
                 "default_args" => default_args,
                 "mutable_slices" => mutable_slices,
+                "opaque_slices" => opaque_slices,
                 _ => {
                     return Err(LoweringError::Other(format!(
                         "Unknown supports = value found: {value}"
