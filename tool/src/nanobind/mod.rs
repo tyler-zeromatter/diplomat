@@ -52,6 +52,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     a.struct_refs = true;
     a.free_functions = true;
     a.custom_bindings = true;
+    a.opaque_slices = true;
 
     a
 }
