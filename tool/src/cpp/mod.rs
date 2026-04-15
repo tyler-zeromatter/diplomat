@@ -57,6 +57,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     a.custom_bindings = true;
     a.default_args = true;
     a.mutable_slices = true;
+    a.tuples = true;
 
     a
 }
