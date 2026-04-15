@@ -30,6 +30,8 @@ export { ErrorStruct } from "./ErrorStruct.mjs"
 
 export { BigStructWithStuff } from "./BigStructWithStuff.mjs"
 
+export { ContainingTuple } from "./ContainingTuple.mjs"
+
 export { CyclicStructA } from "./CyclicStructA.mjs"
 
 export { CyclicStructB } from "./CyclicStructB.mjs"
@@ -48,7 +50,11 @@ export { ScalarPairWithPadding } from "./ScalarPairWithPadding.mjs"
 
 export { StructWithSlices } from "./StructWithSlices.mjs"
 
+export { TupleStruct } from "./TupleStruct.mjs"
+
 export { OptionStruct } from "./OptionStruct.mjs"
+
+export { OutTupleStruct } from "./OutTupleStruct.mjs"
 
 export { AttrOpaque1Renamed } from "./AttrOpaque1Renamed.mjs"
 
@@ -137,4 +143,4 @@ export { MyEnum } from "./MyEnum.mjs"
 import wasm from "./diplomat-wasm.mjs";
 import {FUNCTION_PARAM_ALLOC, internalConstructor} from "./diplomat-runtime.mjs";
 
-FUNCTION_PARAM_ALLOC.reserve(internalConstructor, wasm, 40);
+FUNCTION_PARAM_ALLOC.reserve(internalConstructor, wasm, 48);
