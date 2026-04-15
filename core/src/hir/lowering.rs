@@ -713,7 +713,7 @@ impl<'ast> LoweringContext<'ast> {
 
         let abi_name = self.lower_ident(&method.abi_name, "method abi name")?;
 
-        let hir_method = Method {
+        let mut hir_method = Method {
             docs: Docs::from_ast(&method.docs, self.attr_validator.as_ref(), &mut self.errors),
             name: name?,
             abi_name,
@@ -734,13 +734,30 @@ impl<'ast> LoweringContext<'ast> {
 
         let is_comparison = matches!(
             hir_method.attrs.special_method,
-            Some(SpecialMethod::Comparison)
+            Some(SpecialMethod::Comparison(_))
         );
-        if is_comparison && method.return_type != Some(ast::TypeName::Ordering) {
-            self.errors.push(LoweringError::Other(
-                "Found comparison method that does not return cmp::Ordering".into(),
-            ));
-            return Err(());
+
+        if is_comparison {
+            let is_optional_ord = if let Some(ast::TypeName::Option(t, _)) = &method.return_type {
+                if matches!(**t, ast::TypeName::Ordering) {
+                    if !self.attr_validator.attrs_supported().partial_comparators {
+                        self.errors.push(LoweringError::Other("Comparators that return `Option` are not supported by this backend (Filter with #[diplomat::cfg(supports=partial_comparators)]).".into()));
+                    }
+                    hir_method.attrs.special_method = Some(SpecialMethod::Comparison(true));
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            };
+
+            if !(method.return_type == Some(ast::TypeName::Ordering) || is_optional_ord) {
+                self.errors.push(LoweringError::Other(
+                    "Found comparison method that does not return cmp::Ordering or Optional<cmp::Ordering>".into(),
+                ));
+                return Err(());
+            }
         }
 
         Ok(hir_method)
