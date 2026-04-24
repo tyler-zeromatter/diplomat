@@ -31,6 +31,8 @@ PrimitiveStruct PrimitiveStructVec_get(const PrimitiveStructVec* self, size_t id
 
 void PrimitiveStructVec_take_slice_from_other_namespace(DiplomatStructWithAttrsView _sl);
 
+PrimitiveStructVec* PrimitiveStructVec_take_in_slice(DiplomatPrimitiveStructView a);
+
 void PrimitiveStructVec_destroy(PrimitiveStructVec* self);
 
 
