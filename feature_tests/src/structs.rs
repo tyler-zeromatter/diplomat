@@ -567,6 +567,10 @@ pub mod ffi {
         pub fn take_slice_from_other_namespace(_sl: &[crate::attrs::ffi::StructWithAttrs]) {
             assert!(true)
         }
+
+        pub fn take_in_slice(a : &[PrimitiveStruct]) -> Box<Self> {
+            Box::new(Self(a.iter().cloned().collect()))
+        }
     }
 
     #[diplomat::opaque_mut]
