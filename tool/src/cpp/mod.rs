@@ -51,6 +51,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     a.accessors = false;
     a.static_accessors = false;
     a.comparators = true;
+    a.partial_comparators = true;
     a.stringifiers = false; // TODO
     a.iterators = true;
     a.iterables = true;

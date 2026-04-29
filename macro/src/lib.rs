@@ -358,14 +358,20 @@ fn gen_custom_function(func_info: FuncGen) -> Item {
                 }
                 // anything else goes through DiplomatResult
                 _ => {
-                    let ty = ty.to_syn();
+                    let ty_s = ty.to_syn();
                     let conversion = if *is_std_option == StdlibOrDiplomat::Stdlib {
                         quote! { .ok_or(()).into() }
                     } else {
                         quote! {}
                     };
+
+                    let conversion = if **ty == ast::TypeName::Ordering {
+                        quote! { .map(|i| i as i8) #conversion }
+                    } else {
+                        conversion
+                    };
                     (
-                        quote! { -> diplomat_runtime::DiplomatResult<#ty, ()> },
+                        quote! { -> diplomat_runtime::DiplomatResult<#ty_s, ()> },
                         conversion,
                     )
                 }

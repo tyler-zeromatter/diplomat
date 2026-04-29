@@ -24,7 +24,7 @@
     {%- when crate::hir::SpecialMethod::AddAssign | crate::hir::SpecialMethod::SubAssign |
             crate::hir::SpecialMethod::MulAssign | crate::hir::SpecialMethod::DivAssign -%}
         (nb::self {{special_method.operator_str().unwrap()}} nb::self, nb::rv_policy::none)
-    {%- when crate::hir::SpecialMethod::Comparison -%}
+    {%- when crate::hir::SpecialMethod::Comparison(_) -%}
         (nb::self == nb::self)
         .def(nb::self != nb::self)
         .def(nb::self <= nb::self)

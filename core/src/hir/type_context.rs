@@ -1435,4 +1435,22 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_partial_comparison_unsupported() {
+        uitest_lowering! {
+            #[diplomat::bridge]
+            mod ffi {
+                #[diplomat::opaque]
+                pub struct PartialComparable;
+
+                impl PartialComparable {
+                    #[diplomat::attr(auto, comparison)]
+                    pub fn cmp(&self, other : &PartialComparable) -> Option<core::cmp::Ordering> {
+                        todo!()
+                    }
+                }
+            }
+        }
+    }
 }

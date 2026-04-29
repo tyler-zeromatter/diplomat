@@ -168,6 +168,28 @@ pub mod ffi {
     }
 
     #[diplomat::opaque]
+    #[diplomat::cfg(supports = partial_comparators)]
+    pub struct PartialComparable(f32);
+    impl PartialComparable {
+        #[diplomat::attr(auto, constructor)]
+        pub fn new(float: f32) -> Box<Self> {
+            Box::new(Self(float))
+        }
+
+        #[diplomat::attr(auto, comparison)]
+        pub fn partial_cmp(&self, other: &PartialComparable) -> Option<core::cmp::Ordering> {
+            self.0.partial_cmp(&other.0)
+        }
+
+        pub fn test_nonstd(
+            &self,
+            other: &PartialComparable,
+        ) -> DiplomatOption<core::cmp::Ordering> {
+            self.0.partial_cmp(&other.0).into()
+        }
+    }
+
+    #[diplomat::opaque]
     #[diplomat::cfg(supports = indexing)]
     pub struct MyIndexer(Vec<String>);
 

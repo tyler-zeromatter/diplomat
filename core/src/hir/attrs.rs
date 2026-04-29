@@ -269,8 +269,10 @@ pub enum SpecialMethod {
     Setter(Option<String>),
     /// A stringifier. Must have no parameters and return a string (DiplomatWrite)
     Stringifier,
-    /// A comparison operator. Currently not universally supported
-    Comparison,
+    /// A comparison operator. Currently not universally supported.
+    ///
+    /// bool is true if the comparison is partial (i.e., [`Option<std::cmp::Ordering>`]).
+    Comparison(bool),
     /// An iterator (a type that is mutated to produce new values)
     Iterator,
     /// An iterable (a type that can produce an iterator)
@@ -307,7 +309,7 @@ impl SpecialMethod {
             "getter" => Ok(Some(Self::Getter(parse_meta(meta)?))),
             "setter" => Ok(Some(Self::Setter(parse_meta(meta)?))),
             "stringifier" => Ok(Some(Self::Stringifier)),
-            "comparison" => Ok(Some(Self::Comparison)),
+            "comparison" => Ok(Some(Self::Comparison(false))),
             "iterator" => Ok(Some(Self::Iterator)),
             "iterable" => Ok(Some(Self::Iterable)),
             "indexer" => Ok(Some(Self::Indexer)),
@@ -838,7 +840,7 @@ impl Attrs {
                             ));
                         }
                     }
-                    SpecialMethod::Comparison => {
+                    SpecialMethod::Comparison(_) => {
                         check_param_count("Comparator", 1, errors);
                         if special_method_presence.comparator {
                             errors.push(LoweringError::Other(
@@ -1277,6 +1279,8 @@ pub struct BackendAttrSupport {
     pub stringifiers: bool,
     /// Marking a method as the `compare_to` method, which is special in this language.
     pub comparators: bool,
+    /// Supports comparators that return `Option`
+    pub partial_comparators: bool,
     /// Marking a method as the `next` method, which is special in this language.
     pub iterators: bool,
     /// Marking a method as the `iterator` method, which is special in this language.
@@ -1340,6 +1344,7 @@ impl BackendAttrSupport {
             accessors: true,
             stringifiers: true,
             comparators: true,
+            partial_comparators: true,
             iterators: true,
             iterables: true,
             indexing: true,
@@ -1378,6 +1383,7 @@ impl BackendAttrSupport {
             "accessors" => Some(self.accessors),
             "stringifiers" => Some(self.stringifiers),
             "comparators" => Some(self.comparators),
+            "partial_comparators" => Some(self.partial_comparators),
             "iterators" => Some(self.iterators),
             "iterables" => Some(self.iterables),
             "indexing" => Some(self.indexing),
@@ -1526,6 +1532,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 static_accessors,
                 stringifiers,
                 comparators,
+                partial_comparators,
                 iterators,
                 iterables,
                 indexing,
@@ -1563,6 +1570,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 "static_accessors" => static_accessors,
                 "stringifiers" => stringifiers,
                 "comparators" => comparators,
+                "partial_comparators" => partial_comparators,
                 "iterators" => iterators,
                 "iterables" => iterables,
                 "indexing" => indexing,

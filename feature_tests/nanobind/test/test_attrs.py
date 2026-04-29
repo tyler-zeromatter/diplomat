@@ -71,3 +71,15 @@ def test_sequencing():
     for a in ind:
         i = i + 1
     assert i == 3
+
+def test_partial_comparison():
+    import math
+    a = somelib.ns.RenamedPartialComparable(10)
+    b = somelib.ns.RenamedPartialComparable(20)
+    c = somelib.ns.RenamedPartialComparable(math.nan)
+    assert b > a
+    assert a < b
+    assert a != b
+    assert not(c > a)
+    assert not(c == a)
+    assert not(c != a)
