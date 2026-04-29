@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
     auto partial_cmp_b = ns::RenamedPartialComparable::new_(100.0f);
     auto partial_cmp_c = ns::RenamedPartialComparable::new_(std::numeric_limits<float>::quiet_NaN());
 
-    
+
     simple_assert("Partial Comparison GT", (*partial_cmp_b > *partial_cmp_a).value());
     simple_assert("Partial Comparison LT", (*partial_cmp_a < *partial_cmp_b).value());
     simple_assert("Partial Comparison NE", (*partial_cmp_a != *partial_cmp_b).value());
