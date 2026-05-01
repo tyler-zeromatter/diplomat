@@ -495,7 +495,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
             }
             Type::Slice(hir::Slice::Strs(encoding)) => format!(
                 "diplomat::span<const {}>",
-                self.formatter.cxx.fmt_borrowed_str(encoding)
+                self.formatter.cxx.fmt_borrowed_str_in_slice(encoding)
             )
             .into(),
             Type::Slice(hir::Slice::Struct(b, ref st)) => {
