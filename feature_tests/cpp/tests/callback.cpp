@@ -177,4 +177,11 @@ int main(int argc, char *argv[])
             return diplomat::Ok(primitive_vec_ptr->as_slice());
         });
     }
+
+    {
+        o.test_owned_opaque([](std::unique_ptr<somelib::Opaque> op) {
+            simple_assert_eq("Owned opaques in callbacks", op->get_debug_str(), "\"Some string\"");
+        });
+    }
+
 }
