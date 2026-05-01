@@ -334,6 +334,12 @@ pub mod ffi {
             self.x
         }
 
+        #[diplomat::attr(supports=method_overloading, rename="x")]
+        #[diplomat::cfg(supports=method_overloading)]
+        pub fn x_overload(&self, add: i32) -> i32 {
+            self.x + add
+        }
+
         pub fn y(&self) -> i32 {
             self.y
         }
