@@ -6,13 +6,13 @@
 {%- block cpp_method_name -%}{%- endblock -%}
 {%- endif -%}
 {%- endmacro -%}
-{%- macro overload_method_name_cpp(overload_params, method_name=Option::<String>::None) -%}
-{%- if overload_params.len() > 0 -%}
-nb::overload_cast<{% for p in overload_params -%} {{- p.type_name -}} {%- if !loop.last -%}, {% endif %} {%- endfor
+{%- macro overload_method_name_cpp(overload_params, is_const=false, method_name=Option::<String>::None) -%}
+{%- if m.overloads.len() > 0 -%}
+nb::overload_cast<{% for p in &overload_params -%} {{- p.type_name -}} {%- if !loop.last -%}, {% endif %} {%- endfor
     -%}>(
 {%- endif -%}
 &{{- method_name_cpp_inner(method_name) -}}
-{%- if m.overloads.len() > 0 -%} ) {%- endif -%}
+{%- if m.overloads.len() > 0 -%} {%- if is_const %}, nb::const_ {%- endif -%} ) {%- endif -%}
 {%- endmacro -%}
 {%- macro method_name_cpp(pre_call="std::move(maybe_op_unwrap(", post_call="))") -%}
     {%- decl success_owned_op -%}
@@ -49,7 +49,7 @@ nb::overload_cast<{% for p in overload_params -%} {{- p.type_name -}} {%- if !lo
     {%- endif -%}
 
     {%- call method_name_cpp()-%}
-    {{-overload_method_name_cpp(main_overload_params)-}}
+    {{-overload_method_name_cpp(main_overload_params, m.method.param_self.is_some() && m.method.param_self.as_ref().unwrap().get_mutability().is_immutable())-}}
     {%- endcall -%}
     {{- method_params::params(m.method.params, m.lifetime_args) -}})
     {%- endif -%}
@@ -58,7 +58,7 @@ nb::overload_cast<{% for p in overload_params -%} {{- p.type_name -}} {%- if !lo
     {#- Constructors have special overload behavior. -#}
     {%- if let Some(hir::SpecialMethod::Constructor) = m.method.attrs.special_method -%}{%- else -%}
     {%- for o in m.overloads %}
-    .{{m.def}}("{{m.method_name}}", {% call method_name_cpp()-%} {{-overload_method_name_cpp(o.parameters.params.clone(), o.method_name)-}}
+    .{{m.def}}("{{m.method_name}}", {% call method_name_cpp()-%} {{-overload_method_name_cpp(o.parameters.params.clone(), m.method.param_self.is_some() && m.method.param_self.as_ref().unwrap().get_mutability().is_immutable(), o.method_name)-}}
     {%- endcall -%}
         {{- method_params::params(o.parameters.params, m.lifetime_args) -}})
         {%- endfor -%}
