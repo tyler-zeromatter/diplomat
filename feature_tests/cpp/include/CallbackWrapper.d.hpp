@@ -63,6 +63,8 @@ struct CallbackWrapper {
   template<typename W>
   inline static void test_option_opaque_write(std::function<const somelib::Opaque*()> t, W& writeable_output);
 
+  inline static void test_owned_opaque(std::function<void(std::unique_ptr<somelib::Opaque>)> t);
+
   inline static void test_diplomat_result(std::function<somelib::diplomat::result<size_t, size_t>()> t);
 
   inline static std::string test_result_opaque(std::function<somelib::diplomat::result<const somelib::Opaque&, std::monostate>()> t);

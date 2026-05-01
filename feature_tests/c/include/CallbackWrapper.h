@@ -92,6 +92,11 @@ typedef struct DiplomatCallback_CallbackWrapper_test_option_opaque_t {
     const Opaque* (*run_callback)(const void*);
     void (*destructor)(const void*);
 } DiplomatCallback_CallbackWrapper_test_option_opaque_t;
+typedef struct DiplomatCallback_CallbackWrapper_test_owned_opaque_t {
+    const void* data;
+    void (*run_callback)(const void*, Opaque* );
+    void (*destructor)(const void*);
+} DiplomatCallback_CallbackWrapper_test_owned_opaque_t;
 typedef struct DiplomatCallback_CallbackWrapper_test_diplomat_result_t_result {union {size_t ok; size_t err;}; bool is_ok;} DiplomatCallback_CallbackWrapper_test_diplomat_result_t_result;
 
 typedef struct DiplomatCallback_CallbackWrapper_test_diplomat_result_t {
@@ -165,6 +170,8 @@ void CallbackWrapper_test_option_output(DiplomatCallback_CallbackWrapper_test_op
 void CallbackWrapper_test_diplomat_option_output(DiplomatCallback_CallbackWrapper_test_diplomat_option_output_t t_cb_wrap);
 
 void CallbackWrapper_test_option_opaque(DiplomatCallback_CallbackWrapper_test_option_opaque_t t_cb_wrap, DiplomatWrite* write);
+
+void CallbackWrapper_test_owned_opaque(DiplomatCallback_CallbackWrapper_test_owned_opaque_t t_cb_wrap);
 
 void CallbackWrapper_test_diplomat_result(DiplomatCallback_CallbackWrapper_test_diplomat_result_t t_cb_wrap);
 

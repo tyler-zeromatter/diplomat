@@ -356,6 +356,11 @@ struct as_ffi<T, std::void_t<decltype(std::declval<std::remove_pointer_t<T>>().A
   using type = decltype(std::declval<std::remove_pointer_t<T>>().AsFFI());
 };
 
+template <typename T>
+struct as_ffi<std::unique_ptr<T>> {
+  using type = decltype(std::declval<T>().AsFFI());
+};
+
 template<typename T>
 using as_ffi_t = typename as_ffi<T>::type;
 
@@ -399,6 +404,21 @@ MAKE_SLICE_CONVERTERS(String16, char16_t)
 template<typename T>
 using diplomat_c_span_convert_t = typename diplomat_c_span_convert<T>::type;
 
+template<typename T>
+struct is_unique_ptr {
+  static constexpr bool value = false;
+  using type = T;
+};
+
+template<typename T>
+struct is_unique_ptr<std::unique_ptr<T>> {
+  static constexpr bool value = true;
+  using type = T;
+};
+
+template<typename T>
+constexpr bool is_unique_ptr_v = is_unique_ptr<T>::value;
+
 /// Replace the argument types from the std::function with the argument types for th function pointer
 template<typename T>
 using replace_fn_t = diplomat_c_span_convert_t<replace_string_view_t<as_ffi_t<T>>>;
@@ -418,6 +438,8 @@ template <typename Ret, typename... Args> struct fn_traits<std::function<Ret(Arg
       } else if constexpr (!std::is_same_v<T, as_ffi_t<T>>) {
         if constexpr (std::is_lvalue_reference_v<T>) {
           return *std::remove_reference_t<T>::FromFFI(val);
+        } else if constexpr (is_unique_ptr_v<T>) {
+          return T(is_unique_ptr<T>::type::FromFFI(val));
         }
         else {
           return T::FromFFI(val);

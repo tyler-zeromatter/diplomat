@@ -95,6 +95,11 @@ namespace capi {
         const somelib::capi::Opaque* (*run_callback)(const void*);
         void (*destructor)(const void*);
     } DiplomatCallback_CallbackWrapper_test_option_opaque_t;
+    typedef struct DiplomatCallback_CallbackWrapper_test_owned_opaque_t {
+        const void* data;
+        void (*run_callback)(const void*, somelib::capi::Opaque* );
+        void (*destructor)(const void*);
+    } DiplomatCallback_CallbackWrapper_test_owned_opaque_t;
     typedef struct DiplomatCallback_CallbackWrapper_test_diplomat_result_t_result {union {size_t ok; size_t err;}; bool is_ok;} DiplomatCallback_CallbackWrapper_test_diplomat_result_t_result;
 
     typedef struct DiplomatCallback_CallbackWrapper_test_diplomat_result_t {
@@ -168,6 +173,8 @@ namespace capi {
     void CallbackWrapper_test_diplomat_option_output(DiplomatCallback_CallbackWrapper_test_diplomat_option_output_t t_cb_wrap);
 
     void CallbackWrapper_test_option_opaque(DiplomatCallback_CallbackWrapper_test_option_opaque_t t_cb_wrap, somelib::diplomat::capi::DiplomatWrite* write);
+
+    void CallbackWrapper_test_owned_opaque(DiplomatCallback_CallbackWrapper_test_owned_opaque_t t_cb_wrap);
 
     void CallbackWrapper_test_diplomat_result(DiplomatCallback_CallbackWrapper_test_diplomat_result_t t_cb_wrap);
 
@@ -252,6 +259,10 @@ inline void somelib::CallbackWrapper::test_option_opaque_write(std::function<con
     somelib::diplomat::capi::DiplomatWrite write = somelib::diplomat::WriteTrait<W>::Construct(writeable);
     somelib::capi::CallbackWrapper_test_option_opaque({new decltype(t)(std::move(t)), somelib::diplomat::fn_traits(t).template c_run_callback_diplomat_opaque<const somelib::capi::Opaque*>, somelib::diplomat::fn_traits(t).c_delete},
         &write);
+}
+
+inline void somelib::CallbackWrapper::test_owned_opaque(std::function<void(std::unique_ptr<somelib::Opaque>)> t) {
+    somelib::capi::CallbackWrapper_test_owned_opaque({new decltype(t)(std::move(t)), somelib::diplomat::fn_traits(t).c_run_callback, somelib::diplomat::fn_traits(t).c_delete});
 }
 
 inline void somelib::CallbackWrapper::test_diplomat_result(std::function<somelib::diplomat::result<size_t, size_t>()> t) {

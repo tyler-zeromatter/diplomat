@@ -22,6 +22,7 @@ void add_CallbackWrapper_binding(nb::module_ mod) {
         .def_static("test_opaque_result_error", &somelib::CallbackWrapper::test_opaque_result_error, "t"_a)
         .def_static("test_option_opaque", &somelib::CallbackWrapper::test_option_opaque, "t"_a)
         .def_static("test_option_output", &somelib::CallbackWrapper::test_option_output, "t"_a)
+        .def_static("test_owned_opaque", &somelib::CallbackWrapper::test_owned_opaque, "t"_a)
         .def_static("test_result_opaque", &somelib::CallbackWrapper::test_result_opaque, "t"_a)
         .def_static("test_result_output", &somelib::CallbackWrapper::test_result_output, "t"_a)
         .def_static("test_result_usize_output", &somelib::CallbackWrapper::test_result_usize_output, "t"_a)
