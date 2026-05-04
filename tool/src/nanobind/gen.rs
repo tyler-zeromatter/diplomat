@@ -509,7 +509,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
             Type::DiplomatOption(ref inner) => {
                 format!("std::optional<{}>", self.gen_type_name(inner)).into()
             }
-            Type::Callback(..) => "".into(),
+            Type::Callback(ref cb) => format!("std::function<{}>", self.cpp.gen_fn_sig(cb)).into(),
             _ => unreachable!("unknown AST/HIR variant"),
         }
     }

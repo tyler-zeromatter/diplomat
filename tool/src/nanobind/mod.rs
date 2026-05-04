@@ -423,6 +423,12 @@ mod test {
                     pub fn do_thing() -> bool {
                         return true;
                     }
+
+                    pub fn takes_callback(f : impl Fn()) {
+                        todo!()
+                    }
+                    #[diplomat::attr(*, rename="takes_callback")]
+                    pub fn takes_other_callback(f : impl Fn(bool)) {}
                 }
             }
             }
