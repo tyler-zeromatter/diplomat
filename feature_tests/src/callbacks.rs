@@ -75,6 +75,11 @@ mod ffi {
         }
 
         #[diplomat::attr(kotlin, disable)]
+        pub fn test_owned_opaque(t: impl Fn(Box<crate::structs::ffi::Opaque>)) {
+            t(crate::structs::ffi::Opaque::from_str("Some string"))
+        }
+
+        #[diplomat::attr(kotlin, disable)]
         pub fn test_diplomat_result(t: impl Fn() -> DiplomatResult<usize, usize>) {
             let out = t();
             assert_eq!(out.as_ref().err().cloned(), Some(10));
