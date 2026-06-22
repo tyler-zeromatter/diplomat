@@ -11,7 +11,7 @@ impl MyOpaqueEnum {
         let ret = unsafe { MyOpaqueEnum_new() };
         
         ret
-    
+
     }
 
     pub fn to_string<'anon_0>(&'anon_0 self) -> String {
@@ -21,7 +21,7 @@ impl MyOpaqueEnum {
         
         let out_str = write.to_string();
         out_str
-    
+
     }
 }
 

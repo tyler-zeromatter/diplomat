@@ -1,6 +1,8 @@
+use super::BorrowingOptionStruct;
 use super::OptionEnum;
 use super::OptionInputStruct;
 use super::OptionStruct;
+use super::borrowing_option_struct::BorrowingOptionStructAbi;
 use super::option_input_struct::OptionInputStructAbi;
 use super::option_struct::OptionStructAbi;
 pub struct OptionOpaque;
@@ -16,77 +18,77 @@ impl OptionOpaque {
         let ret = unsafe { OptionOpaque_new(i) };
         
         ret
-    
+
     }
 
     pub fn new_none() -> Option<Box<OptionOpaque>> {
         let ret = unsafe { OptionOpaque_new_none() };
         
         ret
-    
+
     }
 
     pub fn returns() -> Option<OptionStruct> {
         let ret = unsafe { OptionOpaque_returns() };
         
         ret.into_converted_option().map(|ok : OptionStructAbi| { ok.from_ffi() })
-    
+
     }
 
     pub fn option_isize<'anon_0>(&'anon_0 self) -> Option<isize> {
         let ret = unsafe { OptionOpaque_option_isize(self) };
         
         ret.into_converted_option()
-    
+
     }
 
     pub fn option_usize<'anon_0>(&'anon_0 self) -> Option<usize> {
         let ret = unsafe { OptionOpaque_option_usize(self) };
         
         ret.into_converted_option()
-    
+
     }
 
     pub fn option_i32<'anon_0>(&'anon_0 self) -> Option<i32> {
         let ret = unsafe { OptionOpaque_option_i32(self) };
         
         ret.into_converted_option()
-    
+
     }
 
     pub fn option_u32<'anon_0>(&'anon_0 self) -> Option<u32> {
         let ret = unsafe { OptionOpaque_option_u32(self) };
         
         ret.into_converted_option()
-    
+
     }
 
     pub fn new_struct() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct() };
         
         ret.from_ffi()
-    
+
     }
 
     pub fn new_struct_nones() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct_nones() };
         
         ret.from_ffi()
-    
+
     }
 
     pub fn returns_none_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_none_self(self) };
         
         ret
-    
+
     }
 
     pub fn returns_some_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_some_self(self) };
         
         ret
-    
+
     }
 
     pub fn assert_integer<'anon_0>(&'anon_0 self, i : i32) {
@@ -98,35 +100,47 @@ impl OptionOpaque {
         let ret = unsafe { OptionOpaque_option_opaque_argument(arg) };
         
         ret
-    
+
     }
 
     pub fn accepts_option_u8(arg : Option<u8>, sentinel : u8) -> Option<u8> {
         let ret = unsafe { OptionOpaque_accepts_option_u8(arg.into(), sentinel) };
         
         ret.into_converted_option()
-    
+
     }
 
     pub fn accepts_option_enum(arg : Option<OptionEnum>, sentinel : u8) -> Option<OptionEnum> {
         let ret = unsafe { OptionOpaque_accepts_option_enum(arg.into(), sentinel) };
         
         ret.into_converted_option()
-    
+
+    }
+
+    pub fn accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStruct<'anon_0>) {
+        unsafe { OptionOpaque_accepts_borrowing_option_struct(arg.into()) };
+        
+    }
+
+    pub fn accepts_multiple_option_enum(sentinel1 : u8, arg1 : Option<OptionEnum>, arg2 : Option<OptionEnum>, arg3 : Option<OptionEnum>, sentinel2 : u8) -> Option<OptionEnum> {
+        let ret = unsafe { OptionOpaque_accepts_multiple_option_enum(sentinel1, arg1.into(), arg2.into(), arg3.into(), sentinel2) };
+        
+        ret.into_converted_option()
+
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
         let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.map(|ok| { ok.into() }).into(), sentinel) };
         
         ret.into_converted_option().map(|ok : OptionInputStructAbi| { ok.from_ffi() })
-    
+
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
         let ret = unsafe { OptionOpaque_returns_option_input_struct() };
         
         ret.from_ffi()
-    
+
     }
 }
 
@@ -162,6 +176,10 @@ unsafe extern "C" {
     fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption<u8>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
 
     fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
+
+    fn OptionOpaque_accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStructAbi<'anon_0>);
+
+    fn OptionOpaque_accepts_multiple_option_enum(sentinel1 : u8, arg1 : diplomat_runtime::DiplomatOption<OptionEnum>, arg2 : diplomat_runtime::DiplomatOption<OptionEnum>, arg3 : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel2 : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
     fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStructAbi>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStructAbi>;
 

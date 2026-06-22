@@ -1,11 +1,9 @@
 #[repr(C)]
-pub enum OptionEnum {
-    Foo = 0, 
-    Bar = 1, 
-    Baz = 2
+pub enum RenamedDeprecatedEnum {
+    A = 0
 }
 
-impl OptionEnum {}
+impl RenamedDeprecatedEnum {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

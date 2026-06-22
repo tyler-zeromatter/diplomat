@@ -51,14 +51,14 @@ impl MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_new() };
         
         ret.from_ffi()
-    
+
     }
 
     pub fn filled() -> MyStructContainingAnOption {
         let ret = unsafe { MyStructContainingAnOption_filled() };
         
         ret.from_ffi()
-    
+
     }
 }
 

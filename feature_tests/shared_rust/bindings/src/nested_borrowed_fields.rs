@@ -60,7 +60,7 @@ impl<'x, 'y, 'z> NestedBorrowedFields<'x, 'y, 'z> {
         let ret = unsafe { NestedBorrowedFields_from_bar_and_foo_and_strings(bar, foo, dstr16_x.into(), dstr16_z.into(), utf8_str_y.into(), utf8_str_z.into()) };
         
         ret.from_ffi()
-    
+
     }
 }
 
