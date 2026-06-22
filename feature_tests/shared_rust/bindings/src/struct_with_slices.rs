@@ -1,46 +1,7 @@
-pub struct StructWithSlices<'a> {
-    pub first: &'a [u8],
-    pub second: &'a [u16],
-}
-
 #[repr(C)]
-pub(crate) struct StructWithSlicesAbi<'a> {
-    first : diplomat_runtime::DiplomatStrSlice<'a>,
-    second : &'a [u16],
-}
-
-impl<'a> StructWithSlicesAbi<'a> {
-    pub(crate) fn from_ffi(self) -> StructWithSlices<'a> {
-        StructWithSlices {
-            
-            first: self.first.into(),
-            
-            second: self.second,
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : StructWithSlices<'a>) -> StructWithSlicesAbi<'a> {
-        StructWithSlicesAbi {
-            
-            first : this.first.into(),
-            
-            second : this.second,
-            
-        }
-    }
-}
-
-impl<'a> From<StructWithSlices<'a>> for StructWithSlicesAbi<'a>{
-    fn from(value: StructWithSlices<'a>) -> Self {
-        StructWithSlicesAbi::to_ffi(value)
-    }
-}
-
-impl<'a> From<StructWithSlicesAbi<'a>> for StructWithSlices<'a>{
-    fn from(value: StructWithSlicesAbi<'a>) -> Self {
-        StructWithSlicesAbi::from_ffi(value)
-    }
+pub struct StructWithSlices<'a> {
+    pub first: diplomat_runtime::DiplomatStrSlice::<'a>,
+    pub second: diplomat_runtime::DiplomatSlice::<'a, u16>,
 }
 
 impl<'a> StructWithSlices<'a> {

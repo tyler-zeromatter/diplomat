@@ -119,7 +119,7 @@ unsafe extern "C" {
 
     fn ResultOpaque_give_self<'a>(this: &'a ResultOpaque) -> crate::DiplomatResult<(), &'a ResultOpaque>;
 
-    fn ResultOpaque_takes_str<'a, 'anon_0>(this: &'a mut ResultOpaque, _v : diplomat_runtime::DiplomatUtf8StrSlice<'anon_0>) -> &'a mut ResultOpaque;
+    fn ResultOpaque_takes_str<'a, 'anon_0>(this: &'a mut ResultOpaque, _v : diplomat_runtime::DiplomatUtf8StrSlice::<'anon_0>) -> &'a mut ResultOpaque;
 
     fn ResultOpaque_stringify_error<'a>(this: &'a ResultOpaque, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), &'a ResultOpaque>;
 

@@ -78,23 +78,23 @@ impl MyString {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn MyString_new<'anon_0>(v : diplomat_runtime::DiplomatStrSlice<'anon_0>) -> Box<MyString>;
+    fn MyString_new<'anon_0>(v : diplomat_runtime::DiplomatStrSlice::<'anon_0>) -> Box<MyString>;
 
-    fn MyString_new_unsafe<'anon_0>(v : diplomat_runtime::DiplomatUtf8StrSlice<'anon_0>) -> Box<MyString>;
+    fn MyString_new_unsafe<'anon_0>(v : diplomat_runtime::DiplomatUtf8StrSlice::<'anon_0>) -> Box<MyString>;
 
-    fn MyString_new_from_first(v : diplomat_runtime::DiplomatSlice<diplomat_runtime::DiplomatStrSlice>) -> Box<MyString>;
+    fn MyString_new_from_first(v : diplomat_runtime::DiplomatSlice::<diplomat_runtime::DiplomatStrSlice>) -> Box<MyString>;
 
-    fn MyString_new_from_utf16(v : diplomat_runtime::DiplomatSlice<diplomat_runtime::DiplomatStr16Slice>) -> Box<MyString>;
+    fn MyString_new_from_utf16(v : diplomat_runtime::DiplomatSlice::<diplomat_runtime::DiplomatStr16Slice>) -> Box<MyString>;
 
-    fn MyString_set_str<'anon_0, 'anon_1>(this: &'anon_0 mut MyString, new_str : diplomat_runtime::DiplomatStrSlice<'anon_1>);
+    fn MyString_set_str<'anon_0, 'anon_1>(this: &'anon_0 mut MyString, new_str : diplomat_runtime::DiplomatStrSlice::<'anon_1>);
 
     fn MyString_get_str<'anon_0>(this: &'anon_0 MyString, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn MyString_get_static_str() -> diplomat_runtime::DiplomatUtf8StrSlice<'static>;
+    fn MyString_get_static_str() -> diplomat_runtime::DiplomatUtf8StrSlice::<'static>;
 
-    fn MyString_string_transform<'anon_0>(foo : diplomat_runtime::DiplomatUtf8StrSlice<'anon_0>, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn MyString_string_transform<'anon_0>(foo : diplomat_runtime::DiplomatUtf8StrSlice::<'anon_0>, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn MyString_borrow<'a>(this: &'a MyString) -> diplomat_runtime::DiplomatStrSlice<'a>;
+    fn MyString_borrow<'a>(this: &'a MyString) -> diplomat_runtime::DiplomatStrSlice::<'a>;
 
     fn MyString_destroy(this : *mut MyString);
 }

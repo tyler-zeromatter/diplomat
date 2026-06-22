@@ -64,17 +64,17 @@ impl<'a> Foo<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Foo_new<'a>(x : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
+    fn Foo_new<'a>(x : diplomat_runtime::DiplomatStrSlice::<'a>) -> Box<Foo<'a>>;
 
     fn Foo_get_bar<'a: 'b, 'b>(this: &'b Foo) -> Box<Bar<'b, 'a>>;
 
-    fn Foo_new_static<'a>(x : diplomat_runtime::DiplomatStrSlice<'static>) -> Box<Foo<'a>>;
+    fn Foo_new_static<'a>(x : diplomat_runtime::DiplomatStrSlice::<'static>) -> Box<Foo<'a>>;
 
     fn Foo_as_returning<'a, 'anon_0>(this: &'anon_0 Foo) -> BorrowedFieldsReturningAbi<'a>;
 
     fn Foo_extract_from_fields<'a>(fields : BorrowedFieldsAbi<'a>) -> Box<Foo<'a>>;
 
-    fn Foo_extract_from_bounds<'a, 'x, 'y: 'a + 'x, 'z: 'y + 'a + 'x>(bounds : BorrowedFieldsWithBoundsAbi<'x, 'y, 'z>, another_string : diplomat_runtime::DiplomatStrSlice<'a>) -> Box<Foo<'a>>;
+    fn Foo_extract_from_bounds<'a, 'x, 'y: 'a + 'x, 'z: 'y + 'a + 'x>(bounds : BorrowedFieldsWithBoundsAbi<'x, 'y, 'z>, another_string : diplomat_runtime::DiplomatStrSlice::<'a>) -> Box<Foo<'a>>;
 
     fn Foo_destroy(this : *mut Foo);
 }

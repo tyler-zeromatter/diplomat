@@ -157,6 +157,13 @@ pub(super) struct RustFormatter<'tcx> {
 }
 
 impl<'tcx> RustFormatter<'tcx> {
+    pub(super) fn fmt_ms_lifetime(env : &LifetimeEnv, ms : &MaybeStatic<Lifetime>) -> String {
+        match ms {
+            MaybeStatic::Static => "'static".into(),
+            MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns)),
+        }
+    }
+
     pub(super) fn fmt_symbol_name(&self, id: SymbolId) -> Cow<'tcx, str> {
         match id {
             SymbolId::FunctionId(f) => self.tcx.resolve_function(f).name.as_str().into(),
@@ -170,7 +177,7 @@ impl<'tcx> RustFormatter<'tcx> {
         }
     }
 
-    pub(super) fn fmt_primitive_name(&self, primitive: PrimitiveType) -> &'static str {
+    pub(super) fn fmt_primitive_name(primitive: PrimitiveType) -> &'static str {
         match primitive {
             PrimitiveType::Char => "char",
             PrimitiveType::Byte => "u8",

@@ -89,25 +89,25 @@ impl Float64Vec {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn Float64Vec_new_bool<'anon_0>(v : &'anon_0 [bool]) -> Box<Float64Vec>;
+    fn Float64Vec_new_bool<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, bool>) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_i16<'anon_0>(v : &'anon_0 [i16]) -> Box<Float64Vec>;
+    fn Float64Vec_new_i16<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, i16>) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_u16<'anon_0>(v : &'anon_0 [u16]) -> Box<Float64Vec>;
+    fn Float64Vec_new_u16<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, u16>) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_isize<'anon_0>(v : &'anon_0 [isize]) -> Box<Float64Vec>;
+    fn Float64Vec_new_isize<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, isize>) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_usize<'anon_0>(v : &'anon_0 [usize]) -> Box<Float64Vec>;
+    fn Float64Vec_new_usize<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, usize>) -> Box<Float64Vec>;
 
-    fn Float64Vec_new_f64_be_bytes<'anon_0>(v : &'anon_0 [u8]) -> Box<Float64Vec>;
+    fn Float64Vec_new_f64_be_bytes<'anon_0>(v : diplomat_runtime::DiplomatSlice::<'anon_0, u8>) -> Box<Float64Vec>;
 
-    fn Float64Vec_as_slice<'a>(this: &'a Float64Vec) -> &'a [f64];
+    fn Float64Vec_as_slice<'a>(this: &'a Float64Vec) -> diplomat_runtime::DiplomatSlice::<'a, f64>;
 
-    fn Float64Vec_set_value<'anon_0, 'anon_1>(this: &'anon_0 mut Float64Vec, new_slice : &'anon_1 [f64]);
+    fn Float64Vec_set_value<'anon_0, 'anon_1>(this: &'anon_0 mut Float64Vec, new_slice : diplomat_runtime::DiplomatSlice::<'anon_1, f64>);
 
     fn Float64Vec_to_string<'anon_0>(this: &'anon_0 Float64Vec, write_mut : &mut crate::DiplomatWrite) -> ();
 
-    fn Float64Vec_borrow<'a>(this: &'a Float64Vec) -> &'a [f64];
+    fn Float64Vec_borrow<'a>(this: &'a Float64Vec) -> diplomat_runtime::DiplomatSlice::<'a, f64>;
 
     fn Float64Vec_get<'anon_0>(this: &'anon_0 Float64Vec, i : usize) -> diplomat_runtime::DiplomatOption<f64>;
 

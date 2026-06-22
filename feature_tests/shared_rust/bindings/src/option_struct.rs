@@ -1,81 +1,14 @@
 use super::OptionOpaque;
 use super::OptionOpaqueChar;
-pub struct OptionStruct {
-    a: Option<Box<OptionOpaque>>,
-    b: Option<Box<OptionOpaqueChar>>,
-    c: u32,
-    d: Box<OptionOpaque>,
-}
-
 #[repr(C)]
-pub(crate) struct OptionStructAbi {
-    a : Option<Box<OptionOpaque>>,
-    b : Option<Box<OptionOpaqueChar>>,
-    c : u32,
-    d : Box<OptionOpaque>,
+pub struct OptionStruct {
+    pub a: Option<Box<OptionOpaque>>,
+    pub b: Option<Box<OptionOpaqueChar>>,
+    pub c: u32,
+    pub d: Box<OptionOpaque>,
 }
 
-impl OptionStructAbi {
-    pub(crate) fn from_ffi(self) -> OptionStruct {
-        OptionStruct {
-            
-            a: self.a,
-            
-            b: self.b,
-            
-            c: self.c,
-            
-            d: self.d,
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : OptionStruct) -> OptionStructAbi {
-        OptionStructAbi {
-            
-            a : this.a,
-            
-            b : this.b,
-            
-            c : this.c,
-            
-            d : this.d,
-            
-        }
-    }
-}
-
-impl From<OptionStruct> for OptionStructAbi{
-    fn from(value: OptionStruct) -> Self {
-        OptionStructAbi::to_ffi(value)
-    }
-}
-
-impl From<OptionStructAbi> for OptionStruct{
-    fn from(value: OptionStructAbi) -> Self {
-        OptionStructAbi::from_ffi(value)
-    }
-}
-
-impl OptionStruct {
-
-    pub fn get_a(&self) -> &Option<Box<OptionOpaque>> {
-        &self.a
-    }
-
-    pub fn get_b(&self) -> &Option<Box<OptionOpaqueChar>> {
-        &self.b
-    }
-
-    pub fn get_c(&self) -> &u32 {
-        &self.c
-    }
-
-    pub fn get_d(&self) -> &Box<OptionOpaque> {
-        &self.d
-    }
-
-}
+impl OptionStruct {}
 
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]

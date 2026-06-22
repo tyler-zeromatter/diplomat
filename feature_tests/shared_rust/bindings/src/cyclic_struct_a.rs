@@ -1,42 +1,8 @@
 use super::CyclicStructB;
 use super::cyclic_struct_b::CyclicStructBAbi;
-pub struct CyclicStructA {
-    pub a: CyclicStructB,
-}
-
 #[repr(C)]
-pub(crate) struct CyclicStructAAbi {
-    a : CyclicStructBAbi,
-}
-
-impl CyclicStructAAbi {
-    pub(crate) fn from_ffi(self) -> CyclicStructA {
-        CyclicStructA {
-            
-            a: self.a.from_ffi(),
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : CyclicStructA) -> CyclicStructAAbi {
-        CyclicStructAAbi {
-            
-            a : this.a.into(),
-            
-        }
-    }
-}
-
-impl From<CyclicStructA> for CyclicStructAAbi{
-    fn from(value: CyclicStructA) -> Self {
-        CyclicStructAAbi::to_ffi(value)
-    }
-}
-
-impl From<CyclicStructAAbi> for CyclicStructA{
-    fn from(value: CyclicStructAAbi) -> Self {
-        CyclicStructAAbi::from_ffi(value)
-    }
+pub struct CyclicStructA {
+    pub a: CyclicStructBAbi,
 }
 
 impl CyclicStructA {

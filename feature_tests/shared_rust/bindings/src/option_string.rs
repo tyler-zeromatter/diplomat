@@ -29,7 +29,7 @@ impl OptionString {
     pub fn borrow<'a>(&'a self) -> Option<&'a [u8]> {
         let ret = unsafe { OptionString_borrow(self) };
         
-        ret.into_converted_option().map(|ok : diplomat_runtime::DiplomatStrSlice| { ok.into() })
+        ret.into_converted_option().map(|ok : diplomat_runtime::DiplomatStrSlice::<'a>| { ok.into() })
 
     }
 }
@@ -37,11 +37,11 @@ impl OptionString {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OptionString_new<'a>(diplomat_str : diplomat_runtime::DiplomatStrSlice<'a>) -> Option<Box<OptionString>>;
+    fn OptionString_new<'a>(diplomat_str : diplomat_runtime::DiplomatStrSlice::<'a>) -> Option<Box<OptionString>>;
 
     fn OptionString_write<'a>(this: &'a OptionString, write_mut : &mut crate::DiplomatWrite) -> crate::DiplomatResult<(), ()>;
 
-    fn OptionString_borrow<'a>(this: &'a OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice<'a>>;
+    fn OptionString_borrow<'a>(this: &'a OptionString) -> diplomat_runtime::DiplomatOption<diplomat_runtime::DiplomatStrSlice::<'a>>;
 
     fn OptionString_destroy(this : *mut OptionString);
 }

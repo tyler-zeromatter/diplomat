@@ -1,40 +1,6 @@
+#[repr(C)]
 pub struct RenamedTestMacroStruct {
     pub a: usize,
-}
-
-#[repr(C)]
-pub(crate) struct RenamedTestMacroStructAbi {
-    a : usize,
-}
-
-impl RenamedTestMacroStructAbi {
-    pub(crate) fn from_ffi(self) -> RenamedTestMacroStruct {
-        RenamedTestMacroStruct {
-            
-            a: self.a,
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : RenamedTestMacroStruct) -> RenamedTestMacroStructAbi {
-        RenamedTestMacroStructAbi {
-            
-            a : this.a,
-            
-        }
-    }
-}
-
-impl From<RenamedTestMacroStruct> for RenamedTestMacroStructAbi{
-    fn from(value: RenamedTestMacroStruct) -> Self {
-        RenamedTestMacroStructAbi::to_ffi(value)
-    }
-}
-
-impl From<RenamedTestMacroStructAbi> for RenamedTestMacroStruct{
-    fn from(value: RenamedTestMacroStructAbi) -> Self {
-        RenamedTestMacroStructAbi::from_ffi(value)
-    }
 }
 
 impl RenamedTestMacroStruct {

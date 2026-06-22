@@ -1,6 +1,7 @@
 use super::MyEnum;
 use super::MyZst;
 use super::my_zst::MyZstAbi;
+#[repr(C)]
 pub struct MyStruct {
     pub a: u8,
     pub b: bool,
@@ -9,71 +10,6 @@ pub struct MyStruct {
     pub e: i32,
     pub f: char,
     pub g: MyEnum,
-}
-
-#[repr(C)]
-pub(crate) struct MyStructAbi {
-    a : u8,
-    b : bool,
-    c : u8,
-    d : u64,
-    e : i32,
-    f : char,
-    g : MyEnum,
-}
-
-impl MyStructAbi {
-    pub(crate) fn from_ffi(self) -> MyStruct {
-        MyStruct {
-            
-            a: self.a,
-            
-            b: self.b,
-            
-            c: self.c,
-            
-            d: self.d,
-            
-            e: self.e,
-            
-            f: self.f,
-            
-            g: self.g,
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : MyStruct) -> MyStructAbi {
-        MyStructAbi {
-            
-            a : this.a,
-            
-            b : this.b,
-            
-            c : this.c,
-            
-            d : this.d,
-            
-            e : this.e,
-            
-            f : this.f,
-            
-            g : this.g,
-            
-        }
-    }
-}
-
-impl From<MyStruct> for MyStructAbi{
-    fn from(value: MyStruct) -> Self {
-        MyStructAbi::to_ffi(value)
-    }
-}
-
-impl From<MyStructAbi> for MyStruct{
-    fn from(value: MyStructAbi) -> Self {
-        MyStructAbi::from_ffi(value)
-    }
 }
 
 impl MyStruct {

@@ -173,15 +173,15 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_opaque_argument<'anon_0>(arg : &'anon_0 Option<OptionOpaque>) -> bool;
 
-    fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption<u8>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
+    fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption::<u8>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
 
-    fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
+    fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption::<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
     fn OptionOpaque_accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStructAbi<'anon_0>);
 
-    fn OptionOpaque_accepts_multiple_option_enum(sentinel1 : u8, arg1 : diplomat_runtime::DiplomatOption<OptionEnum>, arg2 : diplomat_runtime::DiplomatOption<OptionEnum>, arg3 : diplomat_runtime::DiplomatOption<OptionEnum>, sentinel2 : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
+    fn OptionOpaque_accepts_multiple_option_enum(sentinel1 : u8, arg1 : diplomat_runtime::DiplomatOption::<OptionEnum>, arg2 : diplomat_runtime::DiplomatOption::<OptionEnum>, arg3 : diplomat_runtime::DiplomatOption::<OptionEnum>, sentinel2 : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption<OptionInputStructAbi>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStructAbi>;
+    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption::<OptionInputStructAbi>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStructAbi>;
 
     fn OptionOpaque_returns_option_input_struct() -> OptionInputStructAbi;
 

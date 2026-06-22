@@ -1,53 +1,9 @@
 use super::Bar;
-pub struct BorrowedFields<'a> {
-    pub a: &'a [u16],
-    pub b: &'a [u8],
-    pub c: &'a str,
-}
-
 #[repr(C)]
-pub(crate) struct BorrowedFieldsAbi<'a> {
-    a : diplomat_runtime::DiplomatStr16Slice<'a>,
-    b : diplomat_runtime::DiplomatStrSlice<'a>,
-    c : diplomat_runtime::DiplomatUtf8StrSlice<'a>,
-}
-
-impl<'a> BorrowedFieldsAbi<'a> {
-    pub(crate) fn from_ffi(self) -> BorrowedFields<'a> {
-        BorrowedFields {
-            
-            a: self.a.into(),
-            
-            b: self.b.into(),
-            
-            c: self.c.into(),
-            
-        }
-    }
-
-    pub(crate) fn to_ffi(this : BorrowedFields<'a>) -> BorrowedFieldsAbi<'a> {
-        BorrowedFieldsAbi {
-            
-            a : this.a.into(),
-            
-            b : this.b.into(),
-            
-            c : this.c.into(),
-            
-        }
-    }
-}
-
-impl<'a> From<BorrowedFields<'a>> for BorrowedFieldsAbi<'a>{
-    fn from(value: BorrowedFields<'a>) -> Self {
-        BorrowedFieldsAbi::to_ffi(value)
-    }
-}
-
-impl<'a> From<BorrowedFieldsAbi<'a>> for BorrowedFields<'a>{
-    fn from(value: BorrowedFieldsAbi<'a>) -> Self {
-        BorrowedFieldsAbi::from_ffi(value)
-    }
+pub struct BorrowedFields<'a> {
+    pub a: diplomat_runtime::DiplomatStr16Slice::<'a>,
+    pub b: diplomat_runtime::DiplomatStrSlice::<'a>,
+    pub c: diplomat_runtime::DiplomatUtf8StrSlice::<'a>,
 }
 
 impl<'a> BorrowedFields<'a> {
@@ -62,5 +18,5 @@ impl<'a> BorrowedFields<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStr16Slice<'x>, utf8_str : diplomat_runtime::DiplomatUtf8StrSlice<'x>) -> BorrowedFieldsAbi<'x>;
+    fn BorrowedFields_from_bar_and_strings<'x>(bar : &'x Bar<'x, 'x>, dstr16 : diplomat_runtime::DiplomatStr16Slice::<'x>, utf8_str : diplomat_runtime::DiplomatUtf8StrSlice::<'x>) -> BorrowedFieldsAbi<'x>;
 }
