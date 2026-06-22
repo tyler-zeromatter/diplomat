@@ -56,6 +56,10 @@ pub(crate) fn run<'tcx>(
     for (id, ty) in tcx.all_types() {
         let name = formatter.fmt_symbol_name(id.into());
 
+        if ty.attrs().disable {
+            continue;
+        }
+
         let ctx = FileGenContext::from_type(&config, id, &formatter, tcx);
         let template: &mut dyn TypeTemplate = match ty {
             TypeDef::Struct(st) => &mut ctx.generate_struct(st, false),

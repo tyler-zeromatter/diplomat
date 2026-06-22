@@ -452,6 +452,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     ) -> Vec<FunctionInfo<'tcx>> {
         let mut funcs = Vec::new();
         for f in functions {
+            if f.attrs.disable {
+                continue;
+            }
             funcs.push(FunctionInfo::gen_function_info(ctx, f));
         }
         funcs
