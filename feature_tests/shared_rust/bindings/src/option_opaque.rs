@@ -2,9 +2,9 @@ use super::BorrowingOptionStruct;
 use super::OptionEnum;
 use super::OptionInputStruct;
 use super::OptionStruct;
-use super::borrowing_option_struct::BorrowingOptionStructAbi;
-use super::option_input_struct::OptionInputStructAbi;
-use super::option_struct::OptionStructAbi;
+use super::borrowing_option_struct::BorrowingOptionStruct;
+use super::option_input_struct::OptionInputStruct;
+use super::option_struct::OptionStruct;
 pub struct OptionOpaque;
 
 impl Drop for OptionOpaque {
@@ -31,7 +31,7 @@ impl OptionOpaque {
     pub fn returns() -> Option<OptionStruct> {
         let ret = unsafe { OptionOpaque_returns() };
         
-        ret.into_converted_option().map(|ok : OptionStructAbi| { ok.from_ffi() })
+        ret.into_converted_option()
 
     }
 
@@ -66,14 +66,14 @@ impl OptionOpaque {
     pub fn new_struct() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct() };
         
-        ret.from_ffi()
+        ret
 
     }
 
     pub fn new_struct_nones() -> OptionStruct {
         let ret = unsafe { OptionOpaque_new_struct_nones() };
         
-        ret.from_ffi()
+        ret
 
     }
 
@@ -118,7 +118,7 @@ impl OptionOpaque {
     }
 
     pub fn accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStruct<'anon_0>) {
-        unsafe { OptionOpaque_accepts_borrowing_option_struct(arg.into()) };
+        unsafe { OptionOpaque_accepts_borrowing_option_struct(arg) };
         
     }
 
@@ -130,16 +130,16 @@ impl OptionOpaque {
     }
 
     pub fn accepts_option_input_struct(arg : Option<OptionInputStruct>, sentinel : u8) -> Option<OptionInputStruct> {
-        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.map(|ok| { ok.into() }).into(), sentinel) };
+        let ret = unsafe { OptionOpaque_accepts_option_input_struct(arg.into(), sentinel) };
         
-        ret.into_converted_option().map(|ok : OptionInputStructAbi| { ok.from_ffi() })
+        ret.into_converted_option()
 
     }
 
     pub fn returns_option_input_struct() -> OptionInputStruct {
         let ret = unsafe { OptionOpaque_returns_option_input_struct() };
         
-        ret.from_ffi()
+        ret
 
     }
 }
@@ -151,7 +151,7 @@ unsafe extern "C" {
 
     fn OptionOpaque_new_none() -> Option<Box<OptionOpaque>>;
 
-    fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStructAbi>;
+    fn OptionOpaque_returns() -> diplomat_runtime::DiplomatOption<OptionStruct>;
 
     fn OptionOpaque_option_isize<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<isize>;
 
@@ -161,9 +161,9 @@ unsafe extern "C" {
 
     fn OptionOpaque_option_u32<'anon_0>(this: &'anon_0 OptionOpaque) -> diplomat_runtime::DiplomatOption<u32>;
 
-    fn OptionOpaque_new_struct() -> OptionStructAbi;
+    fn OptionOpaque_new_struct() -> OptionStruct;
 
-    fn OptionOpaque_new_struct_nones() -> OptionStructAbi;
+    fn OptionOpaque_new_struct_nones() -> OptionStruct;
 
     fn OptionOpaque_returns_none_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
 
@@ -177,13 +177,13 @@ unsafe extern "C" {
 
     fn OptionOpaque_accepts_option_enum(arg : diplomat_runtime::DiplomatOption::<OptionEnum>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStructAbi<'anon_0>);
+    fn OptionOpaque_accepts_borrowing_option_struct<'anon_0>(arg : BorrowingOptionStruct<'anon_0>);
 
     fn OptionOpaque_accepts_multiple_option_enum(sentinel1 : u8, arg1 : diplomat_runtime::DiplomatOption::<OptionEnum>, arg2 : diplomat_runtime::DiplomatOption::<OptionEnum>, arg3 : diplomat_runtime::DiplomatOption::<OptionEnum>, sentinel2 : u8) -> diplomat_runtime::DiplomatOption<OptionEnum>;
 
-    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption::<OptionInputStructAbi>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStructAbi>;
+    fn OptionOpaque_accepts_option_input_struct(arg : diplomat_runtime::DiplomatOption::<OptionInputStruct>, sentinel : u8) -> diplomat_runtime::DiplomatOption<OptionInputStruct>;
 
-    fn OptionOpaque_returns_option_input_struct() -> OptionInputStructAbi;
+    fn OptionOpaque_returns_option_input_struct() -> OptionInputStruct;
 
     fn OptionOpaque_destroy(this : *mut OptionOpaque);
 }

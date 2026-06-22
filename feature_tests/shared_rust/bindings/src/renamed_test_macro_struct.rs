@@ -14,7 +14,7 @@ impl RenamedTestMacroStruct {
     pub fn test_meta() -> RenamedTestMacroStruct {
         let ret = unsafe { namespace_TestMacroStruct_test_meta() };
         
-        ret.from_ffi()
+        ret
 
     }
 }
@@ -24,5 +24,5 @@ impl RenamedTestMacroStruct {
 unsafe extern "C" {
     fn namespace_TestMacroStruct_test_func<'a>() -> usize;
 
-    fn namespace_TestMacroStruct_test_meta() -> RenamedTestMacroStructAbi;
+    fn namespace_TestMacroStruct_test_meta() -> RenamedTestMacroStruct;
 }

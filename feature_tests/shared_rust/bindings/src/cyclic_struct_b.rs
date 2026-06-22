@@ -1,5 +1,5 @@
 use super::CyclicStructA;
-use super::cyclic_struct_a::CyclicStructAAbi;
+use super::cyclic_struct_a::CyclicStructA;
 #[repr(C)]
 pub struct CyclicStructB {
     pub field: u8,
@@ -9,14 +9,14 @@ impl CyclicStructB {
     pub fn get_a() -> CyclicStructA {
         let ret = unsafe { CyclicStructB_get_a() };
         
-        ret.from_ffi()
+        ret
 
     }
 
     pub fn get_a_option() -> Option<CyclicStructA> {
         let ret = unsafe { CyclicStructB_get_a_option() };
         
-        ret.into_converted_option().map(|ok : CyclicStructAAbi| { ok.from_ffi() })
+        ret.into_converted_option()
 
     }
 }
@@ -24,7 +24,7 @@ impl CyclicStructB {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn CyclicStructB_get_a() -> CyclicStructAAbi;
+    fn CyclicStructB_get_a() -> CyclicStructA;
 
-    fn CyclicStructB_get_a_option() -> diplomat_runtime::DiplomatOption<CyclicStructAAbi>;
+    fn CyclicStructB_get_a_option() -> diplomat_runtime::DiplomatOption<CyclicStructA>;
 }

@@ -8,19 +8,19 @@ impl RenamedStructWithAttrs {
     pub fn new_fallible(a : bool, b : u32) -> Result<RenamedStructWithAttrs, ()> {
         let ret = unsafe { namespace_StructWithAttrs_new_fallible(a, b) };
         
-        ret.to_result().map(|ok : RenamedStructWithAttrsAbi| { ok.from_ffi() })
+        ret.to_result()
 
     }
 
     pub fn c(self) -> u32 {
-        let ret = unsafe { namespace_StructWithAttrs_c(self.into()) };
+        let ret = unsafe { namespace_StructWithAttrs_c(self) };
         
         ret
 
     }
 
     pub fn deprecated(self) {
-        unsafe { namespace_StructWithAttrs_deprecated(self.into()) };
+        unsafe { namespace_StructWithAttrs_deprecated(self) };
         
     }
 }
@@ -28,9 +28,9 @@ impl RenamedStructWithAttrs {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> crate::DiplomatResult<RenamedStructWithAttrsAbi, ()>;
+    fn namespace_StructWithAttrs_new_fallible(a : bool, b : u32) -> crate::DiplomatResult<RenamedStructWithAttrs, ()>;
 
-    fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrsAbi) -> u32;
+    fn namespace_StructWithAttrs_c(this : RenamedStructWithAttrs) -> u32;
 
-    fn namespace_StructWithAttrs_deprecated(this : RenamedStructWithAttrsAbi);
+    fn namespace_StructWithAttrs_deprecated(this : RenamedStructWithAttrs);
 }

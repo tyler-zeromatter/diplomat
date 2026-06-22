@@ -8,7 +8,7 @@ impl<'a> StructWithSlices<'a> {
     pub fn return_last(self) -> String {
         let mut write = crate::DiplomatWrite::new();
         let write_mut = &mut write;
-        unsafe { StructWithSlices_return_last(self.into(), write_mut) };
+        unsafe { StructWithSlices_return_last(self, write_mut) };
         
         let out_str = write.to_string();
         out_str
@@ -19,5 +19,5 @@ impl<'a> StructWithSlices<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn StructWithSlices_return_last<'a>(this : StructWithSlicesAbi, write_mut : &mut crate::DiplomatWrite) -> ();
+    fn StructWithSlices_return_last<'a>(this : StructWithSlices, write_mut : &mut crate::DiplomatWrite) -> ();
 }

@@ -1,6 +1,6 @@
 use super::MyEnum;
 use super::MyZst;
-use super::my_zst::MyZstAbi;
+use super::my_zst::MyZst;
 #[repr(C)]
 pub struct MyStruct {
     pub a: u8,
@@ -16,12 +16,12 @@ impl MyStruct {
     pub fn new() -> MyStruct {
         let ret = unsafe { MyStruct_new() };
         
-        ret.from_ffi()
+        ret
 
     }
 
     pub fn into_a(self) -> u8 {
-        let ret = unsafe { MyStruct_into_a(self.into()) };
+        let ret = unsafe { MyStruct_into_a(self) };
         
         ret
 
@@ -30,14 +30,14 @@ impl MyStruct {
     pub fn returns_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_returns_zst_result() };
         
-        ret.to_result().map_err(|err : MyZstAbi| { err.from_ffi() })
+        ret.to_result()
 
     }
 
     pub fn fails_zst_result() -> Result<(), MyZst> {
         let ret = unsafe { MyStruct_fails_zst_result() };
         
-        ret.to_result().map_err(|err : MyZstAbi| { err.from_ffi() })
+        ret.to_result()
 
     }
 }
@@ -45,11 +45,11 @@ impl MyStruct {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn MyStruct_new() -> MyStructAbi;
+    fn MyStruct_new() -> MyStruct;
 
-    fn MyStruct_into_a(this : MyStructAbi) -> u8;
+    fn MyStruct_into_a(this : MyStruct) -> u8;
 
-    fn MyStruct_returns_zst_result() -> crate::DiplomatResult<(), MyZstAbi>;
+    fn MyStruct_returns_zst_result() -> crate::DiplomatResult<(), MyZst>;
 
-    fn MyStruct_fails_zst_result() -> crate::DiplomatResult<(), MyZstAbi>;
+    fn MyStruct_fails_zst_result() -> crate::DiplomatResult<(), MyZst>;
 }
