@@ -52,7 +52,7 @@ impl Float64Vec {
     pub fn as_slice<'a>(&'a self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_as_slice(self) };
         
-        ret
+        ret.into()
 
     }
 
@@ -74,7 +74,7 @@ impl Float64Vec {
     pub fn borrow<'a>(&'a self) -> &'a [f64] {
         let ret = unsafe { Float64Vec_borrow(self) };
         
-        ret
+        ret.into()
 
     }
 
