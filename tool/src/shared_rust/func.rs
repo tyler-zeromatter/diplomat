@@ -303,15 +303,8 @@ impl<'tcx> FunctionInfo<'tcx> {
         out: &Type<P>,
     ) -> Option<(Cow<'tcx, str>, Cow<'tcx, str>)> {
         match out {
-            Type::Slice(Slice::Str(lt, enc)) if lt.is_some() => match enc {
-                // From DiplomatUtf8SliceStr -> &str
-                StringEncoding::Utf8 => Some((
-                    "".into(),
-                    ".into()".into(),
-                )),
-                // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
-                _ => Some(("".into(), ".into()".into())),
-            },
+            // Every slice needs to be converted from C ABI to its friendly slice format.
+            Type::Slice(..) => Some(("".into(), ".into()".into())),
             // DiplomatOption<T> -> Option<U>
             Type::DiplomatOption(..) => Some(("".into(), ".into_converted_option()".into())),
             _ => None,
