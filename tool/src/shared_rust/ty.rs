@@ -129,10 +129,9 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
 
         let type_name = self.formatter.fmt_symbol_name(self.id);
-        let name = self.formatter.fmt_struct_abi_name(type_name.clone());
         // FIXME: Hacky, needs to be able to take into account namespaces
         self.imports
-            .remove(&format!("{}::{name}", heck::AsSnakeCase(type_name.clone())));
+            .remove(&format!("{}::{type_name}", heck::AsSnakeCase(type_name.clone())));
         
         
         // TODO:

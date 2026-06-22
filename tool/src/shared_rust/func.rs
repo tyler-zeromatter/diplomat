@@ -113,16 +113,15 @@ impl<'tcx> FunctionInfo<'tcx> {
         });
 
         let self_param = self_param_own.map(|(s, ty)| {
-            let (abi_type_name, conversion, self_lifetime) = match ty {
+            let (abi_type_name, self_lifetime) = match ty {
                 SelfType::Enum(e) => {
                     let type_id: TypeId = e.tcx_id.into();
-                    (ctx.formatter.fmt_symbol_name(type_id.into()), None, None)
+                    (ctx.formatter.fmt_symbol_name(type_id.into()), None)
                 }
                 SelfType::Opaque(op) => {
                     let type_id: TypeId = op.tcx_id.into();
                     (
                         ctx.formatter.fmt_symbol_name(type_id.into()),
-                        None,
                         Some(op.owner.lifetime),
                     )
                 }
@@ -130,8 +129,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                     let type_id: TypeId = st.tcx_id.into();
                     let name = ctx.formatter.fmt_symbol_name(type_id.into());
                     (
-                        ctx.formatter.fmt_struct_abi_name(name),
-                        Some(("".into(), ".into()".into())),
+                        name,
                         st.owner.lifetime(),
                     )
                 }
@@ -173,7 +171,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 var_name: "self".into(),
                 type_info: TypeInfo::new(type_name.into()),
                 abi_override: abi_info,
-                conversion,
+                conversion: None,
             }
         });
 
@@ -262,10 +260,6 @@ impl<'tcx> FunctionInfo<'tcx> {
                 };
                 Some(("".into(), format!("{maybe_map}.into()").into()))
             }
-            Type::Struct(..) => {
-                // Struct -> StructAbi
-                Some(("".into(), ".into()".into()))
-            }
             _ => None,
         }
     }
@@ -318,8 +312,6 @@ impl<'tcx> FunctionInfo<'tcx> {
                 // For any other kind of string conversion, we want to convert from `DiplomatSliceStr` -> &[u8] or &[u16]:
                 _ => Some(("".into(), ".into()".into())),
             },
-            // StructAbi -> Struct
-            Type::Struct(..) => Some(("".into(), ".from_ffi()".into())),
             // DiplomatOption<T> -> Option<U>
             Type::DiplomatOption(..) => Some(("".into(), ".into_converted_option()".into())),
             _ => None,
@@ -551,12 +543,9 @@ impl<'tcx> FunctionInfo<'tcx> {
             },
             Type::Struct(st) => {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
-                let name = ctx
-                    .formatter
-                    .fmt_struct_abi_name(struct_name.clone())
-                    .into_owned();
+                let name = struct_name.into_owned();
                 // FIXME: Hacky, needs to be able to take into account namespaces
-                ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(struct_name)));
+                ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(name.clone())));
                 ABITypeInfo {
                     name: Some(name.into()),
                     ..Default::default()

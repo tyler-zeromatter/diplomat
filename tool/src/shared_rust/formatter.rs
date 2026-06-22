@@ -198,10 +198,6 @@ impl<'tcx> RustFormatter<'tcx> {
         .into()
     }
 
-    pub(super) fn fmt_struct_abi_name(&self, st: Cow<'tcx, str>) -> Cow<'tcx, str> {
-        format!("{st}Abi").into()
-    }
-
     pub(super) fn fmt_slice_abi_name(enc : &StringEncoding) -> &'static str {
         match enc {
             StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
