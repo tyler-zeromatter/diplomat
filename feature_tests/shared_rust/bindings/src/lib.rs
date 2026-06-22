@@ -7,9 +7,6 @@ pub use attr_opaque1_renamed::AttrOpaque1Renamed;
 pub mod bar;
 pub use bar::Bar;
 
-pub mod big_struct_with_stuff;
-pub use big_struct_with_stuff::BigStructWithStuff;
-
 pub mod borrowed_fields;
 pub use borrowed_fields::BorrowedFields;
 
@@ -24,18 +21,6 @@ pub use borrowing_option_struct::BorrowingOptionStruct;
 
 pub mod cached_include_zst;
 pub use cached_include_zst::CachedIncludeZST;
-
-pub mod callback_holder;
-pub use callback_holder::CallbackHolder;
-
-pub mod callback_testing_struct;
-pub use callback_testing_struct::CallbackTestingStruct;
-
-pub mod callback_wrapper;
-pub use callback_wrapper::CallbackWrapper;
-
-pub mod containing_tuple;
-pub use containing_tuple::ContainingTuple;
 
 pub mod contiguous_enum;
 pub use contiguous_enum::ContiguousEnum;
@@ -58,29 +43,14 @@ pub use error_enum::ErrorEnum;
 pub mod error_struct;
 pub use error_struct::ErrorStruct;
 
-pub mod fallible_opaque_constructor;
-pub use fallible_opaque_constructor::FallibleOpaqueConstructor;
-
 pub mod float64_vec;
 pub use float64_vec::Float64Vec;
-
-pub mod float64_vec_error;
-pub use float64_vec_error::Float64VecError;
 
 pub mod foo;
 pub use foo::Foo;
 
-pub mod immutable_struct_of_opaque;
-pub use immutable_struct_of_opaque::ImmutableStructOfOpaque;
-
 pub mod imported_struct;
 pub use imported_struct::ImportedStruct;
-
-pub mod method_overloading;
-pub use method_overloading::MethodOverloading;
-
-pub mod mutable_callback_holder;
-pub use mutable_callback_holder::MutableCallbackHolder;
 
 pub mod my_enum;
 pub use my_enum::MyEnum;
@@ -142,14 +112,8 @@ pub use option_string::OptionString;
 pub mod option_struct;
 pub use option_struct::OptionStruct;
 
-pub mod out_tuple_struct;
-pub use out_tuple_struct::OutTupleStruct;
-
 pub mod primitive_struct;
 pub use primitive_struct::PrimitiveStruct;
-
-pub mod primitive_struct_vec;
-pub use primitive_struct_vec::PrimitiveStructVec;
 
 pub mod ref_list;
 pub use ref_list::RefList;
@@ -163,12 +127,6 @@ pub use renamed_attr_enum::RenamedAttrEnum;
 pub mod renamed_attr_opaque2;
 pub use renamed_attr_opaque2::RenamedAttrOpaque2;
 
-pub mod renamed_block_override;
-pub use renamed_block_override::RenamedBlockOverride;
-
-pub mod renamed_comparable;
-pub use renamed_comparable::RenamedComparable;
-
 pub mod renamed_deprecated_enum;
 pub use renamed_deprecated_enum::RenamedDeprecatedEnum;
 
@@ -178,20 +136,8 @@ pub use renamed_deprecated_opaque::RenamedDeprecatedOpaque;
 pub mod renamed_deprecated_struct;
 pub use renamed_deprecated_struct::RenamedDeprecatedStruct;
 
-pub mod renamed_feature_test;
-pub use renamed_feature_test::RenamedFeatureTest;
-
 pub mod renamed_mixin_test;
 pub use renamed_mixin_test::RenamedMixinTest;
-
-pub mod renamed_my_indexer;
-pub use renamed_my_indexer::RenamedMyIndexer;
-
-pub mod renamed_my_iterable;
-pub use renamed_my_iterable::RenamedMyIterable;
-
-pub mod renamed_my_iterator;
-pub use renamed_my_iterator::RenamedMyIterator;
 
 pub mod renamed_nested;
 pub use renamed_nested::RenamedNested;
@@ -199,41 +145,11 @@ pub use renamed_nested::RenamedNested;
 pub mod renamed_nested2;
 pub use renamed_nested2::RenamedNested2;
 
-pub mod renamed_opaque_arithmetic;
-pub use renamed_opaque_arithmetic::RenamedOpaqueArithmetic;
-
-pub mod renamed_opaque_iterable;
-pub use renamed_opaque_iterable::RenamedOpaqueIterable;
-
-pub mod renamed_opaque_iterator;
-pub use renamed_opaque_iterator::RenamedOpaqueIterator;
-
-pub mod renamed_opaque_ref_iterable;
-pub use renamed_opaque_ref_iterable::RenamedOpaqueRefIterable;
-
-pub mod renamed_opaque_ref_iterator;
-pub use renamed_opaque_ref_iterator::RenamedOpaqueRefIterator;
-
-pub mod renamed_opaque_zst;
-pub use renamed_opaque_zst::RenamedOpaqueZST;
-
 pub mod renamed_opaque_zst_indexer;
 pub use renamed_opaque_zst_indexer::RenamedOpaqueZSTIndexer;
 
-pub mod renamed_opaque_zst_iterator;
-pub use renamed_opaque_zst_iterator::RenamedOpaqueZSTIterator;
-
-pub mod renamed_partial_comparable;
-pub use renamed_partial_comparable::RenamedPartialComparable;
-
-pub mod renamed_partial_comparable_slice;
-pub use renamed_partial_comparable_slice::RenamedPartialComparableSlice;
-
 pub mod renamed_renamed_cached_include_zst;
 pub use renamed_renamed_cached_include_zst::RenamedRenamedCachedIncludeZST;
-
-pub mod renamed_string_list;
-pub use renamed_string_list::RenamedStringList;
 
 pub mod renamed_struct_with_attrs;
 pub use renamed_struct_with_attrs::RenamedStructWithAttrs;
@@ -250,26 +166,11 @@ pub use renamed_vector_test::RenamedVectorTest;
 pub mod result_opaque;
 pub use result_opaque::ResultOpaque;
 
-pub mod scalar_pair_with_padding;
-pub use scalar_pair_with_padding::ScalarPairWithPadding;
-
-pub mod struct_arithmetic;
-pub use struct_arithmetic::StructArithmetic;
-
 pub mod struct_of_opaque;
 pub use struct_of_opaque::StructOfOpaque;
 
 pub mod struct_with_slices;
 pub use struct_with_slices::StructWithSlices;
-
-pub mod trait_testing_struct;
-pub use trait_testing_struct::TraitTestingStruct;
-
-pub mod trait_wrapper;
-pub use trait_wrapper::TraitWrapper;
-
-pub mod tuple_struct;
-pub use tuple_struct::TupleStruct;
 
 pub mod two;
 pub use two::Two;
