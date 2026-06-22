@@ -247,6 +247,10 @@ impl<'tcx> FunctionInfo<'tcx> {
 
                     Some(("".into(), convert.into()))
                 }
+                Slice::Primitive(..) => {
+                    // [PrimitiveType] -> DiplomatSlice (or DiplomatOwnedSlice)
+                    Some(("".into(), ".into()".into()))
+                }
                 _ => None,
             },
             Type::DiplomatOption(ok) => {
