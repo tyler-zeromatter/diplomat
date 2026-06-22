@@ -100,7 +100,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             params.push(ParamInfo {
                 var_name: p.name.as_str().into(),
                 type_info: ctx.gen_type_info(&p.ty),
-                abi_override: Self::gen_abi_type_info(ctx, &p.ty),
+                abi_override: Self::gen_abi_type_info(ctx, &p.ty, &method.lifetime_env),
                 conversion: Self::param_conversion(&p.ty),
             });
         }
@@ -289,9 +289,9 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// For a given [`SuccessType`], get the C ABI type information.
-    fn gen_ok_abi_info(ctx: &mut FileGenContext<'tcx>, ok: &'tcx SuccessType) -> ABITypeInfo<'tcx> {
+    fn gen_ok_abi_info(ctx: &mut FileGenContext<'tcx>, ok: &'tcx SuccessType, env : &LifetimeEnv) -> ABITypeInfo<'tcx> {
         match ok {
-            SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o),
+            SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o, env),
             SuccessType::Write => ABITypeInfo {
                 name: Some("()".into()),
                 ..Default::default()
@@ -343,10 +343,10 @@ impl<'tcx> FunctionInfo<'tcx> {
                     .map(|e| ctx.gen_type_info(e))
                     .unwrap_or(TypeInfo::new("()".into()));
 
-                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
+                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok, env);
                 let err_ty_abi = err
                     .as_ref()
-                    .map(|e| Self::gen_abi_type_info(ctx, e))
+                    .map(|e| Self::gen_abi_type_info(ctx, e, env))
                     .unwrap_or_default();
 
                 let abi_override = ABITypeInfo {
@@ -396,7 +396,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             ReturnType::Nullable(ok) => {
                 let ok_ty = Self::gen_ok_type_info(params, ctx, ok);
 
-                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok);
+                let ok_ty_abi = Self::gen_ok_abi_info(ctx, ok, env);
                 let abi_override = ABITypeInfo {
                     name: Some(
                         format!(
@@ -430,7 +430,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
             ReturnType::Infallible(ok) => {
                 let type_info = Self::gen_ok_type_info(params, ctx, ok);
-                let abi_name = Self::gen_ok_abi_info(ctx, ok);
+                let abi_name = Self::gen_ok_abi_info(ctx, ok, env);
 
                 if matches!(ok, SuccessType::OutType(..) | SuccessType::Write) {
                     Some(ParamInfo {
@@ -481,15 +481,16 @@ impl<'tcx> FunctionInfo<'tcx> {
     pub(super) fn gen_abi_type_info<P: TyPosition>(
         ctx: &mut FileGenContext,
         ty: &Type<P>,
+        env : &LifetimeEnv,
     ) -> ABITypeInfo<'tcx> {
         match ty {
             Type::DiplomatOption(op) => {
                 let regular_type = ctx.gen_type_info(op).name;
-                let inner = Self::gen_abi_type_info(ctx, op);
+                let inner = Self::gen_abi_type_info(ctx, op, env);
                 ABITypeInfo {
                     name: Some(
                         format!(
-                            "diplomat_runtime::DiplomatOption<{}>",
+                            "diplomat_runtime::DiplomatOption::<{}>",
                             inner.name.unwrap_or(regular_type)
                         )
                         .into(),
@@ -499,31 +500,47 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
             Type::Slice(sl) => match sl {
                 Slice::Str(lt, enc) => {
-                    let name = if lt.is_none() {
-                        RustFormatter::fmt_owned_slice_abi_name(enc)
+                    let name = if let Some(lt) = lt {
+                        format!("{}::<{}>", RustFormatter::fmt_slice_abi_name(enc), RustFormatter::fmt_ms_lifetime(env, lt))
                     } else {
-                        RustFormatter::fmt_slice_abi_name(enc)
+                        RustFormatter::fmt_owned_slice_abi_name(enc).into()
                     };
 
                     ABITypeInfo {
                         name: Some(name.into()),
                         // We move the borrow to the generic lifetimes:
                         borrow: Some(MaybeOwn::Own),
-                        generic_lifetimes: Some(lt.iter().cloned().collect()),
                         // We want to avoid any Box<> issues for owned slices (since we already own this with DiplomatSlice):
                         wrapped: Some(TypeInfoWrapper::None),
+                        ..Default::default()
                     }
                 }
                 Slice::Strs(enc) => {
                     let name = RustFormatter::fmt_slice_abi_name(enc);
 
-                    let name = format!("diplomat_runtime::DiplomatSlice<{name}>");
+                    let name = format!("diplomat_runtime::DiplomatSlice::<{name}>");
                     ABITypeInfo {
                         name: Some(name.into()),
+                        borrow: Some(MaybeOwn::Own),
                         ..Default::default()
                     }
                 }
-                _ => ABITypeInfo::default(),
+                Slice::Primitive(lt, t) => {
+                    let primitive_ty = RustFormatter::fmt_primitive_name(*t);
+                    let name = match lt {
+                        MaybeOwn::Own => format!("diplomat_runtime::DiplomatOwnedSlice::<{primitive_ty}>"),
+                        MaybeOwn::Borrow(b) => {
+                            let lt = RustFormatter::fmt_ms_lifetime(env, &b.lifetime);
+                            format!("diplomat_runtime::DiplomatSlice::<{lt}, {primitive_ty}>")
+                        }
+                    };
+                    ABITypeInfo {
+                        name: Some(name.into()),
+                        borrow: Some(MaybeOwn::Own),
+                        ..Default::default()
+                    }
+                }
+                _ => panic!("Unrecognized slice type: {sl:?}"),
             },
             Type::Struct(st) => {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());

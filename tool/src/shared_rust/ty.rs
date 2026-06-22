@@ -70,35 +70,11 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         is_out: bool,
     ) -> impl TypeTemplate<'tcx> {
         /// Like [`super::func::ParamInfo`], and re-uses a lot of the same methods that `ParamInfo` does for generation,
-        /// except it needs to be able to convert to and from C/Rust.
+        /// except we are always using  ABI types by default. Every struct is inherently #[repr(C)] (enforced by Diplomat).
         struct FieldInfo<'a> {
             type_info: TypeInfo<'a>,
-            abi_info: ABITypeInfo<'a>,
+            abi_type_info : ABITypeInfo<'a>,
             name: Cow<'a, str>,
-            to_rust: Option<(Cow<'a, str>, Cow<'a, str>)>,
-            to_c_abi: Option<(Cow<'a, str>, Cow<'a, str>)>,
-        }
-
-        impl<'a> FieldInfo<'a> {
-            fn wrap_convert(&self) -> Cow<'a, str> {
-                let (pre_convert, post_convert) = if let Some((pre, post)) = &self.to_rust {
-                    (pre.clone(), post.clone())
-                } else {
-                    ("".into(), "".into())
-                };
-
-                format!("{pre_convert}self.{}{post_convert}", self.name).into()
-            }
-
-            fn wrap_c_convert(&self) -> Cow<'a, str> {
-                let (pre_convert, post_convert) = if let Some((pre, post)) = &self.to_c_abi {
-                    (pre.clone(), post.clone())
-                } else {
-                    ("".into(), "".into())
-                };
-
-                format!("{pre_convert}this.{}{post_convert}", self.name).into()
-            }
         }
 
         #[derive(Template)]
@@ -126,9 +102,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             .iter()
             .map(|f| FieldInfo {
                 type_info: self.gen_type_info(&f.ty),
-                abi_info: FunctionInfo::gen_abi_type_info(&mut self, &f.ty),
-                to_rust: FunctionInfo::out_type_conversion(&f.ty),
-                to_c_abi: FunctionInfo::param_conversion(&f.ty),
+                abi_type_info: FunctionInfo::gen_abi_type_info(&mut self, &f.ty, lifetime_env),
                 name: f.name.as_str().into(),
             })
             .collect();
@@ -281,7 +255,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     /// Mutable since [`FileGenContext`] may need to update imports depending on the type.
     pub(super) fn gen_type_info<P: TyPosition>(&'rcx mut self, ty: &Type<P>) -> TypeInfo<'tcx> {
         match ty {
-            Type::Primitive(p) => TypeInfo::new(self.formatter.fmt_primitive_name(*p).into()),
+            Type::Primitive(p) => TypeInfo::new(RustFormatter::fmt_primitive_name(*p).into()),
             Type::Struct(st) => {
                 let st_name = self.formatter.fmt_symbol_name(st.id().into());
                 self.add_import(st_name.clone().into());
@@ -330,7 +304,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             Type::Slice(sl) => {
                 let (borrow, type_name) = match sl {
                     Slice::Primitive(b, p) => {
-                        let name = format!("[{}]", self.formatter.fmt_primitive_name(*p));
+                        let name = format!("[{}]", RustFormatter::fmt_primitive_name(*p));
                         (b, name)
                     }
                     Slice::Struct(b, str) => {
