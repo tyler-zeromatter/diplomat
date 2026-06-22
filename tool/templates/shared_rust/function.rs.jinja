@@ -9,9 +9,9 @@
 {%- block function_impl -%}
 pub fn {{name}}{{self.render_generic_lifetimes()}}(
         {%- if is_write -%}
-        {%- call func_params(self_param, &params[..params.len() - 1]) -%}
+        {{- func_params(self_param, &params[..params.len() - 1]) -}}
         {%- else -%}
-        {%- call func_params(self_param, params) -%}
+        {{- func_params(self_param, params) -}}
         {%- endif -%}
     ) {%- if let Some(r) = return_type %} -> {{r.render(lifetime_env, false)}} {%- endif %} {
     {% if is_write -%}
@@ -52,7 +52,7 @@ pub fn {{name}}{{self.render_generic_lifetimes()}}(
 
 {%- block function_def -%}
     fn {{abi_name}}{{self.render_abi_generic_lifetimes()}}(
-        {%- call func_params(self_param, params, true) -%}
+        {{- func_params(self_param, params, true) -}}
     ) 
         
         {%- if let Some(r) = return_type %} -> {{r.render(lifetime_env, true)}} {%- endif %};
