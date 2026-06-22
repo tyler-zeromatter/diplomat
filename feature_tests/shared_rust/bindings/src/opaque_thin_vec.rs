@@ -10,7 +10,7 @@ impl Drop for OpaqueThinVec {
 
 impl OpaqueThinVec {
     pub fn create<'anon_0, 'anon_1, 'anon_2>(a : &'anon_0 [i32], b : &'anon_1 [f32], c : &'anon_2 [u8]) -> Box<OpaqueThinVec> {
-        let ret = unsafe { OpaqueThinVec_create(a, b, c.into()) };
+        let ret = unsafe { OpaqueThinVec_create(a.into(), b.into(), c.into()) };
         
         ret
 

@@ -8,42 +8,42 @@ impl Drop for Float64Vec {
 
 impl Float64Vec {
     pub fn new_bool<'anon_0>(v : &'anon_0 [bool]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_bool(v) };
+        let ret = unsafe { Float64Vec_new_bool(v.into()) };
         
         ret
 
     }
 
     pub fn new_i16<'anon_0>(v : &'anon_0 [i16]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_i16(v) };
+        let ret = unsafe { Float64Vec_new_i16(v.into()) };
         
         ret
 
     }
 
     pub fn new_u16<'anon_0>(v : &'anon_0 [u16]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_u16(v) };
+        let ret = unsafe { Float64Vec_new_u16(v.into()) };
         
         ret
 
     }
 
     pub fn new_isize<'anon_0>(v : &'anon_0 [isize]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_isize(v) };
+        let ret = unsafe { Float64Vec_new_isize(v.into()) };
         
         ret
 
     }
 
     pub fn new_usize<'anon_0>(v : &'anon_0 [usize]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_usize(v) };
+        let ret = unsafe { Float64Vec_new_usize(v.into()) };
         
         ret
 
     }
 
     pub fn new_f64_be_bytes<'anon_0>(v : &'anon_0 [u8]) -> Box<Float64Vec> {
-        let ret = unsafe { Float64Vec_new_f64_be_bytes(v) };
+        let ret = unsafe { Float64Vec_new_f64_be_bytes(v.into()) };
         
         ret
 
@@ -57,7 +57,7 @@ impl Float64Vec {
     }
 
     pub fn set_value<'anon_0, 'anon_1>(&'anon_0 mut self, new_slice : &'anon_1 [f64]) {
-        unsafe { Float64Vec_set_value(self, new_slice) };
+        unsafe { Float64Vec_set_value(self, new_slice.into()) };
         
     }
 
