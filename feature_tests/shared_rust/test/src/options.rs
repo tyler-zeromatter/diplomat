@@ -6,6 +6,13 @@ mod tests {
     fn test_option_opaque() {
         let opaque = OptionOpaque::new(5).unwrap();
         opaque.assert_integer(5);
+        
+        let none_self = opaque.returns_none_self();
+        assert!(none_self.is_none());
+
+        let some_self = opaque.returns_some_self();
+        assert!(some_self.is_some());
+        some_self.unwrap().assert_integer(5);
 
         let opaque = OptionOpaque::new_none();
         assert!(opaque.is_none());
