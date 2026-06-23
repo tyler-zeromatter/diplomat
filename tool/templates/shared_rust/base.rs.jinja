@@ -18,7 +18,11 @@ impl {{- self.generic_lifetimes(false) }} {{type_name}} {{- self.generic_lifetim
 {%- endfor %}
 
 #[link(name = "{{lib_name}}")]
-{#- Opaques generate warnings: #}
+{#- Opaques generate warnings. We currently use `Box<Opaque>` because structs rely on the assumption
+that everything can be implicitly converted from a C-friendly type without extra conversions.
+If we were to use *mut Opaque, then we would need extra conversion code for structs.
+#}
+// Currently disallowed thanks to Box<Opaque> types (which are currently FFI compatible even if Rust complains otherwise):
 #[allow(improper_ctypes)]
 unsafe extern "C" {
 {%- for m in methods %}

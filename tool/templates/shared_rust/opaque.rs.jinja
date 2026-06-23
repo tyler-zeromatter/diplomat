@@ -6,12 +6,14 @@
 
 {% endif -%}
 
-pub struct {{type_name}}{{self.generic_lifetimes(true)}} {%- if lifetimes.len() > 0 %} {
+{#- Eventually, if https://rust-lang.github.io/rfcs/1861-extern-types.html is implemented, we'll want to switch to that. -#}
+#[repr(C)]
+pub struct {{type_name}}{{self.generic_lifetimes(true)}} {
     {%- for lt in lifetimes %}
     {{ lifetime_env.fmt_lifetime(*lt) }}_marker : PhantomData<&'{{lifetime_env.fmt_lifetime(*lt)}} ()>,
     {%- endfor %}
+    _inner : ()
 }
-{%- else -%} ; {%- endif %}
 
 impl{{self.generic_lifetimes(false)}} Drop for {{type_name}}{{self.generic_lifetimes(false)}} {
     fn drop(&mut self) {
