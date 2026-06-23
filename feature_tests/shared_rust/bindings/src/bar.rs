@@ -1,7 +1,7 @@
 use super::Foo;
 use std::marker::PhantomData;
 
-pub struct Bar<'b, 'a> {
+pub struct Bar<'b, 'a: 'b> {
     b_marker : PhantomData<&'b ()>,
     a_marker : PhantomData<&'a ()>,
 }

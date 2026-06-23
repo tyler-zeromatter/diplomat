@@ -1,6 +1,6 @@
 use super::Foo;
 #[repr(C)]
-pub struct BorrowedFieldsWithBounds<'a, 'b, 'c> {
+pub struct BorrowedFieldsWithBounds<'a, 'b: 'a, 'c: 'b + 'a> {
     pub field_a: diplomat_runtime::DiplomatStr16Slice::<'a>,
     pub field_b: diplomat_runtime::DiplomatStrSlice::<'b>,
     pub field_c: diplomat_runtime::DiplomatUtf8StrSlice::<'c>,

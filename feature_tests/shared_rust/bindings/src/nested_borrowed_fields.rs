@@ -3,7 +3,7 @@ use super::BorrowedFields;
 use super::BorrowedFieldsWithBounds;
 use super::Foo;
 #[repr(C)]
-pub struct NestedBorrowedFields<'x, 'y, 'z> {
+pub struct NestedBorrowedFields<'x, 'y: 'x, 'z> {
     pub fields: BorrowedFields<'x>,
     pub bounds: BorrowedFieldsWithBounds<'x, 'y, 'y>,
     pub bounds2: BorrowedFieldsWithBounds<'z, 'z, 'z>,
