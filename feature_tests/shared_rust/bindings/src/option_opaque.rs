@@ -2,9 +2,6 @@ use super::BorrowingOptionStruct;
 use super::OptionEnum;
 use super::OptionInputStruct;
 use super::OptionStruct;
-use super::borrowing_option_struct::BorrowingOptionStruct;
-use super::option_input_struct::OptionInputStruct;
-use super::option_struct::OptionStruct;
 pub struct OptionOpaque;
 
 impl Drop for OptionOpaque {

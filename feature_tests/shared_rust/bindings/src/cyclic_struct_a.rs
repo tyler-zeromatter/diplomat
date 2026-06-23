@@ -1,5 +1,4 @@
 use super::CyclicStructB;
-use super::cyclic_struct_b::CyclicStructB;
 #[repr(C)]
 pub struct CyclicStructA {
     pub a: CyclicStructB,

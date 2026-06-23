@@ -2,9 +2,6 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsReturning;
 use super::BorrowedFieldsWithBounds;
-use super::borrowed_fields::BorrowedFields;
-use super::borrowed_fields_returning::BorrowedFieldsReturning;
-use super::borrowed_fields_with_bounds::BorrowedFieldsWithBounds;
 use std::marker::PhantomData;
 
 pub struct Foo<'a> {

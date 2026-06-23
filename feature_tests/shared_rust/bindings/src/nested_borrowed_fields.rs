@@ -2,8 +2,6 @@ use super::Bar;
 use super::BorrowedFields;
 use super::BorrowedFieldsWithBounds;
 use super::Foo;
-use super::borrowed_fields::BorrowedFields;
-use super::borrowed_fields_with_bounds::BorrowedFieldsWithBounds;
 #[repr(C)]
 pub struct NestedBorrowedFields<'x, 'y, 'z> {
     pub fields: BorrowedFields<'x>,

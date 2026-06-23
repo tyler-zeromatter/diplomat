@@ -1,6 +1,5 @@
 use super::MyEnum;
 use super::MyZst;
-use super::my_zst::MyZst;
 #[repr(C)]
 pub struct MyStruct {
     pub a: u8,

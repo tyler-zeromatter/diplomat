@@ -1,6 +1,5 @@
 use super::DefaultEnum;
 use super::MyStruct;
-use super::my_struct::MyStruct;
 #[repr(C)]
 pub struct MyStructContainingAnOption {
     pub a: diplomat_runtime::DiplomatOption::<MyStruct>,

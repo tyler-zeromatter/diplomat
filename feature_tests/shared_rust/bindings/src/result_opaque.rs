@@ -1,6 +1,5 @@
 use super::ErrorEnum;
 use super::ErrorStruct;
-use super::error_struct::ErrorStruct;
 pub struct ResultOpaque;
 
 impl Drop for ResultOpaque {
