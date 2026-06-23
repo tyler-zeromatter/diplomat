@@ -34,8 +34,13 @@ mod tests {
     #[test]
     fn test_float64_vec() {
         let data = vec![1, 2, 3, 4, 5];
-        let vec = Float64Vec::new_isize(&data);
+        let mut vec = Float64Vec::new_isize(&data);
         let converted : Vec<f64> = data.iter().map(|&i| { i as f64 }).collect();
         assert_eq!(&converted, vec.borrow());
+
+        assert_eq!(vec.to_string(), "[1.0, 2.0, 3.0, 4.0, 5.0]");
+        assert_eq!(vec.get(0), Some(1.0));
+        vec.set_value(&[5.0, 6.0, 7.0, 8.0]);
+        assert_eq!(*vec.as_slice(), [5.0, 6.0, 7.0, 8.0])
     }
 }
