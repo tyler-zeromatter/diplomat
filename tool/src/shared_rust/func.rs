@@ -2,7 +2,9 @@ use std::borrow::Cow;
 
 use askama::Template;
 use diplomat_core::hir::{
-    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice, SpecialMethod, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type, TypeDef, TypeId
+    Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
+    SpecialMethod, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type,
+    TypeDef, TypeId,
 };
 
 use crate::shared_rust::{
@@ -26,14 +28,14 @@ pub(super) struct FunctionInfo<'tcx> {
     lifetime_env: &'tcx LifetimeEnv,
     generic_lifetimes: Vec<MaybeStatic<Lifetime>>,
     abi_lifetimes: Vec<MaybeStatic<Lifetime>>,
-    special_method : Option<SpecialMethod>,
+    special_method: Option<SpecialMethod>,
 }
 
 #[derive(Template)]
 #[template(path = "shared_rust/special_methods.rs.jinja", escape = "none")]
 pub(super) struct SpecialMethodInfo<'tcx> {
-    inner : FunctionInfo<'tcx>,
-    type_name : Cow<'tcx, str>,
+    inner: FunctionInfo<'tcx>,
+    type_name: Cow<'tcx, str>,
 }
 
 #[derive(Default, Clone)]
@@ -65,11 +67,13 @@ impl<'a> ParamInfo<'a> {
         }
     }
 
-    fn render_without_borrow(&self, env : &LifetimeEnv, is_abi: bool) -> String {
+    fn render_without_borrow(&self, env: &LifetimeEnv, is_abi: bool) -> String {
         if is_abi {
-            self.type_info.render_without_borrow(env, &self.abi_override)
+            self.type_info
+                .render_without_borrow(env, &self.abi_override)
         } else {
-            self.type_info.render_without_borrow(env, &ABITypeInfo::default())
+            self.type_info
+                .render_without_borrow(env, &ABITypeInfo::default())
         }
     }
 
@@ -128,10 +132,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 SelfType::Struct(st) => {
                     let type_id: TypeId = st.tcx_id.into();
                     let name = ctx.formatter.fmt_symbol_name(type_id.into());
-                    (
-                        name,
-                        st.owner.lifetime(),
-                    )
+                    (name, st.owner.lifetime())
                 }
                 _ => unreachable!("Unknown SelfType {ty:?}"),
             };
@@ -287,7 +288,11 @@ impl<'tcx> FunctionInfo<'tcx> {
     }
 
     /// For a given [`SuccessType`], get the C ABI type information.
-    fn gen_ok_abi_info(ctx: &mut FileGenContext<'tcx>, ok: &'tcx SuccessType, env : &LifetimeEnv) -> ABITypeInfo<'tcx> {
+    fn gen_ok_abi_info(
+        ctx: &mut FileGenContext<'tcx>,
+        ok: &'tcx SuccessType,
+        env: &LifetimeEnv,
+    ) -> ABITypeInfo<'tcx> {
         match ok {
             SuccessType::OutType(o) => Self::gen_abi_type_info(ctx, o, env),
             SuccessType::Write => ABITypeInfo {
@@ -451,12 +456,12 @@ impl<'tcx> FunctionInfo<'tcx> {
 
     /// Generate an impl block for special Rust trait stuff.
     /// Assumes that any special method can be generated as an `impl` trait block separately from the original method definition, and just call into that.
-    /// 
+    ///
     /// TODO: If you're interested in hiding the underlying conversion function, I'd add a `vis` modifier to [`FunctionInfo`] and make `functions` a mutable reference.
     pub(super) fn get_special_methods(
-        ctx : &mut FileGenContext,
+        ctx: &mut FileGenContext,
         functions: Vec<FunctionInfo<'tcx>>,
-        self_type : Cow<'tcx, str>,
+        self_type: Cow<'tcx, str>,
     ) -> Vec<SpecialMethodInfo<'tcx>> {
         let mut special_methods = Vec::new();
         for f in functions {
@@ -473,7 +478,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     pub(super) fn gen_abi_type_info<P: TyPosition>(
         ctx: &mut FileGenContext,
         ty: &Type<P>,
-        env : &LifetimeEnv,
+        env: &LifetimeEnv,
     ) -> ABITypeInfo<'tcx> {
         match ty {
             Type::DiplomatOption(op) => {
@@ -493,7 +498,11 @@ impl<'tcx> FunctionInfo<'tcx> {
             Type::Slice(sl) => match sl {
                 Slice::Str(lt, enc) => {
                     let name = if let Some(lt) = lt {
-                        format!("{}::<{}>", RustFormatter::fmt_slice_abi_name(enc), RustFormatter::fmt_ms_lifetime(env, lt))
+                        format!(
+                            "{}::<{}>",
+                            RustFormatter::fmt_slice_abi_name(enc),
+                            RustFormatter::fmt_ms_lifetime(env, lt)
+                        )
                     } else {
                         RustFormatter::fmt_owned_slice_abi_name(enc).into()
                     };
@@ -520,7 +529,9 @@ impl<'tcx> FunctionInfo<'tcx> {
                 Slice::Primitive(lt, t) => {
                     let primitive_ty = RustFormatter::fmt_primitive_name(*t);
                     let name = match lt {
-                        MaybeOwn::Own => format!("diplomat_runtime::DiplomatOwnedSlice::<{primitive_ty}>"),
+                        MaybeOwn::Own => {
+                            format!("diplomat_runtime::DiplomatOwnedSlice::<{primitive_ty}>")
+                        }
                         MaybeOwn::Borrow(b) => {
                             let lt = RustFormatter::fmt_ms_lifetime(env, &b.lifetime);
                             format!("diplomat_runtime::DiplomatSlice::<{lt}, {primitive_ty}>")

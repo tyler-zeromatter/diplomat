@@ -1,7 +1,8 @@
 use std::borrow::Cow;
 
 use diplomat_core::hir::{
-    EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType, StringEncoding, SymbolId, TypeContext
+    EnumVariant, Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Mutability, PrimitiveType,
+    StringEncoding, SymbolId, TypeContext,
 };
 use itertools::Itertools;
 
@@ -106,7 +107,7 @@ impl<'a> TypeInfo<'a> {
         self.render_with_override(env, &ABITypeInfo::default())
     }
 
-    pub(super) fn render_without_borrow(&self, env : &LifetimeEnv, over : &ABITypeInfo) -> String {
+    pub(super) fn render_without_borrow(&self, env: &LifetimeEnv, over: &ABITypeInfo) -> String {
         let name = over.name.clone().unwrap_or(self.name.clone().into());
 
         let generic_lifetimes = Self::fmt_generic_lifetimes(
@@ -118,7 +119,7 @@ impl<'a> TypeInfo<'a> {
         );
 
         let name = format!("{name}{generic_lifetimes}");
-        
+
         match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
             TypeInfoWrapper::None => name,
             TypeInfoWrapper::Boxed => format!("Box<{name}>"),
@@ -157,7 +158,7 @@ pub(super) struct RustFormatter<'tcx> {
 }
 
 impl<'tcx> RustFormatter<'tcx> {
-    pub(super) fn fmt_ms_lifetime(env : &LifetimeEnv, ms : &MaybeStatic<Lifetime>) -> String {
+    pub(super) fn fmt_ms_lifetime(env: &LifetimeEnv, ms: &MaybeStatic<Lifetime>) -> String {
         match ms {
             MaybeStatic::Static => "'static".into(),
             MaybeStatic::NonStatic(ns) => format!("'{}", env.fmt_lifetime(ns)),
@@ -198,7 +199,7 @@ impl<'tcx> RustFormatter<'tcx> {
         .into()
     }
 
-    pub(super) fn fmt_slice_abi_name(enc : &StringEncoding) -> &'static str {
+    pub(super) fn fmt_slice_abi_name(enc: &StringEncoding) -> &'static str {
         match enc {
             StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8StrSlice",
             StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatStrSlice",
@@ -206,8 +207,8 @@ impl<'tcx> RustFormatter<'tcx> {
             _ => panic!("Unrecognized encoding type {enc:?}"),
         }
     }
-    
-    pub(super) fn fmt_owned_slice_abi_name(enc : &StringEncoding) -> &'static str {
+
+    pub(super) fn fmt_owned_slice_abi_name(enc: &StringEncoding) -> &'static str {
         match enc {
             StringEncoding::Utf8 => "diplomat_runtime::DiplomatUtf8OwnedStrSlice",
             StringEncoding::UnvalidatedUtf8 => "diplomat_runtime::DiplomatOwnedStrSlice",
