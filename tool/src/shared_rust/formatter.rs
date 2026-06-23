@@ -82,7 +82,7 @@ impl<'a> TypeInfo<'a> {
                         .iter()
                         .map(|l| format!("'{}", env.fmt_lifetime(l)))
                         .join(" + ");
-                    let bounded = if bounded_lts.len() > 0 {
+                    let bounded = if !bounded_lts.is_empty() {
                         format!(": {bounded_str}")
                     } else {
                         "".into()
@@ -108,7 +108,7 @@ impl<'a> TypeInfo<'a> {
     }
 
     pub(super) fn render_without_borrow(&self, env: &LifetimeEnv, over: &ABITypeInfo) -> String {
-        let name = over.name.clone().unwrap_or(self.name.clone().into());
+        let name = over.name.clone().unwrap_or(self.name.clone());
 
         let generic_lifetimes = Self::fmt_generic_lifetimes(
             over.generic_lifetimes

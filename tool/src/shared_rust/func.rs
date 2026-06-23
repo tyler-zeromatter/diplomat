@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use askama::Template;
 use diplomat_core::hir::{
     Lifetime, LifetimeEnv, MaybeOwn, MaybeStatic, Method, OpaqueOwner, ReturnType, SelfType, Slice,
-    SpecialMethod, StringEncoding, StructPathLike, SuccessType, SymbolId, TyPosition, Type,
+    SpecialMethod, StructPathLike, SuccessType, SymbolId, TyPosition, Type,
     TypeDef, TypeId,
 };
 
@@ -235,7 +235,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             Type::Slice(sl) => match sl {
                 Slice::Str(..) => {
                     //  &str|&[u8] -> DiplomatStrSlice
-                    Some(("".into(), format!(".into()").into()))
+                    Some(("".into(), ".into()".into()))
                 }
                 // From &[String|&[u8]|&[u16]] -> DiplomatSlice<DiplomatStrSlice>
                 Slice::Strs(enc) => {
@@ -356,7 +356,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 };
 
                 let ok_convert = Self::ok_type_conversion(ok);
-                let err_convert = err.as_ref().and_then(|e| Self::out_type_conversion(e));
+                let err_convert = err.as_ref().and_then(Self::out_type_conversion);
                 let maybe_map_ok = if let Some((pre, post)) = ok_convert {
                     format!(
                         ".map(|ok : {}| {{ {pre}ok{post} }})",
@@ -379,7 +379,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                     type_info: TypeInfo::new(
                         format!("Result<{}, {}>", ok_ty.render(env), err_ty.render(env)).into(),
                     ),
-                    abi_override: abi_override,
+                    abi_override,
                     conversion: Some((
                         "".into(),
                         format!(".to_result(){maybe_map_ok}{maybe_map_err}").into(),
@@ -458,7 +458,7 @@ impl<'tcx> FunctionInfo<'tcx> {
     /// Assumes that any special method can be generated as an `impl` trait block separately from the original method definition, and just call into that.
     ///
     /// TODO: If you're interested in hiding the underlying conversion function, I'd add a `vis` modifier to [`FunctionInfo`] and make `functions` a mutable reference.
-    pub(super) fn get_special_methods(
+    /*pub(super) fn get_special_methods(
         ctx: &mut FileGenContext,
         functions: Vec<FunctionInfo<'tcx>>,
         self_type: Cow<'tcx, str>,
@@ -471,7 +471,7 @@ impl<'tcx> FunctionInfo<'tcx> {
             }
         }
         special_methods
-    }
+    }*/
 
     /// Given any type, generate C ABI info.
     /// TODO: Should this be moved to [`FileGenContext`], since it's used both by [`ParamInfo`] and `FieldInfo`?

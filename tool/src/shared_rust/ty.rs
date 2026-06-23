@@ -67,7 +67,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
     pub(super) fn generate_struct<P: TyPosition>(
         mut self,
         ty: &'tcx StructDef<P>,
-        is_out: bool,
     ) -> impl TypeTemplate<'tcx> {
         /// Like [`super::func::ParamInfo`], and re-uses a lot of the same methods that `ParamInfo` does for generation,
         /// except we are always using  ABI types by default. Every struct is inherently #[repr(C)] (enforced by Diplomat).
@@ -84,7 +83,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             methods: Vec<FunctionInfo<'a>>,
             lib_name: String,
             imports: BTreeSet<String>,
-            is_out: bool,
             fields: Vec<FieldInfo<'a>>,
             lifetime_env: &'a LifetimeEnv,
             lifetimes: Vec<Lifetime>,
@@ -136,19 +134,18 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         ));
 
         // TODO:
-        let special_methods =
-            FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
+        // let special_methods =
+            // FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
 
         StructTemplate {
             type_name,
             methods,
             lib_name: self.lib_name,
             imports: self.imports,
-            is_out,
             fields,
             lifetime_env,
             lifetimes,
-            special_methods,
+            special_methods: vec![],
         }
     }
 
@@ -191,8 +188,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 )
             }
         }
-        let special_methods =
-            FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
+        // let special_methods =
+            // FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
 
         OpaqueTemplate {
             type_name,
@@ -201,7 +198,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             imports: self.imports,
             dtor_abi,
             lifetime_env: &ty.lifetimes,
-            special_methods,
+            special_methods: vec![],
         }
     }
 
@@ -241,8 +238,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
         }
         let type_name = self.formatter.fmt_symbol_name(self.id);
 
-        let special_methods =
-            FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
+        // let special_methods =
+            // FunctionInfo::get_special_methods(&mut self, methods.clone(), type_name.clone());
 
         EnumTemplate {
             type_name,
@@ -250,7 +247,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             lib_name: self.lib_name,
             imports: self.imports,
             variants,
-            special_methods,
+            special_methods: vec![],
         }
     }
 
@@ -317,7 +314,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                     }
                     Slice::Str(lt, enc) => {
                         // TODO: I don't think this always needs to be wrapped the same way:
-                        let name = match enc {
+                        let name : String = match enc {
                             StringEncoding::Utf8 if lt.is_none() => "String",
                             StringEncoding::Utf8 => "str",
                             StringEncoding::UnvalidatedUtf8 => "[u8]",
@@ -328,7 +325,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
                         match lt {
                             Some(lt) => (&MaybeOwn::from_immutable_lifetime(*lt), name),
-                            None => (&MaybeOwn::Own, format!("{name}")),
+                            None => (&MaybeOwn::Own, name.to_string()),
                         }
                     }
                     Slice::Strs(enc) => {
@@ -361,6 +358,6 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
 
     /// TODO: Add namespacing params.
     pub(super) fn add_import(&mut self, import: String) {
-        self.imports.insert(import.into());
+        self.imports.insert(import);
     }
 }

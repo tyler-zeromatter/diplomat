@@ -62,8 +62,8 @@ pub(crate) fn run<'tcx>(
 
         let ctx = FileGenContext::from_type(&config, id, &formatter, tcx);
         let template: &mut dyn TypeTemplate = match ty {
-            TypeDef::Struct(st) => &mut ctx.generate_struct(st, false),
-            TypeDef::OutStruct(st) => &mut ctx.generate_struct(st, true),
+            TypeDef::Struct(st) => &mut ctx.generate_struct(st),
+            TypeDef::OutStruct(st) => &mut ctx.generate_struct(st),
             TypeDef::Opaque(op) => &mut ctx.generate_opaque(op),
             TypeDef::Enum(e) => &mut ctx.generate_enum(e),
             _ => unreachable!("Unsupported HIR type {ty:?}"),
@@ -81,9 +81,9 @@ pub(crate) fn run<'tcx>(
         files.add_file(format!("{}.rs", mod_name), template.render().unwrap())
     }
 
-    for (id, func) in tcx.all_free_functions() {
+    // for (id, func) in tcx.all_free_functions() {
         // See [`FunctionInfo::gen_function_block`].
-    }
+    // }
 
     files.add_file("lib.rs".into(), lib.render().unwrap());
 
