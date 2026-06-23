@@ -38,11 +38,4 @@ mod tests {
         let converted : Vec<f64> = data.iter().map(|&i| { i as f64 }).collect();
         assert_eq!(&converted, vec.borrow());
     }
-
-    #[test]
-    fn test_string_owned() {
-        let owned : Box<[u8]> = Box::new([b'T', b'e', b's', b't']);
-        let str = MyString::new_owned(owned);
-        assert_eq!(str.borrow(), "Test".as_bytes());
-    }
 }

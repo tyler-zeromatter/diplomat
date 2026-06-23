@@ -10,16 +10,16 @@ mod tests {
         let opaque = OptionOpaque::new_none();
         assert!(opaque.is_none());
 
-        let str = OptionOpaque::new_struct();
-        str.get_a().as_ref().unwrap().assert_integer(101);
-        str.get_b().as_ref().unwrap().assert_char('餐');
-        assert_eq!(*str.get_c(), 904);
-        str.get_d().assert_integer(926535);
+        let st = OptionOpaque::new_struct();
+        st.a.as_ref().unwrap().assert_integer(101);
+        st.b.as_ref().unwrap().assert_char('餐');
+        assert_eq!(st.c, 904);
+        st.d.assert_integer(926535);
         
         let sn = OptionOpaque::new_struct_nones();
-        assert!(sn.get_a().is_none());
-        assert!(sn.get_b().is_none());
-        assert_eq!(*sn.get_c(), 908);
+        assert!(sn.a.is_none());
+        assert!(sn.b.is_none());
+        assert_eq!(sn.c, 908);
     }
 
     #[test]
@@ -43,17 +43,17 @@ mod tests {
         let strct = OptionOpaque::accepts_option_input_struct(None, 123);
         assert!(strct.is_none());
         let strct = OptionOpaque::accepts_option_input_struct(Some(OptionInputStruct {
-            a: Some(7),
-            b: None,
-            c: Some(OptionEnum::Bar)
+            a: Some(7).into(),
+            b: None.into(),
+            c: Some(OptionEnum::Bar).into()
         }), 123).unwrap();
-        assert_eq!(strct.a, Some(7));
-        assert!(strct.b.is_none());
-        assert!(matches!(strct.c, Some(OptionEnum::Bar)));
+        assert_eq!(strct.a.into_option(), Some(7));
+        assert!(strct.b.into_option().is_none());
+        assert!(matches!(strct.c.into_option(), Some(OptionEnum::Bar)));
 
         let strct = OptionOpaque::returns_option_input_struct();
-        assert_eq!(strct.a, Some(6));
-        assert!(strct.b.is_none());
-        assert!(matches!(strct.c, Some(OptionEnum::Bar)));
+        assert_eq!(strct.a.into_option(), Some(6));
+        assert!(strct.b.into_option().is_none());
+        assert!(matches!(strct.c.into_option(), Some(OptionEnum::Bar)));
     }
 }
