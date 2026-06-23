@@ -538,7 +538,7 @@ impl<'tcx> FunctionInfo<'tcx> {
                 let struct_name = ctx.formatter.fmt_symbol_name(st.id().into());
                 let name = struct_name.into_owned();
                 // FIXME: Hacky, needs to be able to take into account namespaces
-                ctx.add_import(format!("{}::{name}", heck::AsSnakeCase(name.clone())));
+                ctx.add_import(name.clone());
                 ABITypeInfo {
                     name: Some(name.into()),
                     ..Default::default()
