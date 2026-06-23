@@ -26,6 +26,9 @@ mod tests {
 
         let error = MyStruct::fails_zst_result();
         assert!(matches!(error.err().unwrap(), MyZst{}));
+
+        let ok = MyStruct::returns_zst_result();
+        assert_eq!(ok.ok().unwrap(), ());
     }
 
     #[test]
