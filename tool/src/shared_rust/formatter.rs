@@ -107,7 +107,7 @@ impl<'a> TypeInfo<'a> {
         self.render_with_override(env, &ABITypeInfo::default())
     }
 
-    pub(super) fn render_without_borrow(&self, env: &LifetimeEnv, over: &ABITypeInfo) -> String {
+    pub(super) fn render_name(&self, env: &LifetimeEnv, over: &ABITypeInfo, borrow : Option<String>) -> String {
         let name = over.name.clone().unwrap_or(self.name.clone());
 
         let generic_lifetimes = Self::fmt_generic_lifetimes(
@@ -120,11 +120,23 @@ impl<'a> TypeInfo<'a> {
 
         let name = format!("{name}{generic_lifetimes}");
 
+        let borrow_stmt = borrow.clone().unwrap_or_default();
+
         match over.wrapped.as_ref().unwrap_or(&self.wrapped) {
-            TypeInfoWrapper::None => name,
-            TypeInfoWrapper::Boxed => format!("Box<{name}>"),
-            TypeInfoWrapper::BoxedOptional => format!("Option<Box<{name}>>"),
-            TypeInfoWrapper::Optional => format!("Option<{name}>"),
+            TypeInfoWrapper::None => format!("{borrow_stmt}{name}"),
+            TypeInfoWrapper::Boxed => {
+                if borrow.is_some() {
+                    panic!("Found borrow on Boxed type.");
+                }
+                format!("Box<{name}>")
+        },
+            TypeInfoWrapper::BoxedOptional => {
+                if borrow.is_some() {
+                    panic!("Found borrow on Boxed type.");
+                }
+                format!("Option<Box<{name}>>")
+        },
+            TypeInfoWrapper::Optional => format!("Option<{borrow_stmt}{name}>"),
         }
     }
 
@@ -147,9 +159,7 @@ impl<'a> TypeInfo<'a> {
             _ => format!("&'{maybe_borrow} "),
         };
 
-        let name_wrapped = self.render_without_borrow(env, over);
-
-        format!("{borrow_stmt}{name_wrapped}")
+        self.render_name(env, over, Some(borrow_stmt))
     }
 }
 

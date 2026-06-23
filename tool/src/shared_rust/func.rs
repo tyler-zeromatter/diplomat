@@ -70,10 +70,10 @@ impl<'a> ParamInfo<'a> {
     fn render_without_borrow(&self, env: &LifetimeEnv, is_abi: bool) -> String {
         if is_abi {
             self.type_info
-                .render_without_borrow(env, &self.abi_override)
+                .render_name(env, &self.abi_override, None)
         } else {
             self.type_info
-                .render_without_borrow(env, &ABITypeInfo::default())
+                .render_name(env, &ABITypeInfo::default(), None)
         }
     }
 

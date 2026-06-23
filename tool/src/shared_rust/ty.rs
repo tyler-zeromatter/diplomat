@@ -292,6 +292,8 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 }
             }
             Type::DiplomatOption(op) => {
+                // For non-opaque optionals.
+                // FIXME: Should use wrapped instead of manually formatting Option<{}>.
                 let info = self.gen_type_info(op);
                 TypeInfo {
                     name: format!("Option<{}>", info.name).into(),
