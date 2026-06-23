@@ -1,3 +1,4 @@
+mod attrs;
 mod slices;
 mod opaque;
 mod enums;
