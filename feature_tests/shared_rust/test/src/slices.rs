@@ -32,6 +32,20 @@ mod tests {
     }
 
     #[test]
+    fn test_mutable_string() {
+        let mut out = MyString::new_unsafe("some string");
+        assert_eq!(out.borrow(), [115, 111, 109, 101, 32, 115, 116, 114, 105, 110, 103]);
+        out.set_str(&[83, 111, 109, 101, 32, 115, 116, 114, 105, 110, 103]);
+        assert_eq!(out.get_str(), "Some string");
+    }
+
+    #[test]
+    fn test_statics() {
+        let out = MyString::get_static_str();
+        assert_eq!(out, "hello");
+    }
+
+    #[test]
     fn test_float64_vec() {
         let data = vec![1, 2, 3, 4, 5];
         let mut vec = Float64Vec::new_isize(&data);
