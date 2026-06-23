@@ -74,14 +74,14 @@ impl OptionOpaque {
 
     }
 
-    pub fn returns_none_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
+    pub fn returns_none_self<'a>(&'a self) -> Option<&'a OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_none_self(self) };
         
         ret
 
     }
 
-    pub fn returns_some_self<'a>(&'a self) -> &'a Option<OptionOpaque> {
+    pub fn returns_some_self<'a>(&'a self) -> Option<&'a OptionOpaque> {
         let ret = unsafe { OptionOpaque_returns_some_self(self) };
         
         ret
@@ -93,7 +93,7 @@ impl OptionOpaque {
         
     }
 
-    pub fn option_opaque_argument<'anon_0>(arg : &'anon_0 Option<OptionOpaque>) -> bool {
+    pub fn option_opaque_argument<'anon_0>(arg : Option<&'anon_0 OptionOpaque>) -> bool {
         let ret = unsafe { OptionOpaque_option_opaque_argument(arg) };
         
         ret
@@ -162,13 +162,13 @@ unsafe extern "C" {
 
     fn OptionOpaque_new_struct_nones() -> OptionStruct;
 
-    fn OptionOpaque_returns_none_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
+    fn OptionOpaque_returns_none_self<'a>(this: &'a OptionOpaque) -> Option<&'a OptionOpaque>;
 
-    fn OptionOpaque_returns_some_self<'a>(this: &'a OptionOpaque) -> &'a Option<OptionOpaque>;
+    fn OptionOpaque_returns_some_self<'a>(this: &'a OptionOpaque) -> Option<&'a OptionOpaque>;
 
     fn OptionOpaque_assert_integer<'anon_0>(this: &'anon_0 OptionOpaque, i : i32);
 
-    fn OptionOpaque_option_opaque_argument<'anon_0>(arg : &'anon_0 Option<OptionOpaque>) -> bool;
+    fn OptionOpaque_option_opaque_argument<'anon_0>(arg : Option<&'anon_0 OptionOpaque>) -> bool;
 
     fn OptionOpaque_accepts_option_u8(arg : diplomat_runtime::DiplomatOption::<u8>, sentinel : u8) -> diplomat_runtime::DiplomatOption<u8>;
 

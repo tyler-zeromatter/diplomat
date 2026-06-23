@@ -30,14 +30,14 @@ impl OpaqueThinVec {
 
     }
 
-    pub fn get<'a>(&'a self, idx : usize) -> &'a Option<OpaqueThin> {
+    pub fn get<'a>(&'a self, idx : usize) -> Option<&'a OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_get(self, idx) };
         
         ret
 
     }
 
-    pub fn first<'a>(&'a self) -> &'a Option<OpaqueThin> {
+    pub fn first<'a>(&'a self) -> Option<&'a OpaqueThin> {
         let ret = unsafe { OpaqueThinVec_first(self) };
         
         ret
@@ -54,9 +54,9 @@ unsafe extern "C" {
 
     fn OpaqueThinVec_len<'anon_0>(this: &'anon_0 OpaqueThinVec) -> usize;
 
-    fn OpaqueThinVec_get<'a>(this: &'a OpaqueThinVec, idx : usize) -> &'a Option<OpaqueThin>;
+    fn OpaqueThinVec_get<'a>(this: &'a OpaqueThinVec, idx : usize) -> Option<&'a OpaqueThin>;
 
-    fn OpaqueThinVec_first<'a>(this: &'a OpaqueThinVec) -> &'a Option<OpaqueThin>;
+    fn OpaqueThinVec_first<'a>(this: &'a OpaqueThinVec) -> Option<&'a OpaqueThin>;
 
     fn OpaqueThinVec_destroy(this : *mut OpaqueThinVec);
 }

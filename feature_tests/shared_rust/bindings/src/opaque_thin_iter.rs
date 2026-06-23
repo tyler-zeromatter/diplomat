@@ -12,7 +12,7 @@ impl<'a> Drop for OpaqueThinIter<'a> {
 }
 
 impl<'a> OpaqueThinIter<'a> {
-    pub fn next(&'a mut self) -> &'a Option<OpaqueThin> {
+    pub fn next(&'a mut self) -> Option<&'a OpaqueThin> {
         let ret = unsafe { OpaqueThinIter_next(self) };
         
         ret
@@ -23,7 +23,7 @@ impl<'a> OpaqueThinIter<'a> {
 #[link(name = "somelib")]
 #[allow(improper_ctypes)]
 unsafe extern "C" {
-    fn OpaqueThinIter_next<'a>(this: &'a mut OpaqueThinIter) -> &'a Option<OpaqueThin>;
+    fn OpaqueThinIter_next<'a>(this: &'a mut OpaqueThinIter) -> Option<&'a OpaqueThin>;
 
     fn OpaqueThinIter_destroy(this : *mut OpaqueThinIter);
 }
