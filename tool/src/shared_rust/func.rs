@@ -454,11 +454,11 @@ impl<'tcx> FunctionInfo<'tcx> {
         funcs
     }
 
-    /// Generate an impl block for special Rust trait stuff.
+    /*/// Generate an impl block for special Rust trait stuff.
     /// Assumes that any special method can be generated as an `impl` trait block separately from the original method definition, and just call into that.
     ///
     /// TODO: If you're interested in hiding the underlying conversion function, I'd add a `vis` modifier to [`FunctionInfo`] and make `functions` a mutable reference.
-    /*pub(super) fn get_special_methods(
+    pub(super) fn get_special_methods(
         ctx: &mut FileGenContext,
         functions: Vec<FunctionInfo<'tcx>>,
         self_type: Cow<'tcx, str>,
