@@ -38,8 +38,7 @@ pub(super) trait TypeTemplate<'a> {
     fn imports(&mut self) -> &mut BTreeSet<String>;
     fn mod_name(&self) -> String;
     /// Lifetimes on the impl block
-    /// TODO: Add a bounded_generic_lifetime function as well.
-    fn generic_lifetimes(&self) -> String;
+    fn generic_lifetimes(&self, include_bounds : bool) -> String;
 }
 
 impl<'tcx, 'rcx> FileGenContext<'tcx> {
@@ -116,13 +115,17 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
                 self.type_name.clone().into()
             }
 
-            fn generic_lifetimes(&self) -> String {
+            fn generic_lifetimes(&self, include_bounds: bool) -> String {
                 let new_lts = self
                     .lifetimes
                     .iter()
                     .map(|lt| MaybeStatic::NonStatic(*lt))
                     .collect();
-                TypeInfo::fmt_generic_lifetimes(new_lts, self.lifetime_env)
+                if include_bounds {
+                    TypeInfo::fmt_generic_bounded_lifetimes(new_lts, self.lifetime_env)
+                } else {
+                    TypeInfo::fmt_generic_lifetimes(new_lts, self.lifetime_env)
+                }
             }
         }
 
@@ -181,11 +184,19 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
             }
-            fn generic_lifetimes(&self) -> String {
-                TypeInfo::fmt_generic_lifetimes(
-                    self.lifetime_env.lifetimes().lifetimes().collect(),
-                    self.lifetime_env,
-                )
+            fn generic_lifetimes(&self, include_bounds : bool) -> String {
+                let lts = self.lifetime_env.lifetimes().lifetimes().collect();
+                if include_bounds {
+                    TypeInfo::fmt_generic_bounded_lifetimes(
+                        lts,
+                        self.lifetime_env,
+                    )
+                } else {
+                    TypeInfo::fmt_generic_lifetimes(
+                        lts,
+                        self.lifetime_env,
+                    )
+                }
             }
         }
         // let special_methods =
@@ -232,7 +243,7 @@ impl<'tcx, 'rcx> FileGenContext<'tcx> {
             fn mod_name(&self) -> String {
                 self.type_name.clone().into()
             }
-            fn generic_lifetimes(&self) -> String {
+            fn generic_lifetimes(&self, _include_bounds : bool) -> String {
                 String::new()
             }
         }

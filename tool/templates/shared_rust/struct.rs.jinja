@@ -3,7 +3,7 @@
 #[repr(C)]
 pub struct {{type_name -}}
 
-{{- self.generic_lifetimes() -}}
+{{- self.generic_lifetimes(true) -}}
 
 {%- if fields.len() > 0 %} {
     {%- for f in fields %}

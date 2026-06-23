@@ -126,13 +126,13 @@ impl<'a> TypeInfo<'a> {
             TypeInfoWrapper::None => format!("{borrow_stmt}{name}"),
             TypeInfoWrapper::Boxed => {
                 if borrow.is_some() {
-                    panic!("Found borrow on Boxed type.");
+                    panic!("Found borrow on Boxed type: {name}.");
                 }
                 format!("Box<{name}>")
         },
             TypeInfoWrapper::BoxedOptional => {
                 if borrow.is_some() {
-                    panic!("Found borrow on Boxed type.");
+                    panic!("Found borrow on Boxed type: {name}.");
                 }
                 format!("Option<Box<{name}>>")
         },
@@ -151,15 +151,15 @@ impl<'a> TypeInfo<'a> {
             },
         };
         let borrow_stmt = match borrow {
-            MaybeOwn::Own => "".into(),
+            MaybeOwn::Own => None,
             // TODO: Would be nice to have a LifetimeEnv helper to avoid formatting anonymous lifetimes.
             MaybeOwn::Borrow(b) if b.mutability == Mutability::Mutable => {
-                format!("&'{maybe_borrow} mut ")
+                Some(format!("&'{maybe_borrow} mut "))
             }
-            _ => format!("&'{maybe_borrow} "),
+            _ => Some(format!("&'{maybe_borrow} ")),
         };
 
-        self.render_name(env, over, Some(borrow_stmt))
+        self.render_name(env, over, borrow_stmt)
     }
 }
 
