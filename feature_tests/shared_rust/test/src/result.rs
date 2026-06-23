@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use shared_rust_feature_test_bindings::{ErrorEnum, MyStruct, MyZst, ResultOpaque};
+    use shared_rust_feature_test_bindings::{ErrorEnum, MyStruct, MyZst, ResultOpaque, ErrorStruct};
 
     #[test]
     fn test_result_opaque() {
@@ -26,5 +26,19 @@ mod tests {
 
         let error = MyStruct::fails_zst_result();
         assert!(matches!(error.err().unwrap(), MyZst{}));
+    }
+
+    #[test]
+    fn test_error_struct() {
+        let res = ErrorStruct::returns_result_option(true);
+        assert!(res.as_ref().is_ok());
+        let opt = res.unwrap();
+        assert!(opt.is_some());
+        assert_eq!(opt.unwrap().j, 125);
+
+        let none = ErrorStruct::returns_result_option(false);
+        assert!(none.as_ref().is_ok());
+        let opt = none.unwrap();
+        assert!(opt.is_none());
     }
 }
