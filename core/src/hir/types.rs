@@ -101,7 +101,7 @@ impl<P :TyPosition> std::hash::Hash for Type<P> {
             },
             Type::Callback(c) => {
                 state.write_u8(6);
-                // TODO: Hash
+                c.hash(state);
             }
             Type::DiplomatOption(op) => {
                 state.write_u8(8);

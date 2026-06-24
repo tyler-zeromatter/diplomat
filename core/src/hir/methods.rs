@@ -70,6 +70,12 @@ impl PartialEq for Callback {
 
 impl Eq for Callback {}
 
+impl std::hash::Hash for Callback {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
 static CALLBACK_COUNT : std::sync::RwLock<usize> = std::sync::RwLock::new(0);
 
 impl Callback {
@@ -104,7 +110,7 @@ impl Callback {
 }
 
 // uninstantiatable; represents no callback allowed
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum NoCallback {}
 
@@ -130,7 +136,7 @@ impl CallbackInstantiationFunctionality for NoCallback {
 }
 
 /// Type that the method returns.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum SuccessType<P: super::TyPosition = OutputOnly> {
     /// Conceptually returns a string, which gets written to the `write: DiplomatWrite` argument
@@ -139,19 +145,6 @@ pub enum SuccessType<P: super::TyPosition = OutputOnly> {
     OutType(Type<P>),
     /// A `()` type in Rust.
     Unit,
-}
-
-impl<P: super::TyPosition> std::hash::Hash for SuccessType<P> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            SuccessType::Write => state.write_u8(0),
-            SuccessType::Unit => state.write_u8(1),
-            SuccessType::OutType(o) => {
-                state.write_u8(2);
-                o.hash(state);
-            }
-        }
-    }
 }
 
 /// Whether or not the method returns a value or a result.

@@ -102,14 +102,14 @@ pub struct StructField<P: TyPosition = Everywhere> {
     pub attrs: Attrs,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub struct ResultUsageInfo<P: TyPosition> {
     pub ok: super::SuccessType<P>,
     pub err: Option<Type<P>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 // InputOnly allows for traits and callbacks, which creates a large byte difference (this type is > 900 bytes).
 #[allow(clippy::large_enum_variant)]
@@ -118,23 +118,6 @@ pub enum ResultUsage {
     Input(ResultUsageInfo<super::InputOnly>),
     /// Result is used as the return of a method:
     Output(ResultUsageInfo<super::OutputOnly>),
-}
-
-impl std::hash::Hash for ResultUsage {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            ResultUsage::Input(i) => {
-                state.write_u8(0);
-                i.ok.hash(state);
-                i.err.hash(state);
-            }
-            ResultUsage::Output(o) => {
-                state.write_u8(1);
-                o.ok.hash(state);
-                o.err.hash(state);
-            }
-        }
-    }
 }
 
 /// Information on how a [`TypeDef`] is used across the HIR.
