@@ -71,6 +71,8 @@ impl<P: TyPosition> PartialEq for Type<P> {
     }
 }
 
+impl<P :TyPosition> Eq for Type<P> {}
+
 impl<P :TyPosition> std::hash::Hash for Type<P> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {

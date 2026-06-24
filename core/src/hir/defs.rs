@@ -102,14 +102,14 @@ pub struct StructField<P: TyPosition = Everywhere> {
     pub attrs: Attrs,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct ResultUsageInfo<P: TyPosition> {
     pub ok: super::SuccessType<P>,
     pub err: Option<Type<P>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 // InputOnly allows for traits and callbacks, which creates a large byte difference (this type is > 900 bytes).
 #[allow(clippy::large_enum_variant)]
@@ -119,22 +119,6 @@ pub enum ResultUsage {
     /// Result is used as the return of a method:
     Output(ResultUsageInfo<super::OutputOnly>),
 }
-
-impl PartialEq for ResultUsage {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (ResultUsage::Input(a), ResultUsage::Input(b)) => {
-                a.ok == b.ok && a.err == b.err
-            }
-            (ResultUsage::Output(a), ResultUsage::Output(b)) => {
-                a.ok == b.ok && a.err == b.err
-            }
-            _ => false
-        }
-    }
-}
-
-impl Eq for ResultUsage {}
 
 impl std::hash::Hash for ResultUsage {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {

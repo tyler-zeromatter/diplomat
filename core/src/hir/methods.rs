@@ -88,7 +88,7 @@ impl CallbackInstantiationFunctionality for NoCallback {
 }
 
 /// Type that the method returns.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum SuccessType<P: super::TyPosition = OutputOnly> {
     /// Conceptually returns a string, which gets written to the `write: DiplomatWrite` argument
@@ -97,19 +97,6 @@ pub enum SuccessType<P: super::TyPosition = OutputOnly> {
     OutType(Type<P>),
     /// A `()` type in Rust.
     Unit,
-}
-
-impl<P : super::TyPosition> PartialEq for SuccessType<P> {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (SuccessType::Write, SuccessType::Write) => true,
-            (SuccessType::Unit, SuccessType::Unit) => true,
-            (SuccessType::OutType(a), SuccessType::OutType(b)) => {
-                a == b
-            }
-            _ => false,
-        }
-    }
 }
 
 impl<P: super::TyPosition> std::hash::Hash for SuccessType<P> {

@@ -151,7 +151,7 @@ pub struct Everywhere;
 /// only be used as return types in functions.
 ///
 /// The directional opposite of this type is [`InputOnly`].
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct OutputOnly;
 
@@ -159,7 +159,7 @@ pub struct OutputOnly;
 /// only be used as input types in functions.
 ///
 /// The directional opposite of this type is [`OutputOnly`].
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct InputOnly;
 
