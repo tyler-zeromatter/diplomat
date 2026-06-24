@@ -184,19 +184,26 @@ impl<P: TyPosition> std::hash::Hash for Slice<P> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {
             Slice::Str(ms, enc) => {
+                state.write_u8(0);
                 ms.hash(state);
                 enc.hash(state);
             }
-            Slice::Strs(enc) => enc.hash(state),
             Slice::Primitive(mo, p) => {
+                state.write_u8(1);
                 mo.hash(state);
                 p.hash(state);
             }
+            Slice::Strs(enc) => {
+                state.write_u8(2);
+                enc.hash(state)
+            }
             Slice::Struct(mo, st) => {
+                state.write_u8(3);
                 mo.hash(state);
                 st.id().hash(state);
             }
             Slice::Opaque(mo, op) => {
+                state.write_u8(4);
                 mo.hash(state);
                 op.tcx_id.hash(state);
             }
