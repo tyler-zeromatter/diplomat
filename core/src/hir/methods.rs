@@ -49,7 +49,7 @@ pub trait CallbackInstantiationFunctionality: Sealed {
     fn get_output_type(&self) -> Result<&ReturnType<InputOnly>, ()>;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 // Note: we do not support borrowing across callbacks
 pub struct Callback {
@@ -59,6 +59,48 @@ pub struct Callback {
     pub name: Option<IdentBuf>,
     pub attrs: Option<Attrs>,
     pub docs: Option<Docs>,
+    id : usize,
+}
+
+impl PartialEq for Callback {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for Callback {}
+
+static CALLBACK_COUNT : std::sync::RwLock<usize> = std::sync::RwLock::new(0);
+
+impl Callback {
+    pub fn new(
+        param_self: Option<TraitParamSelf>,
+        params: Vec<CallbackParam>,
+        output: Box<ReturnType<InputOnly>>, 
+        name: Option<IdentBuf>,
+        attrs: Option<Attrs>,
+        docs: Option<Docs>
+    ) -> Self {
+        Self {
+            param_self,
+            params,
+            output,
+            name,
+            attrs,
+            docs,
+            id: Callback::get_id()
+        }
+    }
+
+    /// Generate a unique ID for each callback.
+    /// Each Callback is defined at a unique location (without an ID, since each is in a parameter),
+    /// so this is just a way to 
+    fn get_id() -> usize {
+        let mut counter = CALLBACK_COUNT.write().expect("Could not write to callback count.");
+        let ret = *counter;
+        *counter += 1;
+        ret
+    }
 }
 
 // uninstantiatable; represents no callback allowed

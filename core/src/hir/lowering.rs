@@ -526,18 +526,18 @@ impl<'ast> LoweringContext<'ast> {
             &mut self.errors,
         );
 
-        Ok(Callback {
+        Ok(Callback::new(
             param_self,
             params,
-            output: Box::new(return_type),
-            name: Some(self.lower_ident(&name, "trait name")?),
-            attrs: Some(attrs),
-            docs: Some(Docs::from_ast(
+            Box::new(return_type),
+            Some(self.lower_ident(&name, "trait name")?),
+            Some(attrs),
+            Some(Docs::from_ast(
                 &ast_trait_method.docs,
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             )),
-        })
+        ))
     }
 
     fn lower_function(
@@ -1283,18 +1283,18 @@ impl<'ast> LoweringContext<'ast> {
                     params.push(param)
                 }
 
-                Ok(Type::Callback(P::build_callback(Callback {
-                    param_self: None,
+                Ok(Type::Callback(P::build_callback(Callback::new(
+                    None,
                     params,
-                    output: Box::new(self.lower_callback_return_type(
+                    Box::new(self.lower_callback_return_type(
                         Some(out_type),
                         ltl,
                         in_path,
                     )?),
-                    name: None,
-                    attrs: None,
-                    docs: None,
-                })))
+                    None,
+                    None,
+                    None,
+                ))))
             }
             ast::TypeName::Unit => {
                 self.errors.push(LoweringError::Other("Unit types can only appear as the return value of a method, or as the Ok/Err variants of a returned result".into()));
