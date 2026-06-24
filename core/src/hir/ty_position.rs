@@ -97,7 +97,7 @@ where
     for<'tcx> TypeDef<'tcx>: From<&'tcx StructDef<Self>>,
 {
     const IN_OUT_STATUS: InputOrOutput;
-    type CallbackInstantiation: Debug + CallbackInstantiationFunctionality + Clone;
+    type CallbackInstantiation: Debug + CallbackInstantiationFunctionality + Clone + PartialEq + Eq;
 
     /// Type representing how we can point to opaques, which must always be behind a pointer.
     ///

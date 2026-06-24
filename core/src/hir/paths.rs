@@ -25,7 +25,7 @@ pub struct StructPath<P: TyPosition = Everywhere> {
     pub owner: MaybeOwn,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct TraitPath {
     pub lifetimes: Lifetimes,

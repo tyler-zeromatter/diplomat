@@ -49,7 +49,7 @@ pub trait CallbackInstantiationFunctionality: Sealed {
     fn get_output_type(&self) -> Result<&ReturnType<InputOnly>, ()>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 // Note: we do not support borrowing across callbacks
 pub struct Callback {
@@ -62,7 +62,7 @@ pub struct Callback {
 }
 
 // uninstantiatable; represents no callback allowed
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum NoCallback {}
 
@@ -113,7 +113,7 @@ impl<P: super::TyPosition> std::hash::Hash for SuccessType<P> {
 }
 
 /// Whether or not the method returns a value or a result.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[allow(clippy::exhaustive_enums)] // this only exists for fallible/infallible, breaking changes for more complex returns are ok
 pub enum ReturnType<P: super::TyPosition = OutputOnly> {
     Infallible(SuccessType<P>),
@@ -129,7 +129,7 @@ pub struct ParamSelf {
     pub attrs: Attrs,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct TraitParamSelf {
     pub trait_path: TraitPath,
@@ -146,7 +146,7 @@ pub struct Param {
 
 /// A parameter in a callback
 /// No name, since all we get is the callback type signature
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct CallbackParam {
     pub ty: Type<OutputOnly>,

@@ -228,7 +228,7 @@ impl<T> MaybeStatic<T> {
 pub struct Lifetime(usize);
 
 /// A set of lifetimes found on a type name, struct signature, or method signature
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Lifetimes {
     indices: SmallVec<[MaybeStatic<Lifetime>; 2]>,
 }

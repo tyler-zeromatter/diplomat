@@ -60,8 +60,7 @@ impl<P: TyPosition> PartialEq for Type<P> {
                 a == b
             }
             (Type::Callback(a), Type::Callback(b)) => {
-                // TODO:
-                false
+                a == b
             }
             (Type::DiplomatOption(a), Type::DiplomatOption(b)) => {
                 a == b
