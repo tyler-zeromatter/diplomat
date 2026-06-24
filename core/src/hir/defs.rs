@@ -1,5 +1,7 @@
 //! Type definitions for structs, output structs, opaque structs, and enums.
 
+use std::collections::HashSet;
+
 use super::lifetimes::LifetimeEnv;
 use super::{
     Attrs, Callback, Everywhere, IdentBuf, Method, OutputOnly, SpecialMethodPresence, TyPosition,
@@ -118,6 +120,39 @@ pub enum ResultUsage {
     Output(ResultUsageInfo<super::OutputOnly>),
 }
 
+impl PartialEq for ResultUsage {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (ResultUsage::Input(a), ResultUsage::Input(b)) => {
+                a.ok == b.ok && a.err == b.err
+            }
+            (ResultUsage::Output(a), ResultUsage::Output(b)) => {
+                a.ok == b.ok && a.err == b.err
+            }
+            _ => false
+        }
+    }
+}
+
+impl Eq for ResultUsage {}
+
+impl std::hash::Hash for ResultUsage {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            ResultUsage::Input(i) => {
+                state.write_u8(0);
+                i.ok.hash(state);
+                i.err.hash(state);
+            }
+            ResultUsage::Output(o) => {
+                state.write_u8(1);
+                o.ok.hash(state);
+                o.err.hash(state);
+            }
+        }
+    }
+}
+
 /// Information on how a [`TypeDef`] is used across the HIR.
 #[derive(Debug, Clone, Default)]
 #[non_exhaustive]
@@ -127,7 +162,8 @@ pub struct TypingUseInfo {
     /// If the given type is ever used in an option.
     pub optioned: bool,
     /// The results that this type is used in.
-    pub results: Vec<ResultUsage>,
+    /// Allocated on the heap to avoid large copies on the stack.
+    pub results: HashSet<Box<ResultUsage>>,
 }
 
 /// Used for setting a type's usage in [`super::LoweringContext::update_usage`]

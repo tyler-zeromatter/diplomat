@@ -99,6 +99,32 @@ pub enum SuccessType<P: super::TyPosition = OutputOnly> {
     Unit,
 }
 
+impl<P : super::TyPosition> PartialEq for SuccessType<P> {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (SuccessType::Write, SuccessType::Write) => true,
+            (SuccessType::Unit, SuccessType::Unit) => true,
+            (SuccessType::OutType(a), SuccessType::OutType(b)) => {
+                a == b
+            }
+            _ => false,
+        }
+    }
+}
+
+impl<P: super::TyPosition> std::hash::Hash for SuccessType<P> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            SuccessType::Write => state.write_u8(0),
+            SuccessType::Unit => state.write_u8(1),
+            SuccessType::OutType(o) => {
+                state.write_u8(2);
+                o.hash(state);
+            }
+        }
+    }
+}
+
 /// Whether or not the method returns a value or a result.
 #[derive(Debug, Clone)]
 #[allow(clippy::exhaustive_enums)] // this only exists for fallible/infallible, breaking changes for more complex returns are ok

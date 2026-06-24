@@ -118,7 +118,7 @@ pub struct EnumPath {
 ///
 /// Ownership in the case of opaques is `Box<Opaque>`, in the case of structs is
 /// `Struct`, and in the case of slices is `Box<[T]>`.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 #[allow(clippy::exhaustive_enums)] // only two answers to this question
 pub enum MaybeOwn {
     Own,

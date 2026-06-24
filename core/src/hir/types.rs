@@ -6,7 +6,7 @@ use super::{
     PrimitiveType, StructPath, StructPathLike, TyPosition, TypeContext, TypeId,
 };
 use crate::ast;
-use crate::hir::MaybeOwn;
+use crate::hir::{MaybeOwn, TraitIdGetter};
 pub use ast::Mutability;
 pub use ast::StringEncoding;
 use either::Either;
@@ -36,6 +36,78 @@ pub enum Type<P: TyPosition = Everywhere> {
     /// This does not get used when the user writes `-> Option<T>` (for non-opaque T):
     /// that will always use [`ReturnType::Nullable`](crate::hir::ReturnType::Nullable).
     DiplomatOption(Box<Type<P>>),
+}
+
+impl<P: TyPosition> PartialEq for Type<P> {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Type::Primitive(a), Type::Primitive(b)) => {
+                a == b
+            }
+            (Type::Opaque(a), Type::Opaque(b)) => {
+                a.tcx_id == b.tcx_id
+            }
+            (Type::Struct(a), Type::Struct(b)) => {
+                a.id() == b.id()
+            }
+            (Type::ImplTrait(a), Type::ImplTrait(b)) => {
+                a.id() == b.id()
+            }
+            (Type::Enum(a), Type::Enum(b)) => {
+                a.tcx_id == b.tcx_id
+            }
+            (Type::Slice(a), Type::Slice(b)) => {
+                a == b
+            }
+            (Type::Callback(a), Type::Callback(b)) => {
+                // TODO:
+                false
+            }
+            (Type::DiplomatOption(a), Type::DiplomatOption(b)) => {
+                a == b
+            }
+            _ => false,
+        }
+    }
+}
+
+impl<P :TyPosition> std::hash::Hash for Type<P> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Type::Primitive(p) => {
+                state.write_u8(0);
+                p.hash(state)
+            },
+            Type::Opaque(o) => {
+                state.write_u8(1);
+                o.tcx_id.hash(state)
+            },
+            Type::Struct(s) => {
+                state.write_u8(2);
+                s.id().hash(state)
+            },
+            Type::ImplTrait(i) => {
+                state.write_u8(3);
+                i.id().hash(state)
+            },
+            Type::Enum(e) => {
+                state.write_u8(4);
+                e.tcx_id.hash(state)
+            },
+            Type::Slice(s) => {
+                state.write_u8(5);
+                s.hash(state)
+            },
+            Type::Callback(c) => {
+                state.write_u8(6);
+                // TODO: Hash
+            }
+            Type::DiplomatOption(op) => {
+                state.write_u8(8);
+                op.hash(state)
+            },
+        }
+    }
 }
 
 /// Type that can appear in the `self` position.
@@ -86,6 +158,51 @@ pub enum Slice<P: TyPosition> {
     Opaque(MaybeOwn, OpaquePath<Optional, Borrow>),
 }
 
+impl<P: TyPosition> PartialEq for Slice<P> {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Slice::Str(st_a, enc_a), Slice::Str(st_b, enc_b)) => {
+                st_a == st_b && enc_a == enc_b
+            }
+            (Slice::Strs(enc_a), Slice::Strs(enc_b)) => enc_a == enc_b,
+            (Slice::Primitive(mo_a, t_a), Slice::Primitive(mo_b, t_b)) => {
+                mo_a == mo_b && t_a == t_b
+            }
+            (Slice::Struct(mo_a, st_a), Slice::Struct(mo_b, st_b)) => {
+                mo_a == mo_b && st_a.id() == st_b.id()
+            }
+            (Slice::Opaque(mo_a, op_a), Slice::Opaque(mo_b, op_b)) => {
+                mo_a == mo_b && op_a.tcx_id == op_b.tcx_id
+            }
+            _ => false,
+        }
+    }
+}
+
+impl<P: TyPosition> std::hash::Hash for Slice<P> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        match self {
+            Slice::Str(ms, enc) => {
+                ms.hash(state);
+                enc.hash(state);
+            }
+            Slice::Strs(enc) => enc.hash(state),
+            Slice::Primitive(mo, p) => {
+                mo.hash(state);
+                p.hash(state);
+            }
+            Slice::Struct(mo, st) => {
+                mo.hash(state);
+                st.id().hash(state);
+            }
+            Slice::Opaque(mo, op) => {
+                mo.hash(state);
+                op.tcx_id.hash(state);
+            }
+        }
+    }
+}
+
 // For now, the lifetime in not optional. This is because when you have references
 // as fields of structs, the lifetime must always be present, and we want to uphold
 // this invariant at the type level within the HIR.
@@ -94,7 +211,7 @@ pub enum Slice<P: TyPosition> {
 // where implicit lifetimes are allowed. Getting this to all fit together will
 // involve getting the implicit lifetime thing to be understood by Diplomat, but
 // should be doable.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq)]
 #[non_exhaustive]
 pub struct Borrow {
     pub lifetime: MaybeStatic<Lifetime>,
