@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class OpaqueThinVec: IDisposable
 {
-    private unsafe RustHandle<Raw.OpaqueThinVec> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.OpaqueThinVec>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.OpaqueThinVec> _destroy = Raw.OpaqueThinVec.Destroy;
 
@@ -33,13 +27,13 @@ public partial class OpaqueThinVec: IDisposable
         {
             unsafe
             {
-                if (_inner.IsNull)
+                if (_inner is null || _inner.IsNull)
                 {
                     throw new ObjectDisposedException("OpaqueThinVec");
                 }
                 Raw.OpaqueThin* result = Raw.OpaqueThinVec.First(AsFFI());
                 GC.KeepAlive(this);
-                return result == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result), new object[] { this });
+                return result == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result, new object[] { this.DiplomatRetainDependency() }));
             }
         }
     }
@@ -50,7 +44,7 @@ public partial class OpaqueThinVec: IDisposable
         {
             unsafe
             {
-                if (_inner.IsNull)
+                if (_inner is null || _inner.IsNull)
                 {
                     throw new ObjectDisposedException("OpaqueThinVec");
                 }
@@ -77,31 +71,25 @@ public partial class OpaqueThinVec: IDisposable
     internal unsafe OpaqueThinVec(Raw.OpaqueThinVec* handle)
     {
         _inner = RustHandle<Raw.OpaqueThinVec>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe OpaqueThinVec(Raw.OpaqueThinVec* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.OpaqueThinVec>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe OpaqueThinVec(RustHandle<Raw.OpaqueThinVec> inner, object[] edges)
+    internal unsafe OpaqueThinVec(Raw.OpaqueThinVec* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.OpaqueThinVec>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe OpaqueThinVec(RustHandle<Raw.OpaqueThinVec> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -131,13 +119,13 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
             Raw.OpaqueThinIter* result = Raw.OpaqueThinVec.Iter(AsFFI());
             GC.KeepAlive(this);
-            return new OpaqueThinIter(result, new object[] { this });
+            return new OpaqueThinIter(result, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -145,7 +133,7 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
@@ -166,13 +154,13 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
             Raw.OpaqueThin* result = Raw.OpaqueThinVec.Get(AsFFI(), idx);
             GC.KeepAlive(this);
-            return result == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result), new object[] { this });
+            return result == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result, new object[] { this.DiplomatRetainDependency() }));
         }
     }
 
@@ -188,7 +176,7 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
@@ -198,7 +186,7 @@ public partial class OpaqueThinVec: IDisposable
             {
                 throw new InvalidOperationException("FFI function failed with unit error");
             }
-            return new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result.Ok), new object[] { this });
+            return new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result.Ok, new object[] { this.DiplomatRetainDependency() }));
         }
     }
 
@@ -214,7 +202,7 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
@@ -224,7 +212,7 @@ public partial class OpaqueThinVec: IDisposable
             {
                 throw new InvalidOperationException("FFI function failed with unit error");
             }
-            return result.Ok == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result.Ok), new object[] { this });
+            return result.Ok == null ? null : new OpaqueThin(RustHandle<Raw.OpaqueThin>.Borrowed(result.Ok, new object[] { this.DiplomatRetainDependency() }));
         }
     }
 
@@ -240,7 +228,7 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
@@ -250,7 +238,7 @@ public partial class OpaqueThinVec: IDisposable
             {
                 throw new InvalidOperationException("FFI function failed with unit error");
             }
-            return new OpaqueThinIter(result.Ok, new object[] { this });
+            return new OpaqueThinIter(result.Ok, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -265,13 +253,13 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
             Raw.OpaqueThinIter* result = Raw.OpaqueThinVec.OptionalIter(AsFFI(), some);
             GC.KeepAlive(this);
-            return result == null ? null : new OpaqueThinIter(result, new object[] { this });
+            return result == null ? null : new OpaqueThinIter(result, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -280,7 +268,7 @@ public partial class OpaqueThinVec: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueThinVec");
             }
@@ -288,7 +276,7 @@ public partial class OpaqueThinVec: IDisposable
             GC.KeepAlive(this);
             if (!result.IsOk)
             {
-                throw new BorrowingErrorException(new BorrowingError(result.Err, new object[] { this }), this);
+                throw new BorrowingErrorException(new BorrowingError(result.Err, new object[] { this.DiplomatRetainDependency() }));
             }
             return result.Ok;
         }
@@ -299,31 +287,58 @@ public partial class OpaqueThinVec: IDisposable
     /// </summary>
     internal unsafe Raw.OpaqueThinVec* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("OpaqueThinVec");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>OpaqueThinVec</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("OpaqueThinVec");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.OpaqueThinVec>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     /// <summary>
-    /// Destroys the underlying object immediately.
+    /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
+    /// <remarks>
+    /// This only relinquishes THIS wrapper's own reference; the underlying
+    /// native resource is not necessarily destroyed when this method
+    /// returns. If another wrapper still holds a live borrow-dependency on
+    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
+    /// is deferred until that borrower releases its own reference too — so
+    /// existing borrowers obtained before this call remain fully valid.
+    /// After this call, this <c>OpaqueThinVec</c> instance itself is unusable:
+    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
     public void Dispose()
     {
         Cleanup();

@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class One
 {
-    private unsafe RustHandle<Raw.One> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.One>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.One> _destroy = Raw.One.Destroy;
 
@@ -32,31 +26,25 @@ public partial class One
     internal unsafe One(Raw.One* handle)
     {
         _inner = RustHandle<Raw.One>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe One(Raw.One* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.One>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe One(RustHandle<Raw.One> inner, object[] edges)
+    internal unsafe One(Raw.One* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.One>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe One(RustHandle<Raw.One> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -79,7 +67,7 @@ public partial class One
             Raw.One* result = Raw.One.Transitivity(holdRaw, noholdRaw);
             GC.KeepAlive(hold);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold });
+            return new One(result, new object[] { hold.DiplomatRetainDependency() });
         }
     }
 
@@ -103,7 +91,7 @@ public partial class One
             Raw.One* result = Raw.One.Cycle(holdRaw, noholdRaw);
             GC.KeepAlive(hold);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold });
+            return new One(result, new object[] { hold.DiplomatRetainDependency() });
         }
     }
 
@@ -139,7 +127,7 @@ public partial class One
             GC.KeepAlive(c);
             GC.KeepAlive(d);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { a, b, c, d });
+            return new One(result, new object[] { a.DiplomatRetainDependency(), b.DiplomatRetainDependency(), c.DiplomatRetainDependency(), d.DiplomatRetainDependency() });
         }
     }
 
@@ -163,7 +151,7 @@ public partial class One
             Raw.One* result = Raw.One.ReturnOutlivesParam(holdRaw, noholdRaw);
             GC.KeepAlive(hold);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold });
+            return new One(result, new object[] { hold.DiplomatRetainDependency() });
         }
     }
 
@@ -195,7 +183,7 @@ public partial class One
             GC.KeepAlive(left);
             GC.KeepAlive(right);
             GC.KeepAlive(bottom);
-            return new One(result, new object[] { top, left, right, bottom });
+            return new One(result, new object[] { top.DiplomatRetainDependency(), left.DiplomatRetainDependency(), right.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
         }
     }
 
@@ -227,7 +215,7 @@ public partial class One
             GC.KeepAlive(left);
             GC.KeepAlive(right);
             GC.KeepAlive(bottom);
-            return new One(result, new object[] { left, bottom });
+            return new One(result, new object[] { left.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
         }
     }
 
@@ -259,7 +247,7 @@ public partial class One
             GC.KeepAlive(left);
             GC.KeepAlive(right);
             GC.KeepAlive(bottom);
-            return new One(result, new object[] { right, bottom });
+            return new One(result, new object[] { right.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
         }
     }
 
@@ -291,7 +279,7 @@ public partial class One
             GC.KeepAlive(left);
             GC.KeepAlive(right);
             GC.KeepAlive(bottom);
-            return new One(result, new object[] { bottom });
+            return new One(result, new object[] { bottom.DiplomatRetainDependency() });
         }
     }
 
@@ -327,7 +315,7 @@ public partial class One
             GC.KeepAlive(c);
             GC.KeepAlive(d);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { a, b, c, d });
+            return new One(result, new object[] { a.DiplomatRetainDependency(), b.DiplomatRetainDependency(), c.DiplomatRetainDependency(), d.DiplomatRetainDependency() });
         }
     }
 
@@ -355,7 +343,7 @@ public partial class One
             GC.KeepAlive(explicitHold);
             GC.KeepAlive(implicitHold);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { explicitHold, implicitHold });
+            return new One(result, new object[] { explicitHold.DiplomatRetainDependency(), implicitHold.DiplomatRetainDependency() });
         }
     }
 
@@ -387,7 +375,7 @@ public partial class One
             GC.KeepAlive(implicit1);
             GC.KeepAlive(implicit2);
             GC.KeepAlive(nohold);
-            return new One(result, new object[] { @explicit, implicit1, implicit2 });
+            return new One(result, new object[] { @explicit.DiplomatRetainDependency(), implicit1.DiplomatRetainDependency(), implicit2.DiplomatRetainDependency() });
         }
     }
 
@@ -396,26 +384,41 @@ public partial class One
     /// </summary>
     internal unsafe Raw.One* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("One");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>One</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("One");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.One>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~One()

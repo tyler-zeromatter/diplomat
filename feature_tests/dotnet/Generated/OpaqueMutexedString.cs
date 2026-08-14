@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class OpaqueMutexedString: IDisposable
 {
-    private unsafe RustHandle<Raw.OpaqueMutexedString> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.OpaqueMutexedString>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.OpaqueMutexedString> _destroy = Raw.OpaqueMutexedString.Destroy;
 
@@ -32,31 +26,25 @@ public partial class OpaqueMutexedString: IDisposable
     internal unsafe OpaqueMutexedString(Raw.OpaqueMutexedString* handle)
     {
         _inner = RustHandle<Raw.OpaqueMutexedString>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe OpaqueMutexedString(Raw.OpaqueMutexedString* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.OpaqueMutexedString>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe OpaqueMutexedString(RustHandle<Raw.OpaqueMutexedString> inner, object[] edges)
+    internal unsafe OpaqueMutexedString(Raw.OpaqueMutexedString* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.OpaqueMutexedString>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe OpaqueMutexedString(RustHandle<Raw.OpaqueMutexedString> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -75,7 +63,7 @@ public partial class OpaqueMutexedString: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueMutexedString");
             }
@@ -88,7 +76,7 @@ public partial class OpaqueMutexedString: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueMutexedString");
             }
@@ -106,13 +94,13 @@ public partial class OpaqueMutexedString: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueMutexedString");
             }
             var result = Raw.OpaqueMutexedString.DummyStr(AsFFI());
             GC.KeepAlive(this);
-            return new DiplomatBorrowedSpan<byte>(result.Ptr, result.Len, new object[] { this });
+            return new DiplomatBorrowedSpan<byte>(result.Ptr, result.Len, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -123,7 +111,7 @@ public partial class OpaqueMutexedString: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueMutexedString");
             }
@@ -137,7 +125,7 @@ public partial class OpaqueMutexedString: IDisposable
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("OpaqueMutexedString");
             }
@@ -152,31 +140,58 @@ public partial class OpaqueMutexedString: IDisposable
     /// </summary>
     internal unsafe Raw.OpaqueMutexedString* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("OpaqueMutexedString");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>OpaqueMutexedString</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("OpaqueMutexedString");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.OpaqueMutexedString>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     /// <summary>
-    /// Destroys the underlying object immediately.
+    /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
+    /// <remarks>
+    /// This only relinquishes THIS wrapper's own reference; the underlying
+    /// native resource is not necessarily destroyed when this method
+    /// returns. If another wrapper still holds a live borrow-dependency on
+    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
+    /// is deferred until that borrower releases its own reference too — so
+    /// existing borrowers obtained before this call remain fully valid.
+    /// After this call, this <c>OpaqueMutexedString</c> instance itself is unusable:
+    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
     public void Dispose()
     {
         Cleanup();

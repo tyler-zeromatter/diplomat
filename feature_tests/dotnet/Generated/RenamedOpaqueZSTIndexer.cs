@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class RenamedOpaqueZSTIndexer
 {
-    private unsafe RustHandle<Raw.RenamedOpaqueZSTIndexer> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.RenamedOpaqueZSTIndexer>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.RenamedOpaqueZSTIndexer> _destroy = Raw.RenamedOpaqueZSTIndexer.Destroy;
 
@@ -32,31 +26,25 @@ public partial class RenamedOpaqueZSTIndexer
     internal unsafe RenamedOpaqueZSTIndexer(Raw.RenamedOpaqueZSTIndexer* handle)
     {
         _inner = RustHandle<Raw.RenamedOpaqueZSTIndexer>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe RenamedOpaqueZSTIndexer(Raw.RenamedOpaqueZSTIndexer* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.RenamedOpaqueZSTIndexer>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe RenamedOpaqueZSTIndexer(RustHandle<Raw.RenamedOpaqueZSTIndexer> inner, object[] edges)
+    internal unsafe RenamedOpaqueZSTIndexer(Raw.RenamedOpaqueZSTIndexer* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.RenamedOpaqueZSTIndexer>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe RenamedOpaqueZSTIndexer(RustHandle<Raw.RenamedOpaqueZSTIndexer> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -78,7 +66,7 @@ public partial class RenamedOpaqueZSTIndexer
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("RenamedOpaqueZSTIndexer");
             }
@@ -93,26 +81,41 @@ public partial class RenamedOpaqueZSTIndexer
     /// </summary>
     internal unsafe Raw.RenamedOpaqueZSTIndexer* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedOpaqueZSTIndexer");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>RenamedOpaqueZSTIndexer</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedOpaqueZSTIndexer");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.RenamedOpaqueZSTIndexer>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~RenamedOpaqueZSTIndexer()

@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class DataProvider
 {
-    private unsafe RustHandle<Raw.DataProvider> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.DataProvider>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.DataProvider> _destroy = Raw.DataProvider.Destroy;
 
@@ -32,31 +26,25 @@ public partial class DataProvider
     internal unsafe DataProvider(Raw.DataProvider* handle)
     {
         _inner = RustHandle<Raw.DataProvider>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe DataProvider(Raw.DataProvider* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.DataProvider>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe DataProvider(RustHandle<Raw.DataProvider> inner, object[] edges)
+    internal unsafe DataProvider(Raw.DataProvider* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.DataProvider>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe DataProvider(RustHandle<Raw.DataProvider> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -90,21 +78,41 @@ public partial class DataProvider
     /// </summary>
     internal unsafe Raw.DataProvider* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("DataProvider");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>DataProvider</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("DataProvider");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.DataProvider>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~DataProvider()

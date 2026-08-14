@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class RenamedAttrOpaque2
 {
-    private unsafe RustHandle<Raw.RenamedAttrOpaque2> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.RenamedAttrOpaque2>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.RenamedAttrOpaque2> _destroy = Raw.RenamedAttrOpaque2.Destroy;
 
@@ -32,31 +26,25 @@ public partial class RenamedAttrOpaque2
     internal unsafe RenamedAttrOpaque2(Raw.RenamedAttrOpaque2* handle)
     {
         _inner = RustHandle<Raw.RenamedAttrOpaque2>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe RenamedAttrOpaque2(Raw.RenamedAttrOpaque2* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.RenamedAttrOpaque2>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe RenamedAttrOpaque2(RustHandle<Raw.RenamedAttrOpaque2> inner, object[] edges)
+    internal unsafe RenamedAttrOpaque2(Raw.RenamedAttrOpaque2* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.RenamedAttrOpaque2>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe RenamedAttrOpaque2(RustHandle<Raw.RenamedAttrOpaque2> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <summary>
@@ -64,26 +52,41 @@ public partial class RenamedAttrOpaque2
     /// </summary>
     internal unsafe Raw.RenamedAttrOpaque2* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedAttrOpaque2");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>RenamedAttrOpaque2</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedAttrOpaque2");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.RenamedAttrOpaque2>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~RenamedAttrOpaque2()

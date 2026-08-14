@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class GcRaceProbe
 {
-    private unsafe RustHandle<Raw.GcRaceProbe> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.GcRaceProbe>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.GcRaceProbe> _destroy = Raw.GcRaceProbe.Destroy;
 
@@ -32,31 +26,25 @@ public partial class GcRaceProbe
     internal unsafe GcRaceProbe(Raw.GcRaceProbe* handle)
     {
         _inner = RustHandle<Raw.GcRaceProbe>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe GcRaceProbe(Raw.GcRaceProbe* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.GcRaceProbe>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe GcRaceProbe(RustHandle<Raw.GcRaceProbe> inner, object[] edges)
+    internal unsafe GcRaceProbe(Raw.GcRaceProbe* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.GcRaceProbe>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe GcRaceProbe(RustHandle<Raw.GcRaceProbe> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <returns>
@@ -75,7 +63,7 @@ public partial class GcRaceProbe
     {
         unsafe
         {
-            if (_inner.IsNull)
+            if (_inner is null || _inner.IsNull)
             {
                 throw new ObjectDisposedException("GcRaceProbe");
             }
@@ -90,26 +78,41 @@ public partial class GcRaceProbe
     /// </summary>
     internal unsafe Raw.GcRaceProbe* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("GcRaceProbe");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>GcRaceProbe</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("GcRaceProbe");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.GcRaceProbe>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~GcRaceProbe()

@@ -1,50 +1,120 @@
 using System;
+using System.Threading;
 
 namespace {{ namespace }}.Diplomat;
 
 #nullable enable
 
-/// <summary>
-/// Frees a Rust-owned <typeparamref name="T"/> by calling its native
-/// destructor. Held by an owned <see cref="RustHandle{T}"/> so the handle can
-/// release the pointer without knowing the concrete type.
-/// </summary>
+/// Frees a Rust-owned <typeparamref name="T"/> by calling its native destructor.
 internal unsafe delegate void RustDestructor<T>(T* ptr) where T : unmanaged;
 
 /// <summary>
-/// A raw pointer that remembers who's responsible for freeing it. An owned
-/// handle carries the Rust destructor and runs it when you release the handle;
-/// a borrowed handle carries none, so releasing it does nothing — Rust still
-/// owns the memory and will free it itself. That's the whole trick: the
-/// pointer itself says "free me" or "leave me alone", so the wrapper doesn't
-/// need a separate flag bolted onto the class.
+/// Reference-counted native handle for one opaque. Starts at refcount 1 (the
+/// owning wrapper). <see cref="Retain"/> hands a dependent a token; when the
+/// count reaches zero this runs the native destructor first, then disposes
+/// every edge — never the other way around.
 /// </summary>
-internal readonly unsafe struct RustHandle<T> where T : unmanaged
+/// <remarks>
+/// The refcount is updated with <see cref="Interlocked"/> so a user-thread
+/// <see cref="Retain"/> can race a GC finalizer thread releasing another
+/// dependent's token on the same handle without lost updates.
+/// </remarks>
+internal sealed unsafe class RustHandle<T> where T : unmanaged
 {
-    private readonly T* _ptr;
-    private readonly RustDestructor<T>? _free;
+    private T* _ptr;
+    private readonly RustDestructor<T>? _destructor;
+    private object[] _edges;
+    private int _refCount = 1;
 
-    private RustHandle(T* ptr, RustDestructor<T>? free)
+    private RustHandle(T* ptr, RustDestructor<T>? destructor, object[] edges)
     {
         _ptr = ptr;
-        _free = free;
+        _destructor = destructor;
+        _edges = edges;
     }
 
-    /// <summary>The C# side owns the pointer: <see cref="Release"/> frees it.</summary>
-    public static RustHandle<T> Owned(T* ptr, RustDestructor<T> free) => new RustHandle<T>(ptr, free);
+    /// The C# side owns the pointer and will run its destructor on release.
+    internal static RustHandle<T> Owned(T* ptr, RustDestructor<T> destructor) =>
+        new RustHandle<T>(ptr, destructor, System.Array.Empty<object>());
 
-    /// <summary>Rust still owns the pointer: <see cref="Release"/> is a no-op.</summary>
-    public static RustHandle<T> Borrowed(T* ptr) => new RustHandle<T>(ptr, null);
+    /// Owned handle that also roots pins and/or retain tokens in <paramref name="edges"/>.
+    internal static RustHandle<T> Owned(T* ptr, RustDestructor<T> destructor, object[] edges) =>
+        new RustHandle<T>(ptr, destructor, edges);
 
-    public T* Ptr => _ptr;
+    /// Rust still owns the pointer; release never runs a destructor.
+    internal static RustHandle<T> Borrowed(T* ptr) =>
+        new RustHandle<T>(ptr, null, System.Array.Empty<object>());
 
-    public bool IsNull => _ptr == null;
+    /// Borrowed handle that also roots keep-alive edges.
+    internal static RustHandle<T> Borrowed(T* ptr, object[] edges) =>
+        new RustHandle<T>(ptr, null, edges);
 
-    public void Release()
+    internal T* Ptr => _ptr;
+
+    /// True once this handle's native pointer has been cleared (refcount hit zero,
+    /// or a borrowed handle was never assigned).
+    internal bool IsNull => _ptr is null;
+
+    /// Bumps the count for one new direct dependent and returns its token.
+    /// The caller must dispose the token exactly once from its own cleanup.
+    internal IDisposable Retain()
     {
-        if (_free != null && _ptr != null)
+        while (true)
         {
-            _free(_ptr);
+            int current = Volatile.Read(ref _refCount);
+            if (current == 0)
+            {
+                throw new ObjectDisposedException(typeof(T).Name);
+            }
+
+            if (Interlocked.CompareExchange(ref _refCount, current + 1, current) == current)
+            {
+                return new DependencyToken(this);
+            }
+        }
+    }
+
+    /// Releases this wrapper's own owner reference.
+    internal void Release() => Decrement();
+
+    private void Decrement()
+    {
+        if (Interlocked.Decrement(ref _refCount) != 0)
+        {
+            return;
+        }
+
+        T* ptr = _ptr;
+        _ptr = null;
+        if (ptr != null && _destructor is not null)
+        {
+            _destructor(ptr);
+        }
+
+        object[] edges = _edges;
+        _edges = System.Array.Empty<object>();
+        foreach (object edge in edges)
+        {
+            (edge as IDisposable)?.Dispose();
+        }
+    }
+
+    /// One retained borrow-dependency token. A dependent holds one of these
+    /// per direct source and disposes it exactly once from its own cleanup.
+    private sealed class DependencyToken : IDisposable
+    {
+        private RustHandle<T>? _owner;
+
+        internal DependencyToken(RustHandle<T> owner)
+        {
+            _owner = owner;
+        }
+
+        public void Dispose()
+        {
+            RustHandle<T>? owner = _owner;
+            _owner = null;
+            owner?.Decrement();
         }
     }
 }

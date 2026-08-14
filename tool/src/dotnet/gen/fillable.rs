@@ -11,7 +11,7 @@ use askama::Template;
 use diplomat_core::hir::{OutputOnly, ReturnableStructDef, Type};
 
 use crate::dotnet::r#gen::{
-    method::{DotnetReturnType, RawExpr},
+    method::{dependencies_array_expr, DotnetReturnType, RawExpr},
     DotnetPrimitives, ItemGenContext,
 };
 
@@ -176,7 +176,21 @@ pub(crate) struct ErrorInfo {
 }
 
 impl ErrorInfo {
-    pub(crate) fn throw_statement_with_edges<R>(&self, raw_expr: R, edges: &[String]) -> String
+    /// `dependencies` are the direct opaque borrow sources this error arm
+    /// retains — threaded through to the inner error opaque's own
+    /// construction (see `DotnetErrorType::exception_inner_expr`), not a
+    /// separate array on the exception class — so the exception class
+    /// itself needs no edge plumbing at all. Pins are structurally
+    /// impossible here (a thrown exception has no unpin path). The error
+    /// arm's own construction is always the Owned lane regardless of the
+    /// inner error opaque's classified role (`DotnetErrorType::new` rejects
+    /// borrowed opaque errors outright), so no role parameter is threaded
+    /// through here.
+    pub(crate) fn throw_statement_with_edges<R>(
+        &self,
+        raw_expr: R,
+        dependencies: &[String],
+    ) -> String
     where
         R: TryInto<RawExpr>,
         R::Error: Display,
@@ -190,13 +204,8 @@ impl ErrorInfo {
             );
         }
 
-        let inner = self.error.exception_inner_expr(raw_expr, edges);
-        if edges.is_empty() {
-            format!("throw new {}({inner});", self.exception_name)
-        } else {
-            let edges_str = edges.join(", ");
-            format!("throw new {}({inner}, {edges_str});", self.exception_name)
-        }
+        let inner = self.error.exception_inner_expr(raw_expr, dependencies);
+        format!("throw new {}({inner});", self.exception_name)
     }
 }
 
@@ -290,10 +299,12 @@ impl DotnetErrorType {
         matches!(self, DotnetErrorType::Opaque(_))
     }
 
-    /// Only opaque (`Box<E>`) errors get a managed C# wrapper that can hold the
-    /// keep-alive edge array; primitive/enum/struct errors marshal by value, so
-    /// there's nowhere to root the borrowed-from owner. That's why this is
-    /// exactly `is_opaque` — not a coincidence a later edit should collapse.
+    /// Only opaque (`Box<E>`) errors get a managed C# wrapper whose own
+    /// `RustHandle` state can retain a dependency (see
+    /// `Self::exception_inner_expr`); primitive/enum/struct errors marshal by
+    /// value, so there's nowhere to hold the retained reference. That's why
+    /// this is exactly `is_opaque` — not a coincidence a later edit should
+    /// collapse.
     pub(crate) fn can_carry_borrow_edges(&self) -> bool {
         self.is_opaque()
     }
@@ -339,14 +350,17 @@ impl DotnetErrorType {
         format!("{name}Exception")
     }
 
-    fn exception_inner_expr(&self, raw_expr: RawExpr, edges: &[String]) -> String {
+    fn exception_inner_expr(&self, raw_expr: RawExpr, dependencies: &[String]) -> String {
         match self {
-            DotnetErrorType::Opaque(name) if edges.is_empty() => format!("new {name}({raw_expr})"),
             DotnetErrorType::Opaque(name) => {
-                format!(
-                    "new {name}({raw_expr}, new object[] {{ {} }})",
-                    edges.join(", ")
-                )
+                if dependencies.is_empty() {
+                    format!("new {name}({raw_expr})")
+                } else {
+                    format!(
+                        "new {name}({raw_expr}, {})",
+                        dependencies_array_expr(dependencies)
+                    )
+                }
             }
             DotnetErrorType::Struct { name, is_zst: true } => format!("new {name}()"),
             DotnetErrorType::Struct {

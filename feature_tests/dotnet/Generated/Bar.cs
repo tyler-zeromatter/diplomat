@@ -10,13 +10,7 @@ namespace Somelib;
 
 public partial class Bar
 {
-    private unsafe RustHandle<Raw.Bar> _inner;
-
-    /// <summary>
-    /// Roots the wrappers this value borrows from so the GC cannot finalize
-    /// a borrowed-from parent while this value is alive.
-    /// </summary>
-    private object[] _edges;
+    private unsafe RustHandle<Raw.Bar>? _inner;
 
     private static readonly unsafe RustDestructor<Raw.Bar> _destroy = Raw.Bar.Destroy;
 
@@ -33,13 +27,13 @@ public partial class Bar
         {
             unsafe
             {
-                if (_inner.IsNull)
+                if (_inner is null || _inner.IsNull)
                 {
                     throw new ObjectDisposedException("Bar");
                 }
                 Raw.Foo* result = Raw.Bar.Foo(AsFFI());
                 GC.KeepAlive(this);
-                return new Foo(RustHandle<Raw.Foo>.Borrowed(result), new object[] { this });
+                return new Foo(RustHandle<Raw.Foo>.Borrowed(result, new object[] { this.DiplomatRetainDependency() }));
             }
         }
     }
@@ -56,31 +50,25 @@ public partial class Bar
     internal unsafe Bar(Raw.Bar* handle)
     {
         _inner = RustHandle<Raw.Bar>.Owned(handle, _destroy);
-        _edges = System.Array.Empty<object>();
-    }
-
-    /// <remarks>
-    /// Edges only keep the borrowed-from objects GC-reachable. If this type is
-    /// opted into a public <c>Dispose</c>, disposing a parent while a borrowing
-    /// child is in use is still a use-after-free and remains the caller's
-    /// responsibility.
-    /// </remarks>
-    internal unsafe Bar(Raw.Bar* handle, object[] edges)
-    {
-        _inner = RustHandle<Raw.Bar>.Owned(handle, _destroy);
-        _edges = edges;
     }
 
     /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A borrowed
-    /// return passes a non-owning handle, so cleanup leaves Rust's pointer
-    /// alone; the edges keep the borrowed-from owners alive while this view is
-    /// in use.
+    /// Owned construction with lifetime resources released after the Rust
+    /// destructor.
     /// </summary>
-    internal unsafe Bar(RustHandle<Raw.Bar> inner, object[] edges)
+    internal unsafe Bar(Raw.Bar* handle, object[] edges)
+    {
+        _inner = RustHandle<Raw.Bar>.Owned(handle, _destroy, edges);
+    }
+
+    /// <summary>
+    /// Wraps a handle that already knows whether it owns the pointer. A
+    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
+    /// pointer alone.
+    /// </summary>
+    internal unsafe Bar(RustHandle<Raw.Bar> inner)
     {
         _inner = inner;
-        _edges = edges;
     }
 
     /// <summary>
@@ -88,26 +76,41 @@ public partial class Bar
     /// </summary>
     internal unsafe Raw.Bar* AsFFI()
     {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("Bar");
+        }
         return _inner.Ptr;
+    }
+
+    /// <summary>
+    /// Retains this value's native resource for a new direct dependent.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">
+    /// This <c>Bar</c> was already disposed/finalized, so there is
+    /// nothing left to lend a dependent.
+    /// </exception>
+    internal unsafe IDisposable DiplomatRetainDependency()
+    {
+        if (_inner is null || _inner.IsNull)
+        {
+            throw new ObjectDisposedException("Bar");
+        }
+        return _inner.Retain();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            if (_inner.IsNull)
+            RustHandle<Raw.Bar>? inner = _inner;
+            if (inner is null)
             {
                 return;
             }
 
-            _inner.Release();
-            _inner = default;
-            // Unpin only after Release: Rust's Drop may still read the pinned buffer.
-            foreach (object edge in _edges)
-            {
-                (edge as DiplomatPinnedMemory)?.Dispose();
-            }
-            _edges = System.Array.Empty<object>(); // release refs so borrowed-from owners can be GC'd
+            _inner = null;
+            inner.Release();
         }
     }
     ~Bar()

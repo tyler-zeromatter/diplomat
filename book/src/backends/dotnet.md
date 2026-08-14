@@ -92,16 +92,27 @@ and runs it on release; a **borrowed** handle carries none, so releasing it is a
 because Rust still owns (and will free) that memory. This means methods returning `&T` or
 `Option<&T>` are safe to wrap without risking a double-free.
 
-Borrowed returns also carry a `_edges` array on the object rooting whatever it borrowed
-from, so the GC can't collect the source object out from under a still-live borrowed
-reference. `object[] _edges` is `Array.Empty<object>()` (no allocation) when a type has
-no lifetime-carrying returns.
+Every `RustHandle<T>` is a small reference-counted class: pointer, destructor, edges, and
+refcount live in exactly one place. Construction starts the count at 1 (the owning wrapper).
+`DiplomatRetainDependency()` bumps the count and returns a token the dependent disposes from
+its own cleanup. That is what lets a source wrapper be disposed (or finalized) *before* every
+dependent has let go of it without either use-after-free or an early native destructor call:
+physical native destruction waits until the owner reference **and** every dependent token are
+gone, in whatever order managed lifetimes end. Cleanup always runs the native destructor
+first, then disposes every edge (pins and retain tokens).
+
+The reference count is updated with `Interlocked` so a user-thread retain can
+race a finalizer-thread token release on the same handle without lost updates.
+Teardown still runs only on the thread that drives the count to zero.
 
 By default, generated opaques are **finalizer-only**: no public `Dispose()`, cleanup runs
 through a private idempotent path invoked by the finalizer. Add
 `#[diplomat::attr(dotnet, manually_disposable)]` on an opaque type declaration to generate
 `: IDisposable` plus a public `Dispose()` that runs the same cleanup and
-`GC.SuppressFinalize(this)`. In both modes, native calls are followed by
+`GC.SuppressFinalize(this)`. `Dispose()` releases this wrapper's ownership reference but
+does not necessarily destroy the native value immediately: existing borrowers keep it
+alive and remain valid. The disposed wrapper itself rejects further use with
+`ObjectDisposedException`. In both modes, native calls are followed by
 `GC.KeepAlive(this)` to prevent finalization while P/Invoke is still using the pointer.
 
 ## String encoding
