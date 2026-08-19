@@ -6,7 +6,7 @@ mod ffi {
         y: i32,
     }
 
-    #[diplomat::cfg(supports = "traits")]
+    #[diplomat::cfg(all(supports = "traits", not(supports = "trait_returns_must_be_fallible")))]
     pub trait TesterTrait {
         fn test_trait_fn(&self, x: u32) -> u32;
         fn test_void_trait_fn(&self);
@@ -19,7 +19,7 @@ mod ffi {
         fn test_result_of_optional(&self, is_ok: bool) -> Result<u32, DiplomatOption<u32>>;
     }
 
-    #[diplomat::cfg(supports = "traits")]
+    #[diplomat::cfg(all(supports = "traits", not(supports = "trait_returns_must_be_fallible")))]
     pub struct TraitWrapper {
         cant_be_empty: bool,
     }
@@ -51,6 +51,34 @@ mod ffi {
             is_ok: bool,
         ) -> Result<u32, DiplomatOption<u32>> {
             t.test_result_of_optional(is_ok)
+        }
+    }
+
+    #[diplomat::cfg(all(supports = "traits", supports = "trait_returns_must_be_fallible"))]
+    pub enum FFIError {
+        #[diplomat::attr(auto, ffi_error)]
+        FFI,
+        User,
+    }
+
+    #[diplomat::cfg(all(supports = "traits", supports = "trait_returns_must_be_fallible"))]
+    pub trait FallibleTesterTrait {
+        fn test_void_trait_fn(&self) -> Result<(), FFIError>;
+        fn test_result_output(&self, x: u32) -> Result<u32, FFIError>;
+    }
+
+    #[diplomat::cfg(all(supports = "traits", supports = "trait_returns_must_be_fallible"))]
+    pub struct FallibleTraitWrapper {
+        cant_be_empty: bool,
+    }
+
+    impl FallibleTraitWrapper {
+        pub fn test_with_trait(t: impl FallibleTesterTrait) {
+            let _ = t.test_void_trait_fn();
+        }
+
+        pub fn test_result_output(t: impl FallibleTesterTrait, x: u32) -> Result<u32, FFIError> {
+            t.test_result_output(x)
         }
     }
 }

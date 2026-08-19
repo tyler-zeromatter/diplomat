@@ -22,3 +22,17 @@ try:
     somelib.ResultOpaque.new_failing_struct(109)
 except Exception as e:
     pass
+
+class ImplementsTrait(somelib.FallibleTesterTrait):
+    def __init__(self):
+        super().__init__()
+        
+
+    def test_void_trait_fn(self):
+        pass
+
+    def test_result_output(self, x : int):
+        return x
+
+i = ImplementsTrait()
+assert somelib.FallibleTraitWrapper.test_result_output(i, 5) == 5
