@@ -1019,6 +1019,9 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
             }
             Type::ImplTrait(ref tr) => {
                 let id = tr.id();
+                self.impl_header
+                    .includes
+                    .insert(self.formatter.fmt_impl_header_path(id.into()));
                 self.decl_header
                     .includes
                     .insert(self.formatter.fmt_decl_header_path(id.into()));
