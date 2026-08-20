@@ -1396,7 +1396,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
     ///
     /// is_generic_write is whether we are generating the method that returns a string or
     /// operates on a Writeable
-    pub(super) fn gen_cpp_return_type_name<P: hir::TyPosition>(
+    pub(crate) fn gen_cpp_return_type_name<P: hir::TyPosition>(
         &mut self,
         result_ty: &ReturnType<P>,
         is_generic_write: bool,

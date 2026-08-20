@@ -5,7 +5,9 @@ use crate::cpp::ExtraCode;
 use crate::read_custom_binding;
 use crate::{cpp::ItemGenContext as CppItemGenContext, hir, ErrorStore};
 use askama::Template;
-use diplomat_core::hir::{IncludeLocation, IncludeSource, SymbolId, TyPosition, Type, TypeId};
+use diplomat_core::hir::{
+    IncludeLocation, IncludeSource, SymbolId, TraitDef, TraitId, TyPosition, Type, TypeId,
+};
 use std::borrow::Cow;
 use std::collections::BTreeSet;
 use std::collections::{BTreeMap, HashMap};
@@ -178,14 +180,14 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
         .render_into(out)
         .unwrap();
 
-        self.add_to_root_module(id);
+        self.add_to_root_module(id.into());
     }
 
-    pub fn add_to_root_module(&mut self, id: TypeId) {
-        self.gen_modules(id.into(), None);
+    pub fn add_to_root_module(&mut self, id: SymbolId) {
+        self.gen_modules(id, None);
         Self::gen_binding_fn(
             self.root_module,
-            self.formatter.fmt_namespaces(id.into()),
+            self.formatter.fmt_namespaces(id),
             self.formatter.fmt_binding_fn(id),
         );
     }
@@ -249,7 +251,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
         }
         .render_into(out)
         .unwrap();
-        self.add_to_root_module(id);
+        self.add_to_root_module(id.into());
     }
 
     pub fn gen_struct_def<P: TyPosition, W: std::fmt::Write + ?Sized>(
@@ -320,7 +322,91 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
         }
         .render_into(out)
         .unwrap();
-        self.add_to_root_module(id);
+        self.add_to_root_module(id.into());
+    }
+
+    pub fn gen_trait_def<W: std::fmt::Write + ?Sized>(
+        &mut self,
+        def: &'tcx TraitDef,
+        id: TraitId,
+        out: &mut W,
+    ) {
+        struct TraitMethodInfo<'a> {
+            name: Cow<'a, str>,
+            return_type_name: Cow<'a, str>,
+            python_return_name: Cow<'a, str>,
+            python_params: Vec<(Cow<'a, str>, Cow<'a, str>)>,
+            params: Vec<NamedType<'a, hir::OutputOnly>>,
+
+            /// What to return if the trait fails a cast.
+            ffi_failed_return: String,
+            docs: Option<String>,
+        }
+
+        #[derive(Template)]
+        #[template(path = "nanobind/trait_impl.cpp.jinja", escape = "none")]
+        struct ImplTemplate<'a> {
+            trait_name: Cow<'a, str>,
+            trait_name_unnamespaced: Cow<'a, str>,
+            methods: &'a [TraitMethodInfo<'a>],
+
+            docs: Option<String>,
+        }
+
+        let trait_name = self.formatter.cxx.fmt_symbol_name(id.into());
+        let trait_name_unnamespaced = self.formatter.cxx.fmt_trait_name_unnamespaced(id);
+
+        let methods = def.methods.iter().map(|m| {
+
+            let ffi_failed_return = match m.output.as_ref() {
+                hir::ReturnType::Fallible(_, Some(err)) => match err {
+                    Type::Enum(e) => {
+                        let ffi_error_name = e.resolve(self.cpp.c.tcx).variants.iter().find(|v| v.attrs.ffi_error);
+                        if let Some(f) = ffi_error_name {
+                            let enum_name = self.cpp.formatter.fmt_type_name(e.tcx_id.into());
+                            let variant_name = self.cpp.formatter.fmt_enum_variant(f);
+                            format!("{enum_name}({enum_name}::Value::{variant_name})")
+                        } else {
+                            unreachable!("Enum variant with FFI error not found (this should have been caught by the HIR)");
+                        }
+                    }
+                    _ => unreachable!("Unsupported fallible type: {err:?} (this should have been caught by the HIR)"),
+                }
+                hir::ReturnType::Infallible(hir::SuccessType::Unit) => "".into(),
+                _ => unreachable!("Unsupported trait return type {:?} (this should have been caught by the HIR)", m.output)
+            };
+            TraitMethodInfo {
+                name: m.name.as_ref().expect("Could not get trait method name").as_str().into(),
+                return_type_name: self.cpp.gen_cpp_return_type_name(&m.output, false),
+                python_return_name: self.formatter.return_type_to_python_type(&m.output),
+                python_params: m.params.iter().map(|p| {
+                    (p.name.as_ref().expect("Could not get name").as_str().into(), self.formatter.hir_type_to_python_type(&p.ty))
+                }).collect(),
+                params: m.params.iter().map(|p| {
+                    NamedType {
+                        name: p.name.as_ref().expect("Could not get trait param name").as_str().into(),
+                        type_name: self.cpp.gen_type_name(&p.ty),
+                        ty: &p.ty,
+                        default_value: None,
+                        docstring: None
+                    }
+                }).collect::<Vec<_>>(),
+                ffi_failed_return,
+                docs: self.formatter.fmt_doc_literal(&def.docs, &def.attrs),
+            }
+        }).collect::<Vec<_>>();
+
+        ImplTemplate {
+            trait_name,
+            trait_name_unnamespaced,
+            methods: methods.as_slice(),
+
+            docs: self.formatter.fmt_doc_literal(&def.docs, &def.attrs),
+        }
+        .render_into(out)
+        .unwrap();
+
+        self.add_to_root_module(id.into());
     }
 
     fn gen_all_method_infos(

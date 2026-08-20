@@ -1,0 +1,96 @@
+class {{trait_name_unnamespaced}}_PyImpl : public {{trait_name}} {
+    protected:
+    nb::handle self;
+    {% for m in methods %}
+    virtual {{m.return_type_name}} {{m.name}}({%- for p in m.params -%} {{p.type_name}} {{p.name}} {%- if !loop.last %}, {% endif %}{% endfor %}) override {
+        // We grab the pointer to the method inside to avoid refcount issues:
+        nb::object func = nb::object(PyObject_GetAttrString(self.ptr(), "{{m.name}}"), nb::detail::steal_t());
+
+        // nb::handle throws std::exception on failure:
+        nb::object out;
+        try {
+            out = func({%- for p in m.params -%} {{p.name}} {%- if !loop.last -%}, {% endif -%} {%- endfor -%});
+        } catch (...) {
+            return diplomat::Err({{m.ffi_failed_return}});
+        }
+        nb::detail::make_caster<{{m.return_type_name}}> caster;
+        if (caster.from_python(out, 0, nullptr)) {
+            if (caster.ok_val.has_value()) {
+                return diplomat::Ok(caster.ok_val.value());
+            } else if (caster.err_val.has_value()) {
+                return diplomat::Err(caster.err_val.value());
+            } else {
+                return diplomat::Err({{m.ffi_failed_return}});
+            }
+        } else {
+            return diplomat::Err({{m.ffi_failed_return}});
+        }
+    }
+    {%- endfor %}
+
+    public:
+    {{trait_name_unnamespaced}}_PyImpl(nb::handle self) : self(self) {}
+
+    // Allocate as Nanobind would a unique_ptr.
+    static PyObject* new_(PyObject* cls, PyObject*, PyObject*) {
+        // Main thing is to note that we use Python's allocator:
+        auto o = nb::detail::inst_new_ext((PyTypeObject*)cls, malloc(sizeof({{trait_name_unnamespaced}}_PyImpl)));
+        if (!o) {
+            return nullptr;
+        }
+
+        auto inst = (nb::detail::nb_inst*) o;
+        // Then, because we're returning from C++, we tell Python to take ownership:
+        inst->destruct = true;
+        inst->cpp_delete = true;
+        return o;
+    }
+
+    static inline void invalidMethod(PyObject* self, const char* method_name) {
+        PyTypeObject* tp = Py_TYPE(self);
+        PyErr_Format(PyExc_AttributeError, "%N does not implement: '%s'", tp, method_name);
+    }
+
+    // Get handles to the Python methods.
+    static int init(PyObject* self, PyObject*, PyObject*) {
+        auto inst = (nb::detail::nb_inst*) self;
+        // Our methods are already defined (per the stub definitions below), so we just check if they're Nanobind methods, and throw if so.
+        {%- for m in methods %}
+        PyObject* {{m.name}}_method = PyObject_GetAttrString(self, "{{m.name}}");
+        if (!{{m.name}}_method || Py_TYPE({{m.name}}_method) == nb::detail::internals->nb_method || 
+            Py_TYPE({{m.name}}_method) == nb::detail::internals->nb_func ||
+            Py_TYPE({{m.name}}_method) == nb::detail::internals->nb_bound_method) {
+            Py_DECREF({{m.name}}_method);
+            invalidMethod(self, "{{m.name}}");
+            return -1;
+        }
+        Py_DECREF({{m.name}}_method);
+        {%- endfor %}
+
+        auto ptr = nb::detail::inst_ptr(inst);
+        // Construct the object in place.
+        new (ptr) {{trait_name_unnamespaced}}_PyImpl(nb::handle(self));
+
+        // We've now constructed, so we set to ready:
+        inst->state = nb::detail::nb_inst::state_ready;
+        return 0;
+    }
+};
+
+nb::class_<{{trait_name}}> base(mod, "{{trait_name_unnamespaced}}_PyBase", nb::sig("from abc import abstractmethod\nclass {{trait_name_unnamespaced}}_PyBase()"));
+base.def("__init__", [](){
+    PyErr_SetString(PyExc_TypeError, "Do not extend {{trait_name_unnamespaced}}_PyBase, please extend {{trait_name_unnamespaced}}.");
+});
+// Allocate slots for both __new__ and __init__, Nanobind does not allow you to bind both without using slots.
+PyType_Slot {{trait_name_unnamespaced}}_PyImpl_slots[] = {
+    {Py_tp_init, (void*) {{trait_name_unnamespaced}}_PyImpl::init},
+    {Py_tp_new, (void *) {{trait_name_unnamespaced}}_PyImpl::new_},
+    {0, nullptr}
+};
+nb::class_<{{trait_name_unnamespaced}}_PyImpl, {{trait_name}}> tr(mod, "{{trait_name_unnamespaced}}", nb::type_slots({{trait_name_unnamespaced}}_PyImpl_slots) {% if let Some(docs) = docs %}, {{docs}}{% endif %});
+// Define abstract methods, for signature information.
+{% for m in methods %}
+tr.def("{{m.name}}", [](){
+    PyErr_SetString(PyExc_TypeError, "Abstract method {{m.name}} called. Please implement.");
+}, nb::sig("@abstractmethod\ndef {{m.name}}({% for p in m.python_params %} {{p.0}} : {{p.1}} {% endfor %}) -> {{m.python_return_name}}"){% if let Some(d) = m.docs %}, {{d}}{% endif%});
+{% endfor %}

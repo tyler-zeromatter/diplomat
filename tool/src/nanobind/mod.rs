@@ -46,8 +46,15 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     a.arithmetic = true;
     a.indexing = true;
     a.option = true;
+
     a.callbacks = true;
-    a.traits = false;
+    a.traits = true;
+    // Based on the current assumption the user compiles with the GIL
+    // (this is an assumption made elsewehere throughout codegen)
+    a.traits_are_send = true;
+    a.traits_are_sync = true;
+    a.trait_returns_must_be_fallible = true;
+
     a.generate_mocking_interface = false;
     a.abi_compatibles = true;
     a.struct_refs = true;
@@ -112,6 +119,17 @@ pub(crate) fn run<'cx>(
     let mut root_module = RootModule::new();
     root_module.module_name = lib_name.clone().into();
 
+    #[derive(Template)]
+    #[template(path = "nanobind/binding.cpp.jinja", escape = "none")]
+    struct Binding {
+        includes: BTreeSet<String>,
+        lib_name: String,
+        namespace: String,
+        unqualified_type: String,
+        body: String,
+        binding_prefix: String,
+    }
+
     let mut submodules = BTreeMap::new();
     for (id, ty) in tcx.all_types() {
         if ty.attrs().disable {
@@ -121,7 +139,8 @@ pub(crate) fn run<'cx>(
 
         let cpp_decl_path = formatter.cxx.fmt_decl_header_path(id.into());
         let cpp_impl_path = formatter.cxx.fmt_impl_header_path(id.into());
-        let binding_impl_path = format!("sub_modules/{}", formatter.fmt_binding_impl_path(id));
+        let binding_impl_path =
+            format!("sub_modules/{}", formatter.fmt_binding_impl_path(id.into()));
 
         let mut context = ItemGenContext {
             formatter: &formatter,
@@ -156,17 +175,6 @@ pub(crate) fn run<'cx>(
 
         let guard = errors.set_context_ty(ty.name_with_span().into());
 
-        #[derive(Template)]
-        #[template(path = "nanobind/binding.cpp.jinja", escape = "none")]
-        struct Binding {
-            includes: BTreeSet<String>,
-            lib_name: String,
-            namespace: String,
-            unqualified_type: String,
-            body: String,
-            binding_prefix: String,
-        }
-
         let mut body = String::default();
         let mut binding_prefix = String::default();
         match ty {
@@ -189,6 +197,64 @@ pub(crate) fn run<'cx>(
             unqualified_type: formatter.cxx.fmt_type_name_unnamespaced(id).to_string(),
             body,
             binding_prefix,
+        };
+
+        files.add_file(binding_impl_path, binding_impl.to_string());
+    }
+
+    for (id, tr) in tcx.all_traits() {
+        if tr.attrs.disable {
+            continue;
+        }
+        let cpp_decl_path = formatter.cxx.fmt_decl_header_path(id.into());
+        let cpp_impl_path = formatter.cxx.fmt_impl_header_path(id.into());
+        let binding_impl_path =
+            format!("sub_modules/{}", formatter.fmt_binding_impl_path(id.into()));
+
+        let mut context = ItemGenContext {
+            formatter: &formatter,
+            errors: &errors,
+            config: &conf,
+            cpp: crate::cpp::ItemGenContext {
+                c: crate::c::ItemGenContext {
+                    tcx,
+                    formatter: &formatter.cxx.c,
+                    errors: &errors,
+                    decl_header_path: &cpp_decl_path,
+                    impl_header_path: &cpp_impl_path,
+                    is_for_cpp: false,
+                },
+                config: &conf,
+                formatter: &formatter.cxx,
+                errors: &errors,
+                impl_header: &mut crate::cpp::Header::default(),
+                decl_header: &mut crate::cpp::Header::default(),
+                generate_definition_includes: false,
+            },
+            root_module: &mut root_module,
+            submodules: &mut submodules,
+            generating_struct_fields: false,
+        };
+
+        context
+            .cpp
+            .impl_header
+            .includes
+            .insert(cpp_impl_path.clone());
+
+        let guard = errors.set_context_ty(tr.name.as_str().into());
+
+        let mut body = String::default();
+        context.gen_trait_def(tr, id, &mut body);
+        drop(guard);
+
+        let binding_impl = Binding {
+            includes: context.cpp.impl_header.includes.clone(),
+            lib_name: lib_name.clone(),
+            namespace: formatter.fmt_namespaces(id.into()).join("::"),
+            unqualified_type: formatter.cxx.fmt_trait_name_unnamespaced(id).to_string(),
+            body,
+            binding_prefix: String::new(),
         };
 
         files.add_file(binding_impl_path, binding_impl.to_string());
