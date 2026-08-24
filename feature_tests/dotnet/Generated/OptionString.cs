@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class OptionString: IDisposable
+public partial class OptionString : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.OptionString>? _inner;
 
@@ -32,19 +32,17 @@ public partial class OptionString: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe OptionString(Raw.OptionString* handle, object[] edges)
+    internal unsafe OptionString(Raw.OptionString* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.OptionString>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe OptionString(RustHandle<Raw.OptionString> inner)
+    internal unsafe OptionString(
+        Raw.OptionString* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.OptionString>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -68,24 +66,23 @@ public partial class OptionString: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionString> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionString");
-            }
-            DiplomatWrite writeable = new DiplomatWrite();
-            try
-            {
-                var result = Raw.OptionString.Write(AsFFI(), &writeable);
-                GC.KeepAlive(this);
-                if (!result.IsOk)
+                DiplomatWrite writeable = new DiplomatWrite();
+                try
                 {
-                    throw new InvalidOperationException("FFI function failed with unit error");
+                    var result = Raw.OptionString.Write(selfLease.Ptr, &writeable);
+                    GC.KeepAlive(this);
+                    if (!result.IsOk)
+                    {
+                        throw new InvalidOperationException("FFI function failed with unit error");
+                    }
+                    return writeable.ToUnicode();
                 }
-                return writeable.ToUnicode();
-            }
-            finally
-            {
-                writeable.Dispose();
+                finally
+                {
+                    writeable.Dispose();
+                }
             }
         }
     }
@@ -95,55 +92,60 @@ public partial class OptionString: IDisposable
     /// </summary>
     internal unsafe Raw.OptionString* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionString>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionString");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>OptionString</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.OptionString> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionString>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionString");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.OptionString> BorrowExclusive()
+    {
+        RustHandle<Raw.OptionString>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("OptionString");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.OptionString>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.OptionString>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>OptionString</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -152,6 +154,7 @@ public partial class OptionString: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~OptionString()
     {
         try

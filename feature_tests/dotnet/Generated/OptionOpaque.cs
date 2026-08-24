@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class OptionOpaque: IDisposable
+public partial class OptionOpaque : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.OptionOpaque>? _inner;
 
@@ -32,19 +32,17 @@ public partial class OptionOpaque: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe OptionOpaque(Raw.OptionOpaque* handle, object[] edges)
+    internal unsafe OptionOpaque(Raw.OptionOpaque* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.OptionOpaque>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe OptionOpaque(RustHandle<Raw.OptionOpaque> inner)
+    internal unsafe OptionOpaque(
+        Raw.OptionOpaque* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.OptionOpaque>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -75,13 +73,12 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaque> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaque");
+                var result = Raw.OptionOpaque.OptionIsize(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result.IsSome ? result.Value : (nint?)null;
             }
-            var result = Raw.OptionOpaque.OptionIsize(AsFFI());
-            GC.KeepAlive(this);
-            return result.IsSome ? result.Value : (nint?)null;
         }
     }
 
@@ -89,13 +86,12 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaque> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaque");
+                var result = Raw.OptionOpaque.OptionUsize(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result.IsSome ? result.Value : (nuint?)null;
             }
-            var result = Raw.OptionOpaque.OptionUsize(AsFFI());
-            GC.KeepAlive(this);
-            return result.IsSome ? result.Value : (nuint?)null;
         }
     }
 
@@ -103,13 +99,12 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaque> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaque");
+                var result = Raw.OptionOpaque.OptionI32(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result.IsSome ? result.Value : (int?)null;
             }
-            var result = Raw.OptionOpaque.OptionI32(AsFFI());
-            GC.KeepAlive(this);
-            return result.IsSome ? result.Value : (int?)null;
         }
     }
 
@@ -117,13 +112,12 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaque> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaque");
+                var result = Raw.OptionOpaque.OptionU32(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result.IsSome ? result.Value : (uint?)null;
             }
-            var result = Raw.OptionOpaque.OptionU32(AsFFI());
-            GC.KeepAlive(this);
-            return result.IsSome ? result.Value : (uint?)null;
         }
     }
 
@@ -131,12 +125,11 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaque> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaque");
+                Raw.OptionOpaque.AssertInteger(selfLease.Ptr, i);
+                GC.KeepAlive(this);
             }
-            Raw.OptionOpaque.AssertInteger(AsFFI(), i);
-            GC.KeepAlive(this);
         }
     }
 
@@ -144,11 +137,12 @@ public partial class OptionOpaque: IDisposable
     {
         unsafe
         {
-            Raw.OptionOpaque* argRaw = arg == null ? null : arg.AsFFI();
-            if (arg != null && argRaw == null) throw new ObjectDisposedException(nameof(OptionOpaque));
-            var result = Raw.OptionOpaque.OptionOpaqueArgument(argRaw);
-            GC.KeepAlive(arg);
-            return result;
+            using (BorrowLease<Raw.OptionOpaque>? argLease = arg == null ? null : arg.BorrowShared())
+            {
+                var result = Raw.OptionOpaque.OptionOpaqueArgument(argLease == null ? null : argLease.Ptr);
+                GC.KeepAlive(arg);
+                return result;
+            }
         }
     }
 
@@ -157,55 +151,60 @@ public partial class OptionOpaque: IDisposable
     /// </summary>
     internal unsafe Raw.OptionOpaque* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionOpaque");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>OptionOpaque</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.OptionOpaque> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionOpaque");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.OptionOpaque> BorrowExclusive()
+    {
+        RustHandle<Raw.OptionOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("OptionOpaque");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.OptionOpaque>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.OptionOpaque>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>OptionOpaque</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -214,6 +213,7 @@ public partial class OptionOpaque: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~OptionOpaque()
     {
         try

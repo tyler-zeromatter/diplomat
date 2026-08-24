@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class RenamedTestOpaque
+public partial class RenamedTestOpaque : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.RenamedTestOpaque>? _inner;
 
@@ -32,19 +32,17 @@ public partial class RenamedTestOpaque
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe RenamedTestOpaque(Raw.RenamedTestOpaque* handle, object[] edges)
+    internal unsafe RenamedTestOpaque(Raw.RenamedTestOpaque* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.RenamedTestOpaque>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe RenamedTestOpaque(RustHandle<Raw.RenamedTestOpaque> inner)
+    internal unsafe RenamedTestOpaque(
+        Raw.RenamedTestOpaque* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.RenamedTestOpaque>.Borrowed(handle, capability, edges);
     }
 
     /// <summary>
@@ -52,43 +50,69 @@ public partial class RenamedTestOpaque
     /// </summary>
     internal unsafe Raw.RenamedTestOpaque* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedTestOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedTestOpaque");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>RenamedTestOpaque</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.RenamedTestOpaque> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedTestOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedTestOpaque");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.RenamedTestOpaque> BorrowExclusive()
+    {
+        RustHandle<Raw.RenamedTestOpaque>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedTestOpaque");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.RenamedTestOpaque>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.RenamedTestOpaque>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>RenamedTestOpaque</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~RenamedTestOpaque()
     {
         try

@@ -48,7 +48,7 @@ public class RcBorrowDependencyTests
         RcFinalizerDependent.ResetDropStats();
     }
 
-    // ── Borrowed view / source explicit Dispose (opt-in IDisposable) ───────
+    // ── Borrowed view / source explicit Dispose ───────────────────────────
 
     [Fact]
     public void BorrowedView_KeepsSourceNativeAllocationAlive_AfterSourceDispose()
@@ -95,6 +95,54 @@ public class RcBorrowDependencyTests
         Assert.Equal(1ul, RcSource.DropCount());
     }
 
+    [Fact]
+    public void SharedView_AllowsSourceMutation_AndThenFailsOnUse()
+    {
+        using RcSource source = RcSource.Create(7);
+        using RcSource view = source.View();
+
+        Assert.Equal(7ul, view.Id());
+        Assert.Throws<InvalidOperationException>(() => view.PingMutable());
+        Assert.True(source.PingMutable());
+
+        Assert.Throws<InvalidOperationException>(() => view.Id());
+
+        using RcSource refreshed = source.View();
+        Assert.Equal(7ul, refreshed.Id());
+    }
+
+    [Fact]
+    public void MutableView_HoldsExclusiveBorrowUntilDisposed()
+    {
+        using RcSource source = RcSource.Create(7);
+        using (var viewScope = source.ViewMut())
+        {
+            RcSource view = viewScope.Value;
+
+            Assert.Equal(7ul, view.Id());
+            Assert.True(view.PingMutable());
+            Assert.True(view.PingMutable());
+            Assert.Throws<InvalidOperationException>(() => source.Id());
+            Assert.Throws<InvalidOperationException>(() => source.PingMutable());
+        }
+
+        Assert.True(source.PingMutable());
+    }
+
+    [Fact]
+    public void MutableScopeEnd_ReleasesSource_WhenSharedSubviewEscapes()
+    {
+        using RcSource source = RcSource.Create(7);
+        var mutableScope = source.ViewMut();
+        using RcSource sharedSubview = mutableScope.Value.View();
+
+        mutableScope.Dispose();
+        Assert.False(mutableScope.HasValue);
+
+        Assert.True(source.PingMutable());
+        Assert.Throws<InvalidOperationException>(() => sharedSubview.Id());
+    }
+
     // ── Owned-borrowing: dependent's own destructor runs before source ─────
 
     [Fact]
@@ -125,6 +173,21 @@ public class RcBorrowDependencyTests
             dependentSeq < sourceSeq,
             $"expected dependent (seq {dependentSeq}) to be destroyed before source (seq {sourceSeq})"
         );
+    }
+
+    [Fact]
+    public void OwnedBorrowingDependent_BlocksSourceMutationUntilDisposed()
+    {
+        using RcSource source = RcSource.Create(11);
+        RcDependent dependent = source.MakeDependent();
+
+        Assert.Equal(11ul, source.Id());
+        Assert.Equal(11ul, dependent.SourceId());
+        Assert.Throws<InvalidOperationException>(() => source.PingMutable());
+
+        dependent.Dispose();
+
+        Assert.True(source.PingMutable());
     }
 
     // ── Transitive/direct dependency chain (only direct edges recorded) ────
@@ -182,13 +245,13 @@ public class RcBorrowDependencyTests
         Assert.Equal(1ul, RcSource.DropCount());
     }
 
-    // ── Finalizer-only (default, non-opt-in) parent/child ordering ─────────
+    // ── Finalizer fallback parent/child ordering ──────────────────────────
 
     [Fact]
-    public void FinalizerOnlyProbes_AreNotIDisposable()
+    public void FinalizerFallbackProbes_AreIDisposable()
     {
-        Assert.DoesNotContain(typeof(IDisposable), typeof(RcFinalizerSource).GetInterfaces());
-        Assert.DoesNotContain(typeof(IDisposable), typeof(RcFinalizerDependent).GetInterfaces());
+        Assert.Contains(typeof(IDisposable), typeof(RcFinalizerSource).GetInterfaces());
+        Assert.Contains(typeof(IDisposable), typeof(RcFinalizerDependent).GetInterfaces());
     }
 
     [MethodImpl(MethodImplOptions.NoInlining
@@ -204,7 +267,7 @@ public class RcBorrowDependencyTests
     }
 
     [Fact]
-    public void FinalizerOnlyPair_DependentDestroyedBeforeSource_ViaFinalizers()
+    public void FinalizerFallbackPair_DependentDestroyedBeforeSource()
     {
         ResetAllDropStats();
 
@@ -227,7 +290,7 @@ public class RcBorrowDependencyTests
         Assert.True(dependentSeq != 0 && sourceSeq != 0);
         Assert.True(
             dependentSeq < sourceSeq,
-            $"expected finalizer-only dependent (seq {dependentSeq}) to be destroyed before source (seq {sourceSeq})"
+            $"expected finalized dependent (seq {dependentSeq}) to be destroyed before source (seq {sourceSeq})"
         );
     }
 }

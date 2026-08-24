@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class RcSource: IDisposable
+public partial class RcSource : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.RcSource>? _inner;
 
@@ -32,19 +32,17 @@ public partial class RcSource: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe RcSource(Raw.RcSource* handle, object[] edges)
+    internal unsafe RcSource(Raw.RcSource* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.RcSource>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe RcSource(RustHandle<Raw.RcSource> inner)
+    internal unsafe RcSource(
+        Raw.RcSource* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.RcSource>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -63,34 +61,65 @@ public partial class RcSource: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RcSource> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("RcSource");
+                var result = Raw.RcSource.Id(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result;
             }
-            var result = Raw.RcSource.Id(AsFFI());
-            GC.KeepAlive(this);
-            return result;
         }
     }
 
     /// <returns>
-    /// A <c>RcSource</c> allocated on Rust side.
+    /// A view into the Rust-backed <c>RcSource</c>.
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// A mutable call on a source invalidates this view. Its next call throws <see cref="InvalidOperationException"/>.
     /// </remarks>
     public RcSource View()
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RcSource> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("RcSource");
+                Raw.RcSource* result = Raw.RcSource.View(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return new RcSource(result, BorrowKind.Shared, selfLease);
             }
-            Raw.RcSource* result = Raw.RcSource.View(AsFFI());
-            GC.KeepAlive(this);
-            return new RcSource(RustHandle<Raw.RcSource>.Borrowed(result, new object[] { this.DiplomatRetainDependency() }));
+        }
+    }
+
+    /// <returns>
+    /// A scoped use of the Rust-backed <c>RcSource</c>.
+    /// </returns>
+    /// <remarks>
+    /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
+    /// Dispose the returned scope when you finish using the value so the borrow ends promptly.
+    /// </remarks>
+    public ScopedUse<RcSource> ViewMut()
+    {
+        unsafe
+        {
+            using (BorrowLease<Raw.RcSource> selfLease = BorrowExclusive())
+            {
+                Raw.RcSource* result = Raw.RcSource.ViewMut(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return new ScopedUse<RcSource>(new RcSource(result, BorrowKind.Exclusive, selfLease));
+            }
+        }
+    }
+
+    public bool PingMutable()
+    {
+        unsafe
+        {
+            using (BorrowLease<Raw.RcSource> selfLease = BorrowExclusive())
+            {
+                var result = Raw.RcSource.PingMutable(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result;
+            }
         }
     }
 
@@ -99,19 +128,18 @@ public partial class RcSource: IDisposable
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public RcDependent MakeDependent()
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RcSource> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("RcSource");
+                Raw.RcDependent* result = Raw.RcSource.MakeDependent(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return new RcDependent(result, selfLease);
             }
-            Raw.RcDependent* result = Raw.RcSource.MakeDependent(AsFFI());
-            GC.KeepAlive(this);
-            return new RcDependent(result, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -144,55 +172,60 @@ public partial class RcSource: IDisposable
     /// </summary>
     internal unsafe Raw.RcSource* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RcSource>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RcSource");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>RcSource</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.RcSource> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RcSource>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RcSource");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.RcSource> BorrowExclusive()
+    {
+        RustHandle<Raw.RcSource>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("RcSource");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.RcSource>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.RcSource>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>RcSource</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -201,6 +234,7 @@ public partial class RcSource: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~RcSource()
     {
         try

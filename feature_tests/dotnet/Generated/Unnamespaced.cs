@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class Unnamespaced: IDisposable
+public partial class Unnamespaced : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.Unnamespaced>? _inner;
 
@@ -32,19 +32,17 @@ public partial class Unnamespaced: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe Unnamespaced(Raw.Unnamespaced* handle, object[] edges)
+    internal unsafe Unnamespaced(Raw.Unnamespaced* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.Unnamespaced>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe Unnamespaced(RustHandle<Raw.Unnamespaced> inner)
+    internal unsafe Unnamespaced(
+        Raw.Unnamespaced* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.Unnamespaced>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -63,16 +61,14 @@ public partial class Unnamespaced: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
-            {
-                throw new ObjectDisposedException("Unnamespaced");
-            }
             if (n == null) throw new ArgumentNullException(nameof(n));
-            Raw.AttrOpaque1Renamed* nRaw = n.AsFFI();
-            if (nRaw == null) throw new ObjectDisposedException(nameof(AttrOpaque1Renamed));
-            Raw.Unnamespaced.UseNamespaced(AsFFI(), nRaw);
-            GC.KeepAlive(this);
-            GC.KeepAlive(n);
+            using (BorrowLease<Raw.Unnamespaced> selfLease = BorrowShared())
+            using (BorrowLease<Raw.AttrOpaque1Renamed> nLease = n.BorrowShared())
+            {
+                Raw.Unnamespaced.UseNamespaced(selfLease.Ptr, nLease.Ptr);
+                GC.KeepAlive(this);
+                GC.KeepAlive(n);
+            }
         }
     }
 
@@ -81,55 +77,60 @@ public partial class Unnamespaced: IDisposable
     /// </summary>
     internal unsafe Raw.Unnamespaced* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Unnamespaced>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Unnamespaced");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>Unnamespaced</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.Unnamespaced> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Unnamespaced>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Unnamespaced");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.Unnamespaced> BorrowExclusive()
+    {
+        RustHandle<Raw.Unnamespaced>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("Unnamespaced");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.Unnamespaced>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.Unnamespaced>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>Unnamespaced</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -138,6 +139,7 @@ public partial class Unnamespaced: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~Unnamespaced()
     {
         try

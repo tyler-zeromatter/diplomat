@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class OptionOpaqueChar
+public partial class OptionOpaqueChar : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.OptionOpaqueChar>? _inner;
 
@@ -32,31 +32,28 @@ public partial class OptionOpaqueChar
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe OptionOpaqueChar(Raw.OptionOpaqueChar* handle, object[] edges)
+    internal unsafe OptionOpaqueChar(Raw.OptionOpaqueChar* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.OptionOpaqueChar>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe OptionOpaqueChar(RustHandle<Raw.OptionOpaqueChar> inner)
+    internal unsafe OptionOpaqueChar(
+        Raw.OptionOpaqueChar* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.OptionOpaqueChar>.Borrowed(handle, capability, edges);
     }
 
     public void AssertChar(uint ch)
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.OptionOpaqueChar> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("OptionOpaqueChar");
+                Raw.OptionOpaqueChar.AssertChar(selfLease.Ptr, ch);
+                GC.KeepAlive(this);
             }
-            Raw.OptionOpaqueChar.AssertChar(AsFFI(), ch);
-            GC.KeepAlive(this);
         }
     }
 
@@ -65,43 +62,69 @@ public partial class OptionOpaqueChar
     /// </summary>
     internal unsafe Raw.OptionOpaqueChar* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionOpaqueChar>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionOpaqueChar");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>OptionOpaqueChar</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.OptionOpaqueChar> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.OptionOpaqueChar>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("OptionOpaqueChar");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.OptionOpaqueChar> BorrowExclusive()
+    {
+        RustHandle<Raw.OptionOpaqueChar>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("OptionOpaqueChar");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.OptionOpaqueChar>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.OptionOpaqueChar>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>OptionOpaqueChar</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~OptionOpaqueChar()
     {
         try

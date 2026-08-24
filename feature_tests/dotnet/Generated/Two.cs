@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class Two
+public partial class Two : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.Two>? _inner;
 
@@ -32,19 +32,17 @@ public partial class Two
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe Two(Raw.Two* handle, object[] edges)
+    internal unsafe Two(Raw.Two* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.Two>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe Two(RustHandle<Raw.Two> inner)
+    internal unsafe Two(
+        Raw.Two* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.Two>.Borrowed(handle, capability, edges);
     }
 
     /// <summary>
@@ -52,43 +50,69 @@ public partial class Two
     /// </summary>
     internal unsafe Raw.Two* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Two>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Two");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>Two</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.Two> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Two>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Two");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.Two> BorrowExclusive()
+    {
+        RustHandle<Raw.Two>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("Two");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.Two>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.Two>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>Two</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~Two()
     {
         try

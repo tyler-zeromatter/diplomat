@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class RenamedAttrOpaque2
+public partial class RenamedAttrOpaque2 : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.RenamedAttrOpaque2>? _inner;
 
@@ -32,19 +32,17 @@ public partial class RenamedAttrOpaque2
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe RenamedAttrOpaque2(Raw.RenamedAttrOpaque2* handle, object[] edges)
+    internal unsafe RenamedAttrOpaque2(Raw.RenamedAttrOpaque2* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.RenamedAttrOpaque2>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe RenamedAttrOpaque2(RustHandle<Raw.RenamedAttrOpaque2> inner)
+    internal unsafe RenamedAttrOpaque2(
+        Raw.RenamedAttrOpaque2* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.RenamedAttrOpaque2>.Borrowed(handle, capability, edges);
     }
 
     /// <summary>
@@ -52,43 +50,69 @@ public partial class RenamedAttrOpaque2
     /// </summary>
     internal unsafe Raw.RenamedAttrOpaque2* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedAttrOpaque2>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedAttrOpaque2");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>RenamedAttrOpaque2</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.RenamedAttrOpaque2> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedAttrOpaque2>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedAttrOpaque2");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.RenamedAttrOpaque2> BorrowExclusive()
+    {
+        RustHandle<Raw.RenamedAttrOpaque2>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedAttrOpaque2");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.RenamedAttrOpaque2>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.RenamedAttrOpaque2>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>RenamedAttrOpaque2</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~RenamedAttrOpaque2()
     {
         try

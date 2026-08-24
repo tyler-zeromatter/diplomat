@@ -61,8 +61,8 @@ pub struct Attrs {
     pub demo_attrs: DemoInfo,
     /// From #[diplomat::attr()]. If true, generates a mocking interface for this type.
     pub generate_mocking_interface: bool,
-    /// From #[diplomat::attr()]. If true, the .NET backend generates `IDisposable`
-    /// and a public `Dispose()` for this opaque type.
+    /// Legacy .NET compatibility attribute. This remains accepted for source
+    /// compatibility but no longer changes generated output.
     pub manually_disposable: bool,
     /// From #[diplomat::attr()]. If true, Diplomat will check that this struct has the same memory layout in backends which support it. Allows this struct to be used in slices ([`super::Slice::Struct`]) and to be borrowed in function parameters.
     pub abi_compatible: bool,
@@ -1362,7 +1362,7 @@ pub struct BackendAttrSupport {
     pub traits_are_sync: bool,
     /// Whether to generate mocking interface.
     pub generate_mocking_interface: bool,
-    /// Whether this backend supports opting an opaque type into `IDisposable`.
+    /// Whether this backend accepts the legacy no-op `manually_disposable` attribute.
     pub manually_disposable: bool,
     /// Passing of structs that only hold (non-slice) primitive types
     /// (for use in slices and languages that support taking direct pointers to structs):

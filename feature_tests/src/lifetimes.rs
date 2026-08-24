@@ -308,7 +308,6 @@ pub mod ffi {
     // via transparent_convert and non-owning references. Iterators, iterables, and getters
     // are all handled via attributes, which may have slightly different codepaths.
     #[diplomat::opaque]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::transparent_convert]
     #[diplomat::attr(demo_gen, disable)]
     pub struct OpaqueThin(pub crate::lifetimes::Internal);
@@ -340,7 +339,6 @@ pub mod ffi {
     }
 
     #[diplomat::opaque_mut]
-    #[diplomat::attr(dotnet, manually_disposable)]
     pub struct OpaqueThinVec(std::vec::Vec<crate::lifetimes::Internal>);
 
     impl OpaqueThinVec {
@@ -494,8 +492,7 @@ pub mod ffi {
         }
     }
 
-    // Dedicated drop probes for dotnet opt-in IDisposable behavior:
-    // one unmarked opaque (finalizer-only default), and one opt-in opaque.
+    // Paired probes verify unmarked and legacy-marked opaques share lifecycle behavior.
     #[diplomat::attr(not(dotnet), disable)]
     #[diplomat::opaque]
     pub struct DefaultDropProbe;
@@ -515,7 +512,6 @@ pub mod ffi {
     }
 
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::opaque]
     pub struct DisposableDropProbe;
 
@@ -542,13 +538,13 @@ pub mod ffi {
     //
     // These exercise the .NET-only reference-counted borrow-dependency
     // mechanism directly (see `tool/templates/dotnet/RustHandle.cs.jinja`):
-    // an IDisposable opt-in "source", a borrowed (non-owning) "view" of it,
+    // an IDisposable "source", a borrowed (non-owning) "view" of it,
     // an owned-but-borrowing "dependent" that has its own Rust destructor
     // while holding a reference into the source (a direct RC edge), a second
     // layer of transitive dependency (a dependent of a dependent — only the
     // *direct* edge at each layer is ever recorded by the generator; the
     // full chain is only reachable by each layer's own recursive Release()),
-    // and a finalizer-only (non-opt-in) parent/child pair for the same
+    // and a parent/child pair for the same
     // destruction-ordering invariant exercised via the finalizer path
     // instead of explicit `Dispose()`.
     //
@@ -560,8 +556,7 @@ pub mod ffi {
     // convention above.
 
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
-    #[diplomat::opaque]
+    #[diplomat::opaque_mut]
     pub struct RcSource(u64);
 
     impl RcSource {
@@ -578,6 +573,14 @@ pub mod ffi {
         /// decrements `self`'s refcount.
         pub fn view<'b>(&'b self) -> &'b Self {
             self
+        }
+
+        pub fn view_mut<'b>(&'b mut self) -> &'b mut Self {
+            self
+        }
+
+        pub fn ping_mutable(&mut self) -> bool {
+            true
         }
 
         /// An owned wrapper with its own Rust destructor that also borrows
@@ -602,7 +605,6 @@ pub mod ffi {
     }
 
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::opaque]
     pub struct RcDependent<'a>(&'a RcSource, u64);
 
@@ -636,7 +638,6 @@ pub mod ffi {
     }
 
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::opaque]
     pub struct RcDependent2<'b, 'a: 'b>(&'b RcDependent<'a>, u64);
 
@@ -659,8 +660,81 @@ pub mod ffi {
         }
     }
 
-    // Finalizer-only (default, non-opt-in) parent/child pair exercising the
-    // same destruction-ordering invariant without explicit `Dispose()`.
+    #[diplomat::attr(not(dotnet), disable)]
+    #[diplomat::opaque_mut]
+    pub struct BorrowSafetyProbe;
+
+    impl BorrowSafetyProbe {
+        pub fn create() -> Box<Self> {
+            Box::new(Self)
+        }
+
+        pub fn reset_drop_count() {
+            super::BORROW_SAFETY_DROPS.store(0, super::Ordering::SeqCst);
+        }
+
+        pub fn drop_count() -> u64 {
+            super::BORROW_SAFETY_DROPS.load(super::Ordering::SeqCst)
+        }
+
+        pub fn reset_shared_call() {
+            super::BORROW_SAFETY_SHARED_ENTERED.store(false, super::Ordering::SeqCst);
+            super::BORROW_SAFETY_SHARED_RELEASE.store(false, super::Ordering::SeqCst);
+        }
+
+        pub fn shared_call_entered() -> bool {
+            super::BORROW_SAFETY_SHARED_ENTERED.load(super::Ordering::SeqCst)
+        }
+
+        pub fn release_shared_call() {
+            super::BORROW_SAFETY_SHARED_RELEASE.store(true, super::Ordering::SeqCst);
+        }
+
+        pub fn hold_shared(&self) {
+            super::BORROW_SAFETY_SHARED_ENTERED.store(true, super::Ordering::SeqCst);
+            while !super::BORROW_SAFETY_SHARED_RELEASE.load(super::Ordering::SeqCst) {
+                std::thread::yield_now();
+            }
+        }
+
+        pub fn ping_shared(&self) -> bool {
+            true
+        }
+
+        pub fn reset_mutable_call() {
+            super::BORROW_SAFETY_MUTABLE_ENTERED.store(false, super::Ordering::SeqCst);
+            super::BORROW_SAFETY_MUTABLE_RELEASE.store(false, super::Ordering::SeqCst);
+        }
+
+        pub fn mutable_call_entered() -> bool {
+            super::BORROW_SAFETY_MUTABLE_ENTERED.load(super::Ordering::SeqCst)
+        }
+
+        pub fn release_mutable_call() {
+            super::BORROW_SAFETY_MUTABLE_RELEASE.store(true, super::Ordering::SeqCst);
+        }
+
+        pub fn hold_mutable(&mut self) {
+            super::BORROW_SAFETY_MUTABLE_ENTERED.store(true, super::Ordering::SeqCst);
+            while !super::BORROW_SAFETY_MUTABLE_RELEASE.load(super::Ordering::SeqCst) {
+                std::thread::yield_now();
+            }
+        }
+
+        pub fn ping_mutable(&mut self) -> bool {
+            true
+        }
+
+        pub fn borrow_static_from_optional<'a>(
+            first: Option<&'a BorrowSafetyProbe>,
+            second: Option<&'a BorrowSafetyProbe>,
+        ) -> &'a [u8] {
+            let _ = (first, second);
+            &[1, 2, 3]
+        }
+    }
+
+    // This pair exercises the finalizer fallback without explicit `Dispose()`.
     #[diplomat::attr(not(dotnet), disable)]
     #[diplomat::opaque]
     pub struct RcFinalizerSource(u64);
@@ -728,7 +802,6 @@ pub mod ffi {
     // `Drop` reads the borrowed slice and records a checksum, so a
     // moved/corrupted buffer is directly observable from C#.
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::opaque]
     pub struct PinnedRcSource<'a>(pub(crate) &'a [u8]);
 
@@ -768,7 +841,6 @@ pub mod ffi {
     }
 
     #[diplomat::attr(not(dotnet), disable)]
-    #[diplomat::attr(dotnet, manually_disposable)]
     #[diplomat::opaque]
     pub struct PinnedRcDependent<'a>(&'a PinnedRcSource<'a>);
 
@@ -806,6 +878,16 @@ pub(crate) static RC_CLOCK: std::sync::atomic::AtomicU64 = std::sync::atomic::At
 pub(crate) static RC_SOURCE_DROPS: std::sync::atomic::AtomicU64 =
     std::sync::atomic::AtomicU64::new(0);
 pub(crate) static RC_SOURCE_DROP_SEQ: std::sync::atomic::AtomicU64 =
+    std::sync::atomic::AtomicU64::new(0);
+pub(crate) static BORROW_SAFETY_SHARED_ENTERED: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+pub(crate) static BORROW_SAFETY_SHARED_RELEASE: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+pub(crate) static BORROW_SAFETY_MUTABLE_ENTERED: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+pub(crate) static BORROW_SAFETY_MUTABLE_RELEASE: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+pub(crate) static BORROW_SAFETY_DROPS: std::sync::atomic::AtomicU64 =
     std::sync::atomic::AtomicU64::new(0);
 pub(crate) static RC_DEPENDENT_DROPS: std::sync::atomic::AtomicU64 =
     std::sync::atomic::AtomicU64::new(0);
@@ -851,6 +933,12 @@ impl Drop for ffi::DefaultDropProbe {
 impl Drop for ffi::DisposableDropProbe {
     fn drop(&mut self) {
         DISPOSABLE_DROP_PROBE_DROPS.fetch_add(1, Ordering::SeqCst);
+    }
+}
+
+impl Drop for ffi::BorrowSafetyProbe {
+    fn drop(&mut self) {
+        BORROW_SAFETY_DROPS.fetch_add(1, Ordering::SeqCst);
     }
 }
 

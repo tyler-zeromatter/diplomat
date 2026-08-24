@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class Utf16Wrap: IDisposable
+public partial class Utf16Wrap : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.Utf16Wrap>? _inner;
 
@@ -32,19 +32,17 @@ public partial class Utf16Wrap: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe Utf16Wrap(Raw.Utf16Wrap* handle, object[] edges)
+    internal unsafe Utf16Wrap(Raw.Utf16Wrap* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.Utf16Wrap>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe Utf16Wrap(RustHandle<Raw.Utf16Wrap> inner)
+    internal unsafe Utf16Wrap(
+        Raw.Utf16Wrap* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.Utf16Wrap>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -67,39 +65,37 @@ public partial class Utf16Wrap: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.Utf16Wrap> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("Utf16Wrap");
-            }
-            DiplomatWrite writeable = new DiplomatWrite();
-            try
-            {
-                Raw.Utf16Wrap.GetDebugStr(AsFFI(), &writeable);
-                GC.KeepAlive(this);
-                return writeable.ToUnicode();
-            }
-            finally
-            {
-                writeable.Dispose();
+                DiplomatWrite writeable = new DiplomatWrite();
+                try
+                {
+                    Raw.Utf16Wrap.GetDebugStr(selfLease.Ptr, &writeable);
+                    GC.KeepAlive(this);
+                    return writeable.ToUnicode();
+                }
+                finally
+                {
+                    writeable.Dispose();
+                }
             }
         }
     }
 
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// A mutable call on a source invalidates this view. Its next call throws <see cref="InvalidOperationException"/>.
     /// </remarks>
     public DiplomatBorrowedSpan<char> BorrowCont()
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.Utf16Wrap> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("Utf16Wrap");
+                var result = Raw.Utf16Wrap.BorrowCont(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return new DiplomatBorrowedSpan<char>(result.Ptr, result.Len, new object[] { selfLease });
             }
-            var result = Raw.Utf16Wrap.BorrowCont(AsFFI());
-            GC.KeepAlive(this);
-            return new DiplomatBorrowedSpan<char>(result.Ptr, result.Len, new object[] { this.DiplomatRetainDependency() });
         }
     }
 
@@ -108,55 +104,60 @@ public partial class Utf16Wrap: IDisposable
     /// </summary>
     internal unsafe Raw.Utf16Wrap* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Utf16Wrap>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Utf16Wrap");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>Utf16Wrap</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.Utf16Wrap> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Utf16Wrap>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Utf16Wrap");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.Utf16Wrap> BorrowExclusive()
+    {
+        RustHandle<Raw.Utf16Wrap>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("Utf16Wrap");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.Utf16Wrap>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.Utf16Wrap>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>Utf16Wrap</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -165,6 +166,7 @@ public partial class Utf16Wrap: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~Utf16Wrap()
     {
         try

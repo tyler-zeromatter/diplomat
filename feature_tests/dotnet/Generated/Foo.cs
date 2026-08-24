@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class Foo
+public partial class Foo : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.Foo>? _inner;
 
@@ -19,7 +19,7 @@ public partial class Foo
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public Bar Bar
     {
@@ -27,13 +27,12 @@ public partial class Foo
         {
             unsafe
             {
-                if (_inner is null || _inner.IsNull)
+                using (BorrowLease<Raw.Foo> selfLease = BorrowShared())
                 {
-                    throw new ObjectDisposedException("Foo");
+                    Raw.Bar* result = Raw.Foo.GetBar(selfLease.Ptr);
+                    GC.KeepAlive(this);
+                    return new Bar(result, selfLease);
                 }
-                Raw.Bar* result = Raw.Foo.GetBar(AsFFI());
-                GC.KeepAlive(this);
-                return new Bar(result, new object[] { this.DiplomatRetainDependency() });
             }
         }
     }
@@ -56,19 +55,17 @@ public partial class Foo
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe Foo(Raw.Foo* handle, object[] edges)
+    internal unsafe Foo(Raw.Foo* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.Foo>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe Foo(RustHandle<Raw.Foo> inner)
+    internal unsafe Foo(
+        Raw.Foo* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.Foo>.Borrowed(handle, capability, edges);
     }
 
     /// <summary>
@@ -76,43 +73,69 @@ public partial class Foo
     /// </summary>
     internal unsafe Raw.Foo* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Foo>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Foo");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>Foo</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.Foo> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.Foo>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("Foo");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.Foo> BorrowExclusive()
+    {
+        RustHandle<Raw.Foo>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("Foo");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.Foo>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.Foo>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>Foo</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~Foo()
     {
         try

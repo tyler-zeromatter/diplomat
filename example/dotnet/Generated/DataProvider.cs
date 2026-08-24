@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class DataProvider
+public partial class DataProvider : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.DataProvider>? _inner;
 
@@ -32,19 +32,17 @@ public partial class DataProvider
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe DataProvider(Raw.DataProvider* handle, object[] edges)
+    internal unsafe DataProvider(Raw.DataProvider* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.DataProvider>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe DataProvider(RustHandle<Raw.DataProvider> inner)
+    internal unsafe DataProvider(
+        Raw.DataProvider* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.DataProvider>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -78,43 +76,69 @@ public partial class DataProvider
     /// </summary>
     internal unsafe Raw.DataProvider* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.DataProvider>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("DataProvider");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>DataProvider</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.DataProvider> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.DataProvider>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("DataProvider");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.DataProvider> BorrowExclusive()
+    {
+        RustHandle<Raw.DataProvider>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("DataProvider");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.DataProvider>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.DataProvider>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>DataProvider</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~DataProvider()
     {
         try

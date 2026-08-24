@@ -66,13 +66,12 @@ to null on the second read. Setters keep `&mut self`; assigning is the point.
 
 Names must not collide either. A property that would share its name with a method, a
 struct field, the type that contains it, or one of the members Diplomat always generates
-(`AsFFI`, `FromFFI`, and opt-in `Dispose` on opaques) is rejected, because C# would not
+(`AsFFI`, `FromFFI`, and `Dispose` on opaques) is rejected, because C# would not
 compile the result.
 
 A getter that returns an owned `Box<[u8]>` (`RustVec`) hands back a value you own, so
-dispose it — `using var x = thing.Data;`. A getter returning an owned opaque can be used
-the same way only when that opaque is opted into
-`#[diplomat::attr(dotnet, manually_disposable)]`.
+dispose it — `using var x = thing.Data;`. A getter returning an owned opaque supports the
+same pattern because every generated opaque implements `IDisposable`.
 
 In accessor position a string-shaped parameter is always `string`, even for
 `&DiplomatStr` (which is `byte[]` everywhere else, zero-copy and unvalidated). A property
@@ -92,28 +91,37 @@ and runs it on release; a **borrowed** handle carries none, so releasing it is a
 because Rust still owns (and will free) that memory. This means methods returning `&T` or
 `Option<&T>` are safe to wrap without risking a double-free.
 
-Every `RustHandle<T>` is a small reference-counted class: pointer, destructor, edges, and
-refcount live in exactly one place. Construction starts the count at 1 (the owning wrapper).
-`DiplomatRetainDependency()` bumps the count and returns a token the dependent disposes from
-its own cleanup. That is what lets a source wrapper be disposed (or finalized) *before* every
-dependent has let go of it without either use-after-free or an early native destructor call:
-physical native destruction waits until the owner reference **and** every dependent token are
-gone, in whatever order managed lifetimes end. Cleanup always runs the native destructor
-first, then disposes every edge (pins and retain tokens).
+Every `RustHandle<T>` is a small reference-counted class: pointer, destructor, edges,
+lifetime claims, and borrow state live in exactly one place. Construction starts the claim
+count at 1 (the owning wrapper). Each `BorrowLease` adds one claim and a shared or exclusive
+mode. A returned borrowed value takes over that lease: shared views convert it to a versioned
+token (`TransferVersioned()`), exclusive views keep the exclusive lease until
+`ScopedUse<T>` ends, and owned-borrowing returns keep the transferred lease until cleanup.
+Physical native destruction waits until the last claim is gone, in whatever order managed
+lifetimes end. Cleanup always runs the native destructor first, then disposes every edge
+(pins and borrow tokens).
 
 The reference count is updated with `Interlocked` so a user-thread retain can
 race a finalizer-thread token release on the same handle without lost updates.
 Teardown still runs only on the thread that drives the count to zero.
 
-By default, generated opaques are **finalizer-only**: no public `Dispose()`, cleanup runs
-through a private idempotent path invoked by the finalizer. Add
-`#[diplomat::attr(dotnet, manually_disposable)]` on an opaque type declaration to generate
-`: IDisposable` plus a public `Dispose()` that runs the same cleanup and
-`GC.SuppressFinalize(this)`. `Dispose()` releases this wrapper's ownership reference but
-does not necessarily destroy the native value immediately: existing borrowers keep it
-alive and remain valid. The disposed wrapper itself rejects further use with
-`ObjectDisposedException`. In both modes, native calls are followed by
-`GC.KeepAlive(this)` to prevent finalization while P/Invoke is still using the pointer.
+Every generated opaque implements `IDisposable` and keeps a finalizer as a fallback.
+`Dispose()` runs the same private idempotent cleanup path and calls
+`GC.SuppressFinalize(this)`. It releases this wrapper's ownership reference but does not
+necessarily destroy the native value immediately: existing borrowers keep it alive and
+remain valid. The disposed wrapper itself rejects further use with
+`ObjectDisposedException`. Native calls are followed by `GC.KeepAlive(this)` to prevent
+finalization while P/Invoke is still using the pointer. The legacy
+`#[diplomat::attr(dotnet, manually_disposable)]` attribute is accepted for source
+compatibility but is otherwise ignored because every opaque is already disposable. It is
+scheduled for removal in the next breaking release ([#1260](https://github.com/rust-diplomat/diplomat/issues/1260)).
+
+Shared versioned views do not keep their source borrowed between calls: a mutable source
+call can proceed and invalidates the old view. Exclusive `ScopedUse<T>` values and owned
+values that borrow from a source are different: they keep a real source borrow until
+disposed. A conflicting source mutation throws `InvalidOperationException` until that
+scope or dependent is disposed. Dispose these values deterministically rather than waiting
+for the GC if the source needs to be mutated again.
 
 ## String encoding
 
@@ -134,11 +142,14 @@ representations line up:
 
 A borrowed string or slice return (`&'a str` / `&'a DiplomatStr` / `&'a DiplomatStr16` /
 `&'a [u8]` / `&'a [u32]`) surfaces as `DiplomatBorrowedSpan<T>` — a zero-copy view over
-memory Rust still owns, rooted with the same keep-alive-edge mechanism as a borrowed
-opaque return. It intentionally does not expose a `Span`-returning property (nothing
-would keep the view rooted once the span escaped it); call `WithSpan(...)` for scoped,
-zero-copy, read-only access instead — the same pattern `RustVec` uses for owned returns
-(see below). Producing an independent `T[]` is a separate, explicit step: call `Clone()`.
+memory Rust still owns. Like a shared opaque view, it holds a versioned lifetime claim
+and implements `IDisposable`; `Dispose()` drops that claim without waiting for GC. A later
+mutable call on the source invalidates the view: the next `WithSpan(...)` or `Clone()`
+throws `InvalidOperationException`. It intentionally does not expose a `Span`-returning
+property (nothing would keep the view rooted once the span escaped it); call
+`WithSpan(...)` for scoped, zero-copy, read-only access instead — the same pattern
+`RustVec` uses for owned returns (see below). Producing an independent `T[]` is a
+separate, explicit step: call `Clone()`.
 
 An owned `Box<[u8]>` return surfaces as `RustVec` — it owns the native allocation, is
 `IDisposable`, and offers the same `WithSpan(...)` / `Clone()` shape as

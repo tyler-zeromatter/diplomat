@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class RenamedVectorTest: IDisposable
+public partial class RenamedVectorTest : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.RenamedVectorTest>? _inner;
 
@@ -20,13 +20,12 @@ public partial class RenamedVectorTest: IDisposable
         {
             unsafe
             {
-                if (_inner is null || _inner.IsNull)
+                using (BorrowLease<Raw.RenamedVectorTest> selfLease = BorrowShared())
                 {
-                    throw new ObjectDisposedException("RenamedVectorTest");
+                    var result = Raw.RenamedVectorTest.Len(selfLease.Ptr);
+                    GC.KeepAlive(this);
+                    return result;
                 }
-                var result = Raw.RenamedVectorTest.Len(AsFFI());
-                GC.KeepAlive(this);
-                return result;
             }
         }
     }
@@ -49,19 +48,17 @@ public partial class RenamedVectorTest: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe RenamedVectorTest(Raw.RenamedVectorTest* handle, object[] edges)
+    internal unsafe RenamedVectorTest(Raw.RenamedVectorTest* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.RenamedVectorTest>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe RenamedVectorTest(RustHandle<Raw.RenamedVectorTest> inner)
+    internal unsafe RenamedVectorTest(
+        Raw.RenamedVectorTest* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.RenamedVectorTest>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -80,13 +77,12 @@ public partial class RenamedVectorTest: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RenamedVectorTest> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("RenamedVectorTest");
+                var result = Raw.RenamedVectorTest.Get(selfLease.Ptr, idx);
+                GC.KeepAlive(this);
+                return result.IsSome ? result.Value : (double?)null;
             }
-            var result = Raw.RenamedVectorTest.Get(AsFFI(), idx);
-            GC.KeepAlive(this);
-            return result.IsSome ? result.Value : (double?)null;
         }
     }
 
@@ -94,12 +90,11 @@ public partial class RenamedVectorTest: IDisposable
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RenamedVectorTest> selfLease = BorrowExclusive())
             {
-                throw new ObjectDisposedException("RenamedVectorTest");
+                Raw.RenamedVectorTest.Push(selfLease.Ptr, value);
+                GC.KeepAlive(this);
             }
-            Raw.RenamedVectorTest.Push(AsFFI(), value);
-            GC.KeepAlive(this);
         }
     }
 
@@ -108,55 +103,60 @@ public partial class RenamedVectorTest: IDisposable
     /// </summary>
     internal unsafe Raw.RenamedVectorTest* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedVectorTest>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedVectorTest");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>RenamedVectorTest</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.RenamedVectorTest> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RenamedVectorTest>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RenamedVectorTest");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.RenamedVectorTest> BorrowExclusive()
+    {
+        RustHandle<Raw.RenamedVectorTest>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("RenamedVectorTest");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.RenamedVectorTest>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.RenamedVectorTest>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>RenamedVectorTest</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -165,6 +165,7 @@ public partial class RenamedVectorTest: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~RenamedVectorTest()
     {
         try

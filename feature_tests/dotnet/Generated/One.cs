@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class One
+public partial class One : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.One>? _inner;
 
@@ -32,19 +32,17 @@ public partial class One
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe One(Raw.One* handle, object[] edges)
+    internal unsafe One(Raw.One* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.One>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe One(RustHandle<Raw.One> inner)
+    internal unsafe One(
+        Raw.One* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.One>.Borrowed(handle, capability, edges);
     }
 
     /// <returns>
@@ -52,22 +50,22 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One Transitivity(One hold, One nohold)
     {
         unsafe
         {
             if (hold == null) throw new ArgumentNullException(nameof(hold));
-            Raw.One* holdRaw = hold.AsFFI();
-            if (holdRaw == null) throw new ObjectDisposedException(nameof(One));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.Transitivity(holdRaw, noholdRaw);
-            GC.KeepAlive(hold);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> holdLease = hold.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.Transitivity(holdLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(hold);
+                GC.KeepAlive(nohold);
+                return new One(result, holdLease);
+            }
         }
     }
 
@@ -76,22 +74,22 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One Cycle(Two hold, One nohold)
     {
         unsafe
         {
             if (hold == null) throw new ArgumentNullException(nameof(hold));
-            Raw.Two* holdRaw = hold.AsFFI();
-            if (holdRaw == null) throw new ObjectDisposedException(nameof(Two));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.Cycle(holdRaw, noholdRaw);
-            GC.KeepAlive(hold);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.Two> holdLease = hold.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.Cycle(holdLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(hold);
+                GC.KeepAlive(nohold);
+                return new One(result, holdLease);
+            }
         }
     }
 
@@ -100,34 +98,31 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One ManyDependents(One a, One b, Two c, Two d, Two nohold)
     {
         unsafe
         {
             if (a == null) throw new ArgumentNullException(nameof(a));
-            Raw.One* aRaw = a.AsFFI();
-            if (aRaw == null) throw new ObjectDisposedException(nameof(One));
             if (b == null) throw new ArgumentNullException(nameof(b));
-            Raw.One* bRaw = b.AsFFI();
-            if (bRaw == null) throw new ObjectDisposedException(nameof(One));
             if (c == null) throw new ArgumentNullException(nameof(c));
-            Raw.Two* cRaw = c.AsFFI();
-            if (cRaw == null) throw new ObjectDisposedException(nameof(Two));
             if (d == null) throw new ArgumentNullException(nameof(d));
-            Raw.Two* dRaw = d.AsFFI();
-            if (dRaw == null) throw new ObjectDisposedException(nameof(Two));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.Two* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(Two));
-            Raw.One* result = Raw.One.ManyDependents(aRaw, bRaw, cRaw, dRaw, noholdRaw);
-            GC.KeepAlive(a);
-            GC.KeepAlive(b);
-            GC.KeepAlive(c);
-            GC.KeepAlive(d);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { a.DiplomatRetainDependency(), b.DiplomatRetainDependency(), c.DiplomatRetainDependency(), d.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> aLease = a.BorrowShared())
+            using (BorrowLease<Raw.One> bLease = b.BorrowShared())
+            using (BorrowLease<Raw.Two> cLease = c.BorrowShared())
+            using (BorrowLease<Raw.Two> dLease = d.BorrowShared())
+            using (BorrowLease<Raw.Two> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.ManyDependents(aLease.Ptr, bLease.Ptr, cLease.Ptr, dLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(a);
+                GC.KeepAlive(b);
+                GC.KeepAlive(c);
+                GC.KeepAlive(d);
+                GC.KeepAlive(nohold);
+                return new One(result, aLease, bLease, cLease, dLease);
+            }
         }
     }
 
@@ -136,22 +131,22 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One ReturnOutlivesParam(Two hold, One nohold)
     {
         unsafe
         {
             if (hold == null) throw new ArgumentNullException(nameof(hold));
-            Raw.Two* holdRaw = hold.AsFFI();
-            if (holdRaw == null) throw new ObjectDisposedException(nameof(Two));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.ReturnOutlivesParam(holdRaw, noholdRaw);
-            GC.KeepAlive(hold);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { hold.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.Two> holdLease = hold.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.ReturnOutlivesParam(holdLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(hold);
+                GC.KeepAlive(nohold);
+                return new One(result, holdLease);
+            }
         }
     }
 
@@ -160,30 +155,28 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One DiamondTop(One top, One left, One right, One bottom)
     {
         unsafe
         {
             if (top == null) throw new ArgumentNullException(nameof(top));
-            Raw.One* topRaw = top.AsFFI();
-            if (topRaw == null) throw new ObjectDisposedException(nameof(One));
             if (left == null) throw new ArgumentNullException(nameof(left));
-            Raw.One* leftRaw = left.AsFFI();
-            if (leftRaw == null) throw new ObjectDisposedException(nameof(One));
             if (right == null) throw new ArgumentNullException(nameof(right));
-            Raw.One* rightRaw = right.AsFFI();
-            if (rightRaw == null) throw new ObjectDisposedException(nameof(One));
             if (bottom == null) throw new ArgumentNullException(nameof(bottom));
-            Raw.One* bottomRaw = bottom.AsFFI();
-            if (bottomRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.DiamondTop(topRaw, leftRaw, rightRaw, bottomRaw);
-            GC.KeepAlive(top);
-            GC.KeepAlive(left);
-            GC.KeepAlive(right);
-            GC.KeepAlive(bottom);
-            return new One(result, new object[] { top.DiplomatRetainDependency(), left.DiplomatRetainDependency(), right.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> topLease = top.BorrowShared())
+            using (BorrowLease<Raw.One> leftLease = left.BorrowShared())
+            using (BorrowLease<Raw.One> rightLease = right.BorrowShared())
+            using (BorrowLease<Raw.One> bottomLease = bottom.BorrowShared())
+            {
+                Raw.One* result = Raw.One.DiamondTop(topLease.Ptr, leftLease.Ptr, rightLease.Ptr, bottomLease.Ptr);
+                GC.KeepAlive(top);
+                GC.KeepAlive(left);
+                GC.KeepAlive(right);
+                GC.KeepAlive(bottom);
+                return new One(result, topLease, leftLease, rightLease, bottomLease);
+            }
         }
     }
 
@@ -192,30 +185,28 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One DiamondLeft(One top, One left, One right, One bottom)
     {
         unsafe
         {
             if (top == null) throw new ArgumentNullException(nameof(top));
-            Raw.One* topRaw = top.AsFFI();
-            if (topRaw == null) throw new ObjectDisposedException(nameof(One));
             if (left == null) throw new ArgumentNullException(nameof(left));
-            Raw.One* leftRaw = left.AsFFI();
-            if (leftRaw == null) throw new ObjectDisposedException(nameof(One));
             if (right == null) throw new ArgumentNullException(nameof(right));
-            Raw.One* rightRaw = right.AsFFI();
-            if (rightRaw == null) throw new ObjectDisposedException(nameof(One));
             if (bottom == null) throw new ArgumentNullException(nameof(bottom));
-            Raw.One* bottomRaw = bottom.AsFFI();
-            if (bottomRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.DiamondLeft(topRaw, leftRaw, rightRaw, bottomRaw);
-            GC.KeepAlive(top);
-            GC.KeepAlive(left);
-            GC.KeepAlive(right);
-            GC.KeepAlive(bottom);
-            return new One(result, new object[] { left.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> topLease = top.BorrowShared())
+            using (BorrowLease<Raw.One> leftLease = left.BorrowShared())
+            using (BorrowLease<Raw.One> rightLease = right.BorrowShared())
+            using (BorrowLease<Raw.One> bottomLease = bottom.BorrowShared())
+            {
+                Raw.One* result = Raw.One.DiamondLeft(topLease.Ptr, leftLease.Ptr, rightLease.Ptr, bottomLease.Ptr);
+                GC.KeepAlive(top);
+                GC.KeepAlive(left);
+                GC.KeepAlive(right);
+                GC.KeepAlive(bottom);
+                return new One(result, leftLease, bottomLease);
+            }
         }
     }
 
@@ -224,30 +215,28 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One DiamondRight(One top, One left, One right, One bottom)
     {
         unsafe
         {
             if (top == null) throw new ArgumentNullException(nameof(top));
-            Raw.One* topRaw = top.AsFFI();
-            if (topRaw == null) throw new ObjectDisposedException(nameof(One));
             if (left == null) throw new ArgumentNullException(nameof(left));
-            Raw.One* leftRaw = left.AsFFI();
-            if (leftRaw == null) throw new ObjectDisposedException(nameof(One));
             if (right == null) throw new ArgumentNullException(nameof(right));
-            Raw.One* rightRaw = right.AsFFI();
-            if (rightRaw == null) throw new ObjectDisposedException(nameof(One));
             if (bottom == null) throw new ArgumentNullException(nameof(bottom));
-            Raw.One* bottomRaw = bottom.AsFFI();
-            if (bottomRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.DiamondRight(topRaw, leftRaw, rightRaw, bottomRaw);
-            GC.KeepAlive(top);
-            GC.KeepAlive(left);
-            GC.KeepAlive(right);
-            GC.KeepAlive(bottom);
-            return new One(result, new object[] { right.DiplomatRetainDependency(), bottom.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> topLease = top.BorrowShared())
+            using (BorrowLease<Raw.One> leftLease = left.BorrowShared())
+            using (BorrowLease<Raw.One> rightLease = right.BorrowShared())
+            using (BorrowLease<Raw.One> bottomLease = bottom.BorrowShared())
+            {
+                Raw.One* result = Raw.One.DiamondRight(topLease.Ptr, leftLease.Ptr, rightLease.Ptr, bottomLease.Ptr);
+                GC.KeepAlive(top);
+                GC.KeepAlive(left);
+                GC.KeepAlive(right);
+                GC.KeepAlive(bottom);
+                return new One(result, rightLease, bottomLease);
+            }
         }
     }
 
@@ -256,30 +245,28 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One DiamondBottom(One top, One left, One right, One bottom)
     {
         unsafe
         {
             if (top == null) throw new ArgumentNullException(nameof(top));
-            Raw.One* topRaw = top.AsFFI();
-            if (topRaw == null) throw new ObjectDisposedException(nameof(One));
             if (left == null) throw new ArgumentNullException(nameof(left));
-            Raw.One* leftRaw = left.AsFFI();
-            if (leftRaw == null) throw new ObjectDisposedException(nameof(One));
             if (right == null) throw new ArgumentNullException(nameof(right));
-            Raw.One* rightRaw = right.AsFFI();
-            if (rightRaw == null) throw new ObjectDisposedException(nameof(One));
             if (bottom == null) throw new ArgumentNullException(nameof(bottom));
-            Raw.One* bottomRaw = bottom.AsFFI();
-            if (bottomRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.DiamondBottom(topRaw, leftRaw, rightRaw, bottomRaw);
-            GC.KeepAlive(top);
-            GC.KeepAlive(left);
-            GC.KeepAlive(right);
-            GC.KeepAlive(bottom);
-            return new One(result, new object[] { bottom.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> topLease = top.BorrowShared())
+            using (BorrowLease<Raw.One> leftLease = left.BorrowShared())
+            using (BorrowLease<Raw.One> rightLease = right.BorrowShared())
+            using (BorrowLease<Raw.One> bottomLease = bottom.BorrowShared())
+            {
+                Raw.One* result = Raw.One.DiamondBottom(topLease.Ptr, leftLease.Ptr, rightLease.Ptr, bottomLease.Ptr);
+                GC.KeepAlive(top);
+                GC.KeepAlive(left);
+                GC.KeepAlive(right);
+                GC.KeepAlive(bottom);
+                return new One(result, bottomLease);
+            }
         }
     }
 
@@ -288,34 +275,31 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One DiamondAndNestedTypes(One a, One b, One c, One d, One nohold)
     {
         unsafe
         {
             if (a == null) throw new ArgumentNullException(nameof(a));
-            Raw.One* aRaw = a.AsFFI();
-            if (aRaw == null) throw new ObjectDisposedException(nameof(One));
             if (b == null) throw new ArgumentNullException(nameof(b));
-            Raw.One* bRaw = b.AsFFI();
-            if (bRaw == null) throw new ObjectDisposedException(nameof(One));
             if (c == null) throw new ArgumentNullException(nameof(c));
-            Raw.One* cRaw = c.AsFFI();
-            if (cRaw == null) throw new ObjectDisposedException(nameof(One));
             if (d == null) throw new ArgumentNullException(nameof(d));
-            Raw.One* dRaw = d.AsFFI();
-            if (dRaw == null) throw new ObjectDisposedException(nameof(One));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.DiamondAndNestedTypes(aRaw, bRaw, cRaw, dRaw, noholdRaw);
-            GC.KeepAlive(a);
-            GC.KeepAlive(b);
-            GC.KeepAlive(c);
-            GC.KeepAlive(d);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { a.DiplomatRetainDependency(), b.DiplomatRetainDependency(), c.DiplomatRetainDependency(), d.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> aLease = a.BorrowShared())
+            using (BorrowLease<Raw.One> bLease = b.BorrowShared())
+            using (BorrowLease<Raw.One> cLease = c.BorrowShared())
+            using (BorrowLease<Raw.One> dLease = d.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.DiamondAndNestedTypes(aLease.Ptr, bLease.Ptr, cLease.Ptr, dLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(a);
+                GC.KeepAlive(b);
+                GC.KeepAlive(c);
+                GC.KeepAlive(d);
+                GC.KeepAlive(nohold);
+                return new One(result, aLease, bLease, cLease, dLease);
+            }
         }
     }
 
@@ -324,26 +308,25 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One ImplicitBounds(One explicitHold, One implicitHold, One nohold)
     {
         unsafe
         {
             if (explicitHold == null) throw new ArgumentNullException(nameof(explicitHold));
-            Raw.One* explicitHoldRaw = explicitHold.AsFFI();
-            if (explicitHoldRaw == null) throw new ObjectDisposedException(nameof(One));
             if (implicitHold == null) throw new ArgumentNullException(nameof(implicitHold));
-            Raw.One* implicitHoldRaw = implicitHold.AsFFI();
-            if (implicitHoldRaw == null) throw new ObjectDisposedException(nameof(One));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.ImplicitBounds(explicitHoldRaw, implicitHoldRaw, noholdRaw);
-            GC.KeepAlive(explicitHold);
-            GC.KeepAlive(implicitHold);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { explicitHold.DiplomatRetainDependency(), implicitHold.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> explicitHoldLease = explicitHold.BorrowShared())
+            using (BorrowLease<Raw.One> implicitHoldLease = implicitHold.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.ImplicitBounds(explicitHoldLease.Ptr, implicitHoldLease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(explicitHold);
+                GC.KeepAlive(implicitHold);
+                GC.KeepAlive(nohold);
+                return new One(result, explicitHoldLease, implicitHoldLease);
+            }
         }
     }
 
@@ -352,30 +335,28 @@ public partial class One
     /// </returns>
     /// <remarks>
     /// Lifetime: the returned native-backed value may borrow from the receiver or one or more inputs.
-    /// The caller is responsible for keeping any borrowed backing storage alive and undisposed while the returned value is in use.
+    /// The returned value keeps its borrowed backing storage alive until cleanup.
     /// </remarks>
     public static One ImplicitBoundsDeep(One @explicit, One implicit1, One implicit2, One nohold)
     {
         unsafe
         {
             if (@explicit == null) throw new ArgumentNullException(nameof(@explicit));
-            Raw.One* @explicitRaw = @explicit.AsFFI();
-            if (@explicitRaw == null) throw new ObjectDisposedException(nameof(One));
             if (implicit1 == null) throw new ArgumentNullException(nameof(implicit1));
-            Raw.One* implicit1Raw = implicit1.AsFFI();
-            if (implicit1Raw == null) throw new ObjectDisposedException(nameof(One));
             if (implicit2 == null) throw new ArgumentNullException(nameof(implicit2));
-            Raw.One* implicit2Raw = implicit2.AsFFI();
-            if (implicit2Raw == null) throw new ObjectDisposedException(nameof(One));
             if (nohold == null) throw new ArgumentNullException(nameof(nohold));
-            Raw.One* noholdRaw = nohold.AsFFI();
-            if (noholdRaw == null) throw new ObjectDisposedException(nameof(One));
-            Raw.One* result = Raw.One.ImplicitBoundsDeep(@explicitRaw, implicit1Raw, implicit2Raw, noholdRaw);
-            GC.KeepAlive(@explicit);
-            GC.KeepAlive(implicit1);
-            GC.KeepAlive(implicit2);
-            GC.KeepAlive(nohold);
-            return new One(result, new object[] { @explicit.DiplomatRetainDependency(), implicit1.DiplomatRetainDependency(), implicit2.DiplomatRetainDependency() });
+            using (BorrowLease<Raw.One> explicitLease = @explicit.BorrowShared())
+            using (BorrowLease<Raw.One> implicit1lease = implicit1.BorrowShared())
+            using (BorrowLease<Raw.One> implicit2lease = implicit2.BorrowShared())
+            using (BorrowLease<Raw.One> noholdLease = nohold.BorrowShared())
+            {
+                Raw.One* result = Raw.One.ImplicitBoundsDeep(explicitLease.Ptr, implicit1lease.Ptr, implicit2lease.Ptr, noholdLease.Ptr);
+                GC.KeepAlive(@explicit);
+                GC.KeepAlive(implicit1);
+                GC.KeepAlive(implicit2);
+                GC.KeepAlive(nohold);
+                return new One(result, explicitLease, implicit1lease, implicit2lease);
+            }
         }
     }
 
@@ -384,43 +365,69 @@ public partial class One
     /// </summary>
     internal unsafe Raw.One* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.One>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("One");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>One</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.One> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.One>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("One");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.One> BorrowExclusive()
+    {
+        RustHandle<Raw.One>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("One");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.One>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.One>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Requests/releases this wrapper's own ownership reference.
+    /// </summary>
+    /// <remarks>
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
+    /// After this call, this <c>One</c> instance itself is unusable:
+    /// its methods (and any attempt to start a new borrow from it) throw
+    /// <see cref="ObjectDisposedException"/> immediately, regardless of
+    /// whether the physical native destruction happened yet.
+    /// </remarks>
+    public void Dispose()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     ~One()
     {
         try

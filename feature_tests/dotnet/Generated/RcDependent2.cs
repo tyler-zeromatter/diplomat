@@ -8,7 +8,7 @@ namespace Somelib;
 
 #nullable enable
 
-public partial class RcDependent2: IDisposable
+public partial class RcDependent2 : IDiplomatScoped, IDisposable
 {
     private unsafe RustHandle<Raw.RcDependent2>? _inner;
 
@@ -32,32 +32,29 @@ public partial class RcDependent2: IDisposable
     /// Owned construction with lifetime resources released after the Rust
     /// destructor.
     /// </summary>
-    internal unsafe RcDependent2(Raw.RcDependent2* handle, object[] edges)
+    internal unsafe RcDependent2(Raw.RcDependent2* handle, params object[] edges)
     {
         _inner = RustHandle<Raw.RcDependent2>.Owned(handle, _destroy, edges);
     }
 
-    /// <summary>
-    /// Wraps a handle that already knows whether it owns the pointer. A
-    /// borrowed return passes a non-owning handle, so cleanup leaves Rust's
-    /// pointer alone.
-    /// </summary>
-    internal unsafe RcDependent2(RustHandle<Raw.RcDependent2> inner)
+    internal unsafe RcDependent2(
+        Raw.RcDependent2* handle,
+        BorrowKind capability,
+        params object[] edges)
     {
-        _inner = inner;
+        _inner = RustHandle<Raw.RcDependent2>.Borrowed(handle, capability, edges);
     }
 
     public ulong Id()
     {
         unsafe
         {
-            if (_inner is null || _inner.IsNull)
+            using (BorrowLease<Raw.RcDependent2> selfLease = BorrowShared())
             {
-                throw new ObjectDisposedException("RcDependent2");
+                var result = Raw.RcDependent2.Id(selfLease.Ptr);
+                GC.KeepAlive(this);
+                return result;
             }
-            var result = Raw.RcDependent2.Id(AsFFI());
-            GC.KeepAlive(this);
-            return result;
         }
     }
 
@@ -90,55 +87,60 @@ public partial class RcDependent2: IDisposable
     /// </summary>
     internal unsafe Raw.RcDependent2* AsFFI()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RcDependent2>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RcDependent2");
         }
-        return _inner.Ptr;
+        return inner.Ptr;
     }
 
-    /// <summary>
-    /// Retains this value's native resource for a new direct dependent.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException">
-    /// This <c>RcDependent2</c> was already disposed/finalized, so there is
-    /// nothing left to lend a dependent.
-    /// </exception>
-    internal unsafe IDisposable DiplomatRetainDependency()
+    internal unsafe BorrowLease<Raw.RcDependent2> BorrowShared()
     {
-        if (_inner is null || _inner.IsNull)
+        RustHandle<Raw.RcDependent2>? inner = _inner;
+        if (inner is null || inner.IsNull)
         {
             throw new ObjectDisposedException("RcDependent2");
         }
-        return _inner.Retain();
+        return inner.BorrowShared();
+    }
+
+    internal unsafe BorrowLease<Raw.RcDependent2> BorrowExclusive()
+    {
+        RustHandle<Raw.RcDependent2>? inner = _inner;
+        if (inner is null || inner.IsNull)
+        {
+            throw new ObjectDisposedException("RcDependent2");
+        }
+        return inner.BorrowExclusive();
     }
 
     private void Cleanup()
     {
         unsafe
         {
-            RustHandle<Raw.RcDependent2>? inner = _inner;
-            if (inner is null)
-            {
-                return;
-            }
-
-            _inner = null;
-            inner.Release();
+            RustHandle<Raw.RcDependent2>? inner =
+                System.Threading.Interlocked.Exchange(ref _inner, null);
+            inner?.Release();
         }
     }
+
+    void IDiplomatScoped.EndScope()
+    {
+        Cleanup();
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Requests/releases this wrapper's own ownership reference.
     /// </summary>
     /// <remarks>
-    /// This only relinquishes THIS wrapper's own reference; the underlying
-    /// native resource is not necessarily destroyed when this method
-    /// returns. If another wrapper still holds a live borrow-dependency on
-    /// it (see <c>RustHandle.cs</c>), the actual Rust destructor call
-    /// is deferred until that borrower releases its own reference too — so
-    /// existing borrowers obtained before this call remain fully valid.
+    /// This releases this wrapper's claim. The native resource may stay alive
+    /// while other wrappers still hold claims. Disposing an exclusive borrowed
+    /// wrapper also ends its scope. Versioned shared views borrowed from that
+    /// scope become invalid and throw before their next native call.
     /// After this call, this <c>RcDependent2</c> instance itself is unusable:
-    /// its methods (and any attempt to retain a new dependent from it) throw
+    /// its methods (and any attempt to start a new borrow from it) throw
     /// <see cref="ObjectDisposedException"/> immediately, regardless of
     /// whether the physical native destruction happened yet.
     /// </remarks>
@@ -147,6 +149,7 @@ public partial class RcDependent2: IDisposable
         Cleanup();
         GC.SuppressFinalize(this);
     }
+
     ~RcDependent2()
     {
         try
