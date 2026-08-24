@@ -52,7 +52,10 @@ namespace capi {
 namespace somelib {
 class TesterTrait {
     private:
-    static void Destroy(const void* data);
+    static void Destroy(const void* data) {
+        auto self = static_cast<const somelib::TesterTrait*>(data);
+        delete self;
+    }
 
     protected:
     virtual uint32_t test_trait_fn(uint32_t x) = 0;

@@ -11,6 +11,7 @@
 #include <functional>
 #include <optional>
 #include <cstdlib>
+#include "TesterTrait.hpp"
 #include "diplomat_runtime.hpp"
 
 
