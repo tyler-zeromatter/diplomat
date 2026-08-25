@@ -1,0 +1,5 @@
+---
+source: core/src/hir/attrs.rs
+expression: output
+---
+Lowering error in Test: `ffi_error` not supported in backend tests
