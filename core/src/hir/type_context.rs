@@ -507,7 +507,11 @@ impl TypeContext {
                     self.validate_ty(&mut ctx.errors, &p.ty);
                 }
 
-                if ctx.attr_validator.attrs_supported().trait_returns_are_fallible {
+                if ctx
+                    .attr_validator
+                    .attrs_supported()
+                    .trait_returns_are_fallible
+                {
                     match m.output.as_ref() {
                         hir::ReturnType::Infallible(hir::SuccessType::Unit) => {}
                         hir::ReturnType::Fallible(_, err) => {
@@ -515,12 +519,11 @@ impl TypeContext {
                                 match e {
                                     hir::Type::Enum(e) => {
                                         let e = self.resolve_enum(e.tcx_id);
-                                        let is_valid = e.variants.iter().find(|v| {
-                                            v.attrs.ffi_error
-                                        });
+                                        let is_valid =
+                                            e.variants.iter().find(|v| v.attrs.ffi_error);
                                         is_valid.is_some()
                                     }
-                                    _ => false
+                                    _ => false,
                                 }
                             } else {
                                 false
@@ -1912,7 +1915,7 @@ mod tests {
 
     #[test]
     fn test_ffi_errors() {
-        let parsed: syn::File = syn::parse_quote! { 
+        let parsed: syn::File = syn::parse_quote! {
             #[diplomat::bridge]
             mod ffi {
                 struct SomeStruct {
@@ -1950,7 +1953,13 @@ mod tests {
 
         let mut attr_validator = hir::BasicAttributeValidator::new("tests");
         attr_validator.support.trait_returns_are_fallible = true;
-        match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &SpanLocation::None) {
+        match hir::TypeContext::from_syn(
+            &parsed,
+            Default::default(),
+            attr_validator,
+            None,
+            &SpanLocation::None,
+        ) {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
@@ -1958,8 +1967,6 @@ mod tests {
                 }
             }
         };
-        insta::with_settings!({}, {
-            insta::assert_snapshot!(output)
-        });
+        insta::with_settings!({}, { insta::assert_snapshot!(output) });
     }
 }

@@ -67,7 +67,7 @@ pub struct Attrs {
     /// From #[diplomat::attr()]. If true, Diplomat will check that this struct has the same memory layout in backends which support it. Allows this struct to be used in slices ([`super::Slice::Struct`]) and to be borrowed in function parameters.
     pub abi_compatible: bool,
     /// From #[diplomat::attr()]. If true, Diplomat will attempt to use the given type to flag backend specific errors (behavior depends on the type)
-    pub ffi_error : bool,
+    pub ffi_error: bool,
     /// From #[diplomat::attr()], found on structs. If true, Diplomat will allow &mut T references to the struct, and the backend may change the types of fields to better support mutation.
     pub mut_struct_ref: bool,
 
@@ -1178,7 +1178,12 @@ impl Attrs {
             ));
         }
 
-        if *ffi_error && !matches!(context, AttributeContext::Field | AttributeContext::EnumVariant(..)) {
+        if *ffi_error
+            && !matches!(
+                context,
+                AttributeContext::Field | AttributeContext::EnumVariant(..)
+            )
+        {
             errors.push(LoweringError::Other(
                 "`ffi_error` is only supported on struct fields or enum variants.".into(),
             ));
@@ -1411,7 +1416,7 @@ pub struct BackendAttrSupport {
     pub owned_byte_slice_returns: bool,
     /// If a trait method's return in a given backend has the possibility to always fail (with the exception of unit types).
     /// See https://github.com/rust-diplomat/diplomat/issues/1262
-    pub trait_returns_are_fallible : bool,
+    pub trait_returns_are_fallible: bool,
 }
 
 impl BackendAttrSupport {
@@ -2212,7 +2217,7 @@ mod tests {
 
     #[test]
     fn test_ffi_error_on_enum() {
-        uitest_lowering_attr! { hir::BackendAttrSupport::all_true(), 
+        uitest_lowering_attr! { hir::BackendAttrSupport::all_true(),
             #[diplomat::bridge]
             mod ffi {
                 pub struct Test {
@@ -2225,7 +2230,7 @@ mod tests {
 
     #[test]
     fn test_ffi_error_enum_unsupported() {
-        uitest_lowering_attr! { hir::BackendAttrSupport::default(), 
+        uitest_lowering_attr! { hir::BackendAttrSupport::default(),
             #[diplomat::bridge]
             mod ffi {
                 pub struct Test {
