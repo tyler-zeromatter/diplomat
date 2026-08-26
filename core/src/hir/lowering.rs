@@ -71,15 +71,18 @@ pub struct LoweringReport {
     error : LoweringError
 }
 
-impl fmt::Display for LoweringReport {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let location = format!("{}{}", self.context.item,
+impl LoweringReport {
+    pub fn get_location(&self) -> String {
+        format!("{}{}", self.context.item,
             if let Some(s) = &self.context.subitem {
                 format!("::{}", s)
             } else {
                 "".into()
             }
-        );
+        )
+    }
+    pub fn ast_report(&self) -> crate::ast::logging::AstReport {
+        let location = self.get_location();
 
         let (primary_label, primary_loc, contexts) = match &self.error {
             LoweringError::InvalidField(field_ident, reason) => {
@@ -94,14 +97,20 @@ impl fmt::Display for LoweringReport {
                 (s.clone(), self.context.location.clone(), vec![])
             }
         };
-        let report = ast::logging::AstReport::new(
+        ast::logging::AstReport::new(
             format!("Lowering error in {location}"),
             primary_loc,
             primary_label,
             contexts,
-        );
-        write_report(&report, f).map_err(|e| {
-            panic!("Could not write lowering report for {location}: {e}");
+        )
+    }
+}
+
+impl fmt::Display for LoweringReport {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let report = self.ast_report();
+        write_report(&report, f, false).map_err(|e| {
+            panic!("Could not write lowering report for {}: {e}", self.get_location());
         })?;
         Ok(())
     }

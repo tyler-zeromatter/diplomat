@@ -21,7 +21,7 @@ impl ContextLocation {
     }
 }
 
-pub(crate) struct AstReport {
+pub struct AstReport {
     title: String,
     primary_loc: Option<Span>,
     primary_label: String,
@@ -31,7 +31,7 @@ pub(crate) struct AstReport {
 }
 
 impl AstReport {
-    pub fn new(
+    pub(crate) fn new(
         title: String,
         primary_loc: Option<Span>,
         primary_label: String,
@@ -112,7 +112,19 @@ impl WriteReport for &mut std::fmt::Formatter<'_> {
     }
 }
 
-pub fn write_report(report : &AstReport, mut out : impl WriteReport) -> Result<(), String> {
+impl WriteReport for &mut String {
+    fn write_fmt(&mut self, args: std::fmt::Arguments<'_>) -> Result<(), String> {
+        std::fmt::Write::write_fmt(self, args).map_err(|e| e.to_string())
+    }
+    fn flush(&mut self) -> Result<(), String> {
+        Ok(())
+    }
+}
+
+pub fn write_report(report : &AstReport, mut out : impl WriteReport, 
+    // Only used when pretty-print feature is enabled:
+    #[allow(unused)]
+    force_ugly : bool) -> Result<(), String> {
     let span = report.primary_loc.as_ref();
     let src = if let Some(sp) = &span {
         match &sp.span_location {
@@ -149,8 +161,13 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport) -> Result<(
             );
         }
     }
+
+    #[allow(unused)]
+    let mut print_ugly = true;
+
     #[cfg(feature = "pretty-print")]
-    {
+    if !force_ugly {
+        print_ugly = false;
         use annotate_snippets::{renderer::DecorStyle, Level, Renderer, Snippet};
         let report = if let Some(sp) = span {
             use annotate_snippets::{Annotation, AnnotationKind};
@@ -168,7 +185,7 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport) -> Result<(
                     })
                     .annotation(
                         AnnotationKind::Primary
-                            .span(bytes_range.unwrap())
+                            .span(bytes_range.clone().unwrap())
                             .label(&report.primary_label),
                     )
                     .annotations(annotations),
@@ -181,8 +198,8 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport) -> Result<(
         let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
         writeln!(out, "{}", renderer.render(report))?;
     }
-    #[cfg(not(feature = "pretty-print"))]
-    {
+    
+    if print_ugly {
         let mut valid_excerpt = true;
         let (location, excerpt_pre, excerpt, excerpt_post) = if let Some(sp) = span {
             let range = bytes_range.unwrap();
@@ -259,7 +276,7 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport) -> Result<(
 
 pub(crate) fn create_report(report: AstReport) -> ! {
     let out = WRITER.read().unwrap()();
-    write_report(&report, out).expect("Could not write report");
+    write_report(&report, out, false).expect("Could not write report");
     // Rust-analyzer will not show error messages unless we panic,
     // This just tells rust-analyzer users to check stderr:
     panic!("Diplomat error: {} (check stderr for more)", report.title);

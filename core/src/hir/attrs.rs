@@ -1711,7 +1711,7 @@ mod tests {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
-                        writeln!(&mut output, "{err}").unwrap();
+                        crate::ast::write_report(&err.ast_report(), &mut output, true).unwrap();
                     }
                 }
             };

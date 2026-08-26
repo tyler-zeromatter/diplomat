@@ -911,9 +911,8 @@ impl TryInto<TraitId> for SymbolId {
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::SpanLocation;
+    use crate::ast::{SpanLocation, write_report};
     use crate::hir;
-    use std::fmt::Write;
 
     macro_rules! uitest_lowering {
         ($($file:tt)*) => {
@@ -929,7 +928,7 @@ mod tests {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
-                        writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                     }
                 }
             };
@@ -956,7 +955,9 @@ mod tests {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
-                        writeln!(&mut output, "{err}").unwrap();
+                        use std::fmt::Write;
+                        write_report(&err.ast_report(), &mut output, true).unwrap();
+                        writeln!(output, "");
                     }
                 }
             };
@@ -1384,7 +1385,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1424,7 +1425,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1466,7 +1467,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1504,7 +1505,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1549,7 +1550,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1589,7 +1590,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1719,7 +1720,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
@@ -1756,7 +1757,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(&err.ast_report(), &mut output, true).unwrap();
                 }
             }
         };
