@@ -517,8 +517,7 @@ impl TypeContext {
                         hir::ReturnType::Fallible(_, err) => {
                             let is_valid = if let Some(hir::Type::Enum(e)) = err {
                                 let e = self.resolve_enum(e.tcx_id);
-                                let is_valid =
-                                    e.variants.iter().find(|v| v.attrs.ffi_error);
+                                let is_valid = e.variants.iter().find(|v| v.attrs.ffi_error);
                                 is_valid.is_some()
                             } else {
                                 false
