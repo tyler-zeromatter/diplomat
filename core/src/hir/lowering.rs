@@ -302,8 +302,7 @@ impl<'ast> LoweringContext<'ast> {
 
     fn lower_enum(&mut self, item: ItemAndInfo<'ast, ast::Enum>) -> Result<EnumDef, ()> {
         let ast_enum = item.item;
-        self.errors
-            .set_item(ast_enum.name.as_str(), &ast_enum.name);
+        self.errors.set_item(ast_enum.name.as_str(), &ast_enum.name);
         let name = self.lower_ident(&ast_enum.name, "enum name");
         let attrs = self.attr_validator.attr_from_ast(
             &ast_enum.attrs,
