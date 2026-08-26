@@ -387,8 +387,8 @@ pub mod test {
         ) {
             Ok(context) => context,
             Err(e) => {
-                for (_cx, err) in e {
-                    eprintln!("Lowering error: {err}");
+                for err in e {
+                    eprintln!("{err}");
                 }
                 panic!("Failed to create context")
             }
