@@ -938,6 +938,33 @@ mod tests {
             });
         }
     }
+    
+    macro_rules! file_test_lowering {
+        ($file_name:expr) => {
+            let folder_pth_name = format!("src/hir/snapshots/span_testing");
+            let folder_pth = std::path::Path::new(&folder_pth_name);
+            let file_path = folder_pth.join($file_name);
+            
+            let st = std::fs::read_to_string(&file_path).expect("Could not read file.");
+            let parsed = syn::parse_str::<syn::File>(&st).expect("Could not read file");
+            
+            let mut attr_validator = hir::BasicAttributeValidator::new("tests");
+            attr_validator.support.option = true;
+            
+            let mut output = String::new();
+            match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &SpanLocation::FilePath(format!("{}/{}", folder_pth_name, $file_name))) {
+                Ok(_context) => (),
+                Err(e) => {
+                    for err in e {
+                        writeln!(&mut output, "{err}").unwrap();
+                    }
+                }
+            };
+            insta::with_settings!({}, {
+                insta::assert_snapshot!(output)
+            });  
+        };
+    }
 
     #[test]
     fn test_required_implied_bounds() {
@@ -1217,21 +1244,10 @@ mod tests {
             }
         };
     }
+
     #[test]
     fn test_struct_forbidden() {
-        uitest_lowering! {
-            #[diplomat::bridge]
-            mod ffi {
-                struct Crimes<'a> {
-                    slice1: &'a str,
-                    slice1: &'a DiplomatStr,
-                    slice2: &'a [u8],
-                    slice3: Box<str>,
-                    slice3: Box<DiplomatStr>,
-                    slice4: Box<[u8]>,
-                }
-            }
-        };
+        file_test_lowering!{"test_struct_forbidden.rs"};
     }
 
     #[test]
