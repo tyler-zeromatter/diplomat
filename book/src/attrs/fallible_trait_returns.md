@@ -1,5 +1,5 @@
 # Fallible Trait Returns
-{{get_supports("trait_returns_are_fallible")}}
+{{get_supports("trait_returns_must_be_fallible")}}
 
 For interpreted languages that with weak typing for variables, traits pose a problem:
 

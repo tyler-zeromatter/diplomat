@@ -510,7 +510,7 @@ impl TypeContext {
                 if ctx
                     .attr_validator
                     .attrs_supported()
-                    .trait_returns_are_fallible
+                    .trait_returns_must_be_fallible
                 {
                     match m.output.as_ref() {
                         hir::ReturnType::Infallible(hir::SuccessType::Unit) => {}
@@ -1952,7 +1952,7 @@ mod tests {
         let mut output = String::new();
 
         let mut attr_validator = hir::BasicAttributeValidator::new("tests");
-        attr_validator.support.trait_returns_are_fallible = true;
+        attr_validator.support.trait_returns_must_be_fallible = true;
         match hir::TypeContext::from_syn(
             &parsed,
             Default::default(),

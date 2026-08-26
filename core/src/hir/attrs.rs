@@ -66,7 +66,8 @@ pub struct Attrs {
     pub manually_disposable: bool,
     /// From #[diplomat::attr()]. If true, Diplomat will check that this struct has the same memory layout in backends which support it. Allows this struct to be used in slices ([`super::Slice::Struct`]) and to be borrowed in function parameters.
     pub abi_compatible: bool,
-    /// From #[diplomat::attr()]. If true, Diplomat will attempt to use the given type to flag backend specific errors (behavior depends on the type)
+    /// From #[diplomat::attr()]. If true, Diplomat will attempt to use the given type to flag backend specific errors.
+    /// Behavior depends on the given type or value.
     pub ffi_error: bool,
     /// From #[diplomat::attr()], found on structs. If true, Diplomat will allow &mut T references to the struct, and the backend may change the types of fields to better support mutation.
     pub mut_struct_ref: bool,
@@ -604,7 +605,7 @@ impl Attrs {
                             this.abi_compatible = true;
                         }
                         "ffi_error" => {
-                            if !support.trait_returns_are_fallible {
+                            if !support.trait_returns_must_be_fallible {
                                 maybe_error_unsupported(auto_found, "ffi_error", backend, errors);
                                 continue;
                             }
@@ -1416,7 +1417,7 @@ pub struct BackendAttrSupport {
     pub owned_byte_slice_returns: bool,
     /// If a trait method's return in a given backend has the possibility to always fail (with the exception of unit types).
     /// See https://github.com/rust-diplomat/diplomat/issues/1262
-    pub trait_returns_are_fallible: bool,
+    pub trait_returns_must_be_fallible: bool,
 }
 
 impl BackendAttrSupport {
@@ -1463,7 +1464,7 @@ impl BackendAttrSupport {
             tuples: true,
             opaque_slices: true,
             owned_byte_slice_returns: true,
-            trait_returns_are_fallible: true,
+            trait_returns_must_be_fallible: true,
         }
     }
 
@@ -1496,7 +1497,7 @@ impl BackendAttrSupport {
             "traits_are_sync" => Some(self.traits_are_sync),
             "manually_disposable" => Some(self.manually_disposable),
             "abi_compatibles" => Some(self.abi_compatibles),
-            "ffi_error" => Some(self.trait_returns_are_fallible),
+            "ffi_error" => Some(self.trait_returns_must_be_fallible),
             "struct_refs" => Some(self.struct_refs),
             "mut_struct_refs" => Some(self.mut_struct_refs),
             "free_functions" => Some(self.free_functions),
@@ -1660,7 +1661,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 tuples,
                 opaque_slices,
                 owned_byte_slice_returns,
-                trait_returns_are_fallible,
+                trait_returns_must_be_fallible,
             } = self.support;
             match value {
                 "namespacing" => namespacing,
@@ -1703,7 +1704,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 "tuples" => tuples,
                 "opaque_slices" => opaque_slices,
                 "owned_byte_slice_returns" => owned_byte_slice_returns,
-                "trait_returns_are_fallible" => trait_returns_are_fallible,
+                "trait_returns_must_be_fallible" => trait_returns_must_be_fallible,
                 _ => {
                     return Err(LoweringError::Other(format!(
                         "Unknown supports = value found: {value}"
