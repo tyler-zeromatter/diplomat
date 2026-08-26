@@ -224,7 +224,7 @@ impl TypeContext {
     ) -> Result<Self, Vec<ErrorAndContext>> {
         let types = ast::File::from_syn(s, include_info, entry_location).all_types();
         let (mut ctx, hir) = Self::from_ast_without_validation(&types, cfg, attr_validator)?;
-        ctx.errors.set_item("(validation)");
+        ctx.errors.set_item("(validation)", &None);
         hir.validate(&mut ctx.errors);
         if !ctx.errors.is_empty() {
             return Err(ctx.errors.take_errors());
@@ -248,11 +248,13 @@ impl TypeContext {
         let mut errors = ErrorStore::default();
 
         for (path, mod_env) in env.iter_modules() {
+            let opt = path.elements.last().and_then(|m| m.span());
             errors.set_item(
                 path.elements
                     .last()
                     .map(|m| m.as_str())
                     .unwrap_or("root module"),
+                    &opt,
             );
             let mod_attrs = Attrs::from_ast(
                 &mod_env.attrs,
@@ -419,12 +421,12 @@ impl TypeContext {
     fn validate<'hir>(&'hir self, errors: &mut ErrorStore<'hir>) {
         // Lifetime validity check
         for (_id, ty) in self.all_types() {
-            errors.set_item(ty.name().as_str());
+            errors.set_item(ty.name().as_str(), ty.span());
 
             self.validate_type_def(errors, ty);
 
             for method in ty.methods() {
-                errors.set_subitem(method.name.as_str());
+                errors.set_subitem(&method.name.as_str(), &method.name);
 
                 // This check must occur before validate_ty_in_method is called
                 // since validate_ty_in_method calls link_lifetimes which does not
@@ -497,7 +499,7 @@ impl TypeContext {
         }
 
         for (_id, def) in self.all_traits() {
-            errors.set_item(def.name.as_str());
+            errors.set_item(&def.name.as_str(), &def.name);
             self.validate_trait(errors, def);
         }
     }
@@ -926,8 +928,8 @@ mod tests {
             match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &SpanLocation::None) {
                 Ok(_context) => (),
                 Err(e) => {
-                    for (ctx, err) in e {
-                        writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                    for err in e {
+                        writeln!(&mut output, "{err}").unwrap();
                     }
                 }
             };
@@ -1365,8 +1367,8 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1405,8 +1407,8 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1447,8 +1449,8 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1485,8 +1487,8 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1530,8 +1532,8 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1570,8 +1572,8 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1700,8 +1702,8 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };
@@ -1737,8 +1739,8 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    writeln!(&mut output, "{err}").unwrap();
                 }
             }
         };

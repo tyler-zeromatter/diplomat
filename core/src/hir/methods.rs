@@ -26,7 +26,7 @@ pub struct Method {
     /// Documentation specified on the method
     pub docs: Docs,
     /// The name of the method as initially declared.
-    pub name: IdentBuf,
+    pub name: super::defs::Ident,
     /// The name of the generated `extern "C"` function
     pub abi_name: IdentBuf,
     /// The lifetimes introduced in this method and surrounding impl block.

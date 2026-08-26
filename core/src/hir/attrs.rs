@@ -1710,8 +1710,8 @@ mod tests {
             match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &crate::ast::SpanLocation::None) {
                 Ok(_context) => (),
                 Err(e) => {
-                    for (ctx, err) in e {
-                        writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                    for err in e {
+                        writeln!(&mut output, "{err}").unwrap();
                     }
                 }
             };
