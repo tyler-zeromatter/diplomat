@@ -13,7 +13,7 @@ pub enum ReturnableStructDef<'tcx> {
     OutStruct(&'tcx OutStructDef),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Ident(pub IdentBuf, pub(crate) Option<crate::ast::Span>);
 
 impl std::cmp::PartialEq<&'static str> for Ident {
