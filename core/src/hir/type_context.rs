@@ -963,7 +963,7 @@ mod tests {
                     for err in e {
                         use std::fmt::Write;
                         write_report(&err.ast_report(), &mut output, true).unwrap();
-                        writeln!(output, "");
+                        writeln!(output, "").unwrap();
                     }
                 }
             };

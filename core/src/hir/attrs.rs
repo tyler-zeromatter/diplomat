@@ -1697,7 +1697,6 @@ impl AttributeValidator for BasicAttributeValidator {
 #[cfg(test)]
 mod tests {
     use crate::hir;
-    use std::fmt::Write;
 
     macro_rules! uitest_lowering_attr {
         ($attrs:expr, $($file:tt)*) => {
