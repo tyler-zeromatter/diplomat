@@ -39,7 +39,7 @@ pub trait SomeTrait {
 }
 ```
 
-Diplomat will set `ErrorEnum` to `FFIError` if a cast to the Rust type cannot be made when `result_enum_okay` is called. Note that since you define your own return types, it is acceptable to re-use existing enums and mark them with `ffi_error`; however, it is recommended that you pick an enum variant which best communicates the `ffi_error` failure case.
+Diplomat will set `ErrorEnum` to `FFIError` if a cast to the Rust type cannot be made when `result_enum_okay` is called. Note that since you define your own return types, it is acceptable to re-use existing enum variants and mark them with `ffi_error`; however, it is recommended that you pick an enum variant which best communicates the `ffi_error` failure case.
 
 ### Plans to support
 Struct fields.
