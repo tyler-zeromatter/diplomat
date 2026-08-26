@@ -9,7 +9,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "OutStruct",
+            name: Ident(
+                "OutStruct",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             fields: [
                 StructField {
                     docs: Docs {
@@ -77,7 +93,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "new",
+                    name: Ident(
+                        "new",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "OutStruct_new",
                     lifetime_env: LifetimeEnv {
                         nodes: [
@@ -257,7 +289,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "Struct",
+            name: Ident(
+                "Struct",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             fields: [
                 StructField {
                     docs: Docs {
@@ -317,7 +365,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "rustc_elision",
+                    name: Ident(
+                        "rustc_elision",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Struct_rustc_elision",
                     lifetime_env: LifetimeEnv {
                         nodes: [
@@ -542,7 +606,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "Opaque",
+            name: Ident(
+                "Opaque",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             methods: [],
             attrs: Attrs {
                 disable: false,

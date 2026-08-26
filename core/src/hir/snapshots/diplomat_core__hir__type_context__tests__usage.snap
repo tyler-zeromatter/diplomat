@@ -10,7 +10,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "StructOptionUsedInReturn",
+            name: Ident(
+                "StructOptionUsedInReturn",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             fields: [
                 StructField {
                     docs: Docs {
@@ -111,7 +127,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "UsedInSlice",
+            name: Ident(
+                "UsedInSlice",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             fields: [
                 StructField {
                     docs: Docs {
@@ -316,14 +348,46 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "Opaque",
+            name: Ident(
+                "Opaque",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             methods: [
                 Method {
                     docs: Docs {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "used_in_option",
+                    name: Ident(
+                        "used_in_option",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_used_in_option",
                     lifetime_env: LifetimeEnv {
                         nodes: [],
@@ -444,7 +508,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "used_in_slice",
+                    name: Ident(
+                        "used_in_slice",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_used_in_slice",
                     lifetime_env: LifetimeEnv {
                         nodes: [
@@ -594,7 +674,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "struct_option_ret",
+                    name: Ident(
+                        "struct_option_ret",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_struct_option_ret",
                     lifetime_env: LifetimeEnv {
                         nodes: [],
@@ -657,7 +753,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "struct_result_ret",
+                    name: Ident(
+                        "struct_result_ret",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_struct_result_ret",
                     lifetime_env: LifetimeEnv {
                         nodes: [],
@@ -727,7 +839,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "option_result_ret",
+                    name: Ident(
+                        "option_result_ret",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_option_result_ret",
                     lifetime_env: LifetimeEnv {
                         nodes: [],
@@ -806,7 +934,23 @@ TypeContext {
                         lines: "",
                         rust_links: [],
                     },
-                    name: "callback_result",
+                    name: Ident(
+                        "callback_result",
+                        Some(
+                            Span {
+                                start: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                end: LineColumn {
+                                    line: 1,
+                                    col: 0,
+                                },
+                                range: 0..0,
+                                span_location: None,
+                            },
+                        ),
+                    ),
                     abi_name: "Opaque_callback_result",
                     lifetime_env: LifetimeEnv {
                         nodes: [],
@@ -988,7 +1132,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "OptionUsedInReturnOpaque",
+            name: Ident(
+                "OptionUsedInReturnOpaque",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             methods: [],
             attrs: Attrs {
                 disable: false,
@@ -1044,7 +1204,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "UsedInOptionOpaque",
+            name: Ident(
+                "UsedInOptionOpaque",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             methods: [],
             attrs: Attrs {
                 disable: false,
@@ -1176,7 +1352,23 @@ TypeContext {
                 lines: "",
                 rust_links: [],
             },
-            name: "UsedInSliceOpaque",
+            name: Ident(
+                "UsedInSliceOpaque",
+                Some(
+                    Span {
+                        start: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        end: LineColumn {
+                            line: 1,
+                            col: 0,
+                        },
+                        range: 0..0,
+                        span_location: None,
+                    },
+                ),
+            ),
             methods: [],
             attrs: Attrs {
                 disable: false,
