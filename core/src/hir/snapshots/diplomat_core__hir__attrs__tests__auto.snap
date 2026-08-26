@@ -4,6 +4,5 @@ expression: output
 ---
 Diplomat error: Lowering error in Opaque::auto_doesnt_work_on_renames
 > Diplomat attribute "rename" gated on 'auto' but is not one that works with 'auto'
-
 Diplomat error: Lowering error in Opaque::auto_doesnt_work_on_disables
 > Diplomat attribute "disable" gated on 'auto' but is not one that works with 'auto'
