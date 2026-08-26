@@ -515,26 +515,21 @@ impl TypeContext {
                     match m.output.as_ref() {
                         hir::ReturnType::Infallible(hir::SuccessType::Unit) => {}
                         hir::ReturnType::Fallible(_, err) => {
-                            let is_valid = if let Some(e) = err {
-                                match e {
-                                    hir::Type::Enum(e) => {
-                                        let e = self.resolve_enum(e.tcx_id);
-                                        let is_valid =
-                                            e.variants.iter().find(|v| v.attrs.ffi_error);
-                                        is_valid.is_some()
-                                    }
-                                    _ => false,
-                                }
+                            let is_valid = if let Some(hir::Type::Enum(e)) = err {
+                                let e = self.resolve_enum(e.tcx_id);
+                                let is_valid =
+                                    e.variants.iter().find(|v| v.attrs.ffi_error);
+                                is_valid.is_some()
                             } else {
                                 false
                             };
 
                             if !is_valid {
-                                ctx.errors.push(LoweringError::Other(format!("Found non #[diplomat::attr(*, ffi_error)] marked error type in trait return. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.")));
+                                ctx.errors.push(LoweringError::Other("Found non #[diplomat::attr(*, ffi_error)] marked error type in trait return. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
                             }
                         }
                         _ => {
-                            ctx.errors.push(LoweringError::Other(format!("Backend trait return types are fallible. Return type must either be a `-> Result<T, E>` or `-> ()`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.")));
+                            ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must either be a `-> Result<T, E>` or `-> ()`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
                         }
                     }
                 }
