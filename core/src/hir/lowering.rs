@@ -303,7 +303,7 @@ impl<'ast> LoweringContext<'ast> {
     fn lower_enum(&mut self, item: ItemAndInfo<'ast, ast::Enum>) -> Result<EnumDef, ()> {
         let ast_enum = item.item;
         self.errors
-            .set_item(&ast_enum.name.as_str(), &ast_enum.name);
+            .set_item(ast_enum.name.as_str(), &ast_enum.name);
         let name = self.lower_ident(&ast_enum.name, "enum name");
         let attrs = self.attr_validator.attr_from_ast(
             &ast_enum.attrs,
@@ -374,7 +374,7 @@ impl<'ast> LoweringContext<'ast> {
     fn lower_opaque(&mut self, item: ItemAndInfo<'ast, ast::OpaqueType>) -> Result<OpaqueDef, ()> {
         let ast_opaque = item.item;
         self.errors
-            .set_item(&ast_opaque.name.as_str(), &ast_opaque.name);
+            .set_item(ast_opaque.name.as_str(), &ast_opaque.name);
         let name = self.lower_ident(&ast_opaque.name, "opaque name");
         let dtor_abi_name = self.lower_ident(&ast_opaque.dtor_abi_name, "opaque dtor abi name");
 
@@ -420,7 +420,7 @@ impl<'ast> LoweringContext<'ast> {
     fn lower_struct(&mut self, item: ItemAndInfo<'ast, ast::Struct>) -> Result<StructDef, ()> {
         let ast_struct = item.item;
         self.errors
-            .set_item(&ast_struct.name.as_str(), &ast_struct.name);
+            .set_item(ast_struct.name.as_str(), &ast_struct.name);
         let struct_name = self.lower_ident(&ast_struct.name, "struct name")?;
 
         let mut fields = Ok(Vec::with_capacity(ast_struct.fields.len()));
@@ -519,7 +519,7 @@ impl<'ast> LoweringContext<'ast> {
     fn lower_trait(&mut self, item: ItemAndInfo<'ast, ast::Trait>) -> Result<TraitDef, ()> {
         let ast_trait = item.item;
         self.errors
-            .set_item(&ast_trait.name.as_str(), &ast_trait.name);
+            .set_item(ast_trait.name.as_str(), &ast_trait.name);
         let trait_name = self.lower_ident(&ast_trait.name, "trait name")?;
 
         let attrs = self.attr_validator.attr_from_ast(
@@ -583,7 +583,7 @@ impl<'ast> LoweringContext<'ast> {
         parent_trait_attrs: &Attrs,
     ) -> Result<Callback, ()> {
         self.errors
-            .set_subitem(&ast_trait_method.name.as_str(), &ast_trait_method.name);
+            .set_subitem(ast_trait_method.name.as_str(), &ast_trait_method.name);
         let name = ast_trait_method.name.clone();
         let self_param_ltl = SelfParamLifetimeLowerer::new(&ast_trait_method.lifetimes, self)?;
         let (param_self, mut param_ltl) =
@@ -629,7 +629,7 @@ impl<'ast> LoweringContext<'ast> {
         ast_function: ItemAndInfo<'ast, ast::Function>,
     ) -> Result<Method, ()> {
         self.errors
-            .set_item(&ast_function.item.name.as_str(), &ast_function.item.name);
+            .set_item(ast_function.item.name.as_str(), &ast_function.item.name);
         let name = ast_function.item.name.clone();
         let param_ltl = SelfParamLifetimeLowerer::no_self_ref(SelfParamLifetimeLowerer::new(
             &ast_function.item.lifetimes,
@@ -703,7 +703,7 @@ impl<'ast> LoweringContext<'ast> {
     ) -> Result<OutStructDef, ()> {
         let ast_out_struct = item.item;
         self.errors
-            .set_item(&ast_out_struct.name.as_str(), &ast_out_struct.name);
+            .set_item(ast_out_struct.name.as_str(), &ast_out_struct.name);
         let name = self.lower_ident(&ast_out_struct.name, "out-struct name");
 
         let attrs = self.attr_validator.attr_from_ast(
@@ -917,7 +917,7 @@ impl<'ast> LoweringContext<'ast> {
 
         let mut has_unnamed_constructor = false;
         for method in ast_methods {
-            self.errors.set_subitem(&method.name.as_str(), &method.name);
+            self.errors.set_subitem(method.name.as_str(), &method.name);
             let attrs = self.attr_validator.attr_from_ast(
                 &method.attrs,
                 method_parent_attrs,

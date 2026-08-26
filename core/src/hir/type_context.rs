@@ -426,7 +426,7 @@ impl TypeContext {
             self.validate_type_def(errors, ty);
 
             for method in ty.methods() {
-                errors.set_subitem(&method.name.as_str(), &method.name);
+                errors.set_subitem(method.name.as_str(), &method.name);
 
                 // This check must occur before validate_ty_in_method is called
                 // since validate_ty_in_method calls link_lifetimes which does not
@@ -499,7 +499,7 @@ impl TypeContext {
         }
 
         for (_id, def) in self.all_traits() {
-            errors.set_item(&def.name.as_str(), &def.name);
+            errors.set_item(def.name.as_str(), &def.name);
             self.validate_trait(errors, def);
         }
     }
