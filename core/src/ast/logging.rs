@@ -121,10 +121,12 @@ impl WriteReport for &mut String {
     }
 }
 
-pub fn write_report(report : &AstReport, mut out : impl WriteReport, 
+pub fn write_report(
+    report: &AstReport,
+    mut out: impl WriteReport,
     // Only used when pretty-print feature is enabled:
-    #[allow(unused)]
-    force_ugly : bool) -> Result<(), String> {
+    #[allow(unused)] force_ugly: bool,
+) -> Result<(), String> {
     let span = report.primary_loc.as_ref();
     let src = if let Some(sp) = &span {
         match &sp.span_location {
@@ -198,7 +200,7 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport,
         let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
         writeln!(out, "{}", renderer.render(report))?;
     }
-    
+
     if print_ugly {
         let mut valid_excerpt = true;
         let (location, excerpt_pre, excerpt, excerpt_post) = if let Some(sp) = span {
@@ -216,7 +218,8 @@ pub fn write_report(report : &AstReport, mut out : impl WriteReport,
             match sp.span_location {
                 SpanLocation::None => {
                     valid_excerpt = false;
-                    (span_location, "", "<Excerpt not available>", "")},
+                    (span_location, "", "<Excerpt not available>", "")
+                }
                 _ => (
                     format!("{span_location}:{start}:{col}"),
                     &src[range_pre..range.start],

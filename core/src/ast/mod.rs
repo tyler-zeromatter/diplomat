@@ -40,7 +40,7 @@ mod paths;
 pub use paths::Path;
 
 mod idents;
-pub use idents::{Ident, SpanLocation, Span};
+pub use idents::{Ident, Span, SpanLocation};
 
 mod docs;
 pub use docs::{DocType, Docs, RustLink, RustLinkDisplay};
@@ -49,4 +49,4 @@ mod macros;
 pub use macros::{MacroDef, MacroUse, Macros};
 
 pub(crate) mod logging;
-pub use logging::{AstReport, write_report};
+pub use logging::{write_report, AstReport};

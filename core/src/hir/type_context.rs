@@ -254,7 +254,7 @@ impl TypeContext {
                     .last()
                     .map(|m| m.as_str())
                     .unwrap_or("root module"),
-                    &opt,
+                &opt,
             );
             let mod_attrs = Attrs::from_ast(
                 &mod_env.attrs,
@@ -911,7 +911,7 @@ impl TryInto<TraitId> for SymbolId {
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::{SpanLocation, write_report};
+    use crate::ast::{write_report, SpanLocation};
     use crate::hir;
 
     macro_rules! uitest_lowering {
@@ -937,21 +937,27 @@ mod tests {
             });
         }
     }
-    
+
     macro_rules! file_test_lowering {
         ($file_name:expr) => {
             let folder_pth_name = format!("src/hir/snapshots/span_testing");
             let folder_pth = std::path::Path::new(&folder_pth_name);
             let file_path = folder_pth.join($file_name);
-            
+
             let st = std::fs::read_to_string(&file_path).expect("Could not read file.");
             let parsed = syn::parse_str::<syn::File>(&st).expect("Could not read file");
-            
+
             let mut attr_validator = hir::BasicAttributeValidator::new("tests");
             attr_validator.support.option = true;
-            
+
             let mut output = String::new();
-            match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &SpanLocation::FilePath(format!("{}/{}", folder_pth_name, $file_name))) {
+            match hir::TypeContext::from_syn(
+                &parsed,
+                Default::default(),
+                attr_validator,
+                None,
+                &SpanLocation::FilePath(format!("{}/{}", folder_pth_name, $file_name)),
+            ) {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
@@ -961,9 +967,7 @@ mod tests {
                     }
                 }
             };
-            insta::with_settings!({}, {
-                insta::assert_snapshot!(output)
-            });  
+            insta::with_settings!({}, { insta::assert_snapshot!(output) });
         };
     }
 
@@ -1248,7 +1252,7 @@ mod tests {
 
     #[test]
     fn test_struct_forbidden() {
-        file_test_lowering!{"test_struct_forbidden.rs"};
+        file_test_lowering! {"test_struct_forbidden.rs"};
     }
 
     #[test]
