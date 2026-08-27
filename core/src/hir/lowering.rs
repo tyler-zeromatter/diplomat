@@ -134,7 +134,7 @@ impl LoweringReport {
 impl fmt::Display for LoweringReport {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let report = self.ast_report();
-        write_report(&report, f, false).map_err(|e| {
+        write_report(&report, f, crate::ast::logging::PrettyPrint::Default).map_err(|e| {
             panic!(
                 "Could not write lowering report for {}: {e}",
                 self.get_location()

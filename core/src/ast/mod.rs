@@ -49,4 +49,4 @@ mod macros;
 pub use macros::{MacroDef, MacroUse, Macros};
 
 pub(crate) mod logging;
-pub use logging::{write_report, AstReport};
+pub use logging::{write_report, AstReport, PrettyPrint};

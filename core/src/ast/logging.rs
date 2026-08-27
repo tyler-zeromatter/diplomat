@@ -121,11 +121,18 @@ impl WriteReport for &mut String {
     }
 }
 
+pub enum PrettyPrint {
+    /// Attempt to use pretty printer first if feature enabled, fall back to ugly printer.
+    Default,
+    /// Even if pretty-printing is enabled, use the ugly printer (mostly for testing)
+    ForceUgly
+}
+
 pub fn write_report(
     report: &AstReport,
     mut out: impl WriteReport,
     // Only used when pretty-print feature is enabled:
-    #[allow(unused)] force_ugly: bool,
+    #[allow(unused)] force_ugly: PrettyPrint,
 ) -> Result<(), String> {
     let span = report.primary_loc.as_ref();
     let src = if let Some(sp) = &span {
@@ -164,12 +171,8 @@ pub fn write_report(
         }
     }
 
-    #[allow(unused)]
-    let mut print_ugly = true;
-
     #[cfg(feature = "pretty-print")]
-    if !force_ugly {
-        print_ugly = false;
+    if matches!(force_ugly, PrettyPrint::Default) {
         use annotate_snippets::{renderer::DecorStyle, Level, Renderer, Snippet};
         let report = if let Some(sp) = span {
             use annotate_snippets::{Annotation, AnnotationKind};
@@ -201,7 +204,8 @@ pub fn write_report(
         writeln!(out, "{}", renderer.render(report))?;
     }
 
-    if print_ugly {
+    // Either the pretty printer is disabled, or we're forced to use the ugly printer:
+    if !cfg!(feature = "pretty-print") || matches!(force_ugly, PrettyPrint::ForceUgly) {
         let mut valid_excerpt = true;
         let (location, excerpt_pre, excerpt, excerpt_post) = if let Some(sp) = span {
             let range = bytes_range.unwrap();
@@ -279,7 +283,7 @@ pub fn write_report(
 
 pub(crate) fn create_report(report: AstReport) -> ! {
     let out = WRITER.read().unwrap()();
-    write_report(&report, out, false).expect("Could not write report");
+    write_report(&report, out, PrettyPrint::ForceUgly).expect("Could not write report");
     // Rust-analyzer will not show error messages unless we panic,
     // This just tells rust-analyzer users to check stderr:
     panic!("Diplomat error: {} (check stderr for more)", report.title);

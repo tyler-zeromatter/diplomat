@@ -1710,7 +1710,7 @@ mod tests {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
-                        crate::ast::write_report(&err.ast_report(), &mut output, true).unwrap();
+                        crate::ast::write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                     }
                 }
             };

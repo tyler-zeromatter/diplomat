@@ -928,7 +928,7 @@ mod tests {
                 Ok(_context) => (),
                 Err(e) => {
                     for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                     }
                 }
             };
@@ -962,7 +962,7 @@ mod tests {
                 Err(e) => {
                     for err in e {
                         use std::fmt::Write;
-                        write_report(&err.ast_report(), &mut output, true).unwrap();
+                        write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                         writeln!(output, "").unwrap();
                     }
                 }
@@ -1389,7 +1389,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1429,7 +1429,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1471,7 +1471,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1509,7 +1509,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1554,7 +1554,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1594,7 +1594,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1724,7 +1724,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
@@ -1761,7 +1761,7 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    write_report(&err.ast_report(), &mut output, true).unwrap();
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                 }
             }
         };
