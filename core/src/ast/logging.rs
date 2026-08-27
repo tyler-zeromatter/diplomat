@@ -121,6 +121,7 @@ impl WriteReport for &mut String {
     }
 }
 
+#[non_exhaustive]
 pub enum PrettyPrint {
     /// Attempt to use pretty printer first if feature enabled, fall back to ugly printer.
     Default,
