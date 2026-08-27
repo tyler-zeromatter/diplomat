@@ -13,8 +13,14 @@ pub enum ReturnableStructDef<'tcx> {
     OutStruct(&'tcx OutStructDef),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Ident(pub IdentBuf, pub(crate) Option<crate::ast::Span>);
+
+impl<'a> Into<std::borrow::Cow<'a, Ident>> for &'a Ident {
+    fn into(self) -> std::borrow::Cow<'a, Ident> {
+        std::borrow::Cow::Borrowed(self)
+    }
+}
 
 impl std::cmp::PartialEq<&'static str> for Ident {
     fn eq(&self, other: &&'static str) -> bool {
@@ -310,6 +316,15 @@ impl<'a> From<&'a EnumDef> for TypeDef<'a> {
 
 impl<'tcx> TypeDef<'tcx> {
     pub fn name(&self) -> &'tcx IdentBuf {
+        match *self {
+            Self::Struct(ty) => &ty.name,
+            Self::OutStruct(ty) => &ty.name,
+            Self::Opaque(ty) => &ty.name,
+            Self::Enum(ty) => &ty.name,
+        }
+    }
+
+    pub fn loc_name(&self) -> &'tcx Ident {
         match *self {
             Self::Struct(ty) => &ty.name,
             Self::OutStruct(ty) => &ty.name,

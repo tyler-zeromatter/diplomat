@@ -16,6 +16,7 @@ mod type_context;
 mod types;
 pub use attrs::*;
 pub use defs::*;
+pub use defs::Ident as LocIdent;
 pub use docs::{Docs, DocsUrlGenerator, TypeReferenceSyntax as DocsTypeReferenceSyntax};
 pub(super) use elision::*;
 pub use lifetimes::*;
