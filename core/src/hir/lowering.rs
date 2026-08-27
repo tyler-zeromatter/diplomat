@@ -16,13 +16,33 @@ use core::fmt;
 use std::collections::HashMap;
 use strck::IntoCk;
 
+#[derive(Debug)]
+#[non_exhaustive]
+/// String holder to provide additional context to the LoweringError.
+pub enum LoweringErrorReason {
+    /// The HIR has read something that could be unsafe when executed.
+    Unsafe(String),
+    /// Anything not caught above.
+    Other(String),
+}
+
+impl fmt::Display for LoweringErrorReason {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LoweringErrorReason::Unsafe(s) => write!(f, "Safety issue: {s}"),
+            LoweringErrorReason::Other(s) => s.fmt(f)
+        }
+    }
+}
+
 /// An error from lowering the AST to the HIR.
+/// This provides location information.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum LoweringError {
     /// A field type is invalid in some way. The contained [`LoweringError`] has more specifics,
     /// this is to just demarcate where the field is for the error.
-    InvalidField(super::defs::Ident, Box<LoweringError>),
+    InvalidField(super::defs::Ident, LoweringErrorReason),
     /// The purpose of having this is that translating to the HIR has enormous
     /// potential for really detailed error handling and giving suggestions.
     ///
@@ -31,6 +51,7 @@ pub enum LoweringError {
     /// written, we ctrl+F for `"LoweringError::Other"` in the lowering code, and turn every
     /// instance into an specialized enum variant, generalizing where possible
     /// without losing any information.
+    /// Currently in the process of being phased out (will be replaced with LoweringError::Generic(LoweringErrorReason))
     Other(String),
 }
 
@@ -437,9 +458,7 @@ impl<'ast> LoweringContext<'ast> {
                     let ffisafe = ty.ffi_safe_version();
                     self.errors.push(LoweringError::InvalidField(
                         super::defs::Ident::new(name.clone(), field_name.span()),
-                        Box::new(LoweringError::Other(format!(
-                            "{ty} is FFI-unsafe, consider using {ffisafe}",
-                        ))),
+                        LoweringErrorReason::Unsafe(format!("{ty} is FFI-unsafe, consider using {ffisafe}")),
                     ));
                 }
                 let ty = self.lower_type::<Everywhere>(
