@@ -17,6 +17,7 @@ pub struct LineColumn {
 
 /// Equivalent to `proc_macro2::Span`.
 #[derive(Hash, Eq, PartialEq, Serialize, Clone, Debug)]
+#[non_exhaustive]
 pub struct Span {
     pub start: LineColumn,
     pub end: LineColumn,

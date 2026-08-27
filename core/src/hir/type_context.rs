@@ -224,7 +224,7 @@ impl TypeContext {
     ) -> Result<Self, Vec<ErrorAndContext>> {
         let types = ast::File::from_syn(s, include_info, entry_location).all_types();
         let (mut ctx, hir) = Self::from_ast_without_validation(&types, cfg, attr_validator)?;
-        ctx.errors.set_item("(validation)");
+        ctx.errors.set_item("(validation)", &None);
         hir.validate(&mut ctx.errors);
         if !ctx.errors.is_empty() {
             return Err(ctx.errors.take_errors());
@@ -248,11 +248,13 @@ impl TypeContext {
         let mut errors = ErrorStore::default();
 
         for (path, mod_env) in env.iter_modules() {
+            let opt = path.elements.last().and_then(|m| m.span());
             errors.set_item(
                 path.elements
                     .last()
                     .map(|m| m.as_str())
                     .unwrap_or("root module"),
+                &opt,
             );
             let mod_attrs = Attrs::from_ast(
                 &mod_env.attrs,
@@ -419,12 +421,12 @@ impl TypeContext {
     fn validate<'hir>(&'hir self, errors: &mut ErrorStore<'hir>) {
         // Lifetime validity check
         for (_id, ty) in self.all_types() {
-            errors.set_item(ty.name().as_str());
+            errors.set_item(ty.name().as_str(), ty.span());
 
             self.validate_type_def(errors, ty);
 
             for method in ty.methods() {
-                errors.set_subitem(method.name.as_str());
+                errors.set_subitem(method.name.as_str(), &method.name);
 
                 // This check must occur before validate_ty_in_method is called
                 // since validate_ty_in_method calls link_lifetimes which does not
@@ -497,7 +499,7 @@ impl TypeContext {
         }
 
         for (_id, def) in self.all_traits() {
-            errors.set_item(def.name.as_str());
+            errors.set_item(def.name.as_str(), &def.name);
             self.validate_trait(errors, def);
         }
     }
@@ -909,9 +911,8 @@ impl TryInto<TraitId> for SymbolId {
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::SpanLocation;
+    use crate::ast::{write_report, SpanLocation};
     use crate::hir;
-    use std::fmt::Write;
 
     macro_rules! uitest_lowering {
         ($($file:tt)*) => {
@@ -926,8 +927,8 @@ mod tests {
             match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &SpanLocation::None) {
                 Ok(_context) => (),
                 Err(e) => {
-                    for (ctx, err) in e {
-                        writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                    for err in e {
+                    write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                     }
                 }
             };
@@ -935,6 +936,44 @@ mod tests {
                 insta::assert_snapshot!(output)
             });
         }
+    }
+
+    macro_rules! file_test_lowering {
+        ($file_name:expr) => {
+            let folder_pth_name = format!("src/hir/snapshots/span_testing");
+            let folder_pth = std::path::Path::new(&folder_pth_name);
+            let file_path = folder_pth.join($file_name);
+
+            let st = std::fs::read_to_string(&file_path).expect("Could not read file.");
+            let parsed = syn::parse_str::<syn::File>(&st).expect("Could not read file");
+
+            let mut attr_validator = hir::BasicAttributeValidator::new("tests");
+            attr_validator.support.option = true;
+
+            let mut output = String::new();
+            match hir::TypeContext::from_syn(
+                &parsed,
+                Default::default(),
+                attr_validator,
+                None,
+                &SpanLocation::FilePath(format!("{}/{}", folder_pth_name, $file_name)),
+            ) {
+                Ok(_context) => (),
+                Err(e) => {
+                    for err in e {
+                        use std::fmt::Write;
+                        write_report(
+                            &err.ast_report(),
+                            &mut output,
+                            crate::ast::logging::PrettyPrint::ForceUgly,
+                        )
+                        .unwrap();
+                        writeln!(output, "").unwrap();
+                    }
+                }
+            };
+            insta::with_settings!({}, { insta::assert_snapshot!(output) });
+        };
     }
 
     #[test]
@@ -1215,21 +1254,10 @@ mod tests {
             }
         };
     }
+
     #[test]
     fn test_struct_forbidden() {
-        uitest_lowering! {
-            #[diplomat::bridge]
-            mod ffi {
-                struct Crimes<'a> {
-                    slice1: &'a str,
-                    slice1: &'a DiplomatStr,
-                    slice2: &'a [u8],
-                    slice3: Box<str>,
-                    slice3: Box<DiplomatStr>,
-                    slice4: Box<[u8]>,
-                }
-            }
-        };
+        file_test_lowering! {"test_struct_forbidden.rs"};
     }
 
     #[test]
@@ -1365,8 +1393,13 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1405,8 +1438,13 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1447,8 +1485,13 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1485,8 +1528,13 @@ mod tests {
         ) {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1530,8 +1578,13 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1570,8 +1623,13 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1700,8 +1758,13 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
@@ -1737,8 +1800,13 @@ mod tests {
         {
             Ok(_context) => (),
             Err(e) => {
-                for (ctx, err) in e {
-                    writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };

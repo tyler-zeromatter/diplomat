@@ -1697,7 +1697,6 @@ impl AttributeValidator for BasicAttributeValidator {
 #[cfg(test)]
 mod tests {
     use crate::hir;
-    use std::fmt::Write;
 
     macro_rules! uitest_lowering_attr {
         ($attrs:expr, $($file:tt)*) => {
@@ -1710,8 +1709,8 @@ mod tests {
             match hir::TypeContext::from_syn(&parsed, Default::default(), attr_validator, None, &crate::ast::SpanLocation::None) {
                 Ok(_context) => (),
                 Err(e) => {
-                    for (ctx, err) in e {
-                        writeln!(&mut output, "Lowering error in {ctx}: {err}").unwrap();
+                    for err in e {
+                        crate::ast::write_report(&err.ast_report(), &mut output, crate::ast::logging::PrettyPrint::ForceUgly).unwrap();
                     }
                 }
             };

@@ -134,8 +134,8 @@ pub fn gen(
         &diplomat_core::ast::SpanLocation::FilePath(entry_parent.to_string_lossy().into()),
     )
     .unwrap_or_else(|e| {
-        for (ctx, err) in e {
-            eprintln!("Lowering error in {ctx}: {err}");
+        for err in e {
+            eprintln!("{err}");
         }
         std::process::exit(1);
     });

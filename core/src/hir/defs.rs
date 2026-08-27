@@ -13,6 +13,34 @@ pub enum ReturnableStructDef<'tcx> {
     OutStruct(&'tcx OutStructDef),
 }
 
+#[derive(Debug)]
+pub struct Ident(pub IdentBuf, pub(crate) Option<crate::ast::Span>);
+
+impl std::cmp::PartialEq<&'static str> for Ident {
+    fn eq(&self, other: &&'static str) -> bool {
+        self.0.eq(other)
+    }
+}
+
+impl std::fmt::Display for Ident {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl Ident {
+    pub(crate) fn new(name: IdentBuf, span: Option<crate::ast::Span>) -> Self {
+        Self(name, span)
+    }
+}
+
+impl std::ops::Deref for Ident {
+    type Target = IdentBuf;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 pub enum TypeDef<'tcx> {
@@ -27,7 +55,7 @@ pub enum TypeDef<'tcx> {
 pub struct TraitDef {
     // TyPosition: InputOnly
     pub docs: Docs,
-    pub name: IdentBuf,
+    pub name: Ident,
     pub methods: Vec<Callback>,
     pub attrs: Attrs,
     pub lifetimes: LifetimeEnv,
@@ -42,7 +70,7 @@ pub type OutStructDef = StructDef<OutputOnly>;
 #[non_exhaustive]
 pub struct StructDef<P: TyPosition = Everywhere> {
     pub docs: Docs,
-    pub name: IdentBuf,
+    pub name: Ident,
     pub fields: Vec<StructField<P>>,
     pub methods: Vec<Method>,
     pub attrs: Attrs,
@@ -63,7 +91,7 @@ pub struct StructDef<P: TyPosition = Everywhere> {
 #[non_exhaustive]
 pub struct OpaqueDef {
     pub docs: Docs,
-    pub name: IdentBuf,
+    pub name: Ident,
     pub methods: Vec<Method>,
     pub attrs: Attrs,
     pub lifetimes: LifetimeEnv,
@@ -79,7 +107,7 @@ pub struct OpaqueDef {
 #[non_exhaustive]
 pub struct EnumDef {
     pub docs: Docs,
-    pub name: IdentBuf,
+    pub name: Ident,
     pub variants: Vec<EnumVariant>,
     pub methods: Vec<Method>,
     pub attrs: Attrs,
@@ -179,7 +207,7 @@ pub struct EnumVariant {
 impl TraitDef {
     pub(super) fn new(
         docs: Docs,
-        name: IdentBuf,
+        name: Ident,
         methods: Vec<Callback>,
         attrs: Attrs,
         lifetimes: LifetimeEnv,
@@ -198,7 +226,7 @@ impl TraitDef {
 impl<P: TyPosition> StructDef<P> {
     pub(super) fn new(
         docs: Docs,
-        name: IdentBuf,
+        name: Ident,
         fields: Vec<StructField<P>>,
         methods: Vec<Method>,
         attrs: Attrs,
@@ -221,7 +249,7 @@ impl<P: TyPosition> StructDef<P> {
 impl OpaqueDef {
     pub(super) fn new(
         docs: Docs,
-        name: IdentBuf,
+        name: Ident,
         methods: Vec<Method>,
         attrs: Attrs,
         lifetimes: LifetimeEnv,
@@ -244,7 +272,7 @@ impl OpaqueDef {
 impl EnumDef {
     pub(super) fn new(
         docs: Docs,
-        name: IdentBuf,
+        name: Ident,
         variants: Vec<EnumVariant>,
         methods: Vec<Method>,
         attrs: Attrs,
@@ -287,6 +315,15 @@ impl<'tcx> TypeDef<'tcx> {
             Self::OutStruct(ty) => &ty.name,
             Self::Opaque(ty) => &ty.name,
             Self::Enum(ty) => &ty.name,
+        }
+    }
+
+    pub fn span(&self) -> &'tcx Option<crate::ast::Span> {
+        match *self {
+            Self::Struct(ty) => &ty.name.1,
+            Self::OutStruct(ty) => &ty.name.1,
+            Self::Opaque(ty) => &ty.name.1,
+            Self::Enum(ty) => &ty.name.1,
         }
     }
 

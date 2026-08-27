@@ -9,6 +9,7 @@ use super::{
     TraitParamSelf, TraitPath, TyPosition, Type, TypeDef, TypeId,
 };
 use crate::ast::attrs::AttrInheritContext;
+use crate::ast::logging::write_report;
 use crate::hir::{Docs, StructPathLike, SymbolId, TypingUseInfo};
 use crate::{ast, Env};
 use core::fmt;
@@ -16,6 +17,7 @@ use std::collections::HashMap;
 use strck::IntoCk;
 
 /// An error from lowering the AST to the HIR.
+/// This provides location information.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum LoweringError {
@@ -38,26 +40,12 @@ impl fmt::Display for LoweringError {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Clone, Default, Debug)]
 pub struct ErrorContext {
+    location: Option<crate::ast::Span>,
+    // Old Lowering Error setup (since the span may not always be present):
     item: String,
     subitem: Option<String>,
-}
-
-impl fmt::Display for ErrorContext {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Some(ref subitem) = self.subitem {
-            write!(f, "{}::{subitem}", self.item)
-        } else {
-            self.item.fmt(f)
-        }
-    }
-}
-
-impl fmt::Debug for ErrorContext {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(self, f)
-    }
 }
 
 /// An error store, which one can push errors to. It keeps track of the
@@ -71,9 +59,53 @@ pub struct ErrorStore<'tree> {
     item: &'tree str,
     /// The current sub-item context (methods, etc)
     subitem: Option<&'tree str>,
+    location: Option<crate::ast::Span>,
 }
 
-pub type ErrorAndContext = (ErrorContext, LoweringError);
+#[derive(Debug)]
+pub struct LoweringReport {
+    context: ErrorContext,
+    error: LoweringError,
+}
+
+impl LoweringReport {
+    pub fn get_location(&self) -> String {
+        format!(
+            "{}{}",
+            self.context.item,
+            if let Some(s) = &self.context.subitem {
+                format!("::{}", s)
+            } else {
+                "".into()
+            }
+        )
+    }
+    pub fn ast_report(&self) -> crate::ast::logging::AstReport {
+        let location = self.get_location();
+
+        ast::logging::AstReport::new(
+            format!("Lowering error in {location}"),
+            self.context.location.clone(),
+            format!("{}", self.error),
+            vec![],
+        )
+    }
+}
+
+impl fmt::Display for LoweringReport {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let report = self.ast_report();
+        write_report(&report, f, crate::ast::logging::PrettyPrint::Default).map_err(|e| {
+            panic!(
+                "Could not write lowering report for {}: {e}",
+                self.get_location()
+            );
+        })?;
+        Ok(())
+    }
+}
+
+pub type ErrorAndContext = LoweringReport;
 
 /// Where a type was found
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -83,14 +115,37 @@ enum TypeLoweringContext {
     Method,
 }
 
+pub(crate) trait ReportContext {
+    fn to_span(&self) -> Option<crate::ast::Span>;
+}
+
+impl ReportContext for ast::Ident {
+    fn to_span(&self) -> Option<crate::ast::Span> {
+        self.span()
+    }
+}
+
+impl ReportContext for super::defs::Ident {
+    fn to_span(&self) -> Option<crate::ast::Span> {
+        self.1.clone()
+    }
+}
+
+impl ReportContext for Option<crate::ast::Span> {
+    fn to_span(&self) -> Option<crate::ast::Span> {
+        self.clone()
+    }
+}
+
 impl<'tree> ErrorStore<'tree> {
     /// Push an error to the error store
     pub fn push(&mut self, error: LoweringError) {
         let context = ErrorContext {
             item: self.item.into(),
             subitem: self.subitem.map(|s| s.into()),
+            location: self.location.clone(),
         };
-        self.errors.push((context, error));
+        self.errors.push(LoweringReport { context, error });
     }
 
     pub(super) fn take_errors(&mut self) -> Vec<ErrorAndContext> {
@@ -101,12 +156,15 @@ impl<'tree> ErrorStore<'tree> {
         self.errors.is_empty()
     }
 
-    pub(super) fn set_item(&mut self, item: &'tree str) {
+    pub(super) fn set_item(&mut self, item: &'tree str, ctx: &dyn ReportContext) {
         self.item = item;
         self.subitem = None;
+        self.location = ctx.to_span();
     }
-    pub(super) fn set_subitem(&mut self, subitem: &'tree str) {
+
+    pub(super) fn set_subitem(&mut self, subitem: &'tree str, ctx: &dyn ReportContext) {
         self.subitem = Some(subitem);
+        self.location = ctx.to_span();
     }
 }
 
@@ -226,7 +284,7 @@ impl<'ast> LoweringContext<'ast> {
 
     fn lower_enum(&mut self, item: ItemAndInfo<'ast, ast::Enum>) -> Result<EnumDef, ()> {
         let ast_enum = item.item;
-        self.errors.set_item(ast_enum.name.as_str());
+        self.errors.set_item(ast_enum.name.as_str(), &ast_enum.name);
         let name = self.lower_ident(&ast_enum.name, "enum name");
         let attrs = self.attr_validator.attr_from_ast(
             &ast_enum.attrs,
@@ -278,7 +336,7 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            name?,
+            super::defs::Ident::new(name?, ast_enum.name.span()),
             variants?,
             methods,
             attrs,
@@ -296,7 +354,8 @@ impl<'ast> LoweringContext<'ast> {
 
     fn lower_opaque(&mut self, item: ItemAndInfo<'ast, ast::OpaqueType>) -> Result<OpaqueDef, ()> {
         let ast_opaque = item.item;
-        self.errors.set_item(ast_opaque.name.as_str());
+        self.errors
+            .set_item(ast_opaque.name.as_str(), &ast_opaque.name);
         let name = self.lower_ident(&ast_opaque.name, "opaque name");
         let dtor_abi_name = self.lower_ident(&ast_opaque.dtor_abi_name, "opaque dtor abi name");
 
@@ -324,7 +383,7 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            name?,
+            super::defs::Ident::new(name?, ast_opaque.name.span()),
             methods,
             attrs,
             lifetimes?,
@@ -341,7 +400,8 @@ impl<'ast> LoweringContext<'ast> {
 
     fn lower_struct(&mut self, item: ItemAndInfo<'ast, ast::Struct>) -> Result<StructDef, ()> {
         let ast_struct = item.item;
-        self.errors.set_item(ast_struct.name.as_str());
+        self.errors
+            .set_item(ast_struct.name.as_str(), &ast_struct.name);
         let struct_name = self.lower_ident(&ast_struct.name, "struct name")?;
 
         let mut fields = Ok(Vec::with_capacity(ast_struct.fields.len()));
@@ -353,12 +413,12 @@ impl<'ast> LoweringContext<'ast> {
         );
         // Only compute fields if the type isn't disabled, otherwise we may encounter forbidden types
         if !attrs.disable {
-            for (name, ty, docs, attrs) in ast_struct.fields.iter() {
-                let name = self.lower_ident(name, "struct field name")?;
+            for (field_name, ty, docs, attrs) in ast_struct.fields.iter() {
+                let name = self.lower_ident(field_name, "struct field name")?;
                 if !ty.is_ffi_safe() {
                     let ffisafe = ty.ffi_safe_version();
                     self.errors.push(LoweringError::Other(format!(
-                        "Found FFI-unsafe type {ty} in struct field {struct_name}.{name}, consider using {ffisafe}",
+                        "{ty} is FFI-unsafe, consider using {ffisafe}"
                     )));
                 }
                 let ty = self.lower_type::<Everywhere>(
@@ -418,7 +478,7 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            struct_name,
+            super::defs::Ident::new(struct_name, ast_struct.name.span()),
             fields?,
             methods,
             attrs,
@@ -436,7 +496,8 @@ impl<'ast> LoweringContext<'ast> {
 
     fn lower_trait(&mut self, item: ItemAndInfo<'ast, ast::Trait>) -> Result<TraitDef, ()> {
         let ast_trait = item.item;
-        self.errors.set_item(ast_trait.name.as_str());
+        self.errors
+            .set_item(ast_trait.name.as_str(), &ast_trait.name);
         let trait_name = self.lower_ident(&ast_trait.name, "trait name")?;
 
         let attrs = self.attr_validator.attr_from_ast(
@@ -482,7 +543,7 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            trait_name,
+            super::defs::Ident::new(trait_name, ast_trait.name.span()),
             fcts,
             attrs,
             lifetimes?,
@@ -499,7 +560,8 @@ impl<'ast> LoweringContext<'ast> {
         in_path: &ast::Path,
         parent_trait_attrs: &Attrs,
     ) -> Result<Callback, ()> {
-        self.errors.set_subitem(ast_trait_method.name.as_str());
+        self.errors
+            .set_subitem(ast_trait_method.name.as_str(), &ast_trait_method.name);
         let name = ast_trait_method.name.clone();
         let self_param_ltl = SelfParamLifetimeLowerer::new(&ast_trait_method.lifetimes, self)?;
         let (param_self, mut param_ltl) =
@@ -544,7 +606,8 @@ impl<'ast> LoweringContext<'ast> {
         &mut self,
         ast_function: ItemAndInfo<'ast, ast::Function>,
     ) -> Result<Method, ()> {
-        self.errors.set_item(ast_function.item.name.as_str());
+        self.errors
+            .set_item(ast_function.item.name.as_str(), &ast_function.item.name);
         let name = ast_function.item.name.clone();
         let param_ltl = SelfParamLifetimeLowerer::no_self_ref(SelfParamLifetimeLowerer::new(
             &ast_function.item.lifetimes,
@@ -594,7 +657,10 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            name: self.lower_ident(&name, "function name")?,
+            name: super::defs::Ident::new(
+                self.lower_ident(&name, "function name")?,
+                ast_function.item.name.span(),
+            ),
             abi_name: self.lower_ident(&ast_function.item.abi_name, "function abi name")?,
             lifetime_env,
             param_self: None,
@@ -614,7 +680,8 @@ impl<'ast> LoweringContext<'ast> {
         item: ItemAndInfo<'ast, ast::Struct>,
     ) -> Result<OutStructDef, ()> {
         let ast_out_struct = item.item;
-        self.errors.set_item(ast_out_struct.name.as_str());
+        self.errors
+            .set_item(ast_out_struct.name.as_str(), &ast_out_struct.name);
         let name = self.lower_ident(&ast_out_struct.name, "out-struct name");
 
         let attrs = self.attr_validator.attr_from_ast(
@@ -677,7 +744,7 @@ impl<'ast> LoweringContext<'ast> {
                 self.attr_validator.as_ref(),
                 &mut self.errors,
             ),
-            name?,
+            super::defs::Ident::new(name?, ast_out_struct.name.span()),
             fields?,
             methods,
             attrs,
@@ -733,7 +800,7 @@ impl<'ast> LoweringContext<'ast> {
 
         let mut hir_method = Method {
             docs: Docs::from_ast(&method.docs, self.attr_validator.as_ref(), &mut self.errors),
-            name: name?,
+            name: super::defs::Ident::new(name?, method.name.span()),
             abi_name,
             lifetime_env,
             param_self,
@@ -828,7 +895,7 @@ impl<'ast> LoweringContext<'ast> {
 
         let mut has_unnamed_constructor = false;
         for method in ast_methods {
-            self.errors.set_subitem(method.name.as_str());
+            self.errors.set_subitem(method.name.as_str(), &method.name);
             let attrs = self.attr_validator.attr_from_ast(
                 &method.attrs,
                 method_parent_attrs,

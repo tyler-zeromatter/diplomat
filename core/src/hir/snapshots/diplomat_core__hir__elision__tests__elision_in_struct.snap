@@ -7,7 +7,23 @@ Method {
         lines: "",
         rust_links: [],
     },
-    name: "elided",
+    name: Ident(
+        "elided",
+        Some(
+            Span {
+                start: LineColumn {
+                    line: 1,
+                    col: 0,
+                },
+                end: LineColumn {
+                    line: 1,
+                    col: 0,
+                },
+                range: 0..0,
+                span_location: None,
+            },
+        ),
+    ),
     abi_name: "Opaque_elided",
     lifetime_env: LifetimeEnv {
         nodes: [],
