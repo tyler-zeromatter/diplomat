@@ -6,22 +6,22 @@ Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:4:9:
 ...slice1: &'a...
    ^^^^^^
-In field slice1: &'a str is FFI-unsafe, consider using DiplomatUtf8Str<'a>
+In field slice1: Safety issue: &'a str is FFI-unsafe, consider using DiplomatUtf8Str<'a>
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:5:9:
 ...slice1: &'a...
    ^^^^^^
-In field slice1: &'a DiplomatStr is FFI-unsafe, consider using DiplomatStrSlice<'a>
+In field slice1: Safety issue: &'a DiplomatStr is FFI-unsafe, consider using DiplomatStrSlice<'a>
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:6:9:
 ...slice2: &'a...
    ^^^^^^
-In field slice2: &'a [u8] is FFI-unsafe, consider using DiplomatSlice<'a,u8>
+In field slice2: Safety issue: &'a [u8] is FFI-unsafe, consider using DiplomatSlice<'a,u8>
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:7:9:
 ...slice3: Box...
    ^^^^^^
-In field slice3: Box<str> is FFI-unsafe, consider using DiplomatOwnedUtf8Str
+In field slice3: Safety issue: Box<str> is FFI-unsafe, consider using DiplomatOwnedUtf8Str
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:3:12:
 ...ruct Crimes<'a>...
@@ -31,7 +31,7 @@ Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:8:9:
 ...slice3: Box...
    ^^^^^^
-In field slice3: Box<DiplomatStr> is FFI-unsafe, consider using DiplomatOwnedStrSlice
+In field slice3: Safety issue: Box<DiplomatStr> is FFI-unsafe, consider using DiplomatOwnedStrSlice
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:3:12:
 ...ruct Crimes<'a>...
@@ -41,7 +41,7 @@ Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:9:9:
 ...slice4: Box...
    ^^^^^^
-In field slice4: Box<[u8]> is FFI-unsafe, consider using Box<[u8]>
+In field slice4: Safety issue: Box<[u8]> is FFI-unsafe, consider using Box<[u8]>
 Diplomat error: Lowering error in Crimes
 In src/hir/snapshots/span_testing/test_struct_forbidden.rs:3:12:
 ...ruct Crimes<'a>...

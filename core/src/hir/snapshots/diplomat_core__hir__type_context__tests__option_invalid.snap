@@ -3,7 +3,7 @@ source: core/src/hir/type_context.rs
 expression: output
 ---
 Diplomat error: Lowering error in Foo
-> In field field: Option<u8> is FFI-unsafe, consider using DiplomatOption<u8>
+> In field field: Safety issue: Option<u8> is FFI-unsafe, consider using DiplomatOption<u8>
 Diplomat error: Lowering error in Foo
 > Found Option<T> for primitive T in a struct field, please use DiplomatOption<T>
 Diplomat error: Lowering error in Foo::do_thing
