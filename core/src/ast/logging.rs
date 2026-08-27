@@ -125,7 +125,7 @@ pub enum PrettyPrint {
     /// Attempt to use pretty printer first if feature enabled, fall back to ugly printer.
     Default,
     /// Even if pretty-printing is enabled, use the ugly printer (mostly for testing)
-    ForceUgly
+    ForceUgly,
 }
 
 pub fn write_report(

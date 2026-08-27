@@ -30,7 +30,7 @@ impl fmt::Display for LoweringErrorReason {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             LoweringErrorReason::Unsafe(s) => write!(f, "Safety issue: {s}"),
-            LoweringErrorReason::Other(s) => s.fmt(f)
+            LoweringErrorReason::Other(s) => s.fmt(f),
         }
     }
 }
@@ -458,7 +458,9 @@ impl<'ast> LoweringContext<'ast> {
                     let ffisafe = ty.ffi_safe_version();
                     self.errors.push(LoweringError::InvalidField(
                         super::defs::Ident::new(name.clone(), field_name.span()),
-                        LoweringErrorReason::Unsafe(format!("{ty} is FFI-unsafe, consider using {ffisafe}")),
+                        LoweringErrorReason::Unsafe(format!(
+                            "{ty} is FFI-unsafe, consider using {ffisafe}"
+                        )),
                     ));
                 }
                 let ty = self.lower_type::<Everywhere>(
