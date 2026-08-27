@@ -42,7 +42,7 @@ impl fmt::Display for LoweringErrorReason {
 pub enum LoweringError {
     /// A field type is invalid in some way. The contained [`LoweringError`] has more specifics,
     /// this is to just demarcate where the field is for the error.
-    InvalidField(super::defs::Ident, LoweringErrorReason),
+    InvalidField(Box<super::defs::Ident>, LoweringErrorReason),
     /// The purpose of having this is that translating to the HIR has enormous
     /// potential for really detailed error handling and giving suggestions.
     ///
@@ -457,7 +457,7 @@ impl<'ast> LoweringContext<'ast> {
                 if !ty.is_ffi_safe() {
                     let ffisafe = ty.ffi_safe_version();
                     self.errors.push(LoweringError::InvalidField(
-                        super::defs::Ident::new(name.clone(), field_name.span()),
+                        Box::new(super::defs::Ident::new(name.clone(), field_name.span())),
                         LoweringErrorReason::Unsafe(format!(
                             "{ty} is FFI-unsafe, consider using {ffisafe}"
                         )),
