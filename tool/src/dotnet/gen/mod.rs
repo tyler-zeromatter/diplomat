@@ -236,7 +236,7 @@ impl<'ctx, 'tcx> ItemGenContext<'ctx, 'tcx> {
             }
             let display_name = self.formatter.fmt_type_name(id).into_owned();
             // Attribute any diagnostic pushed while lowering this type to it.
-            let _guard = self.errors.set_context_ty(display_name.clone().into());
+            let _guard = self.errors.set_context_ty(ty.loc_name().into());
             // `None` means an unsupported shape (diagnostic already recorded);
             // the end-gate in `lib.rs` aborts before any file is written.
             let Some(prepared) = self.prepare_type(display_name, ty) else {

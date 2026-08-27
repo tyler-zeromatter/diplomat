@@ -230,16 +230,16 @@ impl FileMap {
 #[derive(Default)]
 pub struct ErrorStore<'tcx, E> {
     /// The stack of contexts reached so far
-    context: RefCell<ErrorContext<'tcx>>,
+    context: RefCell<Option<ErrorContext<'tcx>>>,
     errors: RefCell<Vec<(ErrorContext<'tcx>, E)>>,
 }
 
 impl<'tcx, E> ErrorStore<'tcx, E> {
     /// Set the context to a named type. Will return a scope guard that will automatically
     /// clear the context on drop.
-    pub fn set_context_ty<'a>(&'a self, ty: Cow<'tcx, str>) -> ErrorContextGuard<'a, 'tcx, E> {
+    pub fn set_context_ty<'a>(&'a self, ty: Cow<'tcx, hir::LocIdent>) -> ErrorContextGuard<'a, 'tcx, E> {
         let new = ErrorContext { ty, method: None };
-        let old = mem::replace(&mut *self.context.borrow_mut(), new);
+        let old = mem::replace(&mut *self.context.borrow_mut(), Some(new));
         ErrorContextGuard(self, old)
     }
 
@@ -247,21 +247,21 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
     /// clear the context on drop.
     pub fn set_context_method<'a>(
         &'a self,
-        method: Cow<'tcx, str>,
+        method: Cow<'tcx, hir::LocIdent>,
     ) -> ErrorContextGuard<'a, 'tcx, E> {
         let new = ErrorContext {
-            ty: self.context.borrow().ty.clone(),
+            ty: self.context.borrow().clone().expect("Cannot set context method without context type.").ty,
             method: Some(method),
         };
 
-        let old = mem::replace(&mut *self.context.borrow_mut(), new);
+        let old = mem::replace(&mut *self.context.borrow_mut(), Some(new));
         ErrorContextGuard(self, old)
     }
 
     pub fn push_error(&self, error: E) {
         self.errors
             .borrow_mut()
-            .push((self.context.borrow().clone(), error));
+            .push((self.context.borrow().clone().expect("Cannot push error without context."), error));
     }
 
     pub fn take_all(&self) -> Vec<(impl fmt::Display + 'tcx, E)> {
@@ -270,10 +270,10 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
 }
 
 /// The context in which an error was discovered
-#[derive(Default, Clone)]
+#[derive(Clone)]
 struct ErrorContext<'tcx> {
-    ty: Cow<'tcx, str>,
-    method: Option<Cow<'tcx, str>>,
+    ty: Cow<'tcx, hir::LocIdent>,
+    method: Option<Cow<'tcx, hir::LocIdent>>,
 }
 
 impl fmt::Display for ErrorContext<'_> {
@@ -289,7 +289,7 @@ impl fmt::Display for ErrorContext<'_> {
 
 /// Scope guard terminating the context created `set_context_*` method on [`ErrorStore`]
 #[must_use]
-pub struct ErrorContextGuard<'a, 'tcx, E>(&'a ErrorStore<'tcx, E>, ErrorContext<'tcx>);
+pub struct ErrorContextGuard<'a, 'tcx, E>(&'a ErrorStore<'tcx, E>, Option<ErrorContext<'tcx>>);
 
 impl<E> Drop for ErrorContextGuard<'_, '_, E> {
     fn drop(&mut self) {

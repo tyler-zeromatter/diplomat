@@ -194,7 +194,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
 
         let _guard = self
             .errors
-            .set_context_ty(self.c.tcx.fmt_symbol_name_diagnostics(id.into()));
+            .set_context_ty((&ty.name).into());
 
         let methods = ty
             .methods
@@ -660,7 +660,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
         let lib_name_ns_prefix = &self.formatter.lib_name_ns_prefix;
         let _guard = self
             .errors
-            .set_context_method(method.name.to_string().into());
+            .set_context_method(Cow::Owned(method.name.clone()));
         let method_name = self.formatter.fmt_method_name(method);
         let abi_name = self
             .formatter

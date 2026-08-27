@@ -437,7 +437,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx> {
 
         let mut visitor = method.borrowing_param_visitor(self.tcx, true);
 
-        let _guard = self.errors.set_context_method(method.name.as_str().into());
+        let _guard = self.errors.set_context_method((&method.name).into());
 
         let abi_name = String::from(method.abi_name.as_str());
 

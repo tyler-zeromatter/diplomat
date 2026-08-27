@@ -246,7 +246,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx, '_> {
                 // Skip method if disabled
                 continue;
             }
-            let _guard = self.errors.set_context_method(method.name.as_str().into());
+            let _guard = self.errors.set_context_method((&method.name).into());
             let (method_chunk, callback_defs) = self.gen_method(method, &mut impl_header);
             methods.push(method_chunk);
             cb_structs_and_defs.extend_from_slice(&callback_defs);
@@ -280,7 +280,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx, '_> {
         let ty = self.tcx.resolve_type(id);
         let _guard = self
             .errors
-            .set_context_ty(self.tcx.fmt_type_name_diagnostics(id));
+            .set_context_ty(ty.loc_name().into());
 
         let mut impl_header = self.gen_function_impls(Some(id), ty.methods().iter());
 

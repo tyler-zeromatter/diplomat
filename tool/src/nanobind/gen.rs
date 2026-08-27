@@ -224,7 +224,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
     ) {
         let _guard = self
             .errors
-            .set_context_ty(self.cpp.c.tcx.fmt_symbol_name_diagnostics(id.into()));
+            .set_context_ty((&ty.name).into());
 
         let type_name = self.formatter.cxx.fmt_type_name(id);
         let type_name_unnamespaced = self.formatter.cxx.fmt_type_name_unnamespaced(id);
@@ -448,7 +448,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
         if method.attrs.disable {
             return None;
         }
-        let _guard = self.errors.set_context_method(method.name.as_str().into());
+        let _guard = self.errors.set_context_method((&method.name).into());
         let cpp_method_name = self.formatter.cxx.fmt_method_name(method);
         let method_name = self.formatter.fmt_method_name(method);
 

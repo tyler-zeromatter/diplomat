@@ -1176,7 +1176,7 @@ impl<'ctx, 'tcx> ItemGenContext<'ctx, 'tcx> {
         // Refine the diagnostic context from `Type` to `Type::method` for
         // anything pushed while lowering this method. Restored on scope exit.
         let method_name = self.formatter.fmt_method_name(method).into_owned();
-        let _guard = self.errors.set_context_method(method_name.clone().into());
+        let _guard = self.errors.set_context_method((&method.name).into());
         let static_kw = if method.param_self.is_some() {
             ""
         } else {

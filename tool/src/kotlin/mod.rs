@@ -127,7 +127,7 @@ pub(crate) fn run<'tcx>(
 
     for (id, ty) in tcx.all_types() {
         ty_gen_cx.callback_params.clear(); // specific to each type in a file
-        let _guard = ty_gen_cx.errors.set_context_ty(ty.name().as_str().into());
+        let _guard = ty_gen_cx.errors.set_context_ty(ty.loc_name().into());
         if ty.attrs().disable {
             continue;
         }
@@ -166,7 +166,7 @@ pub(crate) fn run<'tcx>(
         ty_gen_cx.callback_params.clear(); // specific to each type in a file
         let _guard = ty_gen_cx
             .errors
-            .set_context_ty(trt_def.name.as_str().into());
+            .set_context_ty((&trt_def.name).into());
         if trt_def.attrs.disable {
             continue;
         }
@@ -1034,7 +1034,7 @@ returnVal.option() ?: return null
         struct_name: Option<&str>,
         add_override_specifier_for_opaque_self_methods: bool,
     ) -> MethodInfo {
-        let _guard = self.errors.set_context_method(method.name.as_str().into());
+        let _guard = self.errors.set_context_method((&method.name).into());
         if method.attrs.disable {
             return MethodInfo::default();
         }
