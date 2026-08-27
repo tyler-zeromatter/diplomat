@@ -3,11 +3,11 @@ source: core/src/hir/type_context.rs
 expression: output
 ---
 Diplomat error: Lowering error in BadStructFields
-> In field field1: Safety issue: Option<u8> is FFI-unsafe, consider using DiplomatOption<u8>
+> Option<u8> is FFI-unsafe, consider using DiplomatOption<u8>
 Diplomat error: Lowering error in BadStructFields
 > Found Option<T> for primitive T in a struct field, please use DiplomatOption<T>
 Diplomat error: Lowering error in BadStructFields
-> In field field2: Safety issue: Result<u8, u8> is FFI-unsafe, consider using Result<u8, u8>
+> Result<u8, u8> is FFI-unsafe, consider using Result<u8, u8>
 Diplomat error: Lowering error in BadStructFields
 > Results can only appear as the top-level return type of methods
 Diplomat error: Lowering error in InStructWithOutField
