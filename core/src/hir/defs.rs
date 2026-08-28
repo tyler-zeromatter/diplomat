@@ -38,6 +38,10 @@ impl Ident {
     pub(crate) fn new(name: IdentBuf, span: Option<crate::ast::Span>) -> Self {
         Self(name, span)
     }
+
+    pub fn span(&self) -> Option<&crate::ast::Span> {
+        self.1.as_ref()
+    }
 }
 
 impl std::ops::Deref for Ident {
