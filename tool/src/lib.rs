@@ -20,7 +20,7 @@ use config::toml_value_from_str;
 use config::{find_top_level_attr, Config};
 use core::mem;
 use core::panic;
-use diplomat_core::ast::{ModuleIncludeInfo, write_report};
+use diplomat_core::ast::{write_report, ModuleIncludeInfo};
 use diplomat_core::hir;
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -172,15 +172,22 @@ pub fn gen(
         eprintln!("Found errors whilst generating {target_language}:");
 
         for error in errors {
-            let location = error.0.method.as_ref().or(error.0.ty.as_ref()).map(|s| s.span().cloned()).expect("Could not find location for error.");
+            let location = error
+                .0
+                .method
+                .as_ref()
+                .or(error.0.ty.as_ref())
+                .map(|s| s.span().cloned())
+                .expect("Could not find location for error.");
             let report = diplomat_core::ast::AstReport::new(
                 format!("In {}", error.0),
                 location,
                 error.1,
-                vec![]
+                vec![],
             );
-            let b : Box<dyn std::io::Write> = Box::new(std::io::stderr());
-            write_report(&report, b, diplomat_core::ast::PrettyPrint::Default).expect("Could not write report.");
+            let b: Box<dyn std::io::Write> = Box::new(std::io::stderr());
+            write_report(&report, b, diplomat_core::ast::PrettyPrint::Default)
+                .expect("Could not write report.");
         }
         eprintln!("Not generating files due to errors");
         // Eventually this should use eyre or something
@@ -246,8 +253,14 @@ pub struct ErrorStore<'tcx, E> {
 impl<'tcx, E> ErrorStore<'tcx, E> {
     /// Set the context to a named type. Will return a scope guard that will automatically
     /// clear the context on drop.
-    pub fn set_context_ty<'a>(&'a self, ty: Cow<'tcx, hir::LocIdent>) -> ErrorContextGuard<'a, 'tcx, E> {
-        let new = ErrorContext { ty: Some(ty), method: None };
+    pub fn set_context_ty<'a>(
+        &'a self,
+        ty: Cow<'tcx, hir::LocIdent>,
+    ) -> ErrorContextGuard<'a, 'tcx, E> {
+        let new = ErrorContext {
+            ty: Some(ty),
+            method: None,
+        };
         let old = mem::replace(&mut *self.context.borrow_mut(), Some(new));
         ErrorContextGuard(self, old)
     }
@@ -268,9 +281,13 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
     }
 
     pub fn push_error(&self, error: E) {
-        self.errors
-            .borrow_mut()
-            .push((self.context.borrow().clone().expect("Cannot push error without context."), error));
+        self.errors.borrow_mut().push((
+            self.context
+                .borrow()
+                .clone()
+                .expect("Cannot push error without context."),
+            error,
+        ));
     }
 
     pub fn take_all(&self) -> Vec<(ErrorContext<'tcx>, E)> {
@@ -279,8 +296,7 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
 }
 
 /// The context in which an error was discovered
-#[derive(Clone)]
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct ErrorContext<'tcx> {
     /// Type may not always be set (for free-standing functions)
     ty: Option<Cow<'tcx, hir::LocIdent>>,

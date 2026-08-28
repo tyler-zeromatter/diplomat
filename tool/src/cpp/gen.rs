@@ -192,9 +192,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
         let c_header = self.c.gen_enum_def(id);
         let c_impl_header = self.c.gen_impl(id.into());
 
-        let _guard = self
-            .errors
-            .set_context_ty((&ty.name).into());
+        let _guard = self.errors.set_context_ty((&ty.name).into());
 
         let methods = ty
             .methods

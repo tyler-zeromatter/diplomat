@@ -222,9 +222,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx> {
         id: TypeId,
         out: &mut W,
     ) {
-        let _guard = self
-            .errors
-            .set_context_ty((&ty.name).into());
+        let _guard = self.errors.set_context_ty((&ty.name).into());
 
         let type_name = self.formatter.cxx.fmt_type_name(id);
         let type_name_unnamespaced = self.formatter.cxx.fmt_type_name_unnamespaced(id);

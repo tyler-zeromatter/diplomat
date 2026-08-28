@@ -164,9 +164,7 @@ pub(crate) fn run<'tcx>(
 
     for (id, trt_def) in tcx.all_traits() {
         ty_gen_cx.callback_params.clear(); // specific to each type in a file
-        let _guard = ty_gen_cx
-            .errors
-            .set_context_ty((&trt_def.name).into());
+        let _guard = ty_gen_cx.errors.set_context_ty((&trt_def.name).into());
         if trt_def.attrs.disable {
             continue;
         }
