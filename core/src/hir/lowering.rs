@@ -592,7 +592,10 @@ impl<'ast> LoweringContext<'ast> {
             param_self,
             params,
             output: Box::new(return_type),
-            name: Some(super::defs::Ident::new(self.lower_ident(&name, "trait name")?, ast_trait_method.name.span())),
+            name: Some(super::defs::Ident::new(
+                self.lower_ident(&name, "trait name")?,
+                ast_trait_method.name.span(),
+            )),
             attrs: Some(attrs),
             docs: Some(Docs::from_ast(
                 &ast_trait_method.docs,
