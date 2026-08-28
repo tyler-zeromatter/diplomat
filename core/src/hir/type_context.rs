@@ -225,7 +225,7 @@ impl TypeContext {
         let types = ast::File::from_syn(s, include_info, entry_location).all_types();
         let (mut ctx, hir) = Self::from_ast_without_validation(&types, cfg, attr_validator)?;
         ctx.errors.set_item("(validation)", &None);
-        hir.validate(&mut ctx.errors);
+        hir.validate(&mut ctx);
         if !ctx.errors.is_empty() {
             return Err(ctx.errors.take_errors());
         }
@@ -418,15 +418,15 @@ impl TypeContext {
     ///
     /// Currently validates that methods are not inheriting any transitive bounds from parameters
     ///    Todo: Automatically insert these bounds during HIR construction in a second phase
-    fn validate<'hir>(&'hir self, errors: &mut ErrorStore<'hir>) {
+    fn validate<'hir>(&'hir self, ctx: &mut LoweringContext<'hir>) {
         // Lifetime validity check
         for (_id, ty) in self.all_types() {
-            errors.set_item(ty.name().as_str(), ty.span());
+            ctx.errors.set_item(ty.name().as_str(), ty.span());
 
-            self.validate_type_def(errors, ty);
+            self.validate_type_def(&mut ctx.errors, ty);
 
             for method in ty.methods() {
-                errors.set_subitem(method.name.as_str(), &method.name);
+                ctx.errors.set_subitem(method.name.as_str(), &method.name);
 
                 // This check must occur before validate_ty_in_method is called
                 // since validate_ty_in_method calls link_lifetimes which does not
@@ -436,7 +436,7 @@ impl TypeContext {
                     for lt in out_ty.lifetimes() {
                         if let MaybeStatic::NonStatic(lt) = lt {
                             if method.lifetime_env.get_bounds(lt).is_none() {
-                                errors.push(LoweringError::Other(
+                                ctx.errors.push(LoweringError::Other(
                                     "Found elided lifetime in return type, please explicitly specify".into(),
                                 ));
 
@@ -462,7 +462,7 @@ impl TypeContext {
                             }
                         }
                     }
-                    self.validate_self_ty_in_method(errors, s);
+                    self.validate_self_ty_in_method(&mut ctx.errors, s);
                 }
 
                 for param in &method.params {
@@ -475,7 +475,7 @@ impl TypeContext {
                     }
 
                     self.validate_ty_in_method(
-                        errors,
+                        &mut ctx.errors,
                         Param::Input(param.name.as_str()),
                         &param.ty,
                         method,
@@ -485,7 +485,7 @@ impl TypeContext {
                 let lts = method.output.used_method_lifetimes();
                 let mut intersection = lts.intersection(&struct_ref_lifetimes).peekable();
                 if intersection.peek().is_some() {
-                    errors.push(LoweringError::Other(
+                    ctx.errors.push(LoweringError::Other(
                         format!("Found lifetimes used in struct references also used in the return type: {}", intersection.map(|lt| {
                             format!("'{} ", method.lifetime_env.fmt_lifetime(lt))
                         }).collect::<String>())
@@ -493,14 +493,62 @@ impl TypeContext {
                 }
 
                 method.output.with_contained_types(|out_ty| {
-                    self.validate_ty_in_method(errors, Param::Return, out_ty, method);
+                    self.validate_ty_in_method(&mut ctx.errors, Param::Return, out_ty, method);
                 })
             }
         }
 
         for (_id, def) in self.all_traits() {
-            errors.set_item(def.name.as_str(), &def.name);
-            self.validate_trait(errors, def);
+            ctx.errors.set_item(def.name.as_str(), &def.name);
+            for m in &def.methods {
+                let ident = m.name.as_ref().expect("Trait methods must have names");
+                ctx.errors.set_subitem(ident.as_str(), ident);
+                for p in &m.params {
+                    self.validate_ty(&mut ctx.errors, &p.ty);
+                }
+
+                if ctx
+                    .attr_validator
+                    .attrs_supported()
+                    .trait_returns_must_be_fallible
+                {
+                    match m.output.as_ref() {
+                        hir::ReturnType::Infallible(hir::SuccessType::Unit) => {}
+                        hir::ReturnType::Fallible(_, err) => {
+                            let is_valid = if let Some(hir::Type::Enum(e)) = err {
+                                let e = self.resolve_enum(e.tcx_id);
+                                let is_valid = e.variants.iter().find(|v| v.attrs.ffi_error);
+                                is_valid.is_some()
+                            } else {
+                                false
+                            };
+
+                            if !is_valid {
+                                ctx.errors.push(LoweringError::Other("Found non #[diplomat::attr(*, ffi_error)] marked error type in trait return. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
+                            }
+                        }
+                        _ => {
+                            ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must either be a `-> Result<T, E>` or `-> ()`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
+                        }
+                    }
+                }
+
+                let success = match &*m.output {
+                    hir::ReturnType::Infallible(success) | hir::ReturnType::Nullable(success) => {
+                        success
+                    }
+                    hir::ReturnType::Fallible(success, fallible) => {
+                        if let Some(f) = fallible {
+                            self.validate_ty(&mut ctx.errors, f);
+                        }
+                        success
+                    }
+                };
+
+                if let hir::SuccessType::OutType(o) = success {
+                    self.validate_ty(&mut ctx.errors, o);
+                }
+            }
         }
     }
 
@@ -670,30 +718,6 @@ impl TypeContext {
     fn validate_type_def(&self, errors: &mut ErrorStore, def: TypeDef) {
         if let TypeDef::Struct(st) = def {
             self.validate_struct(errors, st);
-        }
-    }
-
-    fn validate_trait(&self, errors: &mut ErrorStore, def: &TraitDef) {
-        for m in &def.methods {
-            for p in &m.params {
-                self.validate_ty(errors, &p.ty);
-            }
-
-            let success = match &*m.output {
-                hir::ReturnType::Infallible(success) | hir::ReturnType::Nullable(success) => {
-                    success
-                }
-                hir::ReturnType::Fallible(success, fallible) => {
-                    if let Some(f) = fallible {
-                        self.validate_ty(errors, f);
-                    }
-                    success
-                }
-            };
-
-            if let hir::SuccessType::OutType(o) = success {
-                self.validate_ty(errors, o);
-            }
         }
     }
 
@@ -1881,5 +1905,65 @@ mod tests {
                 .unwrap();
 
         insta::assert_debug_snapshot!(tcx);
+    }
+
+    #[test]
+    fn test_ffi_errors() {
+        let parsed: syn::File = syn::parse_quote! {
+            #[diplomat::bridge]
+            mod ffi {
+                struct SomeStruct {
+                    a : i32
+                }
+
+                enum SomeEnum {
+                    B,
+                    #[diplomat::attr(*, ffi_error)]
+                    A,
+                }
+
+                enum UnmarkedEnum {
+                    A,
+                    B
+                }
+
+                pub trait SomeTrait {
+                    fn returns_unit_is_okay();
+                    fn returns_nullable_not_okay() -> Option<()>;
+                    // This is not okay because it's not clear whether the error is an FFI error or not:
+                    fn returns_fallible_unit_not_okay() -> Result<(), ()>;
+                    // TODO: Will be supported
+                    fn returns_fallible_struct_not_okay() -> Result<(), SomeStruct>;
+                    fn returns_fallible_marked_enum_okay() -> Result<(), SomeEnum>;
+                    fn returns_fallible_unmarked_enum_not_okay() -> Result<(), UnmarkedEnum>;
+                    fn returns_fallible_primitive_not_okay() -> Result<(), bool>;
+                }
+            }
+        };
+
+        let mut output = String::new();
+
+        let mut attr_validator = hir::BasicAttributeValidator::new("tests");
+        attr_validator.support.trait_returns_must_be_fallible = true;
+        match hir::TypeContext::from_syn(
+            &parsed,
+            Default::default(),
+            attr_validator,
+            None,
+            &SpanLocation::None,
+        ) {
+            Ok(_context) => (),
+            Err(e) => {
+                for err in e {
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
+                }
+            }
+        };
+        insta::with_settings!({}, { insta::assert_snapshot!(output) });
     }
 }

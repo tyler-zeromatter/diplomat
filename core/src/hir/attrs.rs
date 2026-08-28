@@ -66,6 +66,9 @@ pub struct Attrs {
     pub manually_disposable: bool,
     /// From #[diplomat::attr()]. If true, Diplomat will check that this struct has the same memory layout in backends which support it. Allows this struct to be used in slices ([`super::Slice::Struct`]) and to be borrowed in function parameters.
     pub abi_compatible: bool,
+    /// From #[diplomat::attr()]. If true, Diplomat will attempt to use the given type to flag backend specific errors.
+    /// Behavior depends on the given type or value.
+    pub ffi_error: bool,
     /// From #[diplomat::attr()], found on structs. If true, Diplomat will allow &mut T references to the struct, and the backend may change the types of fields to better support mutation.
     pub mut_struct_ref: bool,
 
@@ -601,6 +604,13 @@ impl Attrs {
                             }
                             this.abi_compatible = true;
                         }
+                        "ffi_error" => {
+                            if !support.trait_returns_must_be_fallible {
+                                maybe_error_unsupported(auto_found, "ffi_error", backend, errors);
+                                continue;
+                            }
+                            this.ffi_error = true;
+                        }
                         "mut_struct_ref" => {
                             if !support.mut_struct_refs {
                                 maybe_error_unsupported(
@@ -773,6 +783,7 @@ impl Attrs {
             generate_mocking_interface,
             manually_disposable,
             abi_compatible,
+            ffi_error,
             mut_struct_ref,
             tuple,
             precondition_violation: _,
@@ -1168,6 +1179,17 @@ impl Attrs {
             ));
         }
 
+        if *ffi_error
+            && !matches!(
+                context,
+                AttributeContext::Field | AttributeContext::EnumVariant(..)
+            )
+        {
+            errors.push(LoweringError::Other(
+                "`ffi_error` is only supported on struct fields or enum variants.".into(),
+            ));
+        }
+
         if *mut_struct_ref && !matches!(context, AttributeContext::Type(TypeDef::Struct(..))) {
             errors.push(LoweringError::Other(
                 "`mut_struct_ref` can only be used on input structs.".into(),
@@ -1263,6 +1285,7 @@ impl Attrs {
             generate_mocking_interface: false,
             manually_disposable: false,
             abi_compatible: false,
+            ffi_error: false,
             mut_struct_ref: false,
             // Not inherited
             tuple: false,
@@ -1392,6 +1415,9 @@ pub struct BackendAttrSupport {
     /// governs the input/field position — a backend can support one without
     /// the other. Currently only used to gate `Box<[u8]>` (byte) returns.
     pub owned_byte_slice_returns: bool,
+    /// If a trait method's return in a given backend has the possibility to always fail (with the exception of unit types).
+    /// See https://github.com/rust-diplomat/diplomat/issues/1262
+    pub trait_returns_must_be_fallible: bool,
 }
 
 impl BackendAttrSupport {
@@ -1438,6 +1464,7 @@ impl BackendAttrSupport {
             tuples: true,
             opaque_slices: true,
             owned_byte_slice_returns: true,
+            trait_returns_must_be_fallible: true,
         }
     }
 
@@ -1470,6 +1497,7 @@ impl BackendAttrSupport {
             "traits_are_sync" => Some(self.traits_are_sync),
             "manually_disposable" => Some(self.manually_disposable),
             "abi_compatibles" => Some(self.abi_compatibles),
+            "ffi_error" => Some(self.trait_returns_must_be_fallible),
             "struct_refs" => Some(self.struct_refs),
             "mut_struct_refs" => Some(self.mut_struct_refs),
             "free_functions" => Some(self.free_functions),
@@ -1633,6 +1661,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 tuples,
                 opaque_slices,
                 owned_byte_slice_returns,
+                trait_returns_must_be_fallible,
             } = self.support;
             match value {
                 "namespacing" => namespacing,
@@ -1675,6 +1704,7 @@ impl AttributeValidator for BasicAttributeValidator {
                 "tuples" => tuples,
                 "opaque_slices" => opaque_slices,
                 "owned_byte_slice_returns" => owned_byte_slice_returns,
+                "trait_returns_must_be_fallible" => trait_returns_must_be_fallible,
                 _ => {
                     return Err(LoweringError::Other(format!(
                         "Unknown supports = value found: {value}"
@@ -2181,6 +2211,32 @@ mod tests {
                     pub fn test(a : i32, b : i64,
                     #[diplomat::attr(*, default_value=100)]
                     c : i128) {}
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_ffi_error_on_enum() {
+        uitest_lowering_attr! { hir::BackendAttrSupport::all_true(),
+            #[diplomat::bridge]
+            mod ffi {
+                pub struct Test {
+                    #[diplomat::attr(*, ffi_error)]
+                    a : bool,
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_ffi_error_enum_unsupported() {
+        uitest_lowering_attr! { hir::BackendAttrSupport::default(),
+            #[diplomat::bridge]
+            mod ffi {
+                pub struct Test {
+                    #[diplomat::attr(*, ffi_error)]
+                    a : bool,
                 }
             }
         }

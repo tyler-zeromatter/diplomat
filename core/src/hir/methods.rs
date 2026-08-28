@@ -56,7 +56,7 @@ pub struct Callback {
     pub param_self: Option<TraitParamSelf>, // this is None for callbacks as method arguments
     pub params: Vec<CallbackParam>,
     pub output: Box<ReturnType<InputOnly>>, // this will be used in Rust (note: can technically be a callback, or void)
-    pub name: Option<IdentBuf>,
+    pub name: Option<super::defs::Ident>,
     pub attrs: Option<Attrs>,
     pub docs: Option<Docs>,
 }
