@@ -312,8 +312,8 @@ impl fmt::Display for ErrorContext<'_> {
         };
 
         match (ty_ident.is_empty(), method_ident.is_empty()) {
-            (true, false) => write!(f, "{ty_ident}"),
-            (false, true) => write!(f, "{method_ident}"),
+            (false, true) => write!(f, "{ty_ident}"),
+            (true, false) => write!(f, "{method_ident}"),
             (false, false) => write!(f, "{ty_ident}::{method_ident}"),
             (true, true) => write!(f, "<unknown location>"),
         }
