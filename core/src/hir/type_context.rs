@@ -1941,8 +1941,6 @@ mod tests {
             }
         };
 
-        use std::fmt::Write;
-
         let mut output = String::new();
 
         let mut attr_validator = hir::BasicAttributeValidator::new("tests");
@@ -1957,7 +1955,12 @@ mod tests {
             Ok(_context) => (),
             Err(e) => {
                 for err in e {
-                    writeln!(&mut output, "{err}").unwrap();
+                    write_report(
+                        &err.ast_report(),
+                        &mut output,
+                        crate::ast::logging::PrettyPrint::ForceUgly,
+                    )
+                    .unwrap();
                 }
             }
         };
