@@ -513,7 +513,6 @@ impl TypeContext {
                     .trait_returns_must_be_fallible
                 {
                     match m.output.as_ref() {
-                        hir::ReturnType::Infallible(hir::SuccessType::Unit) => {}
                         hir::ReturnType::Fallible(_, err) => {
                             let is_valid = if let Some(hir::Type::Enum(e)) = err {
                                 let e = self.resolve_enum(e.tcx_id);
@@ -528,7 +527,7 @@ impl TypeContext {
                             }
                         }
                         _ => {
-                            ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must either be a `-> Result<T, E>` or `-> ()`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
+                            ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
                         }
                     }
                 }
@@ -1928,7 +1927,7 @@ mod tests {
                 }
 
                 pub trait SomeTrait {
-                    fn returns_unit_is_okay();
+                    fn returns_unit_not_okay();
                     fn returns_nullable_not_okay() -> Option<()>;
                     // This is not okay because it's not clear whether the error is an FFI error or not:
                     fn returns_fallible_unit_not_okay() -> Result<(), ()>;
