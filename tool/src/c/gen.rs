@@ -278,7 +278,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx, '_> {
     // Generate a block of implementations for functions on any given type
     pub fn gen_impl(&self, id: hir::TypeId) -> Header {
         let ty = self.tcx.resolve_type(id);
-        let _guard = self.errors.set_context_ty(ty.loc_name().into());
+        let _guard = self.errors.set_context_ty(ty.name_with_span().into());
 
         let mut impl_header = self.gen_function_impls(Some(id), ty.methods().iter());
 

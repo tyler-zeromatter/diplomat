@@ -328,7 +328,8 @@ impl<'tcx> TypeDef<'tcx> {
         }
     }
 
-    pub fn loc_name(&self) -> &'tcx Ident {
+    /// Like [`IdentBuf`], but wrapped to also contain [`crate::ast::Span`] for error printing.
+    pub fn name_with_span(&self) -> &'tcx Ident {
         match *self {
             Self::Struct(ty) => &ty.name,
             Self::OutStruct(ty) => &ty.name,

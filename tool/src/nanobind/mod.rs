@@ -154,7 +154,7 @@ pub(crate) fn run<'cx>(
             .includes
             .insert(cpp_impl_path.clone());
 
-        let guard = errors.set_context_ty(ty.loc_name().into());
+        let guard = errors.set_context_ty(ty.name_with_span().into());
 
         #[derive(Template)]
         #[template(path = "nanobind/binding.cpp.jinja", escape = "none")]

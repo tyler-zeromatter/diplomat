@@ -166,7 +166,7 @@ impl<'cx> ItemGenContext<'_, 'cx> {
     fn gen(&mut self, id: TypeId) -> (String, String) {
         let ty = self.tcx.resolve_type(id);
 
-        let _guard = self.errors.set_context_ty(ty.loc_name().into());
+        let _guard = self.errors.set_context_ty(ty.name_with_span().into());
 
         let name = self.formatter.fmt_type_name(id);
         (

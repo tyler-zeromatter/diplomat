@@ -74,7 +74,7 @@ pub(crate) fn run<'tcx>(
         let decl_header_path = formatter.fmt_decl_header_path(id.into());
         let impl_header_path = formatter.fmt_impl_header_path(id.into());
 
-        let _guard = errors.set_context_ty(ty.loc_name().into());
+        let _guard = errors.set_context_ty(ty.name_with_span().into());
         let context = ItemGenContext {
             tcx,
             formatter: &formatter,

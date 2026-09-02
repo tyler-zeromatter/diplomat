@@ -127,7 +127,7 @@ pub(crate) fn run<'tcx>(
 
     for (id, ty) in tcx.all_types() {
         ty_gen_cx.callback_params.clear(); // specific to each type in a file
-        let _guard = ty_gen_cx.errors.set_context_ty(ty.loc_name().into());
+        let _guard = ty_gen_cx.errors.set_context_ty(ty.name_with_span().into());
         if ty.attrs().disable {
             continue;
         }
