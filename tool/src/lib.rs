@@ -8,6 +8,7 @@ pub(crate) mod filters;
 // Backends
 pub mod c;
 mod cpp;
+mod cpython;
 mod dart;
 mod demo_gen;
 mod dotnet;
@@ -34,6 +35,7 @@ pub fn get_supported(target_language: &str) -> hir::BackendAttrSupport {
     match target_language {
         "c" => c::attr_support(),
         "cpp" => cpp::attr_support(),
+        "cpython" => cpython::attr_support(),
         "dart" => dart::attr_support(),
         "js" => js::attr_support(),
         "demo_gen" => demo_gen::attr_support(),
@@ -143,6 +145,7 @@ pub fn gen(
     let (files, errors) = match target_language {
         "c" => c::run(&tcx, &config, docs_url_gen),
         "cpp" => cpp::run(&tcx, &config, docs_url_gen),
+        "cpython" => cpython::run(&tcx, &config, docs_url_gen),
         "dart" => dart::run(&tcx, docs_url_gen),
         "js" => js::run(&tcx, config, docs_url_gen),
         "dotnet" => dotnet::run(&tcx, &config, docs_url_gen),

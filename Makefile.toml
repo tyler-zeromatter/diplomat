@@ -579,6 +579,16 @@ exit_on_error true
 generate_generic example kotlin somelib "--config kotlin.scaffold=false" /src/main/kotlin
 '''
 
+[tasks.gen-cpython-feature]
+category = "Code generation"
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+!include_files ./support/functions.ds
+
+generate_generic feature_tests cpython src
+'''
+
 [tasks.gen-nanobind-feature]
 category = "Code generation"
 run_task = [

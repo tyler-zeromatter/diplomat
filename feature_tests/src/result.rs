@@ -26,6 +26,7 @@ pub mod ffi {
     impl ErrorStruct {
         #[diplomat::attr(kotlin, disable)]
         #[diplomat::attr(dotnet, disable)]
+        #[diplomat::attr(cpython, disable)]
         pub fn returns_result_option(is_some: bool) -> Result<DiplomatOption<ErrorStruct>, ()> {
             if is_some {
                 Ok(Some(ErrorStruct { i: 0, j: 125 }).into())
