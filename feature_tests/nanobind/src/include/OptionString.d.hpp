@@ -27,7 +27,7 @@ namespace somelib {
 class OptionString {
 public:
 
-  inline static std::unique_ptr<somelib::OptionString> new_(std::string_view diplomat_str);
+  inline static somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionString>> new_(std::string_view diplomat_str);
 
   inline somelib::diplomat::result<std::string, std::monostate> write() const;
   template<typename W>

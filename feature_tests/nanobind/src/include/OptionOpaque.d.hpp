@@ -31,9 +31,9 @@ namespace somelib {
 class OptionOpaque {
 public:
 
-  inline static std::unique_ptr<somelib::OptionOpaque> new_(int32_t i);
+  inline static somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaque>> new_(int32_t i);
 
-  inline static std::unique_ptr<somelib::OptionOpaque> new_none();
+  inline static somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaque>> new_none();
 
   inline static std::optional<somelib::OptionStruct> returns();
 
@@ -49,13 +49,13 @@ public:
 
   inline static somelib::OptionStruct new_struct_nones();
 
-  inline const somelib::OptionOpaque* returns_none_self() const DIPLOMAT_LIFETIME_BOUND;
+  inline somelib::diplomat::maybe_null<const somelib::OptionOpaque*> returns_none_self() const DIPLOMAT_LIFETIME_BOUND;
 
-  inline const somelib::OptionOpaque* returns_some_self() const DIPLOMAT_LIFETIME_BOUND;
+  inline somelib::diplomat::maybe_null<const somelib::OptionOpaque*> returns_some_self() const DIPLOMAT_LIFETIME_BOUND;
 
   inline void assert_integer(int32_t i) const;
 
-  inline static bool option_opaque_argument(const somelib::OptionOpaque* arg);
+  inline static bool option_opaque_argument(somelib::diplomat::maybe_null<const somelib::OptionOpaque*> arg);
 
   inline static std::optional<uint8_t> accepts_option_u8(std::optional<uint8_t> arg, uint8_t sentinel);
 

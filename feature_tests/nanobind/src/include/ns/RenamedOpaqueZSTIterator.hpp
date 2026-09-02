@@ -39,12 +39,12 @@ inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> somelib::ns::Renam
     return std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>(somelib::ns::RenamedOpaqueZSTIterator::FromFFI(result));
 }
 
-inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> somelib::ns::RenamedOpaqueZSTIterator::next() const {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>> somelib::ns::RenamedOpaqueZSTIterator::next() const {
     auto result = somelib::ns::capi::namespace_OpaqueZSTIterator_next(this->AsFFI());
     return std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>(somelib::ns::RenamedOpaqueZSTIterator::FromFFI(result));
 }
 
-inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> somelib::ns::RenamedOpaqueZSTIterator::operator[](size_t _idx) const {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>> somelib::ns::RenamedOpaqueZSTIterator::operator[](size_t _idx) const {
     auto result = somelib::ns::capi::namespace_OpaqueZSTIterator_nullable_indexer(this->AsFFI(),
         _idx);
     return std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>(somelib::ns::RenamedOpaqueZSTIterator::FromFFI(result));

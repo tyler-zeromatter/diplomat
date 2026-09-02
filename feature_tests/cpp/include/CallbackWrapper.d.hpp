@@ -60,9 +60,9 @@ struct CallbackWrapper {
 
   inline static void test_diplomat_option_output(std::function<std::optional<uint32_t>()> t);
 
-  inline static std::string test_option_opaque(std::function<const somelib::Opaque*()> t);
+  inline static std::string test_option_opaque(std::function<somelib::diplomat::maybe_null<const somelib::Opaque*>()> t);
   template<typename W>
-  inline static void test_option_opaque_write(std::function<const somelib::Opaque*()> t, W& writeable_output);
+  inline static void test_option_opaque_write(std::function<somelib::diplomat::maybe_null<const somelib::Opaque*>()> t, W& writeable_output);
 
   inline static void test_owned_opaque(std::function<void(std::unique_ptr<somelib::Opaque>)> t);
 

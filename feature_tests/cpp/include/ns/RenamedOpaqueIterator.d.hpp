@@ -29,7 +29,7 @@ namespace somelib::ns {
 class RenamedOpaqueIterator {
 public:
 
-  inline std::unique_ptr<somelib::ns::AttrOpaque1Renamed> next();
+  inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::AttrOpaque1Renamed>> next();
 
     inline const somelib::ns::capi::RenamedOpaqueIterator* AsFFI() const;
     inline somelib::ns::capi::RenamedOpaqueIterator* AsFFI();

@@ -27,7 +27,7 @@ namespace capi {
 } // namespace capi
 } // namespace
 
-inline std::unique_ptr<somelib::ns::AttrOpaque1Renamed> somelib::ns::RenamedOpaqueIterator::next() {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::AttrOpaque1Renamed>> somelib::ns::RenamedOpaqueIterator::next() {
     auto result = somelib::ns::capi::namespace_OpaqueIterator_next(this->AsFFI());
     return std::unique_ptr<somelib::ns::AttrOpaque1Renamed>(somelib::ns::AttrOpaque1Renamed::FromFFI(result));
 }

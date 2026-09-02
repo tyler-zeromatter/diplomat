@@ -57,13 +57,13 @@ inline size_t somelib::OpaqueThinVec::len() const {
     return result;
 }
 
-inline const somelib::OpaqueThin* somelib::OpaqueThinVec::operator[](size_t idx) const DIPLOMAT_LIFETIME_BOUND {
+inline somelib::diplomat::maybe_null<const somelib::OpaqueThin*> somelib::OpaqueThinVec::operator[](size_t idx) const DIPLOMAT_LIFETIME_BOUND {
     auto result = somelib::capi::OpaqueThinVec_get(this->AsFFI(),
         idx);
     return somelib::OpaqueThin::FromFFI(result);
 }
 
-inline const somelib::OpaqueThin* somelib::OpaqueThinVec::first() const DIPLOMAT_LIFETIME_BOUND {
+inline somelib::diplomat::maybe_null<const somelib::OpaqueThin*> somelib::OpaqueThinVec::first() const DIPLOMAT_LIFETIME_BOUND {
     auto result = somelib::capi::OpaqueThinVec_first(this->AsFFI());
     return somelib::OpaqueThin::FromFFI(result);
 }

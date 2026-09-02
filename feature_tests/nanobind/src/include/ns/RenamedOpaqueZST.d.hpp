@@ -63,7 +63,7 @@ public:
 
   inline static somelib::diplomat::result<std::unique_ptr<somelib::ns::RenamedOpaqueZST>, std::unique_ptr<somelib::ns::RenamedOpaqueZST>> success_fail_zst(bool return_success);
 
-  inline static std::unique_ptr<somelib::ns::RenamedOpaqueZST> optional_zst(bool is_some);
+  inline static somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZST>> optional_zst(bool is_some);
 
   inline static std::unique_ptr<somelib::ns::RenamedOpaqueZST> static_getter();
 
@@ -77,7 +77,7 @@ public:
   inline somelib::diplomat::next_to_iter_helper<somelib::ns::RenamedOpaqueZSTIterator> begin() const;
   inline std::nullopt_t end() const { return std::nullopt; }
 
-  inline std::unique_ptr<somelib::ns::RenamedOpaqueZST> operator[](size_t _idx) const;
+  inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZST>> operator[](size_t _idx) const;
 
     inline const somelib::ns::capi::RenamedOpaqueZST* AsFFI() const;
     inline somelib::ns::capi::RenamedOpaqueZST* AsFFI();

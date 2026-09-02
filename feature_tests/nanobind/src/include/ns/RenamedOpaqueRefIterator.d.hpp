@@ -29,7 +29,7 @@ namespace somelib::ns {
 class RenamedOpaqueRefIterator {
 public:
 
-  inline const somelib::ns::AttrOpaque1Renamed* next() DIPLOMAT_LIFETIME_BOUND;
+  inline somelib::diplomat::maybe_null<const somelib::ns::AttrOpaque1Renamed*> next() DIPLOMAT_LIFETIME_BOUND;
 
     inline const somelib::ns::capi::RenamedOpaqueRefIterator* AsFFI() const;
     inline somelib::ns::capi::RenamedOpaqueRefIterator* AsFFI();

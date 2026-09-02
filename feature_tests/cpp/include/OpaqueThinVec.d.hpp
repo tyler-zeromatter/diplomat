@@ -39,9 +39,9 @@ public:
 
   inline size_t len() const;
 
-  inline const somelib::OpaqueThin* operator[](size_t idx) const DIPLOMAT_LIFETIME_BOUND;
+  inline somelib::diplomat::maybe_null<const somelib::OpaqueThin*> operator[](size_t idx) const DIPLOMAT_LIFETIME_BOUND;
 
-  inline const somelib::OpaqueThin* first() const DIPLOMAT_LIFETIME_BOUND;
+  inline somelib::diplomat::maybe_null<const somelib::OpaqueThin*> first() const DIPLOMAT_LIFETIME_BOUND;
 
     inline const somelib::capi::OpaqueThinVec* AsFFI() const;
     inline somelib::capi::OpaqueThinVec* AsFFI();

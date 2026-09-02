@@ -47,7 +47,7 @@ inline std::unique_ptr<somelib::Opaque> somelib::Opaque::new_() {
     return std::unique_ptr<somelib::Opaque>(somelib::Opaque::FromFFI(result));
 }
 
-inline std::unique_ptr<somelib::Opaque> somelib::Opaque::try_from_utf8(std::string_view input) {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::Opaque>> somelib::Opaque::try_from_utf8(std::string_view input) {
     auto result = somelib::capi::Opaque_try_from_utf8({input.data(), input.size()});
     return std::unique_ptr<somelib::Opaque>(somelib::Opaque::FromFFI(result));
 }

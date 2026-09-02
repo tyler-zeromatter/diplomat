@@ -31,7 +31,7 @@ public:
 
   inline static std::unique_ptr<somelib::Opaque> new_();
 
-  inline static std::unique_ptr<somelib::Opaque> try_from_utf8(std::string_view input);
+  inline static somelib::diplomat::maybe_null<std::unique_ptr<somelib::Opaque>> try_from_utf8(std::string_view input);
 
   inline static somelib::diplomat::result<std::unique_ptr<somelib::Opaque>, somelib::diplomat::Utf8Error> from_str(std::string_view input);
 

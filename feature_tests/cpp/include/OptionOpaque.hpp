@@ -81,12 +81,12 @@ namespace capi {
 } // namespace capi
 } // namespace
 
-inline std::unique_ptr<somelib::OptionOpaque> somelib::OptionOpaque::new_(int32_t i) {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaque>> somelib::OptionOpaque::new_(int32_t i) {
     auto result = somelib::capi::OptionOpaque_new(i);
     return std::unique_ptr<somelib::OptionOpaque>(somelib::OptionOpaque::FromFFI(result));
 }
 
-inline std::unique_ptr<somelib::OptionOpaque> somelib::OptionOpaque::new_none() {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaque>> somelib::OptionOpaque::new_none() {
     auto result = somelib::capi::OptionOpaque_new_none();
     return std::unique_ptr<somelib::OptionOpaque>(somelib::OptionOpaque::FromFFI(result));
 }
@@ -126,12 +126,12 @@ inline somelib::OptionStruct somelib::OptionOpaque::new_struct_nones() {
     return somelib::OptionStruct::FromFFI(result);
 }
 
-inline const somelib::OptionOpaque* somelib::OptionOpaque::returns_none_self() const DIPLOMAT_LIFETIME_BOUND {
+inline somelib::diplomat::maybe_null<const somelib::OptionOpaque*> somelib::OptionOpaque::returns_none_self() const DIPLOMAT_LIFETIME_BOUND {
     auto result = somelib::capi::OptionOpaque_returns_none_self(this->AsFFI());
     return somelib::OptionOpaque::FromFFI(result);
 }
 
-inline const somelib::OptionOpaque* somelib::OptionOpaque::returns_some_self() const DIPLOMAT_LIFETIME_BOUND {
+inline somelib::diplomat::maybe_null<const somelib::OptionOpaque*> somelib::OptionOpaque::returns_some_self() const DIPLOMAT_LIFETIME_BOUND {
     auto result = somelib::capi::OptionOpaque_returns_some_self(this->AsFFI());
     return somelib::OptionOpaque::FromFFI(result);
 }
@@ -141,7 +141,7 @@ inline void somelib::OptionOpaque::assert_integer(int32_t i) const {
         i);
 }
 
-inline bool somelib::OptionOpaque::option_opaque_argument(const somelib::OptionOpaque* arg) {
+inline bool somelib::OptionOpaque::option_opaque_argument(somelib::diplomat::maybe_null<const somelib::OptionOpaque*> arg) {
     auto result = somelib::capi::OptionOpaque_option_opaque_argument(arg ? arg->AsFFI() : nullptr);
     return result;
 }

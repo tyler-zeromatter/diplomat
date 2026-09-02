@@ -36,9 +36,9 @@ public:
 
   inline static std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> ctor();
 
-  inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> next() const;
+  inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>> next() const;
 
-  inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator> operator[](size_t _idx) const;
+  inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIterator>> operator[](size_t _idx) const;
 
   inline somelib::diplomat::result<std::string, std::unique_ptr<somelib::ns::RenamedOpaqueZST>> stringify() const;
   template<typename W>
