@@ -16,9 +16,9 @@ pub enum ReturnableStructDef<'tcx> {
 #[derive(Debug, Clone)]
 pub struct Ident(pub IdentBuf, pub(crate) Option<crate::ast::Span>);
 
-impl<'a> Into<std::borrow::Cow<'a, Ident>> for &'a Ident {
-    fn into(self) -> std::borrow::Cow<'a, Ident> {
-        std::borrow::Cow::Borrowed(self)
+impl<'a> From<&'a Ident> for std::borrow::Cow<'a, Ident> {
+    fn from(val: &'a Ident) -> Self {
+        std::borrow::Cow::Borrowed(val)
     }
 }
 

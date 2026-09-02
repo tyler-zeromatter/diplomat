@@ -261,7 +261,7 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
             ty: Some(ty),
             method: None,
         };
-        let old = mem::replace(&mut *self.context.borrow_mut(), Some(new));
+        let old = (*self.context.borrow_mut()).replace(new);
         ErrorContextGuard(self, old)
     }
 
@@ -276,7 +276,7 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
             method: Some(method),
         };
 
-        let old = mem::replace(&mut *self.context.borrow_mut(), Some(new));
+        let old = (*self.context.borrow_mut()).replace(new);
         ErrorContextGuard(self, old)
     }
 
