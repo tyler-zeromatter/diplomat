@@ -215,12 +215,11 @@ impl<'tcx> PyFormatter<'tcx> {
                     diplomat_core::hir::CallbackInstantiationFunctionality::get_output_type(cb)
                         .expect("Could not get output type.");
 
-                let mut params = Vec::new();
-                for p in diplomat_core::hir::CallbackInstantiationFunctionality::get_inputs(cb)
+                let params = diplomat_core::hir::CallbackInstantiationFunctionality::get_inputs(cb)
                     .expect("Could not get callback inputs.")
-                {
-                    params.push(self.hir_type_to_python_type(&p.ty));
-                }
+                    .iter()
+                    .map(|p| self.hir_type_to_python_type(&p.ty))
+                    .collect::<Vec<_>>();
 
                 format!(
                     "Callable[[{}], {}]",
