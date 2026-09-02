@@ -24,7 +24,8 @@ st
     >(), 
     {%- for f in fields -%}
     {%- if !loop.first %}, {% endif %} "{{f.name}}"_a
-    {%- if !f.type_name.starts_with("std::unique_ptr") -%}
+    {%- if let hir::Type::Opaque(op) = f.ty && op.is_owned() -%}
+    {%- else -%}
     .none()
     {%- endif -%}
     {%- endfor -%}
@@ -36,9 +37,7 @@ st
     {%- if is_out -%} {% let prop_type = "ro" %} {%- else -%} {%- let prop_type = "rw" -%}{%- endif -%}
 
     {%- for f in fields %}
-    {%- if !f.type_name.starts_with("std::unique_ptr") %}
-    .def_{{prop_type}}("{{f.name}}", &{{type_name}}::{{f.name}}{% if let Some(doc) = f.docstring %}, {{doc}}{% endif %})
-    {%- else %}
+    {%- if let hir::Type::Opaque(op) = f.ty && op.is_owned() %}
     .def_prop_{{prop_type}}("{{f.name}}",
         [](const {{type_name}}& self) { return self.{{f.name}}.get(); }
     {%- if !is_out %},
@@ -46,6 +45,8 @@ st
     {%- endif %}
     {%- if let Some(doc) = f.docstring %}, {{doc}}{% endif %}
     )
+    {%- else %}
+    .def_{{prop_type}}("{{f.name}}", &{{type_name}}::{{f.name}}{% if let Some(doc) = f.docstring %}, {{doc}}{% endif %})
     {%- endif -%}
     {%- endfor %}
 
