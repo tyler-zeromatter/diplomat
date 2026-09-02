@@ -10,7 +10,7 @@ use diplomat_tool::config::Config;
     about = "Generate bindings to a target language"
 )]
 struct Opt {
-    /// The target language, "c", "cpp", "js", "demo_gen", "kotlin" (JVM), "dotnet" (C#), or "rust" (experimental)
+    /// The target language, "c", "cpp", "js", "demo_gen", "kotlin" (JVM), "dotnet" (C#), "cpython" (Python, experimental), or "rust" (experimental)
     #[clap()]
     target_language: String,
 
