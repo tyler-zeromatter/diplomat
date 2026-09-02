@@ -242,7 +242,7 @@ pub(crate) fn run<'cx>(
             .includes
             .insert(cpp_impl_path.clone());
 
-        let guard = errors.set_context_ty(tr.name.as_str().into());
+        let guard = errors.set_context_ty((&tr.name).into());
 
         let mut body = String::default();
         context.gen_trait_def(tr, id, &mut body);
