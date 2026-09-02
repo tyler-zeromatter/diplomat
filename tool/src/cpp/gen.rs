@@ -1090,7 +1090,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
             let mutability = borrow.mutability;
             match (borrow.is_owned(), false) {
                 // unique_ptr is nullable
-                (true, _) => self.formatter.fmt_owned(&type_name),
+                (true, op) => self.formatter.fmt_owned(&type_name, op),
                 (false, true) => self.formatter.fmt_optional_borrowed(&type_name, mutability),
                 (false, false) => self.formatter.fmt_borrowed(&type_name, mutability),
             }
@@ -1118,7 +1118,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
         let mutability = op.owner.mutability().unwrap_or(hir::Mutability::Mutable);
         let ret = match (op.owner.is_owned(), op.is_optional()) {
             // unique_ptr is nullable
-            (true, _) => self.formatter.fmt_owned(&type_name),
+            (true, op) => self.formatter.fmt_owned(&type_name, op),
             (false, true) if !use_mt_ptr => {
                 self.formatter.fmt_optional_borrowed(&type_name, mutability)
             }
