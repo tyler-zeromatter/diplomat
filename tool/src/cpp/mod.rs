@@ -133,7 +133,7 @@ pub(crate) fn run<'tcx>(
         };
         context.impl_header.decl_include = Some(decl_header_path.clone());
 
-        let guard = errors.set_context_ty(ty.name().as_str().into());
+        let guard = errors.set_context_ty(ty.name_with_span().into());
         match id {
             hir::TypeId::Enum(e_id) => context.gen_enum_def(e_id),
             hir::TypeId::Opaque(o_id) => context.gen_opaque_def(o_id),
@@ -188,7 +188,7 @@ pub(crate) fn run<'tcx>(
         };
         context.impl_header.decl_include = Some(decl_header_path.clone());
 
-        let guard = errors.set_context_ty(tr.name.as_str().into());
+        let guard = errors.set_context_ty((&tr.name).into());
         context.gen_trait_def(id);
         drop(guard);
 

@@ -6,18 +6,22 @@ use crate::ast::{idents::Span, Ident, SpanLocation};
 static WRITER: RwLock<&(dyn Fn() -> Box<dyn std::io::Write> + Send + Sync)> =
     RwLock::new(&(|| Box::new(std::io::stderr())));
 
-pub(crate) struct ContextLocation {
-    // Allow for pretty-print:
-    #[allow(unused)]
+pub struct ContextLocation {
     location: Span,
-    // Allow for pretty-print:
-    #[allow(unused)]
     label: String,
 }
 
 impl ContextLocation {
     pub fn new(location: Span, label: String) -> Self {
         Self { location, label }
+    }
+
+    pub fn location(&self) -> &Span {
+        &self.location
+    }
+
+    pub fn label(&self) -> &str {
+        &self.label
     }
 }
 
@@ -31,7 +35,7 @@ pub struct AstReport {
 }
 
 impl AstReport {
-    pub(crate) fn new(
+    pub fn new(
         title: String,
         primary_loc: Option<Span>,
         primary_label: String,

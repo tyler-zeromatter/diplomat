@@ -20,7 +20,7 @@ use config::toml_value_from_str;
 use config::{find_top_level_attr, Config};
 use core::mem;
 use core::panic;
-use diplomat_core::ast::ModuleIncludeInfo;
+use diplomat_core::ast::{write_report, ModuleIncludeInfo};
 use diplomat_core::hir;
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -170,8 +170,24 @@ pub fn gen(
     let errors = errors.take_all();
     if !errors.is_empty() {
         eprintln!("Found errors whilst generating {target_language}:");
+
         for error in errors {
-            eprintln!("\t{}: {}", error.0, error.1);
+            let location = error
+                .0
+                .method
+                .as_ref()
+                .or(error.0.ty.as_ref())
+                .map(|s| s.span().cloned())
+                .expect("Could not find location for error.");
+            let report = diplomat_core::ast::AstReport::new(
+                format!("In {}", error.0),
+                location,
+                error.1,
+                vec![],
+            );
+            let b: Box<dyn std::io::Write> = Box::new(std::io::stderr());
+            write_report(&report, b, diplomat_core::ast::PrettyPrint::Default)
+                .expect("Could not write report.");
         }
         eprintln!("Not generating files due to errors");
         // Eventually this should use eyre or something
@@ -230,16 +246,22 @@ impl FileMap {
 #[derive(Default)]
 pub struct ErrorStore<'tcx, E> {
     /// The stack of contexts reached so far
-    context: RefCell<ErrorContext<'tcx>>,
+    context: RefCell<Option<ErrorContext<'tcx>>>,
     errors: RefCell<Vec<(ErrorContext<'tcx>, E)>>,
 }
 
 impl<'tcx, E> ErrorStore<'tcx, E> {
     /// Set the context to a named type. Will return a scope guard that will automatically
     /// clear the context on drop.
-    pub fn set_context_ty<'a>(&'a self, ty: Cow<'tcx, str>) -> ErrorContextGuard<'a, 'tcx, E> {
-        let new = ErrorContext { ty, method: None };
-        let old = mem::replace(&mut *self.context.borrow_mut(), new);
+    pub fn set_context_ty<'a>(
+        &'a self,
+        ty: Cow<'tcx, hir::LocIdent>,
+    ) -> ErrorContextGuard<'a, 'tcx, E> {
+        let new = ErrorContext {
+            ty: Some(ty),
+            method: None,
+        };
+        let old = (*self.context.borrow_mut()).replace(new);
         ErrorContextGuard(self, old)
     }
 
@@ -247,49 +269,76 @@ impl<'tcx, E> ErrorStore<'tcx, E> {
     /// clear the context on drop.
     pub fn set_context_method<'a>(
         &'a self,
-        method: Cow<'tcx, str>,
+        method: Cow<'tcx, hir::LocIdent>,
     ) -> ErrorContextGuard<'a, 'tcx, E> {
         let new = ErrorContext {
-            ty: self.context.borrow().ty.clone(),
+            ty: self.context.borrow().clone().and_then(|c| c.ty),
             method: Some(method),
         };
 
-        let old = mem::replace(&mut *self.context.borrow_mut(), new);
+        let old = (*self.context.borrow_mut()).replace(new);
         ErrorContextGuard(self, old)
     }
 
     pub fn push_error(&self, error: E) {
-        self.errors
-            .borrow_mut()
-            .push((self.context.borrow().clone(), error));
+        self.errors.borrow_mut().push((
+            self.context
+                .borrow()
+                .clone()
+                .expect("Cannot push error without context."),
+            error,
+        ));
     }
 
-    pub fn take_all(&self) -> Vec<(impl fmt::Display + 'tcx, E)> {
+    pub fn take_all(&self) -> Vec<(ErrorContext<'tcx>, E)> {
         mem::take(&mut self.errors.borrow_mut())
     }
 }
 
 /// The context in which an error was discovered
-#[derive(Default, Clone)]
-struct ErrorContext<'tcx> {
-    ty: Cow<'tcx, str>,
-    method: Option<Cow<'tcx, str>>,
+#[derive(Clone, Default)]
+pub struct ErrorContext<'tcx> {
+    /// Type may not always be set (for free-standing functions)
+    ty: Option<Cow<'tcx, hir::LocIdent>>,
+    method: Option<Cow<'tcx, hir::LocIdent>>,
+}
+
+impl<'tcx> ErrorContext<'tcx> {
+    pub fn ty(&self) -> Option<Cow<'tcx, hir::LocIdent>> {
+        self.ty.clone()
+    }
+
+    pub fn method(&self) -> Option<Cow<'tcx, hir::LocIdent>> {
+        self.method.clone()
+    }
 }
 
 impl fmt::Display for ErrorContext<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let ty = &self.ty;
-        if let Some(ref method) = self.method {
-            write!(f, "{ty}::{method}")
+        let ty_ident = if let Some(ty) = &self.ty {
+            format!("{ty}")
         } else {
-            ty.fmt(f)
+            "".into()
+        };
+
+        let method_ident = if let Some(method) = &self.method {
+            format!("{method}")
+        } else {
+            "".into()
+        };
+
+        match (ty_ident.is_empty(), method_ident.is_empty()) {
+            (false, true) => write!(f, "{ty_ident}"),
+            (true, false) => write!(f, "{method_ident}"),
+            (false, false) => write!(f, "{ty_ident}::{method_ident}"),
+            (true, true) => write!(f, "<unknown location>"),
         }
     }
 }
 
 /// Scope guard terminating the context created `set_context_*` method on [`ErrorStore`]
 #[must_use]
-pub struct ErrorContextGuard<'a, 'tcx, E>(&'a ErrorStore<'tcx, E>, ErrorContext<'tcx>);
+pub struct ErrorContextGuard<'a, 'tcx, E>(&'a ErrorStore<'tcx, E>, Option<ErrorContext<'tcx>>);
 
 impl<E> Drop for ErrorContextGuard<'_, '_, E> {
     fn drop(&mut self) {

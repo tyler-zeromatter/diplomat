@@ -16,6 +16,12 @@ pub enum ReturnableStructDef<'tcx> {
 #[derive(Debug, Clone)]
 pub struct Ident(pub IdentBuf, pub(crate) Option<crate::ast::Span>);
 
+impl<'a> From<&'a Ident> for std::borrow::Cow<'a, Ident> {
+    fn from(val: &'a Ident) -> Self {
+        std::borrow::Cow::Borrowed(val)
+    }
+}
+
 impl std::cmp::PartialEq<&'static str> for Ident {
     fn eq(&self, other: &&'static str) -> bool {
         self.0.eq(other)
@@ -31,6 +37,10 @@ impl std::fmt::Display for Ident {
 impl Ident {
     pub(crate) fn new(name: IdentBuf, span: Option<crate::ast::Span>) -> Self {
         Self(name, span)
+    }
+
+    pub fn span(&self) -> Option<&crate::ast::Span> {
+        self.1.as_ref()
     }
 }
 
@@ -310,6 +320,16 @@ impl<'a> From<&'a EnumDef> for TypeDef<'a> {
 
 impl<'tcx> TypeDef<'tcx> {
     pub fn name(&self) -> &'tcx IdentBuf {
+        match *self {
+            Self::Struct(ty) => &ty.name,
+            Self::OutStruct(ty) => &ty.name,
+            Self::Opaque(ty) => &ty.name,
+            Self::Enum(ty) => &ty.name,
+        }
+    }
+
+    /// Like [`IdentBuf`], but wrapped to also contain [`crate::ast::Span`] for error printing.
+    pub fn name_with_span(&self) -> &'tcx Ident {
         match *self {
             Self::Struct(ty) => &ty.name,
             Self::OutStruct(ty) => &ty.name,
