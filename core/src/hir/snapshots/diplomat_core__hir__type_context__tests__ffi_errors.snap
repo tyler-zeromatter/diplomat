@@ -2,6 +2,8 @@
 source: core/src/hir/type_context.rs
 expression: output
 ---
+Diplomat error: Lowering error in SomeStruct::callback_unit_type_not_okay
+> Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.
 Diplomat error: Lowering error in SomeTrait::returns_unit_not_okay
 > Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.
 Diplomat error: Lowering error in SomeTrait::returns_nullable_not_okay
