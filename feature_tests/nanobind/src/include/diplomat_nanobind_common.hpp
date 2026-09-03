@@ -176,6 +176,8 @@ namespace nanobind::detail
                 is_ok = true;
                 if constexpr(std::is_reference_v<T>) {
                     ok_val = std::optional(std::reference_wrapper(caster.operator cast_t<T>()));
+                } else if constexpr(std::is_same_v<T, std::monostate>) {
+                    ok_val = std::optional(std::monostate());
                 } else {
                     ok_val = std::optional(caster.operator cast_t<T>());
                 }
@@ -187,6 +189,8 @@ namespace nanobind::detail
                     is_ok = false;
                     if constexpr(std::is_reference_v<E>) {
                         err_val = std::optional(std::reference_wrapper(err_caster.operator cast_t<E>()));
+                    } else if constexpr(std::is_same_v<E, std::monostate>) {
+                        err_val = std::optional(std::monostate());
                     } else {
                         err_val = std::optional(err_caster.operator cast_t<E>());
                     }

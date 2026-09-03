@@ -560,6 +560,22 @@ class ErrorStruct:
     @staticmethod
     def returns_result_option(is_some: bool) -> ErrorStruct | None: ...
 
+class FFIError:
+    def __init__(self, arg: FFIError.FFIError, /) -> None: ...
+
+    class FFIError(enum.Enum):
+        FFI = 0
+
+        User = 1
+
+    FFI: FFIError.FFIError = FFIError.FFIError.FFI
+
+    User: FFIError.FFIError = FFIError.FFIError.User
+
+    def __eq__(self, arg: FFIError.FFIError, /) -> bool: ...
+
+    def __repr__(self) -> str: ...
+
 class FallibleOpaqueConstructor:
     def __init__(self) -> None: ...
 
@@ -568,6 +584,36 @@ class FallibleOpaqueConstructor:
 
     @x.setter
     def x(self, arg: int, /) -> None: ...
+
+class FallibleTesterTrait(FallibleTesterTrait_PyBase):
+    @abstractmethod
+    def test_void_trait_fn() -> None: ...
+
+    @abstractmethod
+    def test_result_output( x : int ) -> int: ...
+
+from abc import abstractmethod
+class FallibleTesterTrait_PyBase():
+    def __init__() -> None: ...
+
+class FallibleTraitWrapper:
+    @overload
+    def __init__(self) -> None: ...
+
+    @overload
+    def __init__(self, cant_be_empty: bool | None) -> None: ...
+
+    @property
+    def cant_be_empty(self) -> bool: ...
+
+    @cant_be_empty.setter
+    def cant_be_empty(self, arg: bool, /) -> None: ...
+
+    @staticmethod
+    def test_result_output(t: FallibleTesterTrait_PyBase, x: int) -> int: ...
+
+    @staticmethod
+    def test_with_trait(t: FallibleTesterTrait_PyBase) -> None: ...
 
 class Float64Vec:
     @property
@@ -1427,6 +1473,25 @@ class StructWithSlices:
     def second(self, arg: Sequence[int], /) -> None: ...
 
     def return_last(self) -> str: ...
+
+class TraitTestingStruct:
+    @overload
+    def __init__(self) -> None: ...
+
+    @overload
+    def __init__(self, x: int | None, y: int | None) -> None: ...
+
+    @property
+    def x(self) -> int: ...
+
+    @x.setter
+    def x(self, arg: int, /) -> None: ...
+
+    @property
+    def y(self) -> int: ...
+
+    @y.setter
+    def y(self, arg: int, /) -> None: ...
 
 class TupleStruct:
     @overload

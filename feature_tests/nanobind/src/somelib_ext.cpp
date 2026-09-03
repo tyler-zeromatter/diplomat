@@ -31,6 +31,8 @@ void add_StructArithmetic_binding(nb::module_);
 void add_StructOfOpaque_binding(nb::module_);
 void add_StructWithSlices_binding(nb::module_);
 void add_TupleStruct_binding(nb::module_);
+void add_FallibleTraitWrapper_binding(nb::module_);
+void add_TraitTestingStruct_binding(nb::module_);
 void add_OptionStruct_binding(nb::module_);
 void add_OutTupleStruct_binding(nb::module_);
 void add_Unnamespaced_binding(nb::module_);
@@ -65,6 +67,8 @@ void add_ErrorEnum_binding(nb::module_);
 void add_ContiguousEnum_binding(nb::module_);
 void add_DefaultEnum_binding(nb::module_);
 void add_MyEnum_binding(nb::module_);
+void add_FFIError_binding(nb::module_);
+void add_FallibleTesterTrait_binding(nb::module_);
 void add_free_function_binding(nb::module_);
 }namespace somelib::mylib{
   
@@ -194,6 +198,8 @@ NB_MODULE(somelib, mod)
     add_StructOfOpaque_binding(mod);
     add_StructWithSlices_binding(mod);
     add_TupleStruct_binding(mod);
+    add_FallibleTraitWrapper_binding(mod);
+    add_TraitTestingStruct_binding(mod);
     add_OptionStruct_binding(mod);
     add_OutTupleStruct_binding(mod);
     add_Unnamespaced_binding(mod);
@@ -228,6 +234,8 @@ NB_MODULE(somelib, mod)
     add_ContiguousEnum_binding(mod);
     add_DefaultEnum_binding(mod);
     add_MyEnum_binding(mod);
+    add_FFIError_binding(mod);
+    add_FallibleTesterTrait_binding(mod);
     add_free_function_binding(mod);
     
     mylib::add_MethodOverloading_binding(mylib_mod);

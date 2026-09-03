@@ -14,7 +14,10 @@ namespace {{lib_name}} {
 {% endif -%}
 {% if let Some(deprecated) = deprecated %}[[deprecated("{{ deprecated }}")]] {% endif -%} class {{trait_name_unnamespaced}} {
     private:
-    static void Destroy(const void* data);
+    static void Destroy(const void* data) {
+        auto self = static_cast<const {{trait_name}}*>(data);
+        delete self;
+    }
 
     protected:
     {%- for m in methods %}

@@ -44,9 +44,4 @@ inline somelib::capi::DiplomatTraitStruct_TesterTrait somelib::TesterTrait::AsFF
     };
     return trait_inner;
 }
-
-void somelib::TesterTrait::Destroy(const void* data) {
-    auto self = static_cast<const somelib::TesterTrait*>(data);
-    delete self;
-}
 #endif // SOMELIB_TesterTrait_HPP

@@ -2,7 +2,8 @@
 
 use crate::cpp::Cpp2Formatter;
 use diplomat_core::hir::{
-    Attrs, Docs, DocsTypeReferenceSyntax, DocsUrlGenerator, Method, SymbolId, TypeContext, TypeId,
+    Attrs, Docs, DocsTypeReferenceSyntax, DocsUrlGenerator, Method, StructPathLike, SymbolId,
+    TraitIdGetter, TypeContext,
 };
 use std::fmt::Write;
 use std::{borrow::Cow, sync::LazyLock};
@@ -73,14 +74,23 @@ impl<'tcx> PyFormatter<'tcx> {
         Some(literal)
     }
 
-    pub fn fmt_binding_fn(&self, id: TypeId) -> String {
-        let def = self.cxx.c.tcx().resolve_type(id);
-        let type_name = def.attrs().rename.apply(def.name().as_str().into());
-        format!("add_{type_name}_binding")
+    pub fn fmt_binding_fn(&self, id: SymbolId) -> String {
+        let name = match id {
+            SymbolId::TypeId(t) => {
+                let def = self.cxx.c.tcx().resolve_type(t);
+                def.attrs().rename.apply(def.name().as_str().into())
+            }
+            SymbolId::TraitId(tr) => {
+                let def = self.cxx.c.tcx().resolve_trait(tr);
+                def.attrs.rename.apply(def.name.as_str().into())
+            }
+            _ => unreachable!("Unknown SymbolId: {id:?}"),
+        };
+        format!("add_{name}_binding")
     }
 
-    pub fn fmt_binding_impl_path(&self, id: TypeId) -> String {
-        self.cxx.fmt_type_name(id).replace("::", "/") + "_binding.cpp"
+    pub fn fmt_binding_impl_path(&self, id: SymbolId) -> String {
+        self.cxx.fmt_symbol_name(id).replace("::", "/") + "_binding.cpp"
     }
 
     /// Resolve and format the nested module names for this type
@@ -96,6 +106,7 @@ impl<'tcx> PyFormatter<'tcx> {
                 .namespace
                 .as_ref(),
             SymbolId::TypeId(ty) => self.cxx.c.tcx().resolve_type(ty).attrs().namespace.as_ref(),
+            SymbolId::TraitId(tr) => self.cxx.c.tcx().resolve_trait(tr).attrs.namespace.as_ref(),
             _ => panic!("Unsupported SymbolId {id:?}"),
         };
         namespace
@@ -129,6 +140,123 @@ impl<'tcx> PyFormatter<'tcx> {
             format!("{name}_").into()
         } else {
             name
+        }
+    }
+
+    pub fn symbol_to_python_type(&'tcx self, ty: crate::hir::SymbolId) -> Cow<'tcx, str> {
+        let (name, namespace) = match ty {
+            SymbolId::TypeId(ty) => {
+                let resolved = self.cxx.c.tcx().resolve_type(ty);
+                let name = resolved
+                    .attrs()
+                    .rename
+                    .apply(resolved.name().as_str().into());
+                (name, resolved.attrs().namespace.as_ref())
+            }
+            SymbolId::FunctionId(f) => {
+                let resolved = self.cxx.c.tcx().resolve_function(f);
+                let name = resolved.attrs.rename.apply(resolved.name.as_str().into());
+                (name, resolved.attrs.namespace.as_ref())
+            }
+            SymbolId::TraitId(tr) => {
+                let resolved = self.cxx.c.tcx().resolve_trait(tr);
+                let name = resolved.attrs.rename.apply(resolved.name.as_str().into());
+                (name, resolved.attrs.namespace.as_ref())
+            }
+            _ => unreachable!("Unrecognized symbol ID: {ty:?}"),
+        };
+        if let Some(ns) = namespace {
+            format!("{}.{name}", ns.replace("::", ".")).into()
+        } else {
+            name
+        }
+    }
+
+    pub fn primitive_to_python_type(&self, p: &crate::hir::PrimitiveType) -> Cow<'static, str> {
+        match p {
+            crate::hir::PrimitiveType::Bool => "bool".into(),
+            crate::hir::PrimitiveType::Char => "str".into(),
+            crate::hir::PrimitiveType::Byte
+            | crate::hir::PrimitiveType::Ordering
+            | crate::hir::PrimitiveType::Int(..)
+            | crate::hir::PrimitiveType::IntSize(..)
+            | crate::hir::PrimitiveType::Int128(..) => "int".into(),
+            crate::hir::PrimitiveType::Float(..) => "float".into(),
+        }
+    }
+
+    /// Used by trait abstract definitions.
+    pub fn hir_type_to_python_type<P: crate::hir::TyPosition>(
+        &'tcx self,
+        ty: &crate::hir::Type<P>,
+    ) -> Cow<'tcx, str> {
+        match ty {
+            crate::hir::Type::Primitive(p) => self.primitive_to_python_type(p),
+            crate::hir::Type::Opaque(op) => self.symbol_to_python_type(op.id().into()),
+            crate::hir::Type::Struct(st) => self.symbol_to_python_type(st.id().into()),
+            crate::hir::Type::ImplTrait(tr) => self.symbol_to_python_type(tr.id().into()),
+            crate::hir::Type::Enum(e) => self.symbol_to_python_type(e.id().into()),
+            crate::hir::Type::Slice(sl) => match sl {
+                crate::hir::Slice::Str(..) => "str".into(),
+                crate::hir::Slice::Primitive(_, p) => {
+                    format!("list[{}]", self.primitive_to_python_type(p)).into()
+                }
+                crate::hir::Slice::Strs(..) => "list[str]".into(),
+                crate::hir::Slice::Opaque(_, op) => {
+                    format!("list[{}]", self.symbol_to_python_type(op.id().into())).into()
+                }
+                crate::hir::Slice::Struct(_, st) => {
+                    format!("list[{}]", self.symbol_to_python_type(st.id().into())).into()
+                }
+                _ => unreachable!("Unknown AST/HIR variant: {sl:?}"),
+            },
+            crate::hir::Type::Callback(cb) => {
+                let ret =
+                    diplomat_core::hir::CallbackInstantiationFunctionality::get_output_type(cb)
+                        .expect("Could not get output type.");
+
+                let params = diplomat_core::hir::CallbackInstantiationFunctionality::get_inputs(cb)
+                    .expect("Could not get callback inputs.")
+                    .iter()
+                    .map(|p| self.hir_type_to_python_type(&p.ty))
+                    .collect::<Vec<_>>();
+
+                format!(
+                    "Callable[[{}], {}]",
+                    params.join(","),
+                    self.return_type_to_python_type(ret)
+                )
+                .into()
+            }
+            crate::hir::Type::DiplomatOption(op) => {
+                format!("{} | None", self.hir_type_to_python_type(op.as_ref())).into()
+            }
+            _ => unreachable!("Unrecognized AST type: {ty:?}"),
+        }
+    }
+
+    fn success_type_to_python_type<P: crate::hir::TyPosition>(
+        &'tcx self,
+        ty: &crate::hir::SuccessType<P>,
+    ) -> Cow<'tcx, str> {
+        match ty {
+            crate::hir::SuccessType::Unit => "None".into(),
+            crate::hir::SuccessType::Write => "str".into(),
+            crate::hir::SuccessType::OutType(o) => self.hir_type_to_python_type(o),
+            _ => unreachable!("Unrecognized success type: {ty:?}"),
+        }
+    }
+
+    pub fn return_type_to_python_type<P: crate::hir::TyPosition>(
+        &'tcx self,
+        ty: &crate::hir::ReturnType<P>,
+    ) -> Cow<'tcx, str> {
+        match ty {
+            crate::hir::ReturnType::Infallible(i) => self.success_type_to_python_type(i),
+            crate::hir::ReturnType::Nullable(n) => {
+                format!("{} | None", self.success_type_to_python_type(n)).into()
+            }
+            crate::hir::ReturnType::Fallible(ok, _) => self.success_type_to_python_type(ok),
         }
     }
 }

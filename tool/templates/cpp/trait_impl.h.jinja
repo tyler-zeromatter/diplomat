@@ -31,8 +31,3 @@ inline {{ctype}} {{trait_name}}::AsFFI() const {
     };
     return trait_inner;
 }
-
-void {{trait_name}}::Destroy(const void* data) {
-    auto self = static_cast<const {{trait_name}}*>(data);
-    delete self;
-}

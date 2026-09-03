@@ -103,6 +103,9 @@ If you use `WriteTrait`, you will be interfacing with the [C ABI of DiplomatWrit
 ### Callbacks
 Callbacks are represented as `std::function<Ret(Args...)>`, where `Ret` and `Args...` are diplomat-friendly C++ types. These work just like any other C++ callback function and are converted in to the C ABI with some templating.
 
+### Traits
+Traits are implemented as abstract classes with `virtual` functions that must be overridden. When a method accepts a trait in C++, it will be a `std::unique_ptr` of the abstract class, and will be converted into the [C VTable of the trait](./c.md#traits).
+
 ### Struct References
 
 #### &mut Struct

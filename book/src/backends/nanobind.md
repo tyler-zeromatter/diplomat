@@ -75,6 +75,13 @@ The Nanobind backend uses the [default C++ implementation for DiplomatWrite](./c
 ### Callbacks
 Implemented as any ordinary Python function (lambda or `def` will work).
 
+### Traits
+Trait methods are fallible here, so any returned trait must be bound with [ffi_error](../attrs/fallible_trait_returns.md).
+
+Implemented as classes that subclass a given `TraitName`. Python will raise a `TypeError` if *any* method is not implemented in the trait. If you attempt to `super()` a trait name, since the method is abstract, it will raise a `TypeError`. Any exceptions raised while executing in Rust code will be returned as an FFI error.
+
+There is an additional `TraitName_PyBase` class that Nanobind generates. This is purely for stubgen purposes: Nanobind has to bind the [underlying abstract class](./cpp.md#traits) for stubgen, and create an implementation class for binding the abstract methods from Python.
+
 ## Debugging
 Nanobind `.pyd` files can be stepped through using any debugger. As long as you've built the `.pyd` file with debugging symbols, you can attach to any running Python process that has the `.pyd` imported. Here are the steps:
 

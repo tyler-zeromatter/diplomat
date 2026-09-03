@@ -604,6 +604,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
             fmt: &'a Cpp2Formatter<'a>,
             ctype: Cow<'a, str>,
             c_header: C2Header,
+            trait_name: &'a str,
             trait_name_unnamespaced: &'a str,
             namespace: Option<&'a str>,
             methods: &'a [TraitMethodInfo<'a>],
@@ -615,6 +616,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
             fmt: self.formatter,
             c_header,
             ctype: ctype.clone(),
+            trait_name: &trait_name,
             trait_name_unnamespaced: &trait_name_unnamespaced,
             namespace: trait_def.attrs.namespace.as_deref(),
             methods: methods.as_slice(),
@@ -1019,6 +1021,9 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
             }
             Type::ImplTrait(ref tr) => {
                 let id = tr.id();
+                self.impl_header
+                    .includes
+                    .insert(self.formatter.fmt_impl_header_path(id.into()));
                 self.decl_header
                     .includes
                     .insert(self.formatter.fmt_decl_header_path(id.into()));
@@ -1391,7 +1396,7 @@ impl<'ccx, 'tcx: 'ccx> ItemGenContext<'ccx, 'tcx, '_> {
     ///
     /// is_generic_write is whether we are generating the method that returns a string or
     /// operates on a Writeable
-    pub(super) fn gen_cpp_return_type_name<P: hir::TyPosition>(
+    pub(crate) fn gen_cpp_return_type_name<P: hir::TyPosition>(
         &mut self,
         result_ty: &ReturnType<P>,
         is_generic_write: bool,
