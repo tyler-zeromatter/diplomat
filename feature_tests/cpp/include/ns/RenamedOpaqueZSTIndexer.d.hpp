@@ -31,7 +31,7 @@ public:
 
   inline static std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer> new_();
 
-  inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer> operator[](size_t idx) const;
+  inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer>> operator[](size_t idx) const;
 
     inline const somelib::ns::capi::RenamedOpaqueZSTIndexer* AsFFI() const;
     inline somelib::ns::capi::RenamedOpaqueZSTIndexer* AsFFI();

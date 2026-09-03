@@ -27,7 +27,7 @@ namespace capi {
 } // namespace capi
 } // namespace
 
-inline const somelib::OpaqueThin* somelib::OpaqueThinIter::next() DIPLOMAT_LIFETIME_BOUND {
+inline somelib::diplomat::maybe_null<const somelib::OpaqueThin*> somelib::OpaqueThinIter::next() DIPLOMAT_LIFETIME_BOUND {
     auto result = somelib::capi::OpaqueThinIter_next(this->AsFFI());
     return somelib::OpaqueThin::FromFFI(result);
 }

@@ -35,8 +35,8 @@ namespace capi {
 
 namespace somelib {
 struct OptionStruct {
-    std::unique_ptr<somelib::OptionOpaque> a;
-    std::unique_ptr<somelib::OptionOpaqueChar> b;
+    somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaque>> a;
+    somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionOpaqueChar>> b;
     uint32_t c;
     std::unique_ptr<somelib::OptionOpaque> d;
 

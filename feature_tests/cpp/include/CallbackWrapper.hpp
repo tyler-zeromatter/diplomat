@@ -257,7 +257,7 @@ inline void somelib::CallbackWrapper::test_diplomat_option_output(std::function<
     somelib::capi::CallbackWrapper_test_diplomat_option_output({new decltype(t)(std::move(t)), somelib::diplomat::fn_traits(t).template c_run_callback_diplomat_option<uint32_t, somelib::capi::DiplomatCallback_CallbackWrapper_test_diplomat_option_output_t_result>, somelib::diplomat::fn_traits(t).c_delete});
 }
 
-inline std::string somelib::CallbackWrapper::test_option_opaque(std::function<const somelib::Opaque*()> t) {
+inline std::string somelib::CallbackWrapper::test_option_opaque(std::function<somelib::diplomat::maybe_null<const somelib::Opaque*>()> t) {
     std::string output;
     somelib::diplomat::capi::DiplomatWrite write = somelib::diplomat::WriteFromString(output);
     somelib::capi::CallbackWrapper_test_option_opaque({new decltype(t)(std::move(t)), somelib::diplomat::fn_traits(t).template c_run_callback_diplomat_opaque<const somelib::capi::Opaque*>, somelib::diplomat::fn_traits(t).c_delete},
@@ -265,7 +265,7 @@ inline std::string somelib::CallbackWrapper::test_option_opaque(std::function<co
     return output;
 }
 template<typename W>
-inline void somelib::CallbackWrapper::test_option_opaque_write(std::function<const somelib::Opaque*()> t, W& writeable) {
+inline void somelib::CallbackWrapper::test_option_opaque_write(std::function<somelib::diplomat::maybe_null<const somelib::Opaque*>()> t, W& writeable) {
     somelib::diplomat::capi::DiplomatWrite write = somelib::diplomat::WriteTrait<W>::Construct(writeable);
     somelib::capi::CallbackWrapper_test_option_opaque({new decltype(t)(std::move(t)), somelib::diplomat::fn_traits(t).template c_run_callback_diplomat_opaque<const somelib::capi::Opaque*>, somelib::diplomat::fn_traits(t).c_delete},
         &write);

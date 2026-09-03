@@ -218,11 +218,25 @@ impl<'tcx> Cpp2Formatter<'tcx> {
         ident: &'a str,
         mutability: hir::Mutability,
     ) -> Cow<'a, str> {
-        self.c.fmt_ptr(ident, mutability)
+        format!(
+            "{}diplomat::maybe_null<{}>",
+            self.lib_name_ns_prefix,
+            self.c.fmt_ptr(ident, mutability)
+        )
+        .into()
     }
 
-    pub fn fmt_owned<'a>(&self, ident: &'a str) -> Cow<'a, str> {
-        format!("std::unique_ptr<{ident}>").into()
+    pub fn fmt_owned<'a>(&self, ident: &'a str, optional: bool) -> Cow<'a, str> {
+        format!(
+            "{}std::unique_ptr<{ident}>{}",
+            if optional {
+                format!("{}diplomat::maybe_null<", self.lib_name_ns_prefix)
+            } else {
+                "".into()
+            },
+            if optional { ">" } else { "" }
+        )
+        .into()
     }
 
     pub fn fmt_borrowed_slice<'a>(

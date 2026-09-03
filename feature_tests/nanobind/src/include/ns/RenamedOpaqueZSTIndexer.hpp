@@ -33,7 +33,7 @@ inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer> somelib::ns::Rename
     return std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer>(somelib::ns::RenamedOpaqueZSTIndexer::FromFFI(result));
 }
 
-inline std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer> somelib::ns::RenamedOpaqueZSTIndexer::operator[](size_t idx) const {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer>> somelib::ns::RenamedOpaqueZSTIndexer::operator[](size_t idx) const {
     auto result = somelib::ns::capi::namespace_OpaqueZSTIndexer_index(this->AsFFI(),
         idx);
     return std::unique_ptr<somelib::ns::RenamedOpaqueZSTIndexer>(somelib::ns::RenamedOpaqueZSTIndexer::FromFFI(result));

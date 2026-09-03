@@ -32,7 +32,7 @@ namespace capi {
 } // namespace capi
 } // namespace
 
-inline std::unique_ptr<somelib::OptionString> somelib::OptionString::new_(std::string_view diplomat_str) {
+inline somelib::diplomat::maybe_null<std::unique_ptr<somelib::OptionString>> somelib::OptionString::new_(std::string_view diplomat_str) {
     auto result = somelib::capi::OptionString_new({diplomat_str.data(), diplomat_str.size()});
     return std::unique_ptr<somelib::OptionString>(somelib::OptionString::FromFFI(result));
 }
