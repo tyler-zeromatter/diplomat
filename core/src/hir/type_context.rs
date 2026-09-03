@@ -779,11 +779,11 @@ impl TypeContext {
                     };
 
                     if !is_valid {
-                        ctx.errors.push(LoweringError::Other("Found non #[diplomat::attr(*, ffi_error)] marked error type in trait return. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
+                        ctx.errors.push(LoweringError::Other("Found non #[diplomat::attr(*, ffi_error)] marked error type in trait return. See https://rust-diplomat.github.io/diplomat/attrs/fallible_callback_returns.html for more.".to_string()));
                     }
                 }
                 _ => {
-                    ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_trait_returns.html for more.".to_string()));
+                    ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_callback_returns.html for more.".to_string()));
                 }
             }
         }

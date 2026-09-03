@@ -76,7 +76,7 @@ The Nanobind backend uses the [default C++ implementation for DiplomatWrite](./c
 Implemented as any ordinary Python function (lambda or `def` will work).
 
 ### Traits
-Trait methods are fallible here, so any returned trait must be bound with [ffi_error](../attrs/fallible_trait_returns.md).
+Trait methods are fallible here, so any returned trait must be bound with [ffi_error](../attrs/fallible_callback_returns.md).
 
 Implemented as classes that subclass a given `TraitName`. Python will raise a `TypeError` if *any* method is not implemented in the trait. If you attempt to `super()` a trait name, since the method is abstract, it will raise a `TypeError`. Any exceptions raised while executing in Rust code will be returned as an FFI error.
 
