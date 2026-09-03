@@ -783,7 +783,7 @@ impl TypeContext {
                     }
                 }
                 _ => {
-                    ctx.errors.push(LoweringError::Other("Backend trait return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_callback_returns.html for more.".to_string()));
+                    ctx.errors.push(LoweringError::Other("Backend callback return types are fallible. Return type must be a `-> Result<T, E>`. See https://rust-diplomat.github.io/diplomat/attrs/fallible_callback_returns.html for more.".to_string()));
                 }
             }
         }

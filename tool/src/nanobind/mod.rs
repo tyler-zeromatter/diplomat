@@ -53,7 +53,7 @@ pub(crate) fn attr_support() -> BackendAttrSupport {
     // (this is an assumption made elsewehere throughout codegen)
     a.traits_are_send = true;
     a.traits_are_sync = true;
-    a.trait_returns_must_be_fallible = true;
+    a.callback_returns_must_be_fallible = true;
 
     a.generate_mocking_interface = false;
     a.abi_compatibles = true;
