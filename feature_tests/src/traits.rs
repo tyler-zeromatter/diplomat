@@ -1,12 +1,17 @@
 #[diplomat::bridge]
 mod ffi {
+    use crate::callbacks::ffi::FFIError;
+
     #[diplomat::cfg(supports = "traits")]
     pub struct TraitTestingStruct {
         x: i32,
         y: i32,
     }
 
-    #[diplomat::cfg(all(supports = "traits", not(supports = "callback_returns_must_be_fallible")))]
+    #[diplomat::cfg(all(
+        supports = "traits",
+        not(supports = "callback_returns_must_be_fallible")
+    ))]
     pub trait TesterTrait {
         fn test_trait_fn(&self, x: u32) -> u32;
         fn test_void_trait_fn(&self);
@@ -19,7 +24,10 @@ mod ffi {
         fn test_result_of_optional(&self, is_ok: bool) -> Result<u32, DiplomatOption<u32>>;
     }
 
-    #[diplomat::cfg(all(supports = "traits", not(supports = "callback_returns_must_be_fallible")))]
+    #[diplomat::cfg(all(
+        supports = "traits",
+        not(supports = "callback_returns_must_be_fallible")
+    ))]
     pub struct TraitWrapper {
         cant_be_empty: bool,
     }
@@ -52,13 +60,6 @@ mod ffi {
         ) -> Result<u32, DiplomatOption<u32>> {
             t.test_result_of_optional(is_ok)
         }
-    }
-
-    #[diplomat::cfg(all(supports = "traits", supports = "callback_returns_must_be_fallible"))]
-    pub enum FFIError {
-        #[diplomat::attr(auto, ffi_error)]
-        FFI,
-        User,
     }
 
     #[diplomat::cfg(all(supports = "traits", supports = "callback_returns_must_be_fallible"))]
