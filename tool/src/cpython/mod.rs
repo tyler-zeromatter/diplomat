@@ -1,10 +1,12 @@
 mod formatter;
+mod gen;
 
-use askama::Template;
-use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext};
+use askama::{DynTemplate, Template};
+use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext, TypeDef};
 use serde::{Deserialize, Serialize};
 
-use crate::{ErrorStore, FileMap, c::{self, ItemGenContext as CItemGenContext}, cpython::formatter::PyFormatter};
+use crate::cpython::gen::SymbolTemplate;
+use crate::{ErrorStore, FileMap, c::{self, ItemGenContext as CItemGenContext}, cpython::{formatter::PyFormatter, r#gen::ItemGenContext}};
 
 
 pub fn attr_support() -> BackendAttrSupport {
@@ -16,10 +18,6 @@ pub fn attr_support() -> BackendAttrSupport {
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct CPythonConfig {
 
-}
-
-struct ItemGenContext<'cx, 'tcx, 'header> {
-    pub c : CItemGenContext<'cx, 'tcx, 'header>,
 }
 
 pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen : &'tcx DocsUrlGenerator) -> (FileMap, ErrorStore<'tcx, String>) {
@@ -48,6 +46,19 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
                 impl_header_path: &formatter.c.fmt_impl_header_path(id.into())
             }
         };
+
+        let template : &dyn SymbolTemplate = match ty {
+            TypeDef::Enum(e) => {
+                &context.gen_enum_def(e)
+            }
+            TypeDef::Struct(st) => {
+                &context.gen_struct_def(st)
+            }
+            _ => { continue; } // TODO
+        };
+        files.add_file(format!("{}_binding.c", template.file_base_name()), template.dyn_render().unwrap());
+
+
     }
 
     #[derive(Template)]
