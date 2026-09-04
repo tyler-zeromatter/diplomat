@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use askama::{DynTemplate, Template};
 use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, StructDef}};
 
@@ -12,20 +14,20 @@ pub(super) trait SymbolTemplate : DynTemplate {
 }
 
 impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
-    pub fn gen_enum_def(&self, def : &EnumDef) -> impl SymbolTemplate {
+    pub fn gen_enum_def(&self, def : &'tcx EnumDef) -> impl SymbolTemplate + use<'tcx> {
         #[derive(Template)]
         #[template(path = "cpython/symbols/enum.c.jinja", escape = "none")]
-        struct EnumTemplate {
-            name : String,
+        struct EnumTemplate<'tcx> {
+            abi_name : &'tcx str,
         }
 
-        impl SymbolTemplate for EnumTemplate {
+        impl<'tcx> SymbolTemplate for EnumTemplate<'tcx> {
             fn file_base_name(&self) -> String {
-                self.name.clone()
+                self.abi_name.into()
             }
         }
         EnumTemplate {
-            name: def.name.as_str().into(),
+            abi_name: def.name.as_str()
         }
     }
 

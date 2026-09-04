@@ -1,0 +1,3 @@
+int ErrorEnum_init() {
+
+}
