@@ -525,12 +525,17 @@ impl TypeContext {
                 }
             }
         }
+
+        for (_id, f) in self.all_free_functions() {
+            ctx.errors.set_item(f.name.as_str(), &f.name);
+            for p in &f.params {
+                self.validate_ty(ctx, &p.ty);
+            }
+        }
     }
 
     /// Perform validation checks on any given type
     /// (whether it be a struct field, a method argument, etc.)
-    /// Currently used to check if a given type is a slice of structs,
-    /// and ensure the relevant attributes are set there.
     fn validate_ty<P: super::TyPosition>(&self, ctx: &mut LoweringContext, ty: &hir::Type<P>) {
         match ty {
             hir::Type::Slice(hir::Slice::Struct(_, st)) => {
@@ -579,7 +584,7 @@ impl TypeContext {
                 if let Ok(cb_ret) = cb.get_output_type() {
                     self.validate_callback_ret(cb_ret, ctx)
                 }
-            },
+            }
             _ => {}
         }
     }
@@ -753,7 +758,11 @@ impl TypeContext {
         }
     }
 
-    fn validate_callback_ret(&self, return_type : &crate::hir::ReturnType<crate::hir::InputOnly>, ctx : &mut LoweringContext) {
+    fn validate_callback_ret(
+        &self,
+        return_type: &crate::hir::ReturnType<crate::hir::InputOnly>,
+        ctx: &mut LoweringContext,
+    ) {
         if ctx
             .attr_validator
             .attrs_supported()
