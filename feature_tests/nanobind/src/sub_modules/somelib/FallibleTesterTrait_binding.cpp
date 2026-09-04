@@ -79,7 +79,7 @@ void add_FallibleTesterTrait_binding(nb::module_ mod) {
     
         static inline void invalidMethod(PyObject* self, const char* method_name) {
             PyTypeObject* tp = Py_TYPE(self);
-            PyObject* tp_name = PyType_GetName(tp);
+            PyObject* tp_name = PyObject_GetAttrString((PyObject*)tp, "__name__");
             PyErr_Format(PyExc_AttributeError, "%U does not implement: '%s'", tp_name, method_name);
             Py_DECREF(tp_name);
         }
