@@ -1,5 +1,35 @@
 #include "diplomat_runtime_common.h"
 
-PyObject* PyInit__{{lib_name}}() {
+static int {{lib_name}}_exec(PyObject* m) {
+    return 0;
+} 
 
+static PyModuleDef_Slot {{lib_name}}_module_slots[] = {
+    {Py_mod_exec, {{lib_name}}_exec},
+    {0, NULL}
+};
+
+static struct PyModuleDef {{lib_name}}_module = {
+    // m_base
+    PyModuleDef_HEAD_INIT,
+    // m_name
+    "{{lib_name}}",
+    // m_doc
+    "",
+    // m_size
+    0,
+    // m_methods
+    NULL,
+    // m_slots
+    {{lib_name}}_module_slots,
+    // m_traverse
+    NULL,
+    // m_clear
+    NULL,
+    // m_free,
+    NULL
+};
+
+PyMODINIT_FUNC PyInit_{{lib_name}}() {
+    return PyModuleDef_Init(&{{lib_name}}_module);
 }
