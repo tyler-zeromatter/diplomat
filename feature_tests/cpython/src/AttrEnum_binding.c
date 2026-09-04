@@ -1,0 +1,3 @@
+int AttrEnum_init() {
+
+}

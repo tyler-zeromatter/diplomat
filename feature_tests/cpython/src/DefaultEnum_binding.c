@@ -1,0 +1,3 @@
+int DefaultEnum_init() {
+
+}

@@ -1,0 +1,3 @@
+int ContiguousEnum_init() {
+
+}
