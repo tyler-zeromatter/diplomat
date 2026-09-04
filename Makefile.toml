@@ -249,6 +249,33 @@ exit_on_error true
 exec --fail-on-error uvx --with feature_tests/nanobind --refresh-package somelib pytest feature_tests/nanobind/test/
 '''
 
+[tasks.test-cpython-feature]
+category = "Tests"
+dependencies = ["build-feature"]
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+cd feature_tests/cpython
+if not is_path_exists ".venv"
+echo "Creating venv..."
+exec --fail-on-error python -m venv .venv
+end
+
+path = set "./.venv/bin/"
+if is_windows
+path = set "./.venv/Scripts/"
+end
+
+if not is_path_exists "${path}pip"
+# Try uv:
+exec --fail-on-error uv pip install pytest .
+else
+exec --fail-on-error ${pip_to_use} install pytest .
+end
+
+exec --fail-on-error ${path}python -m pytest ./tests
+'''
+
 [tasks.test-dotnet-feature]
 category = "Tests"
 # build-feature produces the `diplomat_feature_tests` cdylib that the
