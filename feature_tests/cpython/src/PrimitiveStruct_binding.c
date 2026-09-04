@@ -1,0 +1,4 @@
+
+int PrimitiveStruct_init() {
+
+}

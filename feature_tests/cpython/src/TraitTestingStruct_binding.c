@@ -1,0 +1,4 @@
+
+int TraitTestingStruct_init() {
+
+}

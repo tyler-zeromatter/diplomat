@@ -1,0 +1,4 @@
+
+int BorrowedFieldsWithBounds_init() {
+
+}

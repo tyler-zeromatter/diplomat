@@ -1,0 +1,4 @@
+
+int ImportedStruct_init() {
+
+}

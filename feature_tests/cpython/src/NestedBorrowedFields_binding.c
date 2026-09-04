@@ -1,0 +1,4 @@
+
+int NestedBorrowedFields_init() {
+
+}

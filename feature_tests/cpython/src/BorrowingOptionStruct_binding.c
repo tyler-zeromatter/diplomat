@@ -1,0 +1,4 @@
+
+int BorrowingOptionStruct_init() {
+
+}

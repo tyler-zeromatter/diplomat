@@ -1,0 +1,4 @@
+
+int DeprecatedStruct_init() {
+
+}
