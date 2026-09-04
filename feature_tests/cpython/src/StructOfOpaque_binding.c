@@ -1,0 +1,4 @@
+
+int StructOfOpaque_init() {
+
+}

@@ -1,0 +1,4 @@
+
+int BorrowedFieldsReturning_init() {
+
+}

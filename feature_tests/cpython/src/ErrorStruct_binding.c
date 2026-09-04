@@ -1,0 +1,4 @@
+
+int ErrorStruct_init() {
+
+}

@@ -1,0 +1,4 @@
+
+int MyStruct_init() {
+
+}

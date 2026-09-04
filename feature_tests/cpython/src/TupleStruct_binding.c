@@ -1,0 +1,4 @@
+
+int TupleStruct_init() {
+
+}

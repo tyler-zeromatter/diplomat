@@ -1,0 +1,4 @@
+
+int StructWithAttrs_init() {
+
+}

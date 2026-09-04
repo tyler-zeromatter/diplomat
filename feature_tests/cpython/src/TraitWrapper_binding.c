@@ -1,0 +1,4 @@
+
+int TraitWrapper_init() {
+
+}

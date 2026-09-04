@@ -1,0 +1,4 @@
+
+int BigStructWithStuff_init() {
+
+}
