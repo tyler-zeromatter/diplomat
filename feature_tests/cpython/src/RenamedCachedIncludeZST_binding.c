@@ -1,0 +1,4 @@
+
+int RenamedCachedIncludeZST_init() {
+
+}

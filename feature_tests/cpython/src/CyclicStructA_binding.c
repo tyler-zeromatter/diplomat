@@ -1,0 +1,4 @@
+
+int CyclicStructA_init() {
+
+}

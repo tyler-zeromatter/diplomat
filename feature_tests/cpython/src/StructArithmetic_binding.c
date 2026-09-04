@@ -1,0 +1,4 @@
+
+int StructArithmetic_init() {
+
+}

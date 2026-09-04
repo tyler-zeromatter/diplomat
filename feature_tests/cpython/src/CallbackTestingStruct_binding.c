@@ -1,0 +1,4 @@
+
+int CallbackTestingStruct_init() {
+
+}

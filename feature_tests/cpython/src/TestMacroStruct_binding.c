@@ -1,0 +1,4 @@
+
+int TestMacroStruct_init() {
+
+}

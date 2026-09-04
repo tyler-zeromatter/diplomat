@@ -1,0 +1,4 @@
+
+int StructWithSlices_init() {
+
+}

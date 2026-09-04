@@ -9,6 +9,7 @@ static PyModuleDef_Slot _somelib_module_slots[] = {
     {0, NULL}
 };
 
+// See https://docs.python.org/3/c-api/module.html#c.PyModuleDef
 static struct PyModuleDef _somelib_module = {
     // m_base
     PyModuleDef_HEAD_INIT,
