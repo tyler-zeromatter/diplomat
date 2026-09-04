@@ -1,0 +1,3 @@
+int DeprecatedEnum_init() {
+
+}

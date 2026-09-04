@@ -1,0 +1,3 @@
+int UnimportedEnum_init() {
+
+}

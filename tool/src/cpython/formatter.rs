@@ -1,4 +1,4 @@
-use diplomat_core::hir::{DocsUrlGenerator, TypeContext};
+use diplomat_core::hir::{DocsUrlGenerator, SymbolId, TypeContext};
 
 use crate::c::CFormatter;
 
