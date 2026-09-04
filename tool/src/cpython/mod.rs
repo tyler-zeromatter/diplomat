@@ -4,7 +4,7 @@ use askama::Template;
 use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext};
 use serde::{Deserialize, Serialize};
 
-use crate::{ErrorStore, FileMap, c::ItemGenContext as CItemGenContext, cpython::formatter::PyFormatter};
+use crate::{ErrorStore, FileMap, c::{self, ItemGenContext as CItemGenContext}, cpython::formatter::PyFormatter};
 
 
 pub fn attr_support() -> BackendAttrSupport {
@@ -26,6 +26,16 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
     let files = FileMap::default();
     let errors = ErrorStore::default();
     let formatter = PyFormatter::new(tcx, config, docs_url_gen);
+    let (c_files, c_errors) = c::run(tcx, config, docs_url_gen);
+    
+    files.files.borrow_mut().extend(
+        c_files
+            .files
+            .take()
+            .into_iter()
+            .map(|(k, v)| (format!("include/{k}"), v)),
+    );
+    errors.errors.borrow_mut().extend(c_errors.errors.take());
 
     for (id, ty) in tcx.all_types() {
         let context = ItemGenContext {
