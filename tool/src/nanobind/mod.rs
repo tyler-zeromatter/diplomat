@@ -523,6 +523,11 @@ mod test {
                 #[diplomat::opaque]
                 struct OpaqueStruct;
 
+                pub enum FFIError {
+                    #[diplomat::attr(auto, ffi_error)]
+                    FFI,
+                }
+
                 impl OpaqueStruct {
                     pub fn new() -> Box<OpaqueStruct> {
                         Box::new(OpaqueStruct{})
@@ -532,12 +537,12 @@ mod test {
                         return true;
                     }
 
-                    pub fn takes_callback(f : impl Fn()) {
+                    pub fn takes_callback(f : impl Fn() -> Result<(), FFIError>) {
                         todo!()
                     }
 
                     #[diplomat::attr(*, rename="takes_callback")]
-                    pub fn takes_other_callback(f : impl Fn(bool)) {}
+                    pub fn takes_other_callback(f : impl Fn(bool) -> Result<(), FFIError>) {}
 
                     #[diplomat::attr(*, rename="new")]
                     pub fn str_slice_override(sl : &[DiplomatStrSlice]) {
