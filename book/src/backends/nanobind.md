@@ -73,7 +73,7 @@ If you have `ndarray` support through `NumPy`, and the inner slice type is suppo
 The Nanobind backend uses the [default C++ implementation for DiplomatWrite](./cpp.md#diplomatwrite), and so returns a `str` type.
 
 ### Callbacks
-Implemented as any ordinary Python function (lambda or `def` will work).
+Implemented as any ordinary Python function (lambda or `def` will work). Callback returns are fallible, so any callback return must be bound with [ffi_error](../attrs/fallible_callback_returns.md).
 
 ### Traits
 Trait methods are fallible here, so any returned trait must be bound with [ffi_error](../attrs/fallible_callback_returns.md).
