@@ -1,4 +1,0 @@
-
-int FeatureTest_init() {
-
-}

@@ -1,4 +1,7 @@
+#include "include/StructWithSlices.h"
 
-int StructWithSlices_init() {
+#include "diplomat_runtime_common.h"
 
+int StructWithSlices_init(PyObject* module) {
+    return 0;
 }

@@ -1,4 +1,0 @@
-
-int OptionInputStruct_init() {
-
-}

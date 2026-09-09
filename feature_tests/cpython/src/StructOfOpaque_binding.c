@@ -1,4 +1,7 @@
+#include "include/StructOfOpaque.h"
 
-int StructOfOpaque_init() {
+#include "diplomat_runtime_common.h"
 
+int StructOfOpaque_init(PyObject* module) {
+    return 0;
 }

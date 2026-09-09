@@ -1,3 +1,0 @@
-int OptionEnum_init() {
-
-}

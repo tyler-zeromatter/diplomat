@@ -1,4 +1,0 @@
-
-int BorrowingOptionStruct_init() {
-
-}

@@ -1,4 +1,0 @@
-
-int ImmutableStructOfOpaque_init() {
-
-}

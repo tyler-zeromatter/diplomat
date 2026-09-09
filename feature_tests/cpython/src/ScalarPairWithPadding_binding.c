@@ -1,4 +1,0 @@
-
-int ScalarPairWithPadding_init() {
-
-}

@@ -1,6 +1,111 @@
 #include "diplomat_runtime_common.h"
 
-static int _somelib_exec(PyObject* m) {
+static int _somelib_exec(PyObject* mod) {
+    
+    if (DeprecatedStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (RenamedCachedIncludeZST_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (StructWithAttrs_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (TestMacroStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (ImportedStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (BorrowedFields_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (BorrowedFieldsReturning_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (BorrowedFieldsWithBounds_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (NestedBorrowedFields_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (CachedIncludeZST_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (ErrorStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (CyclicStructA_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (CyclicStructB_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (CyclicStructC_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (MyStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (MyZst_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (PrimitiveStruct_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (StructOfOpaque_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (StructWithSlices_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (AttrEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (DeprecatedEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (UnimportedEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (ErrorEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (ContiguousEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (DefaultEnum_init(mod) < 0) {
+        return -1;
+    }
+    
+    if (MyEnum_init(mod) < 0) {
+        return -1;
+    }
+    
     return 0;
 } 
 
