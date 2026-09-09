@@ -1,6 +1,11 @@
 #include "diplomat_runtime_common.h"
 
-static int {{lib_name}}_exec(PyObject* m) {
+static int {{lib_name}}_exec(PyObject* mod) {
+    {% for m in header_method_names %}
+    if ({{m}}(mod) < 0) {
+        return -1;
+    }
+    {% endfor %}
     return 0;
 } 
 
