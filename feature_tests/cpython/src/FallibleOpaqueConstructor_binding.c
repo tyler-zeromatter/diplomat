@@ -1,4 +1,0 @@
-
-int FallibleOpaqueConstructor_init() {
-
-}

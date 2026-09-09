@@ -1,4 +1,7 @@
+#include "include/MyStruct.h"
 
-int MyStruct_init() {
+#include "diplomat_runtime_common.h"
 
+int MyStruct_init(PyObject* module) {
+    return 0;
 }

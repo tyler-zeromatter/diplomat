@@ -1,4 +1,0 @@
-
-int PartialComparableSlice_init() {
-
-}

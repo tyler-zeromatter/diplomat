@@ -1,4 +1,7 @@
+#include "include/BorrowedFieldsWithBounds.h"
 
-int BorrowedFieldsWithBounds_init() {
+#include "diplomat_runtime_common.h"
 
+int BorrowedFieldsWithBounds_init(PyObject* module) {
+    return 0;
 }

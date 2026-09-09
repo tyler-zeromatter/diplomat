@@ -1,4 +1,0 @@
-
-int ContainingTuple_init() {
-
-}

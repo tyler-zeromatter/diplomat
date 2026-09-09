@@ -1,4 +1,7 @@
+#include "include/StructWithAttrs.h"
 
-int StructWithAttrs_init() {
+#include "diplomat_runtime_common.h"
 
+int StructWithAttrs_init(PyObject* module) {
+    return 0;
 }

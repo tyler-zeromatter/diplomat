@@ -1,4 +1,0 @@
-
-int CallbackWrapper_init() {
-
-}
