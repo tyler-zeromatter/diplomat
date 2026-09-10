@@ -1,13 +1,37 @@
 #include "diplomat_runtime_common.h"
 
+static void {{lib_name}}_free(void* self) {
+    if (diplomat_internals.enum_mod) {
+        Py_DECREF(diplomat_internals.enum_mod);
+    }
+
+    if (diplomat_internals.enum_ty) {
+        Py_DECREF(diplomat_internals.enum_ty);
+    }
+}
+
+#define CHECK(check, reason, string) if (check) { PyErr_SetString(reason, string); {{lib_name}}_free((void*)mod); return -1; }
+
 static int {{lib_name}}_exec(PyObject* mod) {
-    {% for m in header_method_names %}
-    if ({{m}}(mod) < 0) {
+    if (diplomat_internals.initialized) {
+        PyErr_SetString(PyExc_ImportError, "cannot initialize `{{lib_name}}` more than once");
         return -1;
     }
+
+    // Grab enums:
+    diplomat_internals.enum_mod = PyImport_ImportModule("enum");
+    CHECK(!diplomat_internals.enum_mod, PyExc_ImportError, "could not find `enum` module");
+
+    diplomat_internals.enum_ty = PyObject_GetAttrString(diplomat_internals.enum_mod, "Enum");
+    CHECK(!diplomat_internals.enum_ty, PyExc_ImportError, "could not find `enum.Enum` type");
+
+    {% for m in header_method_names %}
+    CHECK({{m}}(mod) < 0, PyExc_ImportError, "could not initialize {{m}}");
     {% endfor %}
+
+    diplomat_internals.initialized = true;
     return 0;
-} 
+}
 
 static PyModuleDef_Slot {{lib_name}}_module_slots[] = {
     {Py_mod_exec, {{lib_name}}_exec},
@@ -32,8 +56,8 @@ static struct PyModuleDef {{lib_name}}_module = {
     NULL,
     // m_clear
     NULL,
-    // m_free,
-    NULL
+    // m_free
+    {{lib_name}}_free,
 };
 
 PyMODINIT_FUNC PyInit_{{lib_name}}() {

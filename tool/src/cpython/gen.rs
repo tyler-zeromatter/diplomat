@@ -19,6 +19,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
         #[template(path = "cpython/symbols/enum.c.jinja", escape = "none")]
         struct EnumTemplate<'tcx> {
             abi_name : &'tcx str,
+            name : String,
         }
 
         impl<'tcx> SymbolTemplate for EnumTemplate<'tcx> {
@@ -27,7 +28,8 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             }
         }
         EnumTemplate {
-            abi_name: def.name.as_str()
+            abi_name: def.name.as_str(),
+            name: heck::AsUpperCamelCase(def.name.as_str()).to_string(),
         }
     }
 

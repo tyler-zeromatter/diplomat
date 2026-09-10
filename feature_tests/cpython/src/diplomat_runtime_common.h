@@ -6,6 +6,18 @@
 #define PY_LIMITED_API
 #include <Python.h>
 
+#include <stdbool.h>
+
+typedef struct Internals {
+    bool initialized;
+    
+    // Enum construction:
+    PyObject* enum_mod;
+    PyObject* enum_ty;
+} Internals;
+
+Internals diplomat_internals;
+
 // Define all the initialization methods:
 int DeprecatedStruct_init(PyObject* module);
 int RenamedCachedIncludeZST_init(PyObject* module);
