@@ -4,13 +4,21 @@
 
 int {{abi_name}}_init(PyObject* module) {
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    auto enum_args = PyTuple_Pack(1, PyUnicode_FromString("{{name}}"));
+    PyObject* enum_args = PyTuple_Pack(1, PyUnicode_FromString("{{name}}"));
     if (enum_args == NULL) {
         return -1;
     }
 
-    auto enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, Py_None);
+    PyObject* enum_kwargs = PyDict_New();
+
+    PyObject* enum_names = PyTuple_Pack(0);
+
+    PyDict_SetItemString(enum_kwargs, "names", enum_names);
+
+    PyObject* enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, enum_kwargs);
     Py_DECREF(enum_args);
+    Py_DECREF(enum_names);
+    Py_DECREF(enum_kwargs);
     if (enum_def == NULL) {
         return -1;
     }
