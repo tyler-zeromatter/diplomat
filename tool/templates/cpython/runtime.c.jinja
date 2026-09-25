@@ -33,6 +33,8 @@ static int {{lib_name}}_exec(PyObject* mod) {
     return 0;
 }
 
+Internals diplomat_internals = {};
+
 static PyModuleDef_Slot {{lib_name}}_module_slots[] = {
     {Py_mod_exec, {{lib_name}}_exec},
     {0, NULL}
