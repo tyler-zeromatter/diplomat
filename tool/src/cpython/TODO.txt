@@ -1,0 +1,6 @@
+- Enum conversion
+    - We need to store the new Enum type in each enum's `.c` file, then call `PyObject_IsInstance` from the relevant method.
+    - This needs class specific headers.
+- Method gen (test MyEnum methods)
+- Struct gen (how do we do conversion to/from C structs? Ownership?)
+    - I think for structs, an underlying "C" struct pointer as part of the type would work well.
