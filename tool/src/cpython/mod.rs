@@ -35,7 +35,7 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
     );
     errors.errors.borrow_mut().extend(c_errors.errors.take());
 
-    let mut header_method_names = Vec::new();
+    let mut header_methods = Vec::new();
 
     for (id, ty) in tcx.all_types() {
         if ty.attrs().disable {
@@ -62,33 +62,31 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
             }
             _ => { continue; } // TODO
         };
-        files.add_file(format!("{}_binding.c", template.file_base_name()), template.dyn_render().unwrap());
-        header_method_names.push(format!("{}_init", ty.name()));
+        let header_location = format!("include/{}_Py.h", template.file_base_name());
+        files.add_file(format!("{}_binding.c", template.file_base_name()), template.render_impl());
+        files.add_file(header_location.clone(), template.render_header());
+        header_methods.push((header_location, format!("{}_init", ty.name())));
     }
 
     #[derive(Template)]
     #[template(path = "cpython/runtime.c.jinja", escape = "none")]
     struct RuntimeTemplate<'a> {
         lib_name : String,
-        header_method_names : &'a [String],
+        header_methods : &'a [(String, String)],
     }
 
     let runtime = RuntimeTemplate {
         lib_name: config.shared_config.lib_name.clone().expect("CPython backend expects lib_name to be set."),
-        header_method_names: &header_method_names,
+        header_methods: &header_methods,
     };
 
     files.add_file("diplomat_runtime.c".into(), runtime.render().expect("Could not render template"));
 
     #[derive(Template)]
     #[template(path = "cpython/common.h.jinja", escape = "none")]
-    struct RuntimeHeaderTemplate {
-        header_method_names : Vec<String>,
-    }
+    struct RuntimeHeaderTemplate;
 
-    let runtime_header = RuntimeHeaderTemplate {
-        header_method_names,
-    };
+    let runtime_header = RuntimeHeaderTemplate;
 
     files.add_file("diplomat_runtime_common.h".into(), runtime_header.render().expect("Could not render header"));
 

@@ -1,7 +1,18 @@
-#include "include/{{class_name}}.h"
+{% block header %}
+#ifndef {{class_name}}_PY_H
+#define {{class_name}}_PY_H
 
+#include "include/{{class_name}}.h"
 #include "diplomat_runtime_common.h"
+
+int {{class_name}}_init(PyObject* module);
+#endif
+{% endblock %}
+
+{% block definition %}
+#include "include/{{class_name}}_Py.h"
 
 int {{class_name}}_init(PyObject* module) {
     return 0;
 }
+{% endblock %}
