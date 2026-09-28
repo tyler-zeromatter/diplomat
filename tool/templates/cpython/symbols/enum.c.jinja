@@ -3,8 +3,11 @@
 #include "diplomat_runtime_common.h"
 
 int {{abi_name}}_init(PyObject* module) {
+    PyObject* enum_name = PyUnicode_FromString("{{name}}");
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_args = PyTuple_Pack(1, PyUnicode_FromString("{{name}}"));
+    PyObject* enum_args = PyTuple_Pack(1, enum_name);
+    Py_DECREF(enum_name);
+
     if (enum_args == NULL) {
         return -1;
     }
