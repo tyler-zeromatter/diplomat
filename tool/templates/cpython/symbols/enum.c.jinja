@@ -3,34 +3,37 @@
 #include "diplomat_runtime_common.h"
 
 int {{abi_name}}_init(PyObject* module) {
+    PyObject* enum_names_values = PyTuple_New({{def.variants.len()}});
+    {% for v in def.variants %}
+    PyObject* {{v.name}}_value = PyLong_FromLong({{v.discriminant}});
+    if ({{v.name}}_value == NULL) {
+        Py_DECREF(enum_names_values);
+        return -1;
+    }
+    PyObject* {{v.name}}_name = PyUnicode_FromString("{{fmt.fmt_enum_variant(v)}}");
+    
+    PyObject* {{v.name}}_name_and_value = PyTuple_Pack(2, {{v.name}}_name, {{v.name}}_value);
+    Py_DECREF({{v.name}}_name);
+    Py_DECREF({{v.name}}_value);
+
+    // SetItem steals, so we do not need to decref:
+    PyTuple_SetItem(enum_names_values, {{loop.index0}}, {{v.name}}_name_and_value);
+    {% endfor %}
+
     PyObject* enum_name = PyUnicode_FromString("{{name}}");
     // PyTuple_Pack creates strong references to the provided objects (this is equivalent to Py_BuildValue("(O)", enum_name)):
-    PyObject* enum_args = PyTuple_Pack(1, enum_name);
-    // So we must decref:
+    PyObject* enum_args = PyTuple_Pack(2, enum_name, enum_names_values);
+    // So we must decref the args:
     Py_DECREF(enum_name);
+    Py_DECREF(enum_names_values);
 
     if (enum_args == NULL) {
         return -1;
     }
 
-    PyObject* enum_kwargs = PyDict_New();
-
-    PyObject* enum_names = PyTuple_New({{def.variants.len()}});
-    {% for v in def.variants %}
-    PyObject* {{v.name}}_name = PyUnicode_FromString("{{fmt.fmt_enum_variant(v)}}");
-    // SetItem steals, so we do not need to decref:
-    PyTuple_SetItem(enum_names, {{loop.index0}}, {{v.name}}_name);
-
-    {% endfor %}
-
-    // SetItem does not steal, so we need to decref:
-    PyDict_SetItemString(enum_kwargs, "names", enum_names);
-    Py_DECREF(enum_names);
-
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, enum_kwargs);
+    PyObject* enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
-    Py_DECREF(enum_kwargs);
     if (enum_def == NULL) {
         return -1;
     }
