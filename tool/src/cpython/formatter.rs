@@ -1,4 +1,6 @@
-use diplomat_core::hir::{DocsUrlGenerator, SymbolId, TypeContext};
+use std::borrow::Cow;
+
+use diplomat_core::hir::{DocsUrlGenerator, EnumVariant, SymbolId, TypeContext};
 
 use crate::c::CFormatter;
 
@@ -17,5 +19,9 @@ impl<'tcx> PyFormatter<'tcx> {
             c: CFormatter::new(tcx, false, config_for_c, docs_url_gen),
             docs_url_gen,
         }
+    }
+
+    pub fn fmt_enum_variant(&self, variant : &'tcx EnumVariant) -> Cow<'tcx, str> {
+        variant.attrs.rename.apply(variant.name.as_str().into())
     }
 }
