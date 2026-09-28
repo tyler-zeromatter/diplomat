@@ -4,3 +4,7 @@
 - Method gen (test MyEnum methods)
 - Struct gen (how do we do conversion to/from C structs? Ownership?)
     - I think for structs, an underlying "C" struct pointer as part of the type would work well.
+- Opaque gen
+- CI
+    - Run build/tests for Python 3.10
+    - Run tests for latest version of Python (to test ABI stability)?

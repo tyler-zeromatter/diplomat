@@ -18,9 +18,4 @@ typedef struct Internals {
 
 extern Internals diplomat_internals;
 
-// Define all the initialization methods:
-{% for m in header_method_names -%}
-int {{m}}(PyObject* module);
-{% endfor %}
-
 #endif
