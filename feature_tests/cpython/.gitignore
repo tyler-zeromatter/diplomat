@@ -1,5 +1,6 @@
 build
 .venv
+.venv_minpy
 **/__pycache__
 *.egg-info
 *.pdb
