@@ -16,7 +16,7 @@ typedef struct Internals {
     PyObject* enum_ty;
 } Internals;
 
-Internals diplomat_internals;
+extern Internals diplomat_internals;
 
 // Define all the initialization methods:
 int DeprecatedStruct_init(PyObject* module);
