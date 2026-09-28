@@ -1,6 +1,5 @@
-#include "include/TestMacroStruct.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/TestMacroStruct_Py.h"
 
 int TestMacroStruct_init(PyObject* module) {
     return 0;

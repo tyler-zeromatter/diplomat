@@ -1,5 +1,58 @@
 #include "diplomat_runtime_common.h"
 
+#include "include/DeprecatedStruct_Py.h"
+
+#include "include/RenamedCachedIncludeZST_Py.h"
+
+#include "include/StructWithAttrs_Py.h"
+
+#include "include/TestMacroStruct_Py.h"
+
+#include "include/ImportedStruct_Py.h"
+
+#include "include/BorrowedFields_Py.h"
+
+#include "include/BorrowedFieldsReturning_Py.h"
+
+#include "include/BorrowedFieldsWithBounds_Py.h"
+
+#include "include/NestedBorrowedFields_Py.h"
+
+#include "include/CachedIncludeZST_Py.h"
+
+#include "include/ErrorStruct_Py.h"
+
+#include "include/CyclicStructA_Py.h"
+
+#include "include/CyclicStructB_Py.h"
+
+#include "include/CyclicStructC_Py.h"
+
+#include "include/MyStruct_Py.h"
+
+#include "include/MyZst_Py.h"
+
+#include "include/PrimitiveStruct_Py.h"
+
+#include "include/StructOfOpaque_Py.h"
+
+#include "include/StructWithSlices_Py.h"
+
+#include "include/AttrEnum_Py.h"
+
+#include "include/DeprecatedEnum_Py.h"
+
+#include "include/UnimportedEnum_Py.h"
+
+#include "include/ErrorEnum_Py.h"
+
+#include "include/ContiguousEnum_Py.h"
+
+#include "include/DefaultEnum_Py.h"
+
+#include "include/MyEnum_Py.h"
+
+
 static void _somelib_free(void* self) {
     if (diplomat_internals.enum_mod) {
         Py_DECREF(diplomat_internals.enum_mod);

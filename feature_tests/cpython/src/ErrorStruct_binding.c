@@ -1,6 +1,5 @@
-#include "include/ErrorStruct.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/ErrorStruct_Py.h"
 
 int ErrorStruct_init(PyObject* module) {
     return 0;
