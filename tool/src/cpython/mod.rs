@@ -49,7 +49,8 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
                 is_for_cpp: false,
                 decl_header_path: &formatter.c.fmt_decl_header_path(id.into()),
                 impl_header_path: &formatter.c.fmt_impl_header_path(id.into())
-            }
+            },
+            fmt: &formatter
         };
 
         let template : &dyn SymbolTemplate = match ty {
