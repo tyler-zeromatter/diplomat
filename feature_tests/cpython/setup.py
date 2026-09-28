@@ -5,7 +5,9 @@ setup(
     ext_modules=[
         Extension(
             name="_somelib",
-            sources=glob("src/*.c")
+            sources=glob("src/*.c"),
+            include_dirs=["src/include"],
+            py_limited_api=True
         ),
     ]
 )
