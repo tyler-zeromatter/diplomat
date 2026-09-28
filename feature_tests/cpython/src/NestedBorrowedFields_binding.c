@@ -1,6 +1,5 @@
-#include "include/NestedBorrowedFields.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/NestedBorrowedFields_Py.h"
 
 int NestedBorrowedFields_init(PyObject* module) {
     return 0;

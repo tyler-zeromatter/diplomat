@@ -1,6 +1,32 @@
-#include "include/ErrorEnum.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/ErrorEnum_Py.h"
+
+static PyObject* enumClass = NULL;
+
+int ErrorEnum_to_variant(PyObject* enum_obj, ErrorEnum* enum_out) {
+    if (enumClass == NULL) {
+        // TODO: Repr the enum object.
+        PyErr_SetString(PyExc_RuntimeError, "Converting to ErrorEnum failed because it was not initialized (Did you try importing ErrorEnum?)");
+        return -1;
+    }
+    if (PyObject_IsInstance(enum_obj, enumClass) == -1) {
+        return -1;
+    }
+
+    PyObject* enum_val = PyObject_GetAttrString(enum_obj, "value");
+    if (enum_val == NULL) {
+        return -1;
+    }
+
+    // FIXME: This should change based on the bit width of the enum (and whether it's signed or not)
+    int result = PyLong_AsInt64(enum_val, enum_out);
+    Py_DECREF(enum_val);
+    if (result == -1) {
+        return -1;
+    }
+
+    return 0;
+}
 
 int ErrorEnum_init(PyObject* module) {
     PyObject* enum_names_values = PyTuple_New(2);
@@ -46,13 +72,13 @@ int ErrorEnum_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    enumClass = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
-    if (enum_def == NULL) {
+    if (enumClass == NULL) {
         return -1;
     }
 
-    int enum_add_result = PyModule_AddObjectRef(module, "ErrorEnum", enum_def);
-    Py_DECREF(enum_def);
+    int enum_add_result = PyModule_AddObjectRef(module, "ErrorEnum", enumClass);
+    Py_DECREF(enumClass);
     return enum_add_result;
 }

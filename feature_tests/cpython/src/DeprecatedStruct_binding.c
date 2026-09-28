@@ -1,6 +1,5 @@
-#include "include/DeprecatedStruct.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/DeprecatedStruct_Py.h"
 
 int DeprecatedStruct_init(PyObject* module) {
     return 0;

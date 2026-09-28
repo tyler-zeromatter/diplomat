@@ -1,6 +1,5 @@
-#include "include/CyclicStructB.h"
 
-#include "diplomat_runtime_common.h"
+#include "include/CyclicStructB_Py.h"
 
 int CyclicStructB_init(PyObject* module) {
     return 0;
