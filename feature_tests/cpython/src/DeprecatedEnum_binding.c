@@ -3,14 +3,33 @@
 #include "diplomat_runtime_common.h"
 
 int DeprecatedEnum_init(PyObject* module) {
-    // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    auto enum_args = PyTuple_Pack(1, PyUnicode_FromString("DeprecatedEnum"));
+    PyObject* enum_name = PyUnicode_FromString("DeprecatedEnum");
+    // PyTuple_Pack creates strong references to the provided objects (this is equivalent to Py_BuildValue("(O)", enum_name)):
+    PyObject* enum_args = PyTuple_Pack(1, enum_name);
+    // So we must decref:
+    Py_DECREF(enum_name);
+
     if (enum_args == NULL) {
         return -1;
     }
 
-    auto enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, Py_None);
+    PyObject* enum_kwargs = PyDict_New();
+
+    PyObject* enum_names = PyTuple_New(1);
+    
+    PyObject* A_name = PyUnicode_FromString("A");
+    // SetItem setals, so we do not need to decref:
+    PyTuple_SetItem(enum_names, 0, A_name);
+
+    
+
+    PyDict_SetItemString(enum_kwargs, "names", enum_names);
+
+    // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
+    PyObject* enum_def = PyObject_Call(diplomat_internals.enum_ty, enum_args, enum_kwargs);
     Py_DECREF(enum_args);
+    Py_DECREF(enum_names);
+    Py_DECREF(enum_kwargs);
     if (enum_def == NULL) {
         return -1;
     }
