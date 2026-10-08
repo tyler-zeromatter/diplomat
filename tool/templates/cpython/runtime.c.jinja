@@ -29,7 +29,11 @@ static int {{lib_name}}_exec(PyObject* mod) {
     CHECK(!diplomat_internals.enum_ty, PyExc_ImportError, "could not find `enum.Enum` type");
 
     {% for m in header_methods %}
-    CHECK({{m.1}}(mod) < 0, PyExc_ImportError, "could not initialize {{m.1}}");
+    if ({{m.1}}(mod) < 0) {
+        {#- We assume each module sets its own exceptions on failure, so we just return. #}
+        {{lib_name}}_free((void*)mod);
+        return -1;
+    }
     {% endfor %}
 
     diplomat_internals.initialized = true;

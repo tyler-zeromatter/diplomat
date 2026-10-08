@@ -1,3 +1,4 @@
+- Enums are subclass of `enum` type (instead of calling constructor directly)
 - Enum conversion
     - We need to store the new Enum type in each enum's `.c` file, then call `PyObject_IsInstance` from the relevant method.
     - This needs class specific headers.
