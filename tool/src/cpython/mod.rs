@@ -5,6 +5,7 @@ use askama::{DynTemplate, Template};
 use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext, TypeDef};
 use serde::{Deserialize, Serialize};
 
+use crate::c::Header;
 use crate::cpython::gen::SymbolTemplate;
 use crate::{ErrorStore, FileMap, c::{self, ItemGenContext as CItemGenContext}, cpython::{formatter::PyFormatter, r#gen::ItemGenContext}};
 
@@ -89,6 +90,14 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
     let runtime_header = RuntimeHeaderTemplate;
 
     files.add_file("diplomat_runtime_common.h".into(), runtime_header.render().expect("Could not render header"));
+
+    
+    #[derive(Template)]
+    #[template(path = "cpython/common.c.jinja", escape = "none")]
+    struct RuntimeDefinitionTemplate;
+
+    let runtime_def = RuntimeDefinitionTemplate;
+    files.add_file("diplomat_runtime_common.c".into(), runtime_def.render().expect("Could not render runtime definition file"));
 
     (files, errors)
 }

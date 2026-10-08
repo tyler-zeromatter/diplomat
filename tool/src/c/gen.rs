@@ -437,7 +437,7 @@ impl<'tcx> ItemGenContext<'_, 'tcx, '_> {
         format!("typedef struct {fn_name}_result {{{union_def} bool is_ok;}} {fn_name}_result")
     }
 
-    pub(super) fn gen_result_ty<P: hir::TyPosition>(
+    pub(crate) fn gen_result_ty<P: hir::TyPosition>(
         &self,
         fn_name: &str,
         ok_ty: Option<&hir::Type<P>>,

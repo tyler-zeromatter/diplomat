@@ -1,0 +1,39 @@
+PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some() -%} PyTypeObject* defining_class, {%- endif %} PyObject* const *args, Py_ssize_t nargs, PyObject* kwnames){
+    if (nargs != {{m.params.len()}}) {
+        PyErr_Format(PyExc_TypeError, "{{m.name}} takes {{m.inner.params.len()}} arguments, got %lu", nargs);
+        return NULL;
+    }
+
+    {% if m.inner.param_self.is_some() %}
+    if (!self) {
+        PyErr_SetString(PyExc_RuntimeError, "No value for self found");
+        return NULL;
+    }
+    {{abi_name}} self_rs;
+    if ({{abi_name}}_from_py(self, &self_rs) == -1) {
+        return NULL;
+    }
+    {% endif %}
+
+    {% for p in m.params %}
+    
+    {% endfor %}
+
+    {%if let Some(r) = m.c_return%}{{r}} out = {% endif %}{{m.c_name}}({% if m.inner.param_self.is_some() %} self_rs {% if m.params.len() > 0 %}, {% endif -%} {%- endif %}{% for p in m.params %} {{p.name}} {% if !loop.last %}, {% endif -%} {%- endfor %});
+    PyObject* py_out = NULL;
+    
+    {% if let Some(r) = m.return_convert %}
+    py_out = {{r}}(out);
+    {% endif %}
+    return py_out;
+}
+
+static PyMethodDef __{{m.name}}__py_def = {
+    // FIXME: Method name should be lib_name.method_name.name
+    .ml_name = "{{m.name}}",
+    .ml_meth = __{{m.name}}__py_meth,
+    // TODO: Kwargs construction, non-method flag for functions
+    .ml_flags = {% if m.inner.param_self.is_some() %} METH_METHOD | {% endif %} METH_FASTCALL | METH_KEYWORDS,
+    // TODO:
+    .ml_doc = "",
+};
