@@ -341,7 +341,7 @@ namespace nanobind::detail
         Value value;
 
         struct method_owner {
-            object inner;
+            handle inner;
 
             {{lib_name}}::diplomat::result<T, E> operator()(Args... args) {
                 // Acquire the GIL:
@@ -371,6 +371,11 @@ namespace nanobind::detail
                     return {{lib_name}}::diplomat::Err<E>(std::move({{lib_name}}::get_ffi_error<E>::get()));
                 }
             }
+
+            ~method_owner() {
+                nb::gil_scoped_acquire acq;
+                inner.dec_ref();
+            }
         };
         
         template <typename T_>
@@ -385,8 +390,11 @@ namespace nanobind::detail
             if (!PyCallable_Check(src.ptr())) {
                 return false;
             }
+            
+            // Own the method:
+            src.inc_ref();
             value = method_owner {
-                object(src, borrow_t())
+                src
             };
             return true;
         }
