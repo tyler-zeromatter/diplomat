@@ -5,7 +5,8 @@
 #include "include/ContiguousEnum.h"
 #include "diplomat_runtime_common.h"
 
-int ContiguousEnum_to_variant(PyObject* enum_obj, ContiguousEnum* enum_out);
+PyObject* ContiguousEnum_to_py(ContiguousEnum enum_in);
+int ContiguousEnum_from_py(PyObject* enum_obj, ContiguousEnum* enum_out);
 int ContiguousEnum_init(PyObject* module);
 
 #endif

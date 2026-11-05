@@ -5,7 +5,8 @@
 #include "include/DeprecatedEnum.h"
 #include "diplomat_runtime_common.h"
 
-int DeprecatedEnum_to_variant(PyObject* enum_obj, DeprecatedEnum* enum_out);
+PyObject* DeprecatedEnum_to_py(DeprecatedEnum enum_in);
+int DeprecatedEnum_from_py(PyObject* enum_obj, DeprecatedEnum* enum_out);
 int DeprecatedEnum_init(PyObject* module);
 
 #endif

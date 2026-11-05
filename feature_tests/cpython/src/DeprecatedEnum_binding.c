@@ -1,6 +1,24 @@
 
 #include "include/DeprecatedEnum_Py.h"
 
+PyObject* enum_class;
+
+PyObject* DeprecatedEnum_to_py(DeprecatedEnum enum_in) {
+    if (enum_class == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "enum_class is NULL, most likely DeprecatedEnum did not initialize");
+        return NULL;
+    }
+
+    PyObject* enum_arg = PyLong_FromLong((long)enum_in);
+    if (enum_arg == NULL) {
+        return NULL;
+    }
+
+    PyObject* py_out = PyObject_CallOneArg(enum_class, enum_arg);
+    Py_DECREF(enum_arg);
+    return py_out;
+}
+
 int DeprecatedEnum_from_py(PyObject* enum_obj, DeprecatedEnum* enum_out) {
     int instance_check = PyObject_IsInstance(enum_obj, diplomat_internals.enum_ty);
     if (instance_check == -1) {
@@ -58,7 +76,7 @@ int DeprecatedEnum_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
     if (enum_class == NULL) {
         return -1;
@@ -67,5 +85,6 @@ int DeprecatedEnum_init(PyObject* module) {
     
 
     int enum_add_result = PyModule_AddObjectRef(module, "DeprecatedEnum", enum_class);
+    Py_DECREF(enum_class);
     return enum_add_result;
 }

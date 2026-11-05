@@ -1,6 +1,24 @@
 
 #include "include/DefaultEnum_Py.h"
 
+PyObject* enum_class;
+
+PyObject* DefaultEnum_to_py(DefaultEnum enum_in) {
+    if (enum_class == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "enum_class is NULL, most likely DefaultEnum did not initialize");
+        return NULL;
+    }
+
+    PyObject* enum_arg = PyLong_FromLong((long)enum_in);
+    if (enum_arg == NULL) {
+        return NULL;
+    }
+
+    PyObject* py_out = PyObject_CallOneArg(enum_class, enum_arg);
+    Py_DECREF(enum_arg);
+    return py_out;
+}
+
 int DefaultEnum_from_py(PyObject* enum_obj, DefaultEnum* enum_out) {
     int instance_check = PyObject_IsInstance(enum_obj, diplomat_internals.enum_ty);
     if (instance_check == -1) {
@@ -40,6 +58,8 @@ PyObject* __new__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t narg
     DefaultEnum out = DefaultEnum_new();
     PyObject* py_out = NULL;
     
+    
+    py_out = DefaultEnum_to_py(out);
     
     return py_out;
 }
@@ -99,7 +119,7 @@ int DefaultEnum_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
     if (enum_class == NULL) {
         return -1;
@@ -121,5 +141,6 @@ int DefaultEnum_init(PyObject* module) {
     
 
     int enum_add_result = PyModule_AddObjectRef(module, "DefaultEnum", enum_class);
+    Py_DECREF(enum_class);
     return enum_add_result;
 }
