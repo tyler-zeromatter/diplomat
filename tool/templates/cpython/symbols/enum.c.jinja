@@ -5,7 +5,8 @@
 #include "include/{{abi_name}}.h"
 #include "diplomat_runtime_common.h"
 
-int {{abi_name}}_to_variant(PyObject* enum_obj, {{abi_name}}* enum_out);
+PyObject* {{abi_name}}_to_py({{abi_name}} enum_in);
+int {{abi_name}}_from_py(PyObject* enum_obj, {{abi_name}}* enum_out);
 int {{abi_name}}_init(PyObject* module);
 
 #endif
@@ -13,6 +14,25 @@ int {{abi_name}}_init(PyObject* module);
 
 {% block definition %}
 #include "include/{{abi_name}}_Py.h"
+
+PyObject* enum_class;
+
+PyObject* {{abi_name}}_to_py({{abi_name}} enum_in) {
+    if (enum_class == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "enum_class is NULL, most likely {{abi_name}} did not initialize");
+        return NULL;
+    }
+
+    // TODO: Verify bounds instead of casting
+    PyObject* enum_arg = PyLong_FromLong((long)enum_in);
+    if (enum_arg == NULL) {
+        return NULL;
+    }
+
+    PyObject* py_out = PyObject_CallOneArg(enum_class, enum_arg);
+    Py_DECREF(enum_arg);
+    return py_out;
+}
 
 int {{abi_name}}_from_py(PyObject* enum_obj, {{abi_name}}* enum_out) {
     int instance_check = PyObject_IsInstance(enum_obj, diplomat_internals.enum_ty);
@@ -73,7 +93,7 @@ int {{abi_name}}_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    PyObject* enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
     if (enum_class == NULL) {
         return -1;
@@ -100,6 +120,7 @@ int {{abi_name}}_init(PyObject* module) {
     {% endfor %}
 
     int enum_add_result = PyModule_AddObjectRef(module, "{{name}}", enum_class);
+    Py_DECREF(enum_class);
     return enum_add_result;
 }
 {% endblock %}

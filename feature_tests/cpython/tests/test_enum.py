@@ -6,3 +6,5 @@ def test_enum_variants():
     assert somelib.MyEnum.E.value == 2
 
     assert somelib.MyEnum.A.into_value() == -2
+
+    assert somelib.MyEnum.get_a() == somelib.MyEnum.A

@@ -92,7 +92,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
 
             let return_convert = self.convert_return_type(&m.output);
 
-            MethodInfo {
+            Some(MethodInfo {
                 name: m.name.as_str().into(),
                 c_name : m.abi_name.as_str().into(),
                 inner: m,
@@ -100,7 +100,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
                 c_return,
                 return_convert,
                 is_write: m.output.is_write(),
-            }
+            })
         }).collect();
 
         EnumTemplate {
@@ -155,6 +155,11 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
                 }
                 // TODO:
                 _ => None,
+            }
+            Type::Enum(e) => {
+                let en = self.c.tcx.resolve_enum(e.tcx_id);
+                let abi_name = en.name.as_str();
+                Some(format!("{abi_name}_to_py").into())
             }
             // TODO:
             _ => None,
