@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::{DynTemplate, Template};
-use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, InputOnly, IntType, OutputOnly, PrimitiveType, ReturnType, StructDef, SuccessType, TyPosition, Type}};
+use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, InputOnly, IntType, Method, OutputOnly, PrimitiveType, ReturnType, StructDef, SuccessType, TyPosition, Type}};
 
 use crate::{c::{Header, ItemGenContext as CItemGenContext}, cpython::formatter::PyFormatter};
 
@@ -60,47 +60,8 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             if m.attrs.disable {
                 return None;
             }
-            let params = m.params.iter().map(|p| {
-                NamedType {
-                    ty: &p.ty,
-                    name: p.name.as_str().into(),
-                    c_type: self.c.gen_ty_name(&p.ty, &mut Header::default()),
-                }
-            }).collect();
 
-            let c_return = match &m.output {
-                ReturnType::Infallible(SuccessType::Unit | SuccessType::Write(..)) => None,
-                ReturnType::Infallible(SuccessType::OutType(o)) => Some(self.c.gen_ty_name(&o, &mut Header::default())),
-                ReturnType::Fallible(ref ok, _) | ReturnType::Nullable(ref ok) => {
-                    let err = if let ReturnType::Fallible(_, Some(ref e)) = m.output {
-                        Some(e)
-                    } else {
-                        None
-                    };
-
-                    let ok_ty = match ok {
-                        SuccessType::Write(..) | SuccessType::Unit => None,
-                        SuccessType::OutType(o) => Some(o),
-                        _ => unreachable!("Unknown AST/HIR variant"),
-                    };
-
-                    let res = self.c.gen_result_ty(m.abi_name.as_str(), ok_ty, err, &mut Header::default());
-                    Some(res.into())
-                }
-                _ => unreachable!("unknown AST/HIR variant"),
-            };
-
-            let return_convert = self.convert_return_type(&m.output);
-
-            Some(MethodInfo {
-                name: m.name.as_str().into(),
-                c_name : m.abi_name.as_str().into(),
-                inner: m,
-                params,
-                c_return,
-                return_convert,
-                is_write: m.output.is_write(),
-            })
+            Some(self.gen_method_info(m))
         }).collect();
 
         EnumTemplate {
@@ -163,6 +124,52 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             }
             // TODO:
             _ => None,
+        }
+    }
+
+    fn gen_method_info(&self, method : &'tcx Method) -> MethodInfo<'tcx> {
+        let method_name = method.attrs.rename.apply(method.name.as_str().into());
+        let method_abi_name = method.attrs.abi_rename.apply(method.abi_name.as_str().into());
+
+        let params = method.params.iter().map(|p| {
+            NamedType {
+                ty: &p.ty,
+                name: p.name.as_str().into(),
+                c_type: self.c.gen_ty_name(&p.ty, &mut Header::default()),
+            }
+        }).collect();
+
+        let c_return = match &method.output {
+            ReturnType::Infallible(SuccessType::Unit | SuccessType::Write(..)) => None,
+            ReturnType::Infallible(SuccessType::OutType(o)) => Some(self.c.gen_ty_name(&o, &mut Header::default())),
+            ReturnType::Fallible(ref ok, _) | ReturnType::Nullable(ref ok) => {
+                let err = if let ReturnType::Fallible(_, Some(ref e)) = method.output {
+                    Some(e)
+                } else {
+                    None
+                };
+
+                let ok_ty = match ok {
+                    SuccessType::Write(..) | SuccessType::Unit => None,
+                    SuccessType::OutType(o) => Some(o),
+                    _ => unreachable!("Unknown AST/HIR variant"),
+                };
+
+                let res = self.c.gen_result_ty(&method_abi_name, ok_ty, err, &mut Header::default());
+                Some(res.into())
+            }
+            _ => unreachable!("unknown AST/HIR variant"),
+        };
+
+        let return_convert = self.convert_return_type(&method.output);
+        MethodInfo {
+            name: method_name,
+            c_name : method_abi_name,
+            inner: method,
+            params,
+            c_return,
+            return_convert,
+            is_write: method.output.is_write(),
         }
     }
 }
