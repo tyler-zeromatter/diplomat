@@ -42,6 +42,8 @@
 
 #include "include/DeprecatedEnum_Py.h"
 
+#include "include/FFIError_Py.h"
+
 #include "include/UnimportedEnum_Py.h"
 
 #include "include/ErrorEnum_Py.h"
@@ -79,57 +81,140 @@ static int _somelib_exec(PyObject* mod) {
     CHECK(!diplomat_internals.enum_ty, PyExc_ImportError, "could not find `enum.Enum` type");
 
     
-    CHECK(DeprecatedStruct_init(mod) < 0, PyExc_ImportError, "could not initialize DeprecatedStruct_init");
+    if (DeprecatedStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(RenamedCachedIncludeZST_init(mod) < 0, PyExc_ImportError, "could not initialize RenamedCachedIncludeZST_init");
+    if (RenamedCachedIncludeZST_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(StructWithAttrs_init(mod) < 0, PyExc_ImportError, "could not initialize StructWithAttrs_init");
+    if (StructWithAttrs_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(TestMacroStruct_init(mod) < 0, PyExc_ImportError, "could not initialize TestMacroStruct_init");
+    if (TestMacroStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(ImportedStruct_init(mod) < 0, PyExc_ImportError, "could not initialize ImportedStruct_init");
+    if (ImportedStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(BorrowedFields_init(mod) < 0, PyExc_ImportError, "could not initialize BorrowedFields_init");
+    if (BorrowedFields_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(BorrowedFieldsReturning_init(mod) < 0, PyExc_ImportError, "could not initialize BorrowedFieldsReturning_init");
+    if (BorrowedFieldsReturning_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(BorrowedFieldsWithBounds_init(mod) < 0, PyExc_ImportError, "could not initialize BorrowedFieldsWithBounds_init");
+    if (BorrowedFieldsWithBounds_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(NestedBorrowedFields_init(mod) < 0, PyExc_ImportError, "could not initialize NestedBorrowedFields_init");
+    if (NestedBorrowedFields_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(CachedIncludeZST_init(mod) < 0, PyExc_ImportError, "could not initialize CachedIncludeZST_init");
+    if (CachedIncludeZST_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(ErrorStruct_init(mod) < 0, PyExc_ImportError, "could not initialize ErrorStruct_init");
+    if (ErrorStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(CyclicStructA_init(mod) < 0, PyExc_ImportError, "could not initialize CyclicStructA_init");
+    if (CyclicStructA_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(CyclicStructB_init(mod) < 0, PyExc_ImportError, "could not initialize CyclicStructB_init");
+    if (CyclicStructB_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(CyclicStructC_init(mod) < 0, PyExc_ImportError, "could not initialize CyclicStructC_init");
+    if (CyclicStructC_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(MyStruct_init(mod) < 0, PyExc_ImportError, "could not initialize MyStruct_init");
+    if (MyStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(MyZst_init(mod) < 0, PyExc_ImportError, "could not initialize MyZst_init");
+    if (MyZst_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(PrimitiveStruct_init(mod) < 0, PyExc_ImportError, "could not initialize PrimitiveStruct_init");
+    if (PrimitiveStruct_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(StructOfOpaque_init(mod) < 0, PyExc_ImportError, "could not initialize StructOfOpaque_init");
+    if (StructOfOpaque_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(StructWithSlices_init(mod) < 0, PyExc_ImportError, "could not initialize StructWithSlices_init");
+    if (StructWithSlices_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(AttrEnum_init(mod) < 0, PyExc_ImportError, "could not initialize AttrEnum_init");
+    if (AttrEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(DeprecatedEnum_init(mod) < 0, PyExc_ImportError, "could not initialize DeprecatedEnum_init");
+    if (DeprecatedEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(UnimportedEnum_init(mod) < 0, PyExc_ImportError, "could not initialize UnimportedEnum_init");
+    if (FFIError_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(ErrorEnum_init(mod) < 0, PyExc_ImportError, "could not initialize ErrorEnum_init");
+    if (UnimportedEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(ContiguousEnum_init(mod) < 0, PyExc_ImportError, "could not initialize ContiguousEnum_init");
+    if (ErrorEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(DefaultEnum_init(mod) < 0, PyExc_ImportError, "could not initialize DefaultEnum_init");
+    if (ContiguousEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
-    CHECK(MyEnum_init(mod) < 0, PyExc_ImportError, "could not initialize MyEnum_init");
+    if (DefaultEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
+    
+    if (MyEnum_init(mod) < 0) {
+        _somelib_free((void*)mod);
+        return -1;
+    }
     
 
     diplomat_internals.initialized = true;

@@ -1,32 +1,59 @@
 
 #include "include/DefaultEnum_Py.h"
 
-static PyObject* enumClass = NULL;
-
-int DefaultEnum_to_variant(PyObject* enum_obj, DefaultEnum* enum_out) {
-    if (enumClass == NULL) {
-        // TODO: Repr the enum object.
-        PyErr_SetString(PyExc_RuntimeError, "Converting to DefaultEnum failed because it was not initialized (Did you try importing DefaultEnum?)");
+int DefaultEnum_from_py(PyObject* enum_obj, DefaultEnum* enum_out) {
+    int instance_check = PyObject_IsInstance(enum_obj, diplomat_internals.enum_ty);
+    if (instance_check == -1) {
         return -1;
-    }
-    if (PyObject_IsInstance(enum_obj, enumClass) == -1) {
+    } else if (instance_check == 0) {
+        PyErr_SetString(PyExc_TypeError, "Self type is not an instance of DefaultEnum");
         return -1;
     }
 
-    PyObject* enum_val = PyObject_GetAttrString(enum_obj, "value");
-    if (enum_val == NULL) {
+    PyObject* value = PyObject_GetAttrString(enum_obj, "value");
+    if (!value) {
+        return -1;
+    }
+    
+    long enum_val = PyLong_AsLong(value);
+    Py_DECREF(value);
+    if (PyErr_Occurred()) {
         return -1;
     }
 
-    // FIXME: This should change based on the bit width of the enum (and whether it's signed or not)
-    int result = PyLong_AsInt64(enum_val, enum_out);
-    Py_DECREF(enum_val);
-    if (result == -1) {
-        return -1;
-    }
-
+    // FIXME: Maybe a manual conversion? Need to validate the bounds of the enum.
+    *enum_out = (DefaultEnum)enum_val;
     return 0;
 }
+
+
+PyObject* __new__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t nargs, PyObject* kwnames){
+    if (nargs != 0) {
+        PyErr_Format(PyExc_TypeError, "new takes 0 arguments, got %lu", nargs);
+        return NULL;
+    }
+
+    
+
+    
+
+    DefaultEnum out = DefaultEnum_new();
+    PyObject* py_out = NULL;
+    
+    
+    return py_out;
+}
+
+static PyMethodDef __new__py_def = {
+    // FIXME: Method name should be lib_name.method_name.name
+    .ml_name = "new",
+    .ml_meth = __new__py_meth,
+    // TODO: Kwargs construction, non-method flag for functions
+    .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
+    // TODO:
+    .ml_doc = "",
+};
+
 
 int DefaultEnum_init(PyObject* module) {
     PyObject* enum_names_values = PyTuple_New(2);
@@ -72,13 +99,27 @@ int DefaultEnum_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    enumClass = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    PyObject* enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
-    if (enumClass == NULL) {
+    if (enum_class == NULL) {
         return -1;
     }
 
-    int enum_add_result = PyModule_AddObjectRef(module, "DefaultEnum", enumClass);
-    Py_DECREF(enumClass);
+    PyObject* __new__py_static_method = PyCMethod_New(&__new__py_def, NULL, module, NULL);
+    if (__new__py_static_method == NULL) {
+        return -1;
+    }
+
+    PyObject* __new__py_method = PyStaticMethod_New(__new__py_static_method);
+    if (!__new__py_method) {
+        return -1;
+    }
+    
+    Py_DECREF(__new__py_static_method);
+    
+    PyObject_SetAttrString(enum_class, "new", __new__py_method);
+    
+
+    int enum_add_result = PyModule_AddObjectRef(module, "DefaultEnum", enum_class);
     return enum_add_result;
 }

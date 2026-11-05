@@ -18,4 +18,7 @@ typedef struct Internals {
 
 extern Internals diplomat_internals;
 
+extern inline PyObject* Diplomat_bool_to_py(bool b);
+extern inline PyObject* Diplomat_long_to_py(long l);
+
 #endif

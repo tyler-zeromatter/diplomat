@@ -1,32 +1,32 @@
 
 #include "include/ContiguousEnum_Py.h"
 
-static PyObject* enumClass = NULL;
-
-int ContiguousEnum_to_variant(PyObject* enum_obj, ContiguousEnum* enum_out) {
-    if (enumClass == NULL) {
-        // TODO: Repr the enum object.
-        PyErr_SetString(PyExc_RuntimeError, "Converting to ContiguousEnum failed because it was not initialized (Did you try importing ContiguousEnum?)");
+int ContiguousEnum_from_py(PyObject* enum_obj, ContiguousEnum* enum_out) {
+    int instance_check = PyObject_IsInstance(enum_obj, diplomat_internals.enum_ty);
+    if (instance_check == -1) {
         return -1;
-    }
-    if (PyObject_IsInstance(enum_obj, enumClass) == -1) {
+    } else if (instance_check == 0) {
+        PyErr_SetString(PyExc_TypeError, "Self type is not an instance of ContiguousEnum");
         return -1;
     }
 
-    PyObject* enum_val = PyObject_GetAttrString(enum_obj, "value");
-    if (enum_val == NULL) {
+    PyObject* value = PyObject_GetAttrString(enum_obj, "value");
+    if (!value) {
+        return -1;
+    }
+    
+    long enum_val = PyLong_AsLong(value);
+    Py_DECREF(value);
+    if (PyErr_Occurred()) {
         return -1;
     }
 
-    // FIXME: This should change based on the bit width of the enum (and whether it's signed or not)
-    int result = PyLong_AsInt64(enum_val, enum_out);
-    Py_DECREF(enum_val);
-    if (result == -1) {
-        return -1;
-    }
-
+    // FIXME: Maybe a manual conversion? Need to validate the bounds of the enum.
+    *enum_out = (ContiguousEnum)enum_val;
     return 0;
 }
+
+
 
 int ContiguousEnum_init(PyObject* module) {
     PyObject* enum_names_values = PyTuple_New(4);
@@ -100,13 +100,14 @@ int ContiguousEnum_init(PyObject* module) {
     }
 
     // Python enums can be passed without us needing to hold a reference, so we just create straight from the `Enum` class:
-    enumClass = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
+    PyObject* enum_class = PyObject_Call(diplomat_internals.enum_ty, enum_args, NULL);
     Py_DECREF(enum_args);
-    if (enumClass == NULL) {
+    if (enum_class == NULL) {
         return -1;
     }
 
-    int enum_add_result = PyModule_AddObjectRef(module, "ContiguousEnum", enumClass);
-    Py_DECREF(enumClass);
+    
+
+    int enum_add_result = PyModule_AddObjectRef(module, "ContiguousEnum", enum_class);
     return enum_add_result;
 }
