@@ -56,7 +56,10 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
                 self.as_header().render().unwrap()
             }
         }
-        let methods = def.methods.iter().map(|m| {
+        let methods = def.methods.iter().filter_map(|m| {
+            if m.attrs.disable {
+                return None;
+            }
             let params = m.params.iter().map(|p| {
                 NamedType {
                     ty: &p.ty,
