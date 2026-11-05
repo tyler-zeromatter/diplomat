@@ -1,7 +1,7 @@
 
 #include "include/ContiguousEnum_Py.h"
 
-PyObject* enum_class;
+static PyObject* enum_class;
 
 PyObject* ContiguousEnum_to_py(ContiguousEnum enum_in) {
     if (enum_class == NULL) {
@@ -9,6 +9,7 @@ PyObject* ContiguousEnum_to_py(ContiguousEnum enum_in) {
         return NULL;
     }
 
+    // TODO: Verify bounds instead of casting
     PyObject* enum_arg = PyLong_FromLong((long)enum_in);
     if (enum_arg == NULL) {
         return NULL;

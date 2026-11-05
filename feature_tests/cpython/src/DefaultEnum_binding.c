@@ -1,7 +1,7 @@
 
 #include "include/DefaultEnum_Py.h"
 
-PyObject* enum_class;
+static PyObject* enum_class;
 
 PyObject* DefaultEnum_to_py(DefaultEnum enum_in) {
     if (enum_class == NULL) {
@@ -9,6 +9,7 @@ PyObject* DefaultEnum_to_py(DefaultEnum enum_in) {
         return NULL;
     }
 
+    // TODO: Verify bounds instead of casting
     PyObject* enum_arg = PyLong_FromLong((long)enum_in);
     if (enum_arg == NULL) {
         return NULL;
