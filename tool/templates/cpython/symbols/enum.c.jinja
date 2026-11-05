@@ -15,7 +15,7 @@ int {{abi_name}}_init(PyObject* module);
 {% block definition %}
 #include "include/{{abi_name}}_Py.h"
 
-PyObject* enum_class;
+static PyObject* enum_class;
 
 PyObject* {{abi_name}}_to_py({{abi_name}} enum_in) {
     if (enum_class == NULL) {

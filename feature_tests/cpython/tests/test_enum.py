@@ -8,3 +8,5 @@ def test_enum_variants():
     assert somelib.MyEnum.A.into_value() == -2
 
     assert somelib.MyEnum.get_a() == somelib.MyEnum.A
+
+    assert somelib.DefaultEnum.new() == somelib.DefaultEnum.A
