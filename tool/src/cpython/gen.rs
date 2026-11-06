@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::{DynTemplate, Template};
-use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, InputOnly, IntType, Method, OutputOnly, PrimitiveType, ReturnType, StructDef, SuccessType, TyPosition, Type}};
+use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, EnumId, InputOnly, IntType, Method, OutputOnly, PrimitiveType, ReturnType, StructDef, StructId, SuccessType, TyPosition, Type}};
 
 use crate::{c::{Header, ItemGenContext as CItemGenContext}, cpython::formatter::PyFormatter};
 
@@ -33,7 +33,9 @@ struct MethodInfo<'tcx> {
 }
 
 impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
-    pub fn gen_enum_def(&self, def : &'tcx EnumDef) -> impl SymbolTemplate + use<'tcx, 'cx> {
+    pub fn gen_enum_def(&self, id : EnumId) -> impl SymbolTemplate + use<'tcx, 'cx> {
+        let enum_name = self.fmt.fmt_type_name(id.into());
+        let def = self.c.tcx.resolve_enum(id);
         #[derive(Template)]
         #[template(path = "cpython/symbols/enum.c.jinja", escape = "none", blocks=["header", "definition"])]
         struct EnumTemplate<'tcx> {
@@ -66,22 +68,25 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
 
         EnumTemplate {
             abi_name: def.name.as_str(),
-            name: heck::AsUpperCamelCase(def.name.as_str()).to_string(),
+            name: enum_name.to_string(),
             def,
             fmt: self.fmt,
             methods,
         }
     }
 
-    pub fn gen_struct_def(&self, def : &StructDef) -> impl SymbolTemplate {
+    pub fn gen_struct_def(&self, id : StructId) -> impl SymbolTemplate {
+        let struct_name = self.fmt.fmt_type_name(id.into());
+        let def = self.c.tcx.resolve_struct(id);
         #[derive(Template)]
         #[template(path = "cpython/symbols/struct.c.jinja", escape = "none", blocks=["header", "definition"])]
         struct StructTemplate {
-            class_name : String
+            name : String,
+            abi_name : String,
         }
         impl SymbolTemplate for StructTemplate {
             fn file_base_name(&self) -> String {
-                self.class_name.clone()
+                self.abi_name.clone()
             }
             fn render_impl(&self) -> String {
                 self.as_definition().render().unwrap()
@@ -91,7 +96,8 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             }
         }
         StructTemplate {
-            class_name: def.name.as_str().to_string(),
+            name: struct_name.to_string(),
+            abi_name: def.name.as_str().to_string(),
         }
     }
 

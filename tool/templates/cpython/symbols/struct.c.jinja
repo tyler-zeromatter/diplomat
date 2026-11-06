@@ -1,1 +1,39 @@
-{% extends "cpython/symbols/base.c.jinja" %}
+{% block header %}
+#ifndef {{abi_name}}_PY_H
+#define {{abi_name}}_PY_H
+
+#include "include/{{abi_name}}.h"
+#include "diplomat_runtime_common.h"
+
+int {{abi_name}}_init(PyObject* module);
+#endif
+{% endblock %}
+
+{% block definition %}
+#include "include/{{abi_name}}_Py.h"
+
+static PyType_Slot* struct_slots {
+    {0, NULL},
+};
+
+static PyType_Spec struct_spec {
+    // TODO: Add module name
+    .name = "{{name}}",
+    .basicsize = sizeof({{abi_name}}),
+    .itemsize = 0,
+    .flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .slots = struct_slots,
+};
+
+int {{abi_name}}_init(PyObject* module) {
+    PyObject* struct_py = PyType_FromModuleAndSpec(module, &struct_spec, NULL);
+
+    if (struct_py == NULL) {
+        return -1;
+    }
+
+    PyModule_AddObjectRef(module, "{{abi_name}}", struct_py);
+
+    return 0;
+}
+{% endblock %}

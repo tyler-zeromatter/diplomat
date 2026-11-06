@@ -2,7 +2,7 @@ mod formatter;
 mod gen;
 
 use askama::{DynTemplate, Template};
-use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext, TypeDef};
+use diplomat_core::hir::{BackendAttrSupport, DocsUrlGenerator, TypeContext, TypeDef, TypeId};
 use serde::{Deserialize, Serialize};
 
 use crate::c::Header;
@@ -54,11 +54,11 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
             fmt: &formatter
         };
 
-        let template : &dyn SymbolTemplate = match ty {
-            TypeDef::Enum(e) => {
+        let template : &dyn SymbolTemplate = match id {
+            TypeId::Enum(e) => {
                 &context.gen_enum_def(e)
             }
-            TypeDef::Struct(st) => {
+            TypeId::Struct(st) => {
                 &context.gen_struct_def(st)
             }
             _ => { continue; } // TODO
