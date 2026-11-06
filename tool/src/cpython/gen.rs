@@ -100,8 +100,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             ReturnType::Infallible(SuccessType::OutType(o)) => {
                 self.convert_out_type(o)
             },
-            // TODO:
-            _ => None,
+            _ => todo!("Unsupported HIR return value: {ret:?}"),
         }
     }
 
@@ -111,19 +110,16 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
                 PrimitiveType::Bool => Some("Diplomat_bool_to_py".into()),
                 PrimitiveType::Int(i) => match i {
                     IntType::I8 => Some("Diplomat_long_to_py".into()),
-                    // TODO:
-                    _ => None,
+                    _ => todo!("Unsupported HIR out type: {out:?}"),
                 }
-                // TODO:
-                _ => None,
+                _ => todo!("Unsupported HIR out type: {out:?}"),
             }
             Type::Enum(e) => {
                 let en = self.c.tcx.resolve_enum(e.tcx_id);
                 let abi_name = en.name.as_str();
                 Some(format!("{abi_name}_to_py").into())
             }
-            // TODO:
-            _ => None,
+            _ => todo!("Unsupported HIR out type: {out:?}"),
         }
     }
 
