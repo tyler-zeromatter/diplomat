@@ -3,7 +3,7 @@ from glob import glob
 
 import os
 
-libraries = ["diplomat_example_tests"]
+libraries = ["diplomat_example"]
 
 if os.name == 'nt':
     libraries += ["kernel32", "advapi32", "ntdll", "userenv", "Ws2_32", "dbghelp"]
