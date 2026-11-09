@@ -12,7 +12,19 @@ int {{abi_name}}_init(PyObject* module);
 {% block definition %}
 #include "include/{{abi_name}}_Py.h"
 
+
+{% for m in methods %}
+{% include "cpython/functions/method.c.jinja" %}
+{% endfor %}
+
+struct PyMethodDef struct_tp_methods[] = {
+    {%- for m in methods %}
+    __{{m.name}}__py_def {%- if !loop.last -%}, {% endif -%}
+    {%- endfor -%}
+};
+
 static PyType_Slot struct_slots[] = {
+    {Py_tp_methods, struct_tp_methods},
     {0, NULL},
 };
 

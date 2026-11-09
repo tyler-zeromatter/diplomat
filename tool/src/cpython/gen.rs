@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use askama::{DynTemplate, Template};
-use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, EnumId, InputOnly, IntType, Method, OutputOnly, PrimitiveType, ReturnType, StructDef, StructId, SuccessType, TyPosition, Type}};
+use diplomat_core::{ast::DocType::Enum, hir::{EnumDef, EnumId, InputOnly, IntType, Method, OutputOnly, PrimitiveType, ReturnType, StructDef, StructId, StructPathLike, SuccessType, TyPosition, Type}};
 
 use crate::{c::{Header, ItemGenContext as CItemGenContext}, cpython::formatter::PyFormatter};
 
@@ -60,11 +60,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             }
         }
         let methods = def.methods.iter().filter_map(|m| {
-            if m.attrs.disable {
-                return None;
-            }
-
-            Some(self.gen_method_info(m))
+            self.gen_method_info(m)
         }).collect();
 
         EnumTemplate {
@@ -77,7 +73,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
         }
     }
 
-    pub fn gen_struct_def(&self, id : StructId, lib_name : String) -> impl SymbolTemplate {
+    pub fn gen_struct_def(&self, id : StructId, lib_name : String) -> impl SymbolTemplate + use<'tcx> {
         let struct_name = self.fmt.fmt_type_name(id.into());
         let def = self.c.tcx.resolve_struct(id);
         struct FieldInfo {
@@ -86,10 +82,11 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
 
         #[derive(Template)]
         #[template(path = "cpython/symbols/struct.c.jinja", escape = "none", blocks=["header", "definition"])]
-        struct StructTemplate {
+        struct StructTemplate<'tcx> {
             name : String,
             abi_name : String,
             fields : Vec<FieldInfo>,
+            methods : Vec<MethodInfo<'tcx>>,
             lib_name : String,
         }
 
@@ -97,7 +94,11 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             FieldInfo {}
         }).collect();
 
-        impl SymbolTemplate for StructTemplate {
+        let methods = def.methods.iter().flat_map(|m| {
+            self.gen_method_info(m)
+        }).collect();
+
+        impl<'tcx> SymbolTemplate for StructTemplate<'tcx> {
             fn file_base_name(&self) -> String {
                 self.abi_name.clone()
             }
@@ -112,6 +113,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             name: struct_name.to_string(),
             abi_name: def.name.as_str().to_string(),
             fields,
+            methods,
             lib_name,
         }
     }
@@ -140,11 +142,20 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
                 let abi_name = en.name.as_str();
                 Some(format!("{abi_name}_to_py").into())
             }
+            Type::Struct(s) => {
+                let st = self.c.tcx.resolve_type(s.id().into());
+                let abi_name = st.name().as_str();
+                Some(format!("{abi_name}_to_py").into())
+            }
             _ => todo!("Unsupported HIR out type: {out:?}"),
         }
     }
 
-    fn gen_method_info(&self, method : &'tcx Method) -> MethodInfo<'tcx> {
+    fn gen_method_info(&self, method : &'tcx Method) -> Option<MethodInfo<'tcx>> {
+        if method.attrs.disable {
+            return None;
+        }
+
         let method_name = method.attrs.rename.apply(method.name.as_str().into());
         let method_abi_name = method.attrs.abi_rename.apply(method.abi_name.as_str().into());
 
@@ -179,7 +190,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
         };
 
         let return_convert = self.convert_return_type(&method.output);
-        MethodInfo {
+        Some(MethodInfo {
             name: method_name,
             c_name : method_abi_name,
             inner: method,
@@ -187,6 +198,6 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             c_return,
             return_convert,
             is_write: method.output.is_write(),
-        }
+        })
     }
 }
