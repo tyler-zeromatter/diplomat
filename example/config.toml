@@ -7,6 +7,9 @@ lib-name = "icu4x"
 domain = "dev.diplomattest"
 dylib-name = "diplomat_example"
 
+[cpython]
+lib-name = "icu4x"
+
 [dotnet]
 native-lib = "diplomat_example"
 
