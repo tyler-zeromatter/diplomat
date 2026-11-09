@@ -93,7 +93,7 @@ int AttrEnum_init(PyObject* module) {
     PyTuple_SetItem(enum_names_values, 2, C_name_and_value);
     
 
-    PyObject* enum_name = PyUnicode_FromString("AttrEnum");
+    PyObject* enum_name = PyUnicode_FromString("_somelib.RenamedAttrEnum");
     // PyTuple_Pack creates strong references to the provided objects (this is equivalent to Py_BuildValue("(O)", enum_name)):
     PyObject* enum_args = PyTuple_Pack(2, enum_name, enum_names_values);
     // So we must decref the args:
@@ -113,7 +113,7 @@ int AttrEnum_init(PyObject* module) {
 
     
 
-    int enum_add_result = PyModule_AddObjectRef(module, "AttrEnum", enum_class);
+    int enum_add_result = PyModule_AddObjectRef(module, "RenamedAttrEnum", enum_class);
     Py_DECREF(enum_class);
     return enum_add_result;
 }
