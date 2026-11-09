@@ -23,8 +23,7 @@ PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t 
 }
 
 static PyMethodDef __default__py_def = {
-    // FIXME: Method name should be lib_name.method_name.name
-    .ml_name = "default",
+    .ml_name = "somelib.FixedDecimalFormatterOptions.default",
     .ml_meth = __default__py_meth,
     // TODO: Kwargs construction, non-method flag for functions
     .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
