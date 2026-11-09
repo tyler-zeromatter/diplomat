@@ -79,6 +79,7 @@ dependencies = [
     "test-demo-example",
     "test-dart-example",
     "test-kotlin-example",
+    "test-cpython-example",
     "test-rust-example",
 
 ]
@@ -91,6 +92,7 @@ dependencies = [
     "test-demo-feature",
     "test-dart-feature",
     "test-kotlin-feature",
+    "test-cpython-feature",
     "test-nanobind-feature",
     "test-dotnet-feature",
 ]
@@ -271,6 +273,34 @@ script_runner = "@duckscript"
 script = '''
 exit_on_error true
 cd feature_tests/cpython
+if not is_path_exists ".venv"
+echo "Creating venv..."
+exec --fail-on-error python -m venv .venv
+end
+
+path = set "./.venv/bin/"
+if is_windows
+path = set "./.venv/Scripts/"
+end
+
+if not is_path_exists "${path}pip"
+# Try uv:
+exec --fail-on-error uv pip install pytest .
+else
+exec --fail-on-error ${pip_to_use} install pytest .
+end
+
+exec --fail-on-error ${path}python -m pytest ./tests
+'''
+
+
+[tasks.test-cpython-example]
+category = "Tests"
+dependencies = ["build-example"]
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+cd example/cpython
 if not is_path_exists ".venv"
 echo "Creating venv..."
 exec --fail-on-error python -m venv .venv
@@ -645,6 +675,16 @@ exit_on_error true
 !include_files ./support/functions.ds
 
 generate_generic feature_tests cpython src
+'''
+
+[tasks.gen-cpython-example]
+category = "Code generation"
+script_runner = "@duckscript"
+script = '''
+exit_on_error true
+!include_files ./support/functions.ds
+
+generate_generic example cpython src
 '''
 
 [tasks.gen-nanobind-feature]
