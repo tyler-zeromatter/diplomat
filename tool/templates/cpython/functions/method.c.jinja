@@ -29,8 +29,7 @@ PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some
 }
 
 static PyMethodDef __{{m.name}}__py_def = {
-    // FIXME: Method name should be lib_name.method_name.name
-    .ml_name = "{{m.name}}",
+    .ml_name = "{{lib_name}}.{{name}}.{{m.name}}",
     .ml_meth = __{{m.name}}__py_meth,
     // TODO: Kwargs construction, non-method flag for functions
     .ml_flags = {% if m.inner.param_self.is_some() %} METH_METHOD | {% endif %} METH_FASTCALL | METH_KEYWORDS,
