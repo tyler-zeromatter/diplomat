@@ -24,7 +24,7 @@ struct NamedType<'tcx, P: TyPosition> {
 
 struct MethodInfo<'tcx> {
     name : Cow<'tcx, str>,
-    c_name : Cow<'tcx, str>,
+    c_name : &'tcx str,
     inner : &'tcx diplomat_core::hir::Method,
     params : Vec<NamedType<'tcx, InputOnly>>,
     c_return : Option<Cow<'tcx, str>>,
@@ -157,7 +157,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
         }
 
         let method_name = method.attrs.rename.apply(method.name.as_str().into());
-        let method_abi_name = method.attrs.abi_rename.apply(method.abi_name.as_str().into());
+        let method_abi_name = method.abi_name.as_str();
 
         let params = method.params.iter().map(|p| {
             NamedType {
