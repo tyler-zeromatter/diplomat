@@ -3,6 +3,7 @@
 
 
 
+
 PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t nargs, PyObject* kwnames){
     if (nargs != 0) {
         PyErr_Format(PyExc_TypeError, "default takes 0 arguments, got %lu", nargs);
@@ -13,7 +14,7 @@ PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t 
 
     
 
-    FixedDecimalFormatterOptions out = icu4x_icu4x_FixedDecimalFormatterOptions_default_mv1_mv1();
+    FixedDecimalFormatterOptions out = icu4x_FixedDecimalFormatterOptions_default_mv1();
     PyObject* py_out = NULL;
     
     
@@ -22,18 +23,19 @@ PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t 
     return py_out;
 }
 
-static PyMethodDef __default__py_def = {
-    .ml_name = "somelib.FixedDecimalFormatterOptions.default",
-    .ml_meth = __default__py_meth,
-    // TODO: Kwargs construction, non-method flag for functions
-    .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
-    // TODO:
-    .ml_doc = "",
+
+
+static PyMethodDef struct_tp_methods[] = {
+    {
+        .ml_name = "somelib.FixedDecimalFormatterOptions.default",
+        .ml_meth = __default__py_meth,
+        // TODO: Kwargs construction, non-method flag for functions
+        .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
+        // TODO:
+        .ml_doc = "",
+    },
+    {NULL}
 };
-
-
-struct PyMethodDef struct_tp_methods[] = {
-    __default__py_def};
 
 static PyType_Slot struct_slots[] = {
     {Py_tp_methods, struct_tp_methods},
