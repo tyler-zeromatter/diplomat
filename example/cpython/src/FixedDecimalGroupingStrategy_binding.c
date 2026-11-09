@@ -107,7 +107,7 @@ int FixedDecimalGroupingStrategy_init(PyObject* module) {
     PyTuple_SetItem(enum_names_values, 3, Min2_name_and_value);
     
 
-    PyObject* enum_name = PyUnicode_FromString("somelib.FixedDecimalGroupingStrategy");
+    PyObject* enum_name = PyUnicode_FromString("icu4x.FixedDecimalGroupingStrategy");
     // PyTuple_Pack creates strong references to the provided objects (this is equivalent to Py_BuildValue("(O)", enum_name)):
     PyObject* enum_args = PyTuple_Pack(2, enum_name, enum_names_values);
     // So we must decref the args:

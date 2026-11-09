@@ -27,7 +27,7 @@ PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t 
 
 static PyMethodDef struct_tp_methods[] = {
     {
-        .ml_name = "somelib.FixedDecimalFormatterOptions.default",
+        .ml_name = "icu4x.FixedDecimalFormatterOptions.default",
         .ml_meth = __default__py_meth,
         // TODO: Kwargs construction, non-method flag for functions
         .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
@@ -44,7 +44,7 @@ static PyType_Slot struct_slots[] = {
 
 static PyType_Spec struct_spec = {
     // TODO: Add module name
-    .name = "somelib.FixedDecimalFormatterOptions",
+    .name = "icu4x.FixedDecimalFormatterOptions",
     // Negative because this is in *addition* to the base PyObject type:
     .basicsize = -sizeof(FixedDecimalFormatterOptions),
     .itemsize = 0,

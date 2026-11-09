@@ -5,7 +5,7 @@
 #include "include/FixedDecimalGroupingStrategy_Py.h"
 
 
-static void somelib_free(void* self) {
+static void icu4x_free(void* self) {
     if (diplomat_internals.enum_mod) {
         Py_DECREF(diplomat_internals.enum_mod);
     }
@@ -15,11 +15,11 @@ static void somelib_free(void* self) {
     }
 }
 
-#define CHECK(check, reason, string) if (check) { PyErr_SetString(reason, string); somelib_free((void*)mod); return -1; }
+#define CHECK(check, reason, string) if (check) { PyErr_SetString(reason, string); icu4x_free((void*)mod); return -1; }
 
-static int somelib_exec(PyObject* mod) {
+static int icu4x_exec(PyObject* mod) {
     if (diplomat_internals.initialized) {
-        PyErr_SetString(PyExc_ImportError, "cannot initialize `somelib` more than once");
+        PyErr_SetString(PyExc_ImportError, "cannot initialize `icu4x` more than once");
         return -1;
     }
 
@@ -32,12 +32,12 @@ static int somelib_exec(PyObject* mod) {
 
     
     if (FixedDecimalFormatterOptions_init(mod) < 0) {
-        somelib_free((void*)mod);
+        icu4x_free((void*)mod);
         return -1;
     }
     
     if (FixedDecimalGroupingStrategy_init(mod) < 0) {
-        somelib_free((void*)mod);
+        icu4x_free((void*)mod);
         return -1;
     }
     
@@ -48,17 +48,17 @@ static int somelib_exec(PyObject* mod) {
 
 Internals diplomat_internals = {};
 
-static PyModuleDef_Slot somelib_module_slots[] = {
-    {Py_mod_exec, somelib_exec},
+static PyModuleDef_Slot icu4x_module_slots[] = {
+    {Py_mod_exec, icu4x_exec},
     {0, NULL}
 };
 
 // See https://docs.python.org/3/c-api/module.html#c.PyModuleDef
-static struct PyModuleDef somelib_module = {
+static struct PyModuleDef icu4x_module = {
     // m_base
     PyModuleDef_HEAD_INIT,
     // m_name
-    "somelib",
+    "icu4x",
     // m_doc
     "",
     // m_size
@@ -66,15 +66,15 @@ static struct PyModuleDef somelib_module = {
     // m_methods
     NULL,
     // m_slots
-    somelib_module_slots,
+    icu4x_module_slots,
     // m_traverse
     NULL,
     // m_clear
     NULL,
     // m_free
-    somelib_free,
+    icu4x_free,
 };
 
-PyMODINIT_FUNC PyInit_somelib() {
-    return PyModuleDef_Init(&somelib_module);
+PyMODINIT_FUNC PyInit_icu4x() {
+    return PyModuleDef_Init(&icu4x_module);
 }
