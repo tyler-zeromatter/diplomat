@@ -1,3 +1,4 @@
+{%- import "../functions/method.c.jinja" as method -%}
 {% block header %}
 #ifndef {{abi_name}}_PY_H
 #define {{abi_name}}_PY_H
@@ -14,13 +15,14 @@ int {{abi_name}}_init(PyObject* module);
 
 
 {% for m in methods %}
-{% include "cpython/functions/method.c.jinja" %}
+{{method::method_definition(m, abi_name)}}
 {% endfor %}
 
-struct PyMethodDef struct_tp_methods[] = {
+static PyMethodDef struct_tp_methods[] = {
     {%- for m in methods %}
-    __{{m.name}}__py_def {%- if !loop.last -%}, {% endif -%}
-    {%- endfor -%}
+    {% filter indent(4) -%} {{method::method_declaration(m) -}} {%- endfilter -%} {%- if !loop.last -%}, {%- endif -%}
+    {%- endfor %},
+    {NULL}
 };
 
 static PyType_Slot struct_slots[] = {

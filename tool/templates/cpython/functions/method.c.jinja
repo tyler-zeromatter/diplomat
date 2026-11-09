@@ -1,3 +1,4 @@
+{% macro method_definition(m, self_abi_name) %}
 PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some() -%} PyTypeObject* defining_class, {%- endif %} PyObject* const *args, Py_ssize_t nargs, PyObject* kwnames){
     if (nargs != {{m.params.len()}}) {
         PyErr_Format(PyExc_TypeError, "{{m.name}} takes {{m.inner.params.len()}} arguments, got %lu", nargs);
@@ -9,8 +10,8 @@ PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some
         PyErr_SetString(PyExc_RuntimeError, "No value for self found");
         return NULL;
     }
-    {{abi_name}} self_rs;
-    if ({{abi_name}}_from_py(self, &self_rs) == -1) {
+    {{self_abi_name}} self_rs;
+    if ({{self_abi_name}}_from_py(self, &self_rs) == -1) {
         return NULL;
     }
     {% endif %}
@@ -27,12 +28,15 @@ PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some
     {% endif %}
     return py_out;
 }
+{% endmacro %}
 
-static PyMethodDef __{{m.name}}__py_def = {
+{%- macro method_declaration(m) -%} 
+{
     .ml_name = "{{lib_name}}.{{name}}.{{m.name}}",
     .ml_meth = __{{m.name}}__py_meth,
     // TODO: Kwargs construction, non-method flag for functions
     .ml_flags = {% if m.inner.param_self.is_some() %} METH_METHOD | {% endif %} METH_FASTCALL | METH_KEYWORDS,
     // TODO:
     .ml_doc = "",
-};
+}
+{%- endmacro -%}

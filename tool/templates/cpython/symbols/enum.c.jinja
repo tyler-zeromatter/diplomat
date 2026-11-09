@@ -1,3 +1,4 @@
+{%- import "../functions/method.c.jinja" as method -%}
 {% block header %}
 #ifndef {{abi_name}}_PY_H
 #define {{abi_name}}_PY_H
@@ -60,7 +61,8 @@ int {{abi_name}}_from_py(PyObject* enum_obj, {{abi_name}}* enum_out) {
 }
 
 {% for m in methods %}
-{% include "cpython/functions/method.c.jinja" %}
+{{ method::method_definition(m, abi_name) }}
+static PyMethodDef __{{m.name}}__py_def = {{ method::method_declaration(m) }};
 {% endfor %}
 
 int {{abi_name}}_init(PyObject* module) {
