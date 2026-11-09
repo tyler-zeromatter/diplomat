@@ -35,7 +35,7 @@ PyObject* __{{m.name}}__py_meth(PyObject* self, {% if m.inner.param_self.is_some
     .ml_name = "{{m.name}}",
     .ml_meth = __{{m.name}}__py_meth,
     // TODO: Kwargs construction, non-method flag for functions
-    .ml_flags = {% if m.inner.param_self.is_some() %} METH_METHOD | {% endif %} METH_FASTCALL | METH_KEYWORDS,
+    .ml_flags = {% if m.inner.param_self.is_some() %} METH_METHOD {% else %} METH_STATIC {% endif %} | METH_FASTCALL | METH_KEYWORDS,
     // TODO:
     .ml_doc = "",
 }
