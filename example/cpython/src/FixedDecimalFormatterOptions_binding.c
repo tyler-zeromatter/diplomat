@@ -1,6 +1,60 @@
 
 #include "include/FixedDecimalFormatterOptions_Py.h"
 
+static PyObject* struct_py = NULL;
+static PyObject* (*struct_alloc)(PyTypeObject* self, Py_ssize_t nitems) = NULL;
+
+PyObject* FixedDecimalFormatterOptions_to_py(FixedDecimalFormatterOptions in) {
+    if (struct_py == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Could not get FixedDecimalFormatterOptions Python type, module may not be initialized.");
+        return NULL;
+    }
+
+    if (struct_alloc == NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "Could not get FixedDecimalFormatterOptions allocator, module may not be initialized.");
+        return NULL;
+    }
+
+    // We use the built-in allocator because the constructor may have been overridden:
+    PyObject* struct_obj = struct_alloc(struct_py, 1);
+    if (struct_obj == NULL) {
+        return NULL;
+    }
+    
+
+    FixedDecimalFormatterOptions* self_data = (FixedDecimalFormatterOptions*)PyObject_GetTypeData(struct_obj, struct_py);
+    if (self_data == NULL) {
+        Py_DECREF(struct_obj);
+        return NULL;
+    }
+
+    *self_data = in;
+
+    struct_obj = PyObject_Init(struct_obj, struct_py);
+    if (struct_obj == NULL) {
+        return NULL;
+    }
+    return struct_obj;
+}
+
+int FixedDecimalFormatterOptions_from_py(PyObject* struct_obj, FixedDecimalFormatterOptions** struct_out) {
+    int instance_check = PyObject_IsInstance(struct_obj, struct_py);
+    if (instance_check == -1) {
+        Py_DECREF(struct_obj);
+        return -1;
+    } else if (instance_check == 0) {
+        PyErr_SetString(PyExc_TypeError, "Self type is not an instance of FixedDecimalFormatterOptions");
+        Py_DECREF(struct_obj);
+        return -1;
+    }
+
+    FixedDecimalFormatterOptions* self_data = (FixedDecimalFormatterOptions*)PyObject_GetTypeData(struct_obj, struct_py);
+    Py_DECREF(struct_obj);
+    *struct_out = self_data;
+
+    return 0;
+}
+
 
 
 
@@ -27,10 +81,10 @@ PyObject* __default__py_meth(PyObject* self,  PyObject* const *args, Py_ssize_t 
 
 static PyMethodDef struct_tp_methods[] = {
     {
-        .ml_name = "icu4x.FixedDecimalFormatterOptions.default",
+        .ml_name = "default",
         .ml_meth = __default__py_meth,
         // TODO: Kwargs construction, non-method flag for functions
-        .ml_flags =  METH_FASTCALL | METH_KEYWORDS,
+        .ml_flags =  METH_STATIC  | METH_FASTCALL | METH_KEYWORDS,
         // TODO:
         .ml_doc = "",
     },
@@ -53,13 +107,20 @@ static PyType_Spec struct_spec = {
 };
 
 int FixedDecimalFormatterOptions_init(PyObject* module) {
-    PyObject* struct_py = PyType_FromModuleAndSpec(module, &struct_spec, NULL);
+    struct_py = PyType_FromModuleAndSpec(module, &struct_spec, NULL);
 
     if (struct_py == NULL) {
         return -1;
     }
 
+    struct_alloc = PyType_GetSlot((PyTypeObject*)struct_py, Py_tp_alloc);
+    if (struct_alloc == NULL) {
+        PyErr_SetString(PyExc_ImportError, "Could not get allocator for FixedDecimalFormatterOptions");
+        return -1;
+    }
+
     PyModule_AddObjectRef(module, "FixedDecimalFormatterOptions", struct_py);
+    Py_DECREF(struct_py);
 
     return 0;
 }

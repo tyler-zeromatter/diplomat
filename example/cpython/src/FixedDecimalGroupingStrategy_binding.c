@@ -30,6 +30,7 @@ int FixedDecimalGroupingStrategy_from_py(PyObject* enum_obj, FixedDecimalGroupin
     }
 
     PyObject* value = PyObject_GetAttrString(enum_obj, "value");
+    Py_DECREF(enum_obj);
     if (!value) {
         return -1;
     }
