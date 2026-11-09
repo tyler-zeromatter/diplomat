@@ -33,7 +33,7 @@ struct MethodInfo<'tcx> {
 }
 
 impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
-    pub fn gen_enum_def(&self, id : EnumId) -> impl SymbolTemplate + use<'tcx, 'cx> {
+    pub fn gen_enum_def(&self, id : EnumId, lib_name : String) -> impl SymbolTemplate + use<'tcx, 'cx> {
         let enum_name = self.fmt.fmt_type_name(id.into());
         let def = self.c.tcx.resolve_enum(id);
         #[derive(Template)]
@@ -44,6 +44,7 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             def : &'tcx EnumDef,
             fmt : &'tcx PyFormatter<'tcx>,
             methods : Vec<MethodInfo<'tcx>>,
+            lib_name : String,
         }
 
         impl<'tcx> SymbolTemplate for EnumTemplate<'tcx> {
@@ -72,18 +73,30 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
             def,
             fmt: self.fmt,
             methods,
+            lib_name,
         }
     }
 
-    pub fn gen_struct_def(&self, id : StructId) -> impl SymbolTemplate {
+    pub fn gen_struct_def(&self, id : StructId, lib_name : String) -> impl SymbolTemplate {
         let struct_name = self.fmt.fmt_type_name(id.into());
         let def = self.c.tcx.resolve_struct(id);
+        struct FieldInfo {
+
+        }
+
         #[derive(Template)]
         #[template(path = "cpython/symbols/struct.c.jinja", escape = "none", blocks=["header", "definition"])]
         struct StructTemplate {
             name : String,
             abi_name : String,
+            fields : Vec<FieldInfo>,
+            lib_name : String,
         }
+
+        let fields = def.fields.iter().map(|f| {
+            FieldInfo {}
+        }).collect();
+
         impl SymbolTemplate for StructTemplate {
             fn file_base_name(&self) -> String {
                 self.abi_name.clone()
@@ -98,6 +111,8 @@ impl<'cx, 'tcx, 'header> ItemGenContext<'cx, 'tcx, 'header> {
         StructTemplate {
             name: struct_name.to_string(),
             abi_name: def.name.as_str().to_string(),
+            fields,
+            lib_name,
         }
     }
 

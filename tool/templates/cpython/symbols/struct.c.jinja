@@ -12,14 +12,15 @@ int {{abi_name}}_init(PyObject* module);
 {% block definition %}
 #include "include/{{abi_name}}_Py.h"
 
-static PyType_Slot* struct_slots {
+static PyType_Slot struct_slots[] = {
     {0, NULL},
 };
 
-static PyType_Spec struct_spec {
+static PyType_Spec struct_spec = {
     // TODO: Add module name
-    .name = "{{name}}",
-    .basicsize = sizeof({{abi_name}}),
+    .name = "{{lib_name}}.{{name}}",
+    // Negative because this is in *addition* to the base PyObject type:
+    .basicsize = {% if fields.is_empty() -%} 0 {%- else -%} -sizeof({{abi_name}}) {%- endif -%},
     .itemsize = 0,
     .flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .slots = struct_slots,

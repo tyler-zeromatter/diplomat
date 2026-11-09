@@ -22,6 +22,8 @@ pub struct CPythonConfig {
 }
 
 pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen : &'tcx DocsUrlGenerator) -> (FileMap, ErrorStore<'tcx, String>) {
+    let lib_name = config.shared_config.lib_name.clone().expect("CPython backend expects lib_name to be set.");
+
     let files = FileMap::default();
     let errors = ErrorStore::default();
     let formatter = PyFormatter::new(tcx, config, docs_url_gen);
@@ -56,10 +58,10 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
 
         let template : &dyn SymbolTemplate = match id {
             TypeId::Enum(e) => {
-                &context.gen_enum_def(e)
+                &context.gen_enum_def(e, lib_name.clone())
             }
             TypeId::Struct(st) => {
-                &context.gen_struct_def(st)
+                &context.gen_struct_def(st, lib_name.clone())
             }
             _ => { continue; } // TODO
         };
@@ -77,7 +79,7 @@ pub fn run<'tcx>(tcx : &'tcx TypeContext, config : &crate::Config, docs_url_gen 
     }
 
     let runtime = RuntimeTemplate {
-        lib_name: config.shared_config.lib_name.clone().expect("CPython backend expects lib_name to be set."),
+        lib_name,
         header_methods: &header_methods,
     };
 
